@@ -1,0 +1,77 @@
+<html>
+  <style>
+/* from https://css-tricks.com/hexagons-and-beyond-flexible-responsive-grid-patterns-sans-media-queries/ */
+
+.main {
+  display:flex;
+  --s: 60px;  /* size  */
+}
+
+.container {
+    font-size: 0; /* disable white space between inline block element */
+    background: url(images/mapb.jpg) no-repeat center;
+    background-size: cover;
+    width: 1024px;
+    height: 768px;
+}
+
+.container > div {
+    height: var(--s);
+/*    margin: calc(var(--m)); */
+    margin: 0;
+    /*    width: calc(var(--s) * 1.1732); */
+    width: 70;
+    background-color: transparent;
+    display: inline-block;
+    font-size:10pt;
+    text-align: center;
+    foreground-color: #000000;
+    clip-path: polygon(0 50%, 25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%);
+    background-color: rgba(255, 22, 255, 0.2);
+}
+
+.container > div.selected {
+    background-color: rgba(22, 255, 22, 0.2);
+}
+
+
+  </style>
+  <script>
+    function selectHex(target) {
+	e = null;
+	if (target.parentElement.id == "container") {
+	    e = target;
+	}
+	if (e != null) {
+	    if (e.className == "selected") {
+		e.className = null;
+	    } else {
+		e.className = "selected";
+	    }
+	}
+    }
+  </script>
+  <body>
+    <div class="main">
+      <div class="container" id="container" onClick="selectHex(event.target)">
+	<script>
+	  c = document.getElementById("container");
+	  for (let j = 0; j < 9; j++) {
+	      for (let i = 0; i < 12; i++) {
+		  t = i * 64 + 11;
+		  left = 46 + (j * 110);
+		  c.insertAdjacentHTML(`beforeend`, `<div style="position: absolute; top:${t}px; left:${left}px;"></div>`);
+	      }
+	  }
+	  for (let j = 0; j < 8; j++) {
+	      for (let i = 0; i < 11; i++) {
+		  t = i * 64 + 43;
+		  left = 100 + (j * 110);
+		  c.insertAdjacentHTML(`beforeend`, `<div style="position: absolute; top:${t}px; left:${left}px;"></div>`);
+	      }
+	  }
+	</script>
+      </div>
+    </div>
+  </body>
+</html>
