@@ -1,0 +1,85 @@
+<html>
+  <style>
+/* from https://css-tricks.com/hexagons-and-beyond-flexible-responsive-grid-patterns-sans-media-queries/ */
+
+.main {
+  display:flex;
+  --s: 100px;  /* size  */
+  --m: 2px;    /* margin */
+  --f: calc(var(--s) * 1.732 + 4 * var(--m) - 1px);
+
+  --m2: 4px;
+  --s2: calc(var(--s) - 2 * var(--m2));
+}
+
+.container {
+  font-size: 0; /* disable white space between inline block element */
+}
+
+.container > div {
+  width: var(--s);
+  margin: var(--m);
+  height: calc(var(--s) * 1.1547);
+  display: inline-block;
+  font-size:20pt;
+  text-align: center;
+  background-color: #FF2222;
+  foreground-color: #000000;
+  clip-path: polygon(0% 25%, 0% 75%, 50% 100%, 100% 75%, 100% 25%, 50% 0%);
+  margin-bottom: calc(var(--m) - var(--s) * 0.2885);
+}
+
+.container > div.selected {
+    background-color: #22FF22;
+}
+
+.container > div > div {
+    width: var(--s2);
+    height: calc(var(--s2) * 1.1547);
+    background-color: #FF2222;
+    text-align: center;
+    display: inline-block;
+    margin: var(--m2);
+    clip-path: polygon(0% 25%, 0% 75%, 50% 100%, 100% 75%, 100% 25%, 50% 0%);
+}
+
+/* the magic that indents every other line */
+.container::before {
+  content: "";
+  width: calc(var(--s) / 2 + var(--m));
+  height: 120%; 
+  float: left;
+  shape-outside: repeating-linear-gradient(#0000 0 calc(var(--f) - 3px), #000 0 var(--f));
+}
+  </style>
+  <script>
+    function selectHex(target) {
+	e = null;
+	if (target.parentElement.id == "container") {
+	    e = target;
+	} else if (target.parentElement.parentElement.id == "container") {
+	    e = target.parentElement;
+	}
+	if (e != null) {
+	    if (e.className == "selected") {
+		e.className = null;
+	    } else {
+		e.className = "selected";
+	    }
+	}
+    }
+  </script>
+  <body>
+    <div class="main">
+      <div class="container" id="container" onClick="selectHex(event.target)">
+	<!-- use nested divs so the outer one can highlight the outline -->
+	<script>
+	  c = document.getElementById("container");
+	  for (let i = 0; i < 100; i++) {
+	      c.insertAdjacentHTML(`beforeend`, `<div><div>${i}</div></div>`);
+	  }
+	</script>
+      </div>
+    </div>
+  </body>
+</html>
