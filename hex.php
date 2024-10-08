@@ -105,17 +105,17 @@ class Hex {
 
 class Board {
 
-    private static function addHex(array &$hexes, Hex $hex) {
-        @ $hexrow = &$hexes[$hex->row];
+    private function addHex(Hex $hex) {
+        @ $hexrow = &$this->hexes[$hex->row];
         if ($hexrow == null) {
-            $hexes[$hex->row] = [];
+            $this->hexes[$hex->row] = [];
         }
         $hexrow[$hex->col] = $hex;
     }
 
-    private static function getHex(array &$hexes, int $row, int $col) : ?Hex {
-        if (key_exists($row, $hexes)) {
-            return @ $hexes[$row][$col];
+    private function hexAt(int $row, int $col) : ?Hex {
+        if (key_exists($row, $this->hexes)) {
+            return @ $this->hexes[$row][$col];
         }
         return null;
     }
@@ -147,7 +147,8 @@ class Board {
 END;
     
     public static function fromMap(int $numPlayers): Board {
-        $hexes = [];
+        $empty = [];
+        $board = new Board($empty);
         $lines = explode("\n", Board::MAP);
         $row = 0;
         foreach ($lines as &$s) {
@@ -160,16 +161,16 @@ END;
                 case '.':
                     break;
                 case '_':
-                    self::addHex($hexes, Hex::plain($row, $col));
+                    $board->addHex(Hex::plain($row, $col));
                     break;
                 case 'C':
-                    self::addHex($hexes, Hex::city($row, $col));
+                    $board->addHex(Hex::city($row, $col));
                     break;
                 case '!':
-                    self::addHex($hexes, Hex::ziggurat($row, $col));
+                    $board->addHex(Hex::ziggurat($row, $col));
                     break;
                 case '=':
-                    self::addHex($hexes, Hex::water($row, $col));
+                    $board->addHex(Hex::water($row, $col));
                     break;
                 }
                 $col+=2;
@@ -179,15 +180,20 @@ END;
 
         switch ($numPlayers) {
         case 2:
-            self::pruneFrom($hexes, 18, 16);
+            $board->pruneFrom(18, 16);
             break;
         case 3:
-            self::pruneFrom($hexes, 2, 0);
+            $board->pruneFrom(2, 0);
         }
 
-        // Place cities and farms.
-        $pool = Board::initializePool($numPlayers);
-        foreach ($hexes as &$hexrow) {
+        $pool = self::initializePool($numPlayers);
+        $board->placeCitiesAndFarms($pool);
+
+        return $board;
+    }
+
+    private function placeCitiesAndFarms(array &$pool) {
+        foreach ($this->hexes as &$hexrow) {
             foreach ($hexrow as &$hex) {
                 if ($hex->needsCityOrFarm()) {
                     $x = array_pop($pool);
@@ -196,23 +202,21 @@ END;
                 }
             }
         }
-
-        return new Board($hexes);
     }
 
     public function __construct(private array &$hexes) {}
 
-    private static function pruneFrom(array &$hexes, int $row, int $col) {
-        $queue = [ self::getHex($hexes, $row, $col) ];
+    private function pruneFrom(int $row, int $col) {
+        $queue = [ $this->hexAt($row, $col) ];
         while ($queue) {
             $next = array();
             foreach ($queue as $h) {
                 // printf("pruning $h\n");
-                $hexrow = &$hexes[$h->row];
+                $hexrow = &$this->hexes[$h->row];
                 unset($hexrow[$h->col]);
             }
             foreach ($queue as $h) {
-                $n = self::neighbors($hexes, $h);
+                $n = $this->neighbors($h);
                 // printf("neighbors are %s\n", implode(',', $n));
                 $next = array_merge($next, $n);
             }
@@ -220,18 +224,18 @@ END;
         }
     }
 
-    private static function neighbors(array &$hexes, Hex &$h): array {
+    private function neighbors(Hex &$h): array {
         $r = $h->row;
         $c = $h->col;
 
         return array_filter(
                 [
-                    self::getHex($hexes, $r-2, $c),
-                    self::getHex($hexes, $r-1, $c+1),
-                    self::getHex($hexes, $r+1, $c+1),
-                    self::getHex($hexes, $r+2, $c),
-                    self::getHex($hexes, $r+1, $c-1),
-                    self::getHex($hexes, $r-1, $c-1)
+                    $this->hexAt($r-2, $c),
+                    $this->hexAt($r-1, $c+1),
+                    $this->hexAt($r+1, $c+1),
+                    $this->hexAt($r+2, $c),
+                    $this->hexAt($r+1, $c-1),
+                    $this->hexAt($r-1, $c-1)
                 ], function ($h) {
                     return $h != null && $h->type == HexType::Plain;
                 }
@@ -275,11 +279,6 @@ END;
         }
         shuffle($pool);
         return $pool;
-    }
-
-
-    public function hexAt(int $row, int $col): ?Hex {
-        return self::getHex($this->hexes, $row, $col);
     }
 }
 
