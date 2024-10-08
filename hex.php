@@ -194,7 +194,7 @@ END;
 
     private function placeCitiesAndFarms(array &$pool) {
         $this->visitAll(
-            function (&$hex) use ($pool) {
+            function (&$hex) use (&$pool) {
                 if ($hex->needsCityOrFarm()) {
                     $x = array_pop($pool);
                     printf("%d:%d %s\n", $hex->row, $hex->col, $x->value);
