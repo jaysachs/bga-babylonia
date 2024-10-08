@@ -30,7 +30,6 @@ enum CityOrFarm: string {
 
 class Ziggurat {
     public $scored = false;
-    // has it scored
 }
 
 enum PieceType: string {
@@ -147,6 +146,9 @@ class Board {
 END;
     
     public static function forPlayerCount(int $numPlayers): Board {
+        if ($numPlayers < 2 || $numPlayers > 4) {
+            throw new InvalidArgumentException(sprintf("invalid number of players: %s", $numPlayers));
+        }
         $empty = [];
         $board = new Board($empty);
         $lines = explode("\n", Board::MAP);
@@ -188,7 +190,9 @@ END;
 
         $pool = self::initializePool($numPlayers);
         $board->placeCitiesAndFarms($pool);
-
+        if (count($pool) != 0) {
+            throw new LogicException("placed all cities and farms but tiles leftover");
+        }
         return $board;
     }
 
@@ -305,28 +309,86 @@ END;
     }
 }
 
-enum BonusType {
-/* ... */
+enum ZigguratType : string {
+    case Plus10 = 'Plus10';
+    case ExtraTurn = 'ExtraTurn';
+    case SevenTokens = 'SevenTokens';
+    case ThreeNobles = 'ThreeNobles';
+    case NobleWith3Farmers = 'NobleWith3Farmers';
+    case NoblesInFields = 'NoblesInFields';
+    case ExtraCityPoints = 'ExtraCityPoints';
+    case FreeCentralLandConnects = 'FreeCentralLandConnects';
+    case FreeRiverConnects = 'FreeRiverConnects';
 };
 
-class PlayerStuff {
-    public $scored_cities = array();
-    public $scored_farms = array();
-    public $hand = array(); /* PieceType */
-    public $pool = array(); /* PieceType */
-    public $bonuses = array(); /* BonusType */
-    public $score = 0;
+class Game {
+    public Board $board;
+    public array $players;
+    public array $ziggurats;
+
+    public static function newGame(int $numPlayers, bool $optionalZigguarts = false) : Game {
+        $game = new Game();
+        $game->board = Board::forPlayerCount($numPlayers);
+        $game->ziggurats[] = ZigguratType::Plus10;
+        $game->ziggurats[] = ZigguratType::ExtraTurn;
+        $game->ziggurats[] = ZigguratType::SevenTokens;
+        $game->ziggurats[] = ZigguratType::ThreeNobles;
+        $game->ziggurats[] = ZigguratType::NobleWith3Farmers;
+        $game->ziggurats[] = ZigguratType::NoblesInFields;
+        $game->ziggurats[] = ZigguratType::ExtraCityPoints;
+        if ($optionalZigguarts) {
+            $game->ziggurats[] = ZigguratType::FreeCentralLandConnects;
+            $game->ziggurats[] = ZigguratType::FreeRiverConnects;
+            shuffle($game->ziggurats);
+            array_pop($game->ziggurats);
+            array_pop($game->ziggurats);
+        }
+        for ($i = 0; $i < $numPlayers; $i++) {
+            $game->players[] = new Player();
+        }
+        return $game;
+    }
 }
 
+class Player {
+    public $scored_cities = array();
+    public $scored_farms = array();
+    private $hand = array(); /* PieceType */
+    private $pool = array(); /* PieceType */
+    public $ziggurats = array(); /* ZigguratType */
+    public $score = 0;
 
-$b = Board::forPlayerCount(2);
-var_dump($b);
+    public function __construct() {
+        $pool = &$this->pool;
+        for ($i = 0; $i < 6; $i++) {
+            $pool[] = PieceType::Priest;
+            $pool[] = PieceType::Merchant;
+            $pool[] = PieceType::Noble;
+            $pool[] = PieceType::Farmer;
+            $pool[] = PieceType::Farmer;
+        }
+        shuffle($pool);
+        $this->refreshHand();
+    }
+    
+    /* returns false if pool is empty */
+    public function refreshHand() : bool {
+        $handSize = $this->handSize();
+        while (count($this->hand) < $handSize) {
+            if (count($this->pool) == 0) {
+                return false;
+            }
+            $this->hand[] = array_pop($this->pool);
+        }
+        return true;
+    }
 
-$b = Board::forPlayerCount(3);
-var_dump($b);
+    public function handSize() : int {
+        return array_search(ZigguratType::SevenTokens, $this->ziggurats) === false ? 5 : 7;
+    }
+}
 
-$b = Board::forPlayerCount(4);
-var_dump($b);
-
+$g = Game::newGame($argv[1], $argv[2]);
+var_dump($g);
 
 ?>
