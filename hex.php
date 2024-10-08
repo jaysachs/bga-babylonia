@@ -46,7 +46,7 @@ class PlayedPiece {
 }
 
 enum HexType: string {
-    case Plain = 'Plain';
+    case Land = 'Land';
     case Water = 'Water';
 }
 
@@ -85,11 +85,11 @@ class Hex {
     }
 
     public static function plain(int $row, int $col):Hex {
-        return new Hex(HexType::Plain, $row, $col, null);
+        return new Hex(HexType::Land, $row, $col, null);
     }
 
     public static function city(int $row, int $col): Hex {
-        return new Hex(HexType::Plain, $row, $col, self::$city_marker);
+        return new Hex(HexType::Land, $row, $col, self::$city_marker);
     }
 
     public static function water(int $row, int $col): Hex {
@@ -206,27 +206,42 @@ END;
 
     public function __construct(private array &$hexes) {}
 
-    private function pruneFrom(int $row, int $col) {
-        $queue = [ $this->hexAt($row, $col) ];
+    /* visit should return true if continue exploring */
+    private function bfs(int $start_row, int $start_col, Closure $visit) {
+        $seen = [];
+        $queue = [ $this->hexAt($start_row, $start_col) ];
         while ($queue) {
-            $next = array();
-            foreach ($queue as $h) {
-                // printf("pruning $h\n");
-                $hexrow = &$this->hexes[$h->row];
-                unset($hexrow[$h->col]);
+            $hex = array_pop($queue);
+            $seen[] = $hex;
+            if ($visit($hex)) {
+                $nb = $this->neighbors($hex, $visit);
+                foreach ($nb as $n) {
+                    if (!array_search($n, $seen)) {
+                        $queue[] = $n;
+                    }
+                }
             }
-            foreach ($queue as $h) {
-                $n = $this->neighbors($h);
-                // printf("neighbors are %s\n", implode(',', $n));
-                $next = array_merge($next, $n);
-            }
-            $queue = array_unique($next);
         }
     }
 
-    private function neighbors(Hex &$h): array {
-        $r = $h->row;
-        $c = $h->col;
+    private function pruneFrom(int $start_row, int $start_col) {
+        $this->bfs(
+            $start_row,
+            $start_col,
+            function($hex) {
+                // only prune out land, not water
+                if ($hex->type == HexType::Land) {
+                  $hexrow = &$this->hexes[$hex->row];
+                  unset($hexrow[$hex->col]);
+                }
+                return $hex->type == HexType::Land;
+            }
+        );
+    }
+
+    private function neighbors(Hex &$hex, Closure $matching): array {
+        $r = $hex->row;
+        $c = $hex->col;
 
         return array_filter(
                 [
@@ -236,8 +251,8 @@ END;
                     $this->hexAt($r+2, $c),
                     $this->hexAt($r+1, $c-1),
                     $this->hexAt($r-1, $c-1)
-                ], function ($h) {
-                    return $h != null && $h->type == HexType::Plain;
+                ], function ($nh) use ($matching) {
+                    return $nh != null && $matching($nh);
                 }
             );
     }
