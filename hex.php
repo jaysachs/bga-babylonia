@@ -180,10 +180,10 @@ END;
 
         switch ($numPlayers) {
         case 2:
-            $board->pruneFrom(18, 16);
+            $board->removeLandmassAt(18, 16);
             break;
         case 3:
-            $board->pruneFrom(2, 0);
+            $board->removeLandmassAt(2, 0);
         }
 
         $pool = self::initializePool($numPlayers);
@@ -193,13 +193,21 @@ END;
     }
 
     private function placeCitiesAndFarms(array &$pool) {
-        foreach ($this->hexes as &$hexrow) {
-            foreach ($hexrow as &$hex) {
+        $this->visitAll(
+            function (&$hex) use ($pool) {
                 if ($hex->needsCityOrFarm()) {
                     $x = array_pop($pool);
                     printf("%d:%d %s\n", $hex->row, $hex->col, $x->value);
                     $hex->placeCityOrFarm($x);
                 }
+            }
+        );
+    }
+
+    private function visitAll(Closure $visit) {
+        foreach ($this->hexes as &$hexrow) {
+            foreach ($hexrow as &$hex) {
+                $visit($hex);
             }
         }
     }
@@ -224,17 +232,17 @@ END;
         }
     }
 
-    private function pruneFrom(int $start_row, int $start_col) {
+    private function removeLandmassAt(int $start_row, int $start_col) {
         $this->bfs(
             $start_row,
             $start_col,
             function($hex) {
-                // only prune out land, not water
                 if ($hex->type == HexType::Land) {
                   $hexrow = &$this->hexes[$hex->row];
                   unset($hexrow[$hex->col]);
+                  return true;
                 }
-                return $hex->type == HexType::Land;
+                return false;
             }
         );
     }
