@@ -55,6 +55,11 @@ enum HexType: string {
  * (see https://www.redblobgames.com/grids/hexagons/#neighbors)
  */
 class Hex {
+
+    public function __toString(): string {
+        return sprintf("%s %d:%d %s", $this->type->value, $this->row, $this->col, $this->piece);
+    }
+    
     public function __construct(public HexType $type,
                                 public int $row,
                                 public int $col,
@@ -79,10 +84,6 @@ class Hex {
         return $this->piece == self::$city_marker;
     }
 
-    public function key(): string {
-        return $this->row . "_" . $this->col;
-    }
-    
     public static function plain(int $row, int $col):Hex {
         return new Hex(HexType::Plain, $row, $col, null);
     }
@@ -102,26 +103,21 @@ class Hex {
     private static $city_marker = "__citymarker__";
 }
 
-class HexSet {
-    public function add(Hex $h) {
-        $this->values[$h->key()] = $h;
-    }
-
-    public function remove(Hex $h) {
-        removeKey($h->key());
-    }
-
-    public function removeKey(string $k) {
-        unset($this->values[$k]);
-    }
-
-    private $values = [];
-}
-
 class Board {
 
     private static function addHex(array &$hexes, Hex $hex) {
-        $hexes[$hex->key()] = $hex;
+        @ $hexrow = &$hexes[$hex->row];
+        if ($hexrow == null) {
+            $hexes[$hex->row] = [];
+        }
+        $hexrow[$hex->col] = $hex;
+    }
+
+    private static function getHex(array &$hexes, int $row, int $col) : ?Hex {
+        if (key_exists($row, $hexes)) {
+            return @ $hexes[$row][$col];
+        }
+        return null;
     }
 
     const MAP = <<<'END'
@@ -183,19 +179,21 @@ END;
 
         switch ($numPlayers) {
         case 2:
-            self::pruneFrom($hexes, "18_16");
+            self::pruneFrom($hexes, 18, 16);
             break;
         case 3:
-            self::pruneFrom($hexes, "2_0");
+            self::pruneFrom($hexes, 2, 0);
         }
 
         // Place cities and farms.
         $pool = Board::initializePool($numPlayers);
-        foreach ($hexes as &$hex) {
-            if ($hex->needsCityOrFarm()) {
-                $x = array_pop($pool);
-                printf("%d:%d %s\n", $hex->row, $hex->col, $x->value);
-                $hex->placeCityOrFarm($x);
+        foreach ($hexes as &$hexrow) {
+            foreach ($hexrow as &$hex) {
+                if ($hex->needsCityOrFarm()) {
+                    $x = array_pop($pool);
+                    printf("%d:%d %s\n", $hex->row, $hex->col, $x->value);
+                    $hex->placeCityOrFarm($x);
+                }
             }
         }
 
@@ -204,41 +202,40 @@ END;
 
     public function __construct(private array &$hexes) {}
 
-    private static function pruneFrom(array &$hexes, string $start) {
-        $queue = [ $start ];
+    private static function pruneFrom(array &$hexes, int $row, int $col) {
+        $queue = [ self::getHex($hexes, $row, $col) ];
         while ($queue) {
             $next = array();
             foreach ($queue as $h) {
-                unset($hexes[$h]);
+                // printf("pruning $h\n");
+                $hexrow = &$hexes[$h->row];
+                unset($hexrow[$h->col]);
             }
             foreach ($queue as $h) {
                 $n = self::neighbors($hexes, $h);
+                // printf("neighbors are %s\n", implode(',', $n));
                 $next = array_merge($next, $n);
             }
             $queue = array_unique($next);
         }
     }
 
-    private static function neighbors(array &$hexes, string $hk): array {
-        $hk1 = explode("_", $hk);
-        $r = (int) $hk1[0];
-        $c = (int) $hk1[1];
+    private static function neighbors(array &$hexes, Hex &$h): array {
+        $r = $h->row;
+        $c = $h->col;
 
-        return array_map(
-            function ($h) { return $h->key(); },
-            array_filter(
+        return array_filter(
                 [
-                    @$hexes[self::key($r-2, $c)],
-                    @$hexes[self::key($r-1, $c+1)],
-                    @$hexes[self::key($r+1, $c+1)],
-                    @$hexes[self::key($r+2, $c)],
-                    @$hexes[self::key($r+1, $c-1)],
-                    @$hexes[self::key($r-1, $c-1)]
+                    self::getHex($hexes, $r-2, $c),
+                    self::getHex($hexes, $r-1, $c+1),
+                    self::getHex($hexes, $r+1, $c+1),
+                    self::getHex($hexes, $r+2, $c),
+                    self::getHex($hexes, $r+1, $c-1),
+                    self::getHex($hexes, $r-1, $c-1)
                 ], function ($h) {
                     return $h != null && $h->type == HexType::Plain;
                 }
-            )
-        );
+            );
     }
 
     private static function initializePool(int $numPlayers) {
@@ -282,11 +279,7 @@ END;
 
 
     public function hexAt(int $row, int $col): ?Hex {
-        return $this->hexes[self::key($hex->row, $hex->col)];
-    }
-    
-    static function key(int $row, int $col): string {
-        return "$row" . "_" . $col;
+        return self::getHex($this->hexes, $row, $col);
     }
 }
 
@@ -304,14 +297,14 @@ class PlayerStuff {
 }
 
 
+$b = Board::fromMap(2);
+var_dump($b);
+
 $b = Board::fromMap(3);
 var_dump($b);
 
 $b = Board::fromMap(4);
 var_dump($b);
 
-
-$b = Board::fromMap(2);
-var_dump($b);
 
 ?>
