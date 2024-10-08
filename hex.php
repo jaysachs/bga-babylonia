@@ -2,12 +2,12 @@
 
 enum CityOrFarm: string {
     case Priest = 'P';
-    case Noble ='N';
+    case Civil ='N';
     case Merchant = 'M';
-    case PriestNoble = 'PN';
-    case NobleMerchant = 'NM';
+    case PriestCivil = 'PN';
+    case CivilMerchant = 'NM';
     case MerchantPriest = 'MP';
-    case PriestNobleMerchant = 'PNM';
+    case PriestCivilMerchant = 'PNM';
     case Farm5 = 'F5';
     case Farm6 = 'F6';
     case Farm7 = 'F7';
@@ -34,9 +34,12 @@ class Ziggurat {
 
 enum PieceType: string {
     case Priest = 'Priest';
-    case Noble = 'Noble';
+    case Civil = 'Civil';
     case Merchant = 'Merchant';
     case Farmer = 'Farmer';
+
+    public function isFarmer(): bool { return $this == PieceType::Farmer; }
+    public function isNoble(): bool { return $this != PieceType::Farmer; }
 }
 
 class PlayedPiece {
@@ -65,6 +68,10 @@ class Hex {
                                 public PlayedPiece|CityOrFarm|Ziggurat|string|null $piece) {
     }
 
+    public function isPlayable(): bool {
+        return $this->piece == null || is_a($this->piece, CityOrFarm);
+    }
+    
     public function placeCityOrFarm(CityOrFarm $city_or_farm) {
         if ($this->piece != self::$city_marker) {
             throw new LogicException("attempt to place city or farm where it is not expected");
@@ -274,10 +281,10 @@ END;
         $pool = array();
         for ($i = 0; $i < 2; $i++) {
             $pool[] = CityOrFarm::Priest;
-            $pool[] = CityOrFarm::Noble;
+            $pool[] = CityOrFarm::Civil;
             $pool[] = CityOrFarm::Merchant;
-            $pool[] = CityOrFarm::PriestNoble;
-            $pool[] = CityOrFarm::NobleMerchant;
+            $pool[] = CityOrFarm::PriestCivil;
+            $pool[] = CityOrFarm::CivilMerchant;
             $pool[] = CityOrFarm::MerchantPriest;
         }
         for ($i = 0; $i < 3; $i++) {
@@ -287,10 +294,10 @@ END;
         $pool[] = CityOrFarm::Farm6;
         $pool[] = CityOrFarm::Farm7;
         if ($numPlayers > 2) {
-            $pool[] = CityOrFarm::PriestNoble;
-            $pool[] = CityOrFarm::NobleMerchant;
+            $pool[] = CityOrFarm::PriestCivil;
+            $pool[] = CityOrFarm::CivilMerchant;
             $pool[] = CityOrFarm::MerchantPriest;
-            $pool[] = CityOrFarm::PriestNobleMerchant;
+            $pool[] = CityOrFarm::PriestCivilMerchant;
             $pool[] = CityOrFarm::Farm5;
             $pool[] = CityOrFarm::Farm6;
             $pool[] = CityOrFarm::Farm7;
@@ -298,7 +305,7 @@ END;
         }
         if ($numPlayers > 3) {
             $pool[] = CityOrFarm::Priest;
-            $pool[] = CityOrFarm::Noble;
+            $pool[] = CityOrFarm::Civil;
             $pool[] = CityOrFarm::Merchant;
             for ($i = 0; $i < 3; $i++) {
                 $pool[] = CityOrFarm::FarmX;
@@ -348,6 +355,46 @@ class Game {
         }
         return $game;
     }
+
+    public function playPiece(Player &$player, PieceType $piece, int $row, int $col) {
+        if (!array_search($this->players, $player)) {
+            throw new InvalidArgumentException("");
+        }
+        $hex = $this->board->hexAt($row, $col);
+        if ($hex == null) {
+            // TODO: illegal
+        }
+        if (!$hex->canBePlayed()) {
+            // TODO: illegal
+        }
+        if (!$player->pickUp($piece)) {
+            // TODO: illegal
+        }
+        if ($hex->piece == null) {
+            $hex->play($piece);
+        } else if (is_a($hex->piece, CityOrFarm) && $hex->piece->isFarm()) {
+            if ($piece->isFarmer()) {
+                if ($this->board->anyNeighborMatches($hex, function ($h) {
+                    return is_a($h->piece, PlayedPiece)
+                        && $h->piece->player == $player
+                        && $h->piece->type->isNoble();
+                })) {
+                    $hex->play($piece);
+                    // TODO: score farm
+                } else {
+                    // TODO: illegal
+                }
+            } else {
+                if ($player->hasZiggurat(ZigguratType::NoblesInFields)) {
+                    $hex->play($piece);
+                    // TODO: score farm
+                } else {
+                    // TODO: illegal
+                }
+            }
+        }
+        
+    }
 }
 
 class Player {
@@ -363,7 +410,7 @@ class Player {
         for ($i = 0; $i < 6; $i++) {
             $pool[] = PieceType::Priest;
             $pool[] = PieceType::Merchant;
-            $pool[] = PieceType::Noble;
+            $pool[] = PieceType::Civil;
             $pool[] = PieceType::Farmer;
             $pool[] = PieceType::Farmer;
         }
@@ -383,8 +430,12 @@ class Player {
         return true;
     }
 
+    public function hasZiggurat(ZigguratType $type): bool {
+        return array_search($type, $this->ziggurats) === false;
+    }
+
     public function handSize() : int {
-        return array_search(ZigguratType::SevenTokens, $this->ziggurats) === false ? 5 : 7;
+        return $this->hasZiggurat(ZigguratType::SevenTokens) ? 7 : 5;
     }
 }
 
