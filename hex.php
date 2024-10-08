@@ -124,11 +124,37 @@ class Board {
         $hexes[$hex->key()] = $hex;
     }
 
-    public static function fromMapfile(string $filename, int $numPlayers): Board {
+    const MAP = <<<'END'
+        .   .   .   .   =   _   .   .   .
+          _   .   .   _   C   _   .   .
+        _   =   _   _   =   _   C   .   .
+          !   C   _   _   _   _   _   .
+        _   =   _   C   =   _   _   C   .
+          _   _   _   _   =   !   _   .
+        C   =   _   _   C   =   _   _   .
+          _   =   C   _   _   _   _   C
+        _   _   =   _   _   =   C   _   .
+          C   _   =   _   C   _   _   _
+        _   _   C   _   _   =   _   _   .
+          _   _   =   _   _   _   C   _
+        C   _   _   C   !   =   _   _   C
+          _   _   =   _   _   C   _   _
+        _   C   C   _   _   =   _   C   _
+          =   _   =   _   =   _   _   _
+        =   =   _   _   C   _   C   _   _
+          _   =   =   _   =   _   _   _
+        =   !   =   _   _   C   _   !   C
+          _   _   C   C   =   _   _   _
+        =   _   _   _   _   =   _   _   _
+        <  C   _   _   _   _   _   _   _
+        .   _   C   _   C   =   C   C   .
+END;
+    
+    public static function fromMap(int $numPlayers): Board {
         $hexes = [];
-        $f = fopen($filename, "r");
+        $lines = explode("\n", Board::MAP);
         $row = 0;
-        while ($s = fgets($f)) {
+        foreach ($lines as &$s) {
             $col = ($row & 1) ? 1 : 0;
             foreach (str_split($s) as $ch) {
                 switch ($ch) {
@@ -278,14 +304,14 @@ class PlayerStuff {
 }
 
 
-$b = Board::fromMapfile("map2.txt", 3);
+$b = Board::fromMap(3);
 var_dump($b);
 
-$b = Board::fromMapfile("map2.txt", 4);
+$b = Board::fromMap(4);
 var_dump($b);
 
 
-$b = Board::fromMapfile("map2.txt", 2);
+$b = Board::fromMap(2);
 var_dump($b);
 
 ?>
