@@ -46,7 +46,7 @@ class PlayedPiece {
 }
 
 enum HexType: string {
-    case Plain = '';
+    case Plain = 'Plain';
     case Water = 'Water';
 }
 
@@ -129,11 +129,11 @@ class Board {
         $f = fopen($filename, "r");
         $row = 0;
         while ($s = fgets($f)) {
-            $col = 0;
+            $col = ($row & 1) ? 1 : 0;
             foreach (str_split($s) as $ch) {
                 switch ($ch) {
                 case ' ':
-                    $col--;
+                    $col -= 2;
                     break;
                 case '.':
                     break;
@@ -150,15 +150,17 @@ class Board {
                     self::addHex($hexes, Hex::water($row, $col));
                     break;
                 }
-                $col++;
+                $col+=2;
             }
             $row++;
         }
+
         switch ($numPlayers) {
         case 2:
-            self::pruneFrom($hexes, array_key_last($hexes));
+            self::pruneFrom($hexes, "18_16");
+            break;
         case 3:
-            self::pruneFrom($hexes, array_key_first($hexes));
+            self::pruneFrom($hexes, "2_0");
         }
 
         // Place cities and farms.
@@ -171,42 +173,46 @@ class Board {
             }
         }
 
-        var_dump($hexes);
         return new Board($hexes);
     }
 
     public function __construct(private array &$hexes) {}
 
     private static function pruneFrom(array &$hexes, string $start) {
-        $queue = [ $hexes[$start] ];
+        $queue = [ $start ];
         while ($queue) {
             $next = array();
             foreach ($queue as $h) {
-                printf("pruning %s\n", $h->key());
-                unset($hexes[$h->key()]);
+                unset($hexes[$h]);
             }
             foreach ($queue as $h) {
-                $n = array_filter(self::neighbors($hexes, $h),
-                                  function ($h) { return $h->type == HexType::Plain; });
-                printf("neighbors of %s are %s\n", $h->key(), array_reduce($n, function ($c, $h) { return $c . ',' . $h->key(); }), '');
+                $n = self::neighbors($hexes, $h);
                 $next = array_merge($next, $n);
             }
-            $queue = $next;
+            $queue = array_unique($next);
         }
     }
 
-    private static function neighbors(array &$hexes, Hex $h): array {
-        $r = $h->row;
-        $c = $h->col;
+    private static function neighbors(array &$hexes, string $hk): array {
+        $hk1 = explode("_", $hk);
+        $r = (int) $hk1[0];
+        $c = (int) $hk1[1];
 
-        return array_filter([
-            $hexes[self::key($r-2, $c)],
-            $hexes[self::key($r-1, $c+1)],
-            $hexes[self::key($r+1, $c+1)],
-            $hexes[self::key($r+2, $c)],
-            $hexes[self::key($r+1, $c-1)],
-            $hexes[self::key($r-1, $c-1)]
-        ], function ($v) { return $v != null; });
+        return array_map(
+            function ($h) { return $h->key(); },
+            array_filter(
+                [
+                    @$hexes[self::key($r-2, $c)],
+                    @$hexes[self::key($r-1, $c+1)],
+                    @$hexes[self::key($r+1, $c+1)],
+                    @$hexes[self::key($r+2, $c)],
+                    @$hexes[self::key($r+1, $c-1)],
+                    @$hexes[self::key($r-1, $c-1)]
+                ], function ($h) {
+                    return $h != null && $h->type == HexType::Plain;
+                }
+            )
+        );
     }
 
     private static function initializePool(int $numPlayers) {
@@ -271,13 +277,13 @@ class PlayerStuff {
     public $score = 0;
 }
 
-/*
+
 $b = Board::fromMapfile("map2.txt", 3);
 var_dump($b);
 
 $b = Board::fromMapfile("map2.txt", 4);
 var_dump($b);
-*/
+
 
 $b = Board::fromMapfile("map2.txt", 2);
 var_dump($b);
