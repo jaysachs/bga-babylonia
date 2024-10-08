@@ -19,6 +19,7 @@
     height: var(--s);
 /*    margin: calc(var(--m)); */
     margin: 0;
+    padding: 0;
     /*    width: calc(var(--s) * 1.1732); */
     width: 70;
     background-color: transparent;
@@ -27,11 +28,19 @@
     text-align: center;
     foreground-color: #000000;
     clip-path: polygon(0 50%, 25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%);
-    background-color: rgba(255, 22, 255, 0.2);
+/*    background-color: rgba(255, 22, 255, 0.2); */
 }
 
 .container > div.selected {
     background-color: rgba(22, 255, 22, 0.2);
+}
+
+img.farmer {
+    content: url(images/purple-farmer.png);
+    width: 80%;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 
@@ -41,12 +50,18 @@
 	e = null;
 	if (target.parentElement.id == "container") {
 	    e = target;
+	} else if (target.parentElement.parentElement.id == "container") {
+	    e = target.parentElement;
 	}
 	if (e != null) {
 	    if (e.className == "selected") {
 		e.className = null;
+		e.replaceChildren();
 	    } else {
 		e.className = "selected";
+		let img = document.createElement("img");
+		img.setAttribute("class", "farmer");
+		e.replaceChildren(img);
 	    }
 	}
     }
