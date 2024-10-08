@@ -268,7 +268,7 @@ END;
     private static function initializePool(int $numPlayers) {
         // set up city pool
         $pool = array();
-        for ($i = 0; $i < 2; ++$i) {
+        for ($i = 0; $i < 2; $i++) {
             $pool[] = CityOrFarm::Priest;
             $pool[] = CityOrFarm::Noble;
             $pool[] = CityOrFarm::Merchant;
