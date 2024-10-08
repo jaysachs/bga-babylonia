@@ -142,11 +142,11 @@ class Board {
         =   !   =   _   _   C   _   !   C
           _   _   C   C   =   _   _   _
         =   _   _   _   _   =   _   _   _
-        <  C   _   _   _   _   _   _   _
+          C   _   _   _   _   _   _   _
         .   _   C   _   C   =   C   C   .
 END;
     
-    public static function fromMap(int $numPlayers): Board {
+    public static function forPlayerCount(int $numPlayers): Board {
         $empty = [];
         $board = new Board($empty);
         $lines = explode("\n", Board::MAP);
@@ -173,7 +173,7 @@ END;
                     $board->addHex(Hex::water($row, $col));
                     break;
                 }
-                $col+=2;
+                $col += 2;
             }
             $row++;
         }
@@ -319,13 +319,13 @@ class PlayerStuff {
 }
 
 
-$b = Board::fromMap(2);
+$b = Board::forPlayerCount(2);
 var_dump($b);
 
-$b = Board::fromMap(3);
+$b = Board::forPlayerCount(3);
 var_dump($b);
 
-$b = Board::fromMap(4);
+$b = Board::forPlayerCount(4);
 var_dump($b);
 
 
