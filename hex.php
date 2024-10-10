@@ -1,21 +1,21 @@
 <?php
 
 enum Piece: string {
-    case ZIGGURAT = 'ZIGGURAT';
-    case PRIEST = 'PRIEST';
-    case CIVIL = 'CIVIL';
-    case MERCHANT = 'MERCHANT';
-    case CITY_P = 'CITY_P';
-    case CITY_C = 'CITY_C';
-    case CITY_M = 'CITY_M';
-    case CITY_PC = 'CITY_PC';
-    case CITY_PM = 'CITY_PM';
-    case CITY_MC = 'CITY_MC';
-    case CITY_PCM = 'CITY_PCM';
-    case FARM_5 = 'FARM_5';
-    case FARM_6 = 'FARM_6';
-    case FARM_7 = 'FARM_7';
-    case FARM_CITIES = 'FARM_C';
+    case ZIGGURAT = 'ziggurat';
+    case PRIEST = 'priest';
+    case CIVIL = 'civil';
+    case MERCHANT = 'merchant';
+    case CITY_P = 'city_p';
+    case CITY_C = 'city_c';
+    case CITY_M = 'city_m';
+    case CITY_PC = 'city_pc';
+    case CITY_PM = 'city_pm';
+    case CITY_MC = 'city_mc';
+    case CITY_PCM = 'city_pcm';
+    case FARM_5 = 'farm_5';
+    case FARM_6 = 'farm_6';
+    case FARM_7 = 'farm_7';
+    case FARM_CITIES = 'farm_c';
     case PLACEHOLDER = '';
 
     public function isFarm(): bool {
@@ -47,10 +47,10 @@ class Ziggurat {
 }
 
 enum PieceType: string {
-    case Priest = 'Priest';
-    case Civil = 'Civil';
-    case Merchant = 'Merchant';
-    case Farmer = 'Farmer';
+    case Priest = 'priest';
+    case Civil = 'civil';
+    case Merchant = 'merchant';
+    case Farmer = 'farmer';
 
     public function isFarmer(): bool { return $this == PieceType::Farmer; }
     public function isNoble(): bool { return $this != PieceType::Farmer; }
@@ -332,16 +332,16 @@ END;
     }
 }
 
-enum ZigguratType : string {
-    case Plus10 = 'Plus10';
-    case ExtraTurn = 'ExtraTurn';
-    case SevenTokens = 'SevenTokens';
-    case ThreeNobles = 'ThreeNobles';
-    case NobleWith3Farmers = 'NobleWith3Farmers';
-    case NoblesInFields = 'NoblesInFields';
-    case ExtraCityPoints = 'ExtraCityPoints';
-    case FreeCentralLandConnects = 'FreeCentralLandConnects';
-    case FreeRiverConnects = 'FreeRiverConnects';
+enum BonusTile : string {
+    case PLUS_10 = 'tile1';
+    case EXTRA_TURN = 'tile2';
+    case SEVEN_TOKENS = 'tile3';
+    case THREE_NOBLES = 'tile4';
+    case NOBLE_WITH_3_FARMERS = 'tile5';
+    case NOBLES_IN_FIELDS = 'tile6';
+    case EXTRA_CITY_POINTS = 'tile7';
+    case FREE_CENTRAL_LAND_CONNECTS = 'tile8';
+    case FREE_RIVER_CONNECTS = 'tile9';
 };
 
 class Game {
@@ -353,16 +353,16 @@ class Game {
     public static function newGame(int $numPlayers, bool $optionalZigguarts = false) : Game {
         $game = new Game();
         $game->board = Board::forPlayerCount($numPlayers);
-        $game->ziggurats[] = ZigguratType::Plus10;
-        $game->ziggurats[] = ZigguratType::ExtraTurn;
-        $game->ziggurats[] = ZigguratType::SevenTokens;
-        $game->ziggurats[] = ZigguratType::ThreeNobles;
-        $game->ziggurats[] = ZigguratType::NobleWith3Farmers;
-        $game->ziggurats[] = ZigguratType::NoblesInFields;
-        $game->ziggurats[] = ZigguratType::ExtraCityPoints;
+        $game->ziggurats[] = BonusTile::PLUS_10;
+        $game->ziggurats[] = BonusTile::EXTRA_TURN;
+        $game->ziggurats[] = BonusTile::SEVEN_TOKENS;
+        $game->ziggurats[] = BonusTile::THREE_NOBLES;
+        $game->ziggurats[] = BonusTile::NOBLE_WITH_3_FARMERS;
+        $game->ziggurats[] = BonusTile::NOBLES_IN_FIELDS;
+        $game->ziggurats[] = BonusTile::EXTRA_CITY_POINTS;
         if ($optionalZigguarts) {
-            $game->ziggurats[] = ZigguratType::FreeCentralLandConnects;
-            $game->ziggurats[] = ZigguratType::FreeRiverConnects;
+            $game->ziggurats[] = BonusTile::FREE_CENTRAL_LAND_CONNECTS;
+            $game->ziggurats[] = BonusTile::FREE_RIVER_CONNECTS;
             shuffle($game->ziggurats);
             array_pop($game->ziggurats);
             array_pop($game->ziggurats);
@@ -402,7 +402,7 @@ class Game {
                     // TODO: illegal
                 }
             } else {
-                if ($player->hasZiggurat(ZigguratType::NoblesInFields)) {
+                if ($player->hasBonusTile(BonusTile::NoblesInFields)) {
                     $hex->play($piece);
                     // TODO: score farm
                 } else {
@@ -419,7 +419,7 @@ class Player {
     public $scored_farms = array();
     private $hand = array(); /* PieceType */
     private $pool = array(); /* PieceType */
-    public $ziggurats = array(); /* ZigguratType */
+    public $ziggurats = array(); /* BonusTile */
     public $score = 0;
 
     public function __construct() {
@@ -447,12 +447,12 @@ class Player {
         return true;
     }
 
-    public function hasZiggurat(ZigguratType $type): bool {
+    public function hasBonusTile(BonusTile $type): bool {
         return array_search($type, $this->ziggurats) === false;
     }
 
     public function handSize() : int {
-        return $this->hasZiggurat(ZigguratType::SevenTokens) ? 7 : 5;
+        return $this->hasBonusTile(BonusTile::SEVEN_TOKENS) ? 7 : 5;
     }
 }
 

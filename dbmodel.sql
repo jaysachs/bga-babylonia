@@ -38,12 +38,13 @@
 -- could try to shove in `players` but need an array type
 --   maybe using MySQL `SET` type?
 
-ALTER TABLE `player` ADD `player_bonuses` SET ('1', '2', '3', '4', '5', '6', '7', '8', '9') DEFAULT NULL;
+ALTER TABLE `player` ADD `player_bonuses` SET ('tile1', 'tile2', 'tile3', 'tile4', 'tile5', 'tile6', 'tile7', 'tile8', 'tile9') DEFAULT NULL;
 
+ALTER TABLE `player` ADD `won_cities` INT UNSIGNED NOT NULL DEFAULT '0';
 
 CREATE TABLE IF NOT EXISTS `bonuses` (
   `player_id` int(10) unsigned NOT NULL,
-  `bonus_type` varchar(20) NOT NULL,
+  `bonus_type` varchar(5) NOT NULL,
   PRIMARY KEY (`player_id`, `bonus_type`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8l
 
