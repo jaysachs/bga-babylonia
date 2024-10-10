@@ -33,6 +33,20 @@
 -- Example 2: add a custom field to the standard "player" table
 -- ALTER TABLE `player` ADD `player_my_custom_field` INT UNSIGNED NOT NULL DEFAULT '0';
 
+
+-- which bonus tiles players own.
+-- could try to shove in `players` but need an array type
+--   maybe using MySQL `SET` type?
+
+ALTER TABLE `player` ADD `player_bonuses` SET ('1', '2', '3', '4', '5', '6', '7', '8', '9') DEFAULT NULL;
+
+
+CREATE TABLE IF NOT EXISTS `bonuses` (
+  `player_id` int(10) unsigned NOT NULL,
+  `bonus_type` varchar(20) NOT NULL,
+  PRIMARY KEY (`player_id`, `bonus_type`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8l
+
 CREATE TABLE IF NOT EXISTS `board` (
   `board_x` smallint(5) unsigned NOT NULL,
   `board_y` smallint(5) unsigned NOT NULL,
