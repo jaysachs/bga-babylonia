@@ -167,7 +167,7 @@ class Board {
           C   _   _   _   _   _   _   _
         .   _   C   _   C   =   C   C   .
 END;
-    
+
     public static function forPlayerCount(int $numPlayers): Board {
         if ($numPlayers < 2 || $numPlayers > 4) {
             throw new InvalidArgumentException(sprintf("invalid number of players: %s", $numPlayers));
@@ -332,16 +332,16 @@ END;
     }
 }
 
-enum BonusTile : string {
-    case PLUS_10 = 'tile1';
-    case EXTRA_TURN = 'tile2';
-    case SEVEN_TOKENS = 'tile3';
-    case THREE_NOBLES = 'tile4';
-    case NOBLE_WITH_3_FARMERS = 'tile5';
-    case NOBLES_IN_FIELDS = 'tile6';
-    case EXTRA_CITY_POINTS = 'tile7';
-    case FREE_CENTRAL_LAND_CONNECTS = 'tile8';
-    case FREE_RIVER_CONNECTS = 'tile9';
+enum ZigguratCard : string {
+    case PLUS_10 = 'zcard1';
+    case EXTRA_TURN = 'zcard2';
+    case SEVEN_TOKENS = 'zcard3';
+    case THREE_NOBLES = 'zcard4';
+    case NOBLE_WITH_3_FARMERS = 'zcard5';
+    case NOBLES_IN_FIELDS = 'zcard6';
+    case EXTRA_CITY_POINTS = 'zcard7';
+    case FREE_CENTRAL_LAND_CONNECTS = 'zcard8';
+    case FREE_RIVER_CONNECTS = 'zcard9';
 };
 
 class Game {
@@ -353,16 +353,16 @@ class Game {
     public static function newGame(int $numPlayers, bool $optionalZigguarts = false) : Game {
         $game = new Game();
         $game->board = Board::forPlayerCount($numPlayers);
-        $game->ziggurats[] = BonusTile::PLUS_10;
-        $game->ziggurats[] = BonusTile::EXTRA_TURN;
-        $game->ziggurats[] = BonusTile::SEVEN_TOKENS;
-        $game->ziggurats[] = BonusTile::THREE_NOBLES;
-        $game->ziggurats[] = BonusTile::NOBLE_WITH_3_FARMERS;
-        $game->ziggurats[] = BonusTile::NOBLES_IN_FIELDS;
-        $game->ziggurats[] = BonusTile::EXTRA_CITY_POINTS;
+        $game->ziggurats[] = ZigguratCard::PLUS_10;
+        $game->ziggurats[] = ZigguratCard::EXTRA_TURN;
+        $game->ziggurats[] = ZigguratCard::SEVEN_TOKENS;
+        $game->ziggurats[] = ZigguratCard::THREE_NOBLES;
+        $game->ziggurats[] = ZigguratCard::NOBLE_WITH_3_FARMERS;
+        $game->ziggurats[] = ZigguratCard::NOBLES_IN_FIELDS;
+        $game->ziggurats[] = ZigguratCard::EXTRA_CITY_POINTS;
         if ($optionalZigguarts) {
-            $game->ziggurats[] = BonusTile::FREE_CENTRAL_LAND_CONNECTS;
-            $game->ziggurats[] = BonusTile::FREE_RIVER_CONNECTS;
+            $game->ziggurats[] = ZigguratCard::FREE_CENTRAL_LAND_CONNECTS;
+            $game->ziggurats[] = ZigguratCard::FREE_RIVER_CONNECTS;
             shuffle($game->ziggurats);
             array_pop($game->ziggurats);
             array_pop($game->ziggurats);
@@ -402,7 +402,7 @@ class Game {
                     // TODO: illegal
                 }
             } else {
-                if ($player->hasBonusTile(BonusTile::NoblesInFields)) {
+                if ($player->hasZigguratCard(ZigguratCard::NoblesInFields)) {
                     $hex->play($piece);
                     // TODO: score farm
                 } else {
@@ -419,7 +419,7 @@ class Player {
     public $scored_farms = array();
     private $hand = array(); /* PieceType */
     private $pool = array(); /* PieceType */
-    public $ziggurats = array(); /* BonusTile */
+    public $ziggurats = array(); /* ZigguratCard */
     public $score = 0;
 
     public function __construct() {
@@ -447,12 +447,12 @@ class Player {
         return true;
     }
 
-    public function hasBonusTile(BonusTile $type): bool {
+    public function hasZigguratCard(ZigguratCard $type): bool {
         return array_search($type, $this->ziggurats) === false;
     }
 
     public function handSize() : int {
-        return $this->hasBonusTile(BonusTile::SEVEN_TOKENS) ? 7 : 5;
+        return $this->hasZigguratCard(ZigguratCard::SEVEN_TOKENS) ? 7 : 5;
     }
 }
 

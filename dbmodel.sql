@@ -38,7 +38,7 @@
 -- could try to shove in `players` but need an array type
 --   maybe using MySQL `SET` type?
 
-ALTER TABLE `player` ADD `player_bonuses` SET ('tile1', 'tile2', 'tile3', 'tile4', 'tile5', 'tile6', 'tile7', 'tile8', 'tile9') DEFAULT NULL;
+ALTER TABLE `player` ADD `ziggurat_cards` SET ('zcard1', 'zcard2', 'zcard3', 'zcard4', 'zcard5', 'zcard6', 'zcard7', 'zcard8', 'zcard9') DEFAULT NULL;
 
 ALTER TABLE `player` ADD `won_cities` INT UNSIGNED NOT NULL DEFAULT '0';
 
