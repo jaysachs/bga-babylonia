@@ -1,30 +1,44 @@
 <?php
 
-enum CityOrFarm: string {
-    case Priest = 'P';
-    case Civil ='N';
-    case Merchant = 'M';
-    case PriestCivil = 'PN';
-    case CivilMerchant = 'NM';
-    case MerchantPriest = 'MP';
-    case PriestCivilMerchant = 'PNM';
-    case Farm5 = 'F5';
-    case Farm6 = 'F6';
-    case Farm7 = 'F7';
-    case FarmX = 'FX';
+enum Piece: string {
+    case ZIGGURAT = 'ZIGGURAT';
+    case PRIEST = 'PRIEST';
+    case CIVIL = 'CIVIL';
+    case MERCHANT = 'MERCHANT';
+    case CITY_P = 'CITY_P';
+    case CITY_C = 'CITY_C';
+    case CITY_M = 'CITY_M';
+    case CITY_PC = 'CITY_PC';
+    case CITY_PM = 'CITY_PM';
+    case CITY_MC = 'CITY_MC';
+    case CITY_PCM = 'CITY_PCM';
+    case FARM_5 = 'FARM_5';
+    case FARM_6 = 'FARM_6';
+    case FARM_7 = 'FARM_7';
+    case FARM_CITIES = 'FARM_C';
+    case PLACEHOLDER = '';
 
     public function isFarm(): bool {
         return match($this) {
-            CityOrFarm::Farm5,
-            CityOrFarm::Farm6,
-            CityOrFarm::Farm7,
-            CityOrFarm::FarmX => true,
+            Piece::FARM_5,
+            Piece::FARM_6,
+            Piece::FARM_7,
+            Piece::FARM_CITIES => true,
             default => false,
         };
     }
 
     public function isCity(): bool {
-        return !$this->isFarm();
+        return match($this) {
+            Piece::CITY_P,
+            Piece::CITY_C,
+            Piece::CITY_M,
+            Piece::CITY_PC,
+            Piece::CITY_PM,
+            Piece::CITY_MC,
+            Piece::CITY_PCM => true,
+            default => false,
+        };
     }
 }
 
@@ -65,16 +79,19 @@ class Hex {
     public function __construct(public HexType $type,
                                 public int $row,
                                 public int $col,
-                                public PlayedPiece|CityOrFarm|Ziggurat|string|null $piece) {
+                                public ?Piece $piece) {
     }
 
     public function isPlayable(): bool {
-        return $this->piece == null || is_a($this->piece, CityOrFarm);
+        return $this->piece == null || $this->piece->isCity() || $this->piece->isFarm();
     }
     
-    public function placeCityOrFarm(CityOrFarm $city_or_farm) {
-        if ($this->piece != self::$city_marker) {
+    public function placeCityOrFarm(Piece $city_or_farm) {
+        if ($this->piece != Piece::PLACEHOLDER) {
             throw new LogicException("attempt to place city or farm where it is not expected");
+        }
+        if (!$city_or_farm->isCity() && !$city_or_farm->isFarm()) {
+            throw new LogicException("attempt to place a non-city or farm");
         }
         $this->piece = $city_or_farm;
     }
@@ -87,7 +104,7 @@ class Hex {
     }
 
     public function needsCityOrFarm(): bool {
-        return $this->piece == self::$city_marker;
+        return $this->piece == Piece::PLACEHOLDER;
     }
 
     public static function plain(int $row, int $col):Hex {
@@ -95,7 +112,7 @@ class Hex {
     }
 
     public static function city(int $row, int $col): Hex {
-        return new Hex(HexType::Land, $row, $col, self::$city_marker);
+        return new Hex(HexType::Land, $row, $col, Piece::PLACEHOLDER);
     }
 
     public static function water(int $row, int $col): Hex {
@@ -103,10 +120,9 @@ class Hex {
     }
 
     public static function ziggurat(int $row, int $col): Hex {
-        return new Hex(HexType::Water, $row, $col, new Ziggurat());
+        return new Hex(HexType::Water, $row, $col, Piece::ZIGGURAT);
     }
 
-    private static $city_marker = "__citymarker__";
 }
 
 class Board {
@@ -280,35 +296,35 @@ END;
         // set up city pool
         $pool = array();
         for ($i = 0; $i < 2; $i++) {
-            $pool[] = CityOrFarm::Priest;
-            $pool[] = CityOrFarm::Civil;
-            $pool[] = CityOrFarm::Merchant;
-            $pool[] = CityOrFarm::PriestCivil;
-            $pool[] = CityOrFarm::CivilMerchant;
-            $pool[] = CityOrFarm::MerchantPriest;
+            $pool[] = Piece::CITY_P;
+            $pool[] = Piece::CITY_C;
+            $pool[] = Piece::CITY_M;
+            $pool[] = Piece::CITY_PC;
+            $pool[] = Piece::CITY_MC;
+            $pool[] = Piece::CITY_PM;
         }
         for ($i = 0; $i < 3; $i++) {
-            $pool[] = CityOrFarm::FarmX;
+            $pool[] = Piece::FARM_CITIES;
         }
-        $pool[] = CityOrFarm::Farm5;
-        $pool[] = CityOrFarm::Farm6;
-        $pool[] = CityOrFarm::Farm7;
+        $pool[] = Piece::FARM_5;
+        $pool[] = Piece::FARM_6;
+        $pool[] = Piece::FARM_7;
         if ($numPlayers > 2) {
-            $pool[] = CityOrFarm::PriestCivil;
-            $pool[] = CityOrFarm::CivilMerchant;
-            $pool[] = CityOrFarm::MerchantPriest;
-            $pool[] = CityOrFarm::PriestCivilMerchant;
-            $pool[] = CityOrFarm::Farm5;
-            $pool[] = CityOrFarm::Farm6;
-            $pool[] = CityOrFarm::Farm7;
-            $pool[] = CityOrFarm::FarmX;
+            $pool[] = Piece::CITY_PC;
+            $pool[] = Piece::CITY_MC;
+            $pool[] = Piece::CITY_PM;
+            $pool[] = Piece::CITY_PCM;
+            $pool[] = Piece::FARM_5;
+            $pool[] = Piece::FARM_6;
+            $pool[] = Piece::FARM_7;
+            $pool[] = Piece::FARM_CITIES;
         }
         if ($numPlayers > 3) {
-            $pool[] = CityOrFarm::Priest;
-            $pool[] = CityOrFarm::Civil;
-            $pool[] = CityOrFarm::Merchant;
+            $pool[] = Piece::CITY_P;
+            $pool[] = Piece::CITY_C;
+            $pool[] = Piece::CITY_M;
             for ($i = 0; $i < 3; $i++) {
-                $pool[] = CityOrFarm::FarmX;
+                $pool[] = Piece::FARM_CITIES;
             }
         }
         shuffle($pool);
@@ -332,6 +348,7 @@ class Game {
     public Board $board;
     public array $players;
     public array $ziggurats;
+    public string $player_on_turn;
 
     public static function newGame(int $numPlayers, bool $optionalZigguarts = false) : Game {
         $game = new Game();
@@ -372,7 +389,7 @@ class Game {
         }
         if ($hex->piece == null) {
             $hex->play($piece);
-        } else if (is_a($hex->piece, CityOrFarm) && $hex->piece->isFarm()) {
+        } else if ($hex->piece->isFarm()) {
             if ($piece->isFarmer()) {
                 if ($this->board->anyNeighborMatches($hex, function ($h) {
                     return is_a($h->piece, PlayedPiece)
