@@ -47,21 +47,28 @@ img.farmer {
   </style>
   <script>
     function selectHex(target) {
-	e = null;
+	e = target;
+	while (e.parentElement != null && e.parentElement.id != "container") {
+	    e = e.parentElement;
+	}
+/*	
 	if (target.parentElement.id == "container") {
 	    e = target;
 	} else if (target.parentElement.parentElement.id == "container") {
 	    e = target.parentElement;
+	} else if (target.parentElement.parentElement.parentElement.id == "container") {
+	    e = target.parentElement.parentElement;
 	}
+*/	
 	if (e != null) {
 	    if (e.className == "selected") {
 		e.className = null;
-		e.replaceChildren();
+		let img = e.firstElementChild;
+		img.className = null;
 	    } else {
 		e.className = "selected";
-		let img = document.createElement("img");
+		let img = e.firstElementChild;
 		img.setAttribute("class", "farmer");
-		e.replaceChildren(img);
 	    }
 	}
     }
@@ -75,14 +82,16 @@ img.farmer {
 	      for (let i = 0; i < 12; i++) {
 		  t = i * 64 + 11;
 		  left = 46 + (j * 110);
-		  c.insertAdjacentHTML(`beforeend`, `<div style="position: absolute; top:${t}px; left:${left}px;"></div>`);
+		  c.insertAdjacentHTML(`beforeend`,
+				       `<div style="position: absolute; top:${t}px; left:${left}px;"><img></img></div>`);
 	      }
 	  }
 	  for (let j = 0; j < 8; j++) {
 	      for (let i = 0; i < 11; i++) {
 		  t = i * 64 + 43;
 		  left = 100 + (j * 110);
-		  c.insertAdjacentHTML(`beforeend`, `<div style="position: absolute; top:${t}px; left:${left}px;"></div>`);
+		  c.insertAdjacentHTML(`beforeend`,
+				       `<div style="position: absolute; top:${t}px; left:${left}px;"><img></img></div>`);
 	      }
 	  }
 	</script>
