@@ -42,10 +42,10 @@ ALTER TABLE `player` ADD `ziggurat_cards` SET ('zcard1', 'zcard2', 'zcard3', 'zc
 
 ALTER TABLE `player` ADD `won_cities` INT UNSIGNED NOT NULL DEFAULT '0';
 
-CREATE TABLE IF NOT EXISTS `bonuses` (
+CREATE TABLE IF NOT EXISTS `ziggurat_cards` (
   `player_id` int(10) unsigned NOT NULL,
-  `bonus_type` varchar(5) NOT NULL,
-  PRIMARY KEY (`player_id`, `bonus_type`)
+  `ziggurat_card` varchar(5) NOT NULL,
+  PRIMARY KEY (`player_id`, `ziggurat_card`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8l
 
 CREATE TABLE IF NOT EXISTS `board` (
