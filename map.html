@@ -4,7 +4,7 @@
 
 .main {
   display:flex;
-  --s: 60px;  /* size  */
+/*  --s: 60px;  size  */
 }
 
 .container {
@@ -16,12 +16,10 @@
 }
 
 .container > div {
-    height: var(--s);
-/*    margin: calc(var(--m)); */
+    height: 61px;
+    width: 70px;
     margin: 0;
     padding: 0;
-    /*    width: calc(var(--s) * 1.1732); */
-    width: 70;
     background-color: transparent;
     display: inline-block;
     font-size:10pt;
@@ -39,6 +37,7 @@ img.farmer {
     content: url(images/purple-farmer.png);
     width: 80%;
     display: block;
+    margin-top: 3px;
     margin-left: auto;
     margin-right: auto;
 }
@@ -72,18 +71,18 @@ img.farmer {
 	  c = document.getElementById("container");
 	  for (let j = 0; j < 9; j++) {
 	      for (let i = 0; i < 12; i++) {
-		  t = i * 64 + 11;
+		  t = i * 63 + 15;
 		  left = 46 + (j * 110);
 		  c.insertAdjacentHTML(`beforeend`,
-				       `<div style="position: absolute; top:${t}px; left:${left}px;"><img></img></div>`);
+				       `<div id="hex_${i}_${j*2}" style="position: absolute; top:${t}px; left:${left}px;"><img></img></div>`);
 	      }
 	  }
 	  for (let j = 0; j < 8; j++) {
 	      for (let i = 0; i < 11; i++) {
-		  t = i * 64 + 43;
+		  t = i * 63 + 46;
 		  left = 100 + (j * 110);
 		  c.insertAdjacentHTML(`beforeend`,
-				       `<div style="position: absolute; top:${t}px; left:${left}px;"><img></img></div>`);
+				       `<div id="hex_${i+1}_${1+j*2}" style="position: absolute; top:${t}px; left:${left}px;"><img></img></div>`);
 	      }
 	  }
 	</script>
