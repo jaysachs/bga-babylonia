@@ -46,20 +46,11 @@ img.farmer {
 
   </style>
   <script>
-    function selectHex(target) {
-	e = target;
+    function selectHex(event) {
+	e = event.target;
 	while (e.parentElement != null && e.parentElement.id != "container") {
 	    e = e.parentElement;
 	}
-/*	
-	if (target.parentElement.id == "container") {
-	    e = target;
-	} else if (target.parentElement.parentElement.id == "container") {
-	    e = target.parentElement;
-	} else if (target.parentElement.parentElement.parentElement.id == "container") {
-	    e = target.parentElement.parentElement;
-	}
-*/	
 	if (e != null) {
 	    if (e.className == "selected") {
 		e.className = null;
@@ -71,11 +62,12 @@ img.farmer {
 		img.setAttribute("class", "farmer");
 	    }
 	}
+	event.stopPropagation();
     }
   </script>
   <body>
     <div class="main">
-      <div class="container" id="container" onClick="selectHex(event.target)">
+      <div class="container" id="container" onClick="selectHex(event)">
 	<script>
 	  c = document.getElementById("container");
 	  for (let j = 0; j < 9; j++) {
