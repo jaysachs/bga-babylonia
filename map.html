@@ -30,9 +30,11 @@
 /*    background-color: rgba(255, 22, 255, 0.2); */
 }
 
+
 .container > div.selected {
-    background-color: rgba(22, 255, 22, 0.2);
+    background-color: rgba(22, 255, 22, 0.1);
 }
+
 
 img.city_p {
     content: url(imgs/zigurat.png);
@@ -43,13 +45,29 @@ img.city_p {
     margin-right: auto;
 }
 
-img.farmer {
-    content: url(images/purple-farmer.png);
-    width: 80%;
-    display: block;
+.container > div > div {
+    width: 57px;
+    height: 57px;
     margin-top: 3px;
-    margin-left: auto;
-    margin-right: auto;
+    margin-left: 6px;
+    background-size: cover;
+/*    margin-right: auto; */
+}
+
+div.farmer {
+    background: url(imgs/Purple.png) 0 0px;
+}
+
+div.priest {
+    background: url(imgs/Purple.png) 0 57px;
+}
+
+div.civil {
+    background: url(imgs/Purple.png) 0 114px;
+}
+
+div.merchant {
+    background: url(imgs/Purple.png) 0 171px;
 }
 
 
@@ -60,15 +78,22 @@ img.farmer {
 	while (e.parentElement != null && e.parentElement.id != "container") {
 	    e = e.parentElement;
 	}
-	if (e != null) {
-	    if (e.className == "selected") {
-		e.className = null;
-		let img = e.firstElementChild;
-		img.className = null;
+	if (e.parentElement != null) {
+	    e.classList.toggle("selected");
+	    let c = e.firstElementChild.classList;
+	    if (c.contains("farmer")) {
+		c.remove("farmer");
+		c.add("merchant");
+	    } else if (c.contains("merchant")) {
+		c.remove("merchant");
+		c.add("priest");
+	    } else if (c.contains("priest")) {
+		c.remove("priest");
+		c.add("civil");
+	    } else if (c.contains("civil")) {
+		c.remove("civil");
 	    } else {
-		e.className = "selected";
-		let img = e.firstElementChild;
-		img.setAttribute("class", "farmer");
+		c.add("farmer");
 	    }
 	}
 	event.stopPropagation();
@@ -84,7 +109,7 @@ img.farmer {
 		  t = i * 63 + 15;
 		  left = 46 + (j * 110);
 		  c.insertAdjacentHTML(`beforeend`,
-				       `<div id="hex_${i}_${j*2}" style="position: absolute; top:${t}px; left:${left}px;"><img></img></div>`);
+				       `<div id="hex_${i}_${j*2}" style="position: absolute; top:${t}px; left:${left}px;"><div></div></div>`);
 	      }
 	  }
 	  for (let j = 0; j < 8; j++) {
@@ -92,7 +117,7 @@ img.farmer {
 		  t = i * 63 + 46;
 		  left = 100 + (j * 110);
 		  c.insertAdjacentHTML(`beforeend`,
-				       `<div id="hex_${i+1}_${1+j*2}" style="position: absolute; top:${t}px; left:${left}px;"><img></img></div>`);
+				       `<div id="hex_${i+1}_${1+j*2}" style="position: absolute; top:${t}px; left:${left}px;"><div></div></div>`);
 	      }
 	  }
 	</script>
