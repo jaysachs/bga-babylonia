@@ -107,6 +107,8 @@ img.city_p {
 	    e = e.parentElement;
 	}
 	if (e.parentElement != null) {
+	    let x = e.id.split("_");
+	    console.log("selected hex " + x[1] + ", " + x[2]);
 	    e.classList.toggle("selected");
 	    let c = e.firstElementChild.classList;
 	    if (c.contains("farmer")) {
