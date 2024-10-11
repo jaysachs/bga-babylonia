@@ -3,16 +3,18 @@
 /* from https://css-tricks.com/hexagons-and-beyond-flexible-responsive-grid-patterns-sans-media-queries/ */
 
 .main {
-  display:flex;
-/*  --s: 60px;  size  */
 }
 
 .container {
     font-size: 0; /* disable white space between inline block element */
     background: url(images/mapb.jpg) no-repeat center;
     background-size: cover;
+    display: block;
     width: 1024px;
     height: 768px;
+    position: absolute;
+    left: 0px;
+    top: 100px;
 }
 
 .container > div {
@@ -27,6 +29,7 @@
     align-items: center;
     foreground-color: #000000;
     clip-path: polygon(0 50%, 25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%);
+    position: absolute;
 /*    background-color: rgba(255, 22, 255, 0.2); */
 }
 
@@ -54,27 +57,52 @@ img.city_p {
 /*    margin-right: auto; */
 }
 
-div.farmer {
+.farmer {
     background: url(images/Purple.png) 0 0px;
 }
 
-div.priest {
+.priest {
     background: url(images/Purple.png) 0 57px;
 }
 
-div.civil {
+.civil {
     background: url(images/Purple.png) 0 114px;
 }
 
-div.merchant {
+.merchant {
     background: url(images/Purple.png) 0 171px;
 }
 
+.hand {
+    display: inline-block;
+    width: auto;
+    margin: 5px;
+    background-color: transparent;
+    text-align: center;
+    align-items: center;
+    border-style: groove;
+    font-size:10pt;
+}
+
+.hand > div {
+    display: inline-block;
+    width: 57px;
+    height: 57px;
+    margin-top: 3px;
+    margin-left: 6px;
+    background-size: cover;
+}
+
+.handlabel {
+    display: inline;
+    vertical-align: center;
+    font-size: 20pt;
+}
 
   </style>
   <script>
     function selectHex(event) {
-	e = event.target;
+	let e = event.target;
 	while (e.parentElement != null && e.parentElement.id != "container") {
 	    e = e.parentElement;
 	}
@@ -101,23 +129,40 @@ div.merchant {
   </script>
   <body>
     <div class="main">
+
+      <div style="display: inline">
+	<div class="handlabel">Hand:</div>
+	<div class="hand" id="hand">
+	  <div class="farmer"></div>
+	  <div class="priest"></div>
+	  <div class="merchant"></div>
+	  <div class="farmer"></div>
+	  <div class="merchant"></div>
+	  <div></div>
+	  <div></div>
+	</div>
+      </div>
       <div class="container" id="container" onClick="selectHex(event)">
 	<script>
-	  c = document.getElementById("container");
+	  let c = document.getElementById("container");
 	  for (let j = 0; j < 9; j++) {
 	      for (let i = 0; i < 12; i++) {
-		  t = i * 63 + 15;
-		  left = 46 + (j * 110);
-		  c.insertAdjacentHTML(`beforeend`,
-				       `<div id="hex_${i}_${j*2}" style="position: absolute; top:${t}px; left:${left}px;"><div></div></div>`);
+		  let top = i * 63 + 6;
+		  let left = 39 + (j * 110);
+		  c.insertAdjacentHTML(
+		      `beforeend`,
+		      `<div id="hex_${i}_${j*2}" style="top:${top}px; left:${left}px;"><div></div></div>`
+		  );
 	      }
 	  }
 	  for (let j = 0; j < 8; j++) {
 	      for (let i = 0; i < 11; i++) {
-		  t = i * 63 + 46;
-		  left = 100 + (j * 110);
-		  c.insertAdjacentHTML(`beforeend`,
-				       `<div id="hex_${i+1}_${1+j*2}" style="position: absolute; top:${t}px; left:${left}px;"><div></div></div>`);
+		  let top = i * 63 + 37;
+		  let left = 93 + (j * 110);
+		  c.insertAdjacentHTML(
+		      `beforeend`,
+		      `<div id="hex_${i+1}_${1+j*2}" style="top:${top}px; left:${left}px;"><div></div></div>`
+		  );
 	      }
 	  }
 	</script>
