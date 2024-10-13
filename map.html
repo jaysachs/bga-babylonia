@@ -3,11 +3,14 @@
 /* from https://css-tricks.com/hexagons-and-beyond-flexible-responsive-grid-patterns-sans-media-queries/ */
 
 .main {
+    --hw: 70px;
+    --hw2: calc(var(--hw) + 1px);
+    --hh: 61px;
 }
 
 .container {
     font-size: 0; /* disable white space between inline block element */
-    background: url(images/mapb.jpg) no-repeat center;
+    /*    background: url(images/mapb.jpg) no-repeat center; */
     background-size: cover;
     display: block;
     width: 1024px;
@@ -18,8 +21,8 @@
 }
 
 .container > div {
-    height: 61px;
-    width: 70px;
+    height: calc(--hh);
+    width: calc(--hw);
     margin: 0;
     padding: 0;
     background-color: transparent;
@@ -49,27 +52,90 @@ img.zig {
 }
 
 .container > div > div {
-    width: 57px;
-    height: 57px;
+    /* why not hw for width?? */
+    /*    width: calc(--hw - 4)px; */
+    width: calc(--hw - 4px);
+    
+    height: calc(--hh - 4px);
     margin-top: 3px;
-    margin-left: 6px;
+    margin-left: 0px;
     background-size: cover;
 /*    margin-right: auto; */
 }
 
+.xcity-back { background: url('imgs/city-back.png'); }
+.xcity-m { background: url('imgs/c2-x3.png'); }
+.xcity-sp { background: url('imgs/city3x3.png'); }
+.xcity-msp { background: url('imgs/3cityx1.png'); }
+.xcity-p { background: url('imgs/city5x3.png'); }
+.xcity-mp { background: url('imgs/city6x3.png'); }
+.xcity-s { background: url('imgs/city7x3.png'); }
+.xcity-ms { background: url('imgs/city4x3.png'); }
+.xfarm5 { background: url('imgs/f5x2.png'); }
+.xfarm6 { background: url('imgs/f6x2.png'); }
+.xfarmX { background: url('imgs/f7x2.png'); }
+.xfarm7 { background: url('imgs/fx7.png'); }
 
-.city-back { background-image: url('images/cityfarms-sprites.png') background-position: 0px 0px; width: 244px; height: 208px; }
-.city-m { background-image: url('images/cityfarms-sprites.png') background-position: -244px 0px; width: 241px; height: 208px; }
-.city-sp { background-image: url('images/cityfarms-sprites.png') background-position: -488px 0px; width: 228px; height: 201px; }
-.city-msp { background-image: url('images/cityfarms-sprites.png') background-position: -732px 0px; width: 238px; height: 203px; }
-.city-p { background-image: url('images/cityfarms-sprites.png') background-position: 0px -208px; width: 232px; height: 202px; }
-.city-mp { background-image: url('images/cityfarms-sprites.png') background-position: -244px -208px; width: 241px; height: 207px; }
-.city-s { background-image: url('images/cityfarms-sprites.png') background-position: -488px -208px; width: 229px; height: 202px; }
-.city-ms { background-image: url('images/cityfarms-sprites.png') background-position: -732px -208px; width: 234px; height: 202px; }
-.farm5 { background-image: url('images/cityfarms-sprites.png') background-position: 0px -416px; width: 232px; height: 200px; }
-.farm6 { background-image: url('images/cityfarms-sprites.png') background-position: -244px -416px; width: 232px; height: 200px; }
-.farmX { background-image: url('images/cityfarms-sprites.png') background-position: -488px -416px; width: 237px; height: 206px; }
-.farm7 { background-image: url('images/cityfarms-sprites.png') background-position: -732px -416px; width: 232px; height: 200px; }
+
+/*
+.city-back { background: url('images/cityfarmsprites.png') 0px 0px; }
+.city-m { background: url('images/cityfarmsprites.png') -67px 0px; }
+.city-msp { background: url('images/cityfarmsprites.png') -134px 0px; }
+.city-s { background: url('images/cityfarmsprites.png') -201px 0px; }
+.farm5 { background: url('images/cityfarmsprites.png') -268px 0px; }
+.city-p { background: url('images/cityfarmsprites.png') -350px 0px; }
+.city-mp { background: url('images/cityfarmsprites.png') -420px 0px; }
+.city-ms { background: url('images/cityfarmsprites.png') -490px 0px; }
+.city-sp { background: url('images/cityfarmsprites.png') -560px 0px; }
+.farm6 { background: url('images/cityfarmsprites.png') -630px 0px; }
+.farm7 { background: url('images/cityfarmsprites.png') -700px 0px; }
+.farmX { background: url('images/cityfarmsprites.png') -770px 0px; }
+*/
+
+/*
+.city-back { background-image: url('images/cityfarmsprites.png'); background-position: 0px 0px; }
+.city-m { background-image: url('images/cityfarmsprites.png'); background-position: -244px 0px; }
+.city-msp { background-image: url('images/cityfarmsprites.png'); background-position: -488px 0px; }
+.city-s { background-image: url('images/cityfarmsprites.png'); background-position: -732px 0px; }
+.farm5 { background-image: url('images/cityfarmsprites.png'); background-position: -976px 0px; }
+.city-p { background-image: url('images/cityfarmsprites.png'); background-position: -1220px 0px; }
+.city-mp { background-image: url('images/cityfarmsprites.png'); background-position: -1464px 0px; }
+.city-ms { background-image: url('images/cityfarmsprites.png'); background-position: -1708px 0px; }
+.city-sp { background-image: url('images/cityfarmsprites.png'); background-position: -1952px 0px; }
+.farm6 { background-image: url('images/cityfarmsprites.png'); background-position: -2196px 0px; }
+.farm7 { background-image: url('images/cityfarmsprites.png'); background-position: -2440px 0px; }
+.farmX { background-image: url('images/cityfarmsprites.png'); background-position: -2684px 0px; }
+*/
+
+/* for img src */
+.container > div > img {
+    background-color: #ff8888;
+    object-fit: cover;
+    height: var(--hh);
+    width: var(--hw);
+/*    margin-top: 3px; */
+        display: block; 
+    padding: 0;
+    margin: 0;
+/*    margin-left: 0px;
+    margin-right: 0px; */
+    background-size: cover;
+/*    margin-right: auto; */
+}
+
+/* 4 + 71*index */
+.city-back { content: url('images/cityfarmsprites.png'); object-position: 0px 0px; }
+.city-m  { content: url('images/cityfarmsprites.png'); object-position: calc(-4px - 1*var(--hw2)) 0px; }
+.city-msp { content: url('images/cityfarmsprites.png'); object-position: calc(-4px - 2*var(--hw2)) 0px; }
+.city-s  { content: url('images/cityfarmsprites.png'); object-position: calc(-4px - 3*var(--hw2)) 0px; }
+.farm5   { content: url('images/cityfarmsprites.png'); object-position: calc(-4px - 4*var(--hw2)) 0px; } /* var(--hw2)) 0px; } */
+.city-p { content: url('images/cityfarmsprites.png'); object-position: calc(-4px - 5*var(--hw2)) 0px; }
+.city-mp { content: url('images/cityfarmsprites.png'); object-position: calc(-4px - 6*var(--hw2)) 0px; }
+.city-ms { content: url('images/cityfarmsprites.png'); object-position: calc(-4px - 7*var(--hw2)) 0px; }
+.city-sp { content: url('images/cityfarmsprites.png'); object-position: calc(-4px - 8*var(--hw2)) 0px; }
+.farm6   { content: url('images/cityfarmsprites.png'); object-position: calc(-4px - 9*var(--hw2)) 0px; }
+.farm7   { content: url('images/cityfarmsprites.png'); object-position: calc(-4px - 10*var(--hw2)) 0px; }
+.farmX   { content: url('images/cityfarmsprites.png'); object-position: calc(-4px - 11*var(--hw2)) 0px; }
 
 
 
@@ -77,18 +143,34 @@ img.zig {
 
 .farmer {
     background: url(images/Purple.png) 0 0px;
+    width: 57px;
+    height: 57px;
+    margin-top: 3px;
+    margin-left: 6px;
 }
 
 .priest {
     background: url(images/Purple.png) 0 57px;
+    width: 57px;
+    height: 57px;
+    margin-top: 3px;
+    margin-left: 6px;
 }
 
 .servant {
     background: url(images/Purple.png) 0 114px;
+    width: 57px;
+    height: 57px;
+    margin-top: 3px;
+    margin-left: 6px;
 }
 
 .merchant {
     background: url(images/Purple.png) 0 171px;
+    width: 57px;
+    height: 57px;
+    margin-top: 3px;
+    margin-left: 6px;
 }
 
 .hand {
@@ -119,16 +201,8 @@ img.zig {
 
   </style>
   <script>
-    function selectHex(event) {
-	let e = event.target;
-	while (e.parentElement != null && e.parentElement.id != "container") {
-	    e = e.parentElement;
-	}
-	if (e.parentElement != null) {
-	    let x = e.id.split("_");
-	    console.log("selected hex " + x[1] + ", " + x[2]);
-	    e.classList.toggle("selected");
-	    let c = e.firstElementChild.classList;
+
+    function cyclePieces(c) {
 	    if (c.contains("farmer")) {
 		c.remove("farmer");
 		c.add("merchant");
@@ -143,9 +217,13 @@ img.zig {
 	    } else {
 		c.add("farmer");
 	    }
+    }
 
-	    /*
-	    if (c.contains("farm5")) {
+    function cycleCities(c) {
+	    if (c.contains("city-back")) {
+		c.remove("city-back");
+		c.add("farm5");
+	    } else if (c.contains("farm5")) {
 		c.remove("farm5");
 		c.add("farm6");
 	    } else if (c.contains("farm6")) {
@@ -157,10 +235,10 @@ img.zig {
 	    } else if (c.contains("farmX")) {
 		c.remove("farmX");
 		c.add("city-m");
-	    } else if (c.contains("farmcity-m")) {
+	    } else if (c.contains("city-m")) {
 		c.remove("city-m");
 		c.add("city-p");
-	    } else if (c.contains("city-m")) {
+	    } else if (c.contains("city-p")) {
 		c.remove("city-p");
 		c.add("city-s");
 	    } else if (c.contains("city-s")) {
@@ -175,10 +253,25 @@ img.zig {
 	    } else if (c.contains("city-sp")) {
 		c.remove("city-sp");
 		c.add("city-msp");
+	    } else if (c.contains("city-msp")) {
+		c.remove("city-msp");
 	    } else {
-		c.add("farm5");
+		c.add("city-back");
 		}
-	*/
+    }
+    
+    function selectHex(event) {
+	let e = event.target;
+	while (e.parentElement != null && e.parentElement.id != "container") {
+	    e = e.parentElement;
+	}
+	if (e.parentElement != null) {
+	    let x = e.id.split("_");
+	    console.log("selected hex " + x[1] + ", " + x[2]);
+	    // e.classList.toggle("selected");
+	    let c = e.firstElementChild.classList;
+	    // cyclePieces(c);
+	    cycleCities(c);
 	}
 	event.stopPropagation();
     }
@@ -201,6 +294,7 @@ img.zig {
       <div class="container" id="container" onClick="selectHex(event)">
 	<script>
 	  let c = document.getElementById("container");
+	  /*
 	  for (let j = 0; j < 9; j++) {
 	      for (let i = 0; i < 12; i++) {
 		  let top = i * 63 + 6;
@@ -220,7 +314,11 @@ img.zig {
 		      `<div id="hex_${i+1}_${1+j*2}" style="top:${top}px; left:${left}px;"><div></div></div>`
 		  );
 	      }
-	  }
+	      }
+	      */
+	  c.insertAdjacentHTML(
+	      `beforeend`,
+	      `<div id="sample_hx" style="top:10px; left: 400px;"><img></img></div>`);
 	</script>
       </div>
     </div>
