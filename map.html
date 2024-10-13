@@ -10,7 +10,7 @@
 
 .container {
     font-size: 0; /* disable white space between inline block element */
-    /*    background: url(images/mapb.jpg) no-repeat center; */
+    background: url(images/mapb.jpg) no-repeat center;
     background-size: cover;
     display: block;
     width: 1024px;
@@ -21,8 +21,8 @@
 }
 
 .container > div {
-    height: calc(--hh);
-    width: calc(--hw);
+    height: calc(var(--hh));
+    width: calc(var(--hw));
     margin: 0;
     padding: 0;
     background-color: transparent;
@@ -33,7 +33,7 @@
     foreground-color: #000000;
     clip-path: polygon(0 50%, 25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%);
     position: absolute;
-/*    background-color: rgba(255, 22, 255, 0.2); */
+    background-color: rgba(255, 22, 255, 0.2);
 }
 
 
@@ -52,13 +52,11 @@ img.zig {
 }
 
 .container > div > div {
-    /* why not hw for width?? */
-    /*    width: calc(--hw - 4)px; */
-    width: calc(--hw - 4px);
-    
-    height: calc(--hh - 4px);
+    /* use hh for width since smaller and want it to be square */
+    width: calc(var(--hh) - 4px);
+    height: calc(var(--hh) - 4px);
     margin-top: 3px;
-    margin-left: 0px;
+    margin-left: 6px;
     background-size: cover;
 /*    margin-right: auto; */
 }
@@ -75,37 +73,6 @@ img.zig {
 .xfarm6 { background: url('imgs/f6x2.png'); }
 .xfarmX { background: url('imgs/f7x2.png'); }
 .xfarm7 { background: url('imgs/fx7.png'); }
-
-
-/*
-.city-back { background: url('images/cityfarmsprites.png') 0px 0px; }
-.city-m { background: url('images/cityfarmsprites.png') -67px 0px; }
-.city-msp { background: url('images/cityfarmsprites.png') -134px 0px; }
-.city-s { background: url('images/cityfarmsprites.png') -201px 0px; }
-.farm5 { background: url('images/cityfarmsprites.png') -268px 0px; }
-.city-p { background: url('images/cityfarmsprites.png') -350px 0px; }
-.city-mp { background: url('images/cityfarmsprites.png') -420px 0px; }
-.city-ms { background: url('images/cityfarmsprites.png') -490px 0px; }
-.city-sp { background: url('images/cityfarmsprites.png') -560px 0px; }
-.farm6 { background: url('images/cityfarmsprites.png') -630px 0px; }
-.farm7 { background: url('images/cityfarmsprites.png') -700px 0px; }
-.farmX { background: url('images/cityfarmsprites.png') -770px 0px; }
-*/
-
-/*
-.city-back { background-image: url('images/cityfarmsprites.png'); background-position: 0px 0px; }
-.city-m { background-image: url('images/cityfarmsprites.png'); background-position: -244px 0px; }
-.city-msp { background-image: url('images/cityfarmsprites.png'); background-position: -488px 0px; }
-.city-s { background-image: url('images/cityfarmsprites.png'); background-position: -732px 0px; }
-.farm5 { background-image: url('images/cityfarmsprites.png'); background-position: -976px 0px; }
-.city-p { background-image: url('images/cityfarmsprites.png'); background-position: -1220px 0px; }
-.city-mp { background-image: url('images/cityfarmsprites.png'); background-position: -1464px 0px; }
-.city-ms { background-image: url('images/cityfarmsprites.png'); background-position: -1708px 0px; }
-.city-sp { background-image: url('images/cityfarmsprites.png'); background-position: -1952px 0px; }
-.farm6 { background-image: url('images/cityfarmsprites.png'); background-position: -2196px 0px; }
-.farm7 { background-image: url('images/cityfarmsprites.png'); background-position: -2440px 0px; }
-.farmX { background-image: url('images/cityfarmsprites.png'); background-position: -2684px 0px; }
-*/
 
 /* for img src */
 .container > div > img {
@@ -125,17 +92,17 @@ img.zig {
 
 /* 4 + 71*index */
 .city-back { content: url('images/cityfarmsprites.png'); object-position: 0px 0px; }
-.city-m  { content: url('images/cityfarmsprites.png'); object-position: calc(-4px - 1*var(--hw2)) 0px; }
-.city-msp { content: url('images/cityfarmsprites.png'); object-position: calc(-4px - 2*var(--hw2)) 0px; }
-.city-s  { content: url('images/cityfarmsprites.png'); object-position: calc(-4px - 3*var(--hw2)) 0px; }
-.farm5   { content: url('images/cityfarmsprites.png'); object-position: calc(-4px - 4*var(--hw2)) 0px; } /* var(--hw2)) 0px; } */
-.city-p { content: url('images/cityfarmsprites.png'); object-position: calc(-4px - 5*var(--hw2)) 0px; }
-.city-mp { content: url('images/cityfarmsprites.png'); object-position: calc(-4px - 6*var(--hw2)) 0px; }
-.city-ms { content: url('images/cityfarmsprites.png'); object-position: calc(-4px - 7*var(--hw2)) 0px; }
-.city-sp { content: url('images/cityfarmsprites.png'); object-position: calc(-4px - 8*var(--hw2)) 0px; }
-.farm6   { content: url('images/cityfarmsprites.png'); object-position: calc(-4px - 9*var(--hw2)) 0px; }
-.farm7   { content: url('images/cityfarmsprites.png'); object-position: calc(-4px - 10*var(--hw2)) 0px; }
-.farmX   { content: url('images/cityfarmsprites.png'); object-position: calc(-4px - 11*var(--hw2)) 0px; }
+.city-m    { content: url('images/cityfarmsprites.png'); object-position: calc(-4px - 1*var(--hw2)) 0px; }
+.city-msp  { content: url('images/cityfarmsprites.png'); object-position: calc(-4px - 2*var(--hw2)) 0px; }
+.city-s    { content: url('images/cityfarmsprites.png'); object-position: calc(-4px - 3*var(--hw2)) 0px; }
+.farm5     { content: url('images/cityfarmsprites.png'); object-position: calc(-4px - 4*var(--hw2)) 0px; }
+.city-p    { content: url('images/cityfarmsprites.png'); object-position: calc(-4px - 5*var(--hw2)) 0px; }
+.city-mp   { content: url('images/cityfarmsprites.png'); object-position: calc(-4px - 6*var(--hw2)) 0px; }
+.city-ms   { content: url('images/cityfarmsprites.png'); object-position: calc(-4px - 7*var(--hw2)) 0px; }
+.city-sp   { content: url('images/cityfarmsprites.png'); object-position: calc(-4px - 8*var(--hw2)) 0px; }
+.farm6     { content: url('images/cityfarmsprites.png'); object-position: calc(-4px - 9*var(--hw2)) 0px; }
+.farm7     { content: url('images/cityfarmsprites.png'); object-position: calc(-4px - 10*var(--hw2)) 0px; }
+.farmX     { content: url('images/cityfarmsprites.png'); object-position: calc(-4px - 11*var(--hw2)) 0px; }
 
 
 
@@ -143,14 +110,10 @@ img.zig {
 
 .farmer {
     background: url(images/Purple.png) 0 0px;
-    width: 57px;
-    height: 57px;
-    margin-top: 3px;
-    margin-left: 6px;
 }
 
 .priest {
-    background: url(images/Purple.png) 0 57px;
+    background: url(images/Purple.png) 0 -57px;
     width: 57px;
     height: 57px;
     margin-top: 3px;
@@ -158,7 +121,7 @@ img.zig {
 }
 
 .servant {
-    background: url(images/Purple.png) 0 114px;
+    background: url(images/Purple.png) 0 -114px;
     width: 57px;
     height: 57px;
     margin-top: 3px;
@@ -166,7 +129,7 @@ img.zig {
 }
 
 .merchant {
-    background: url(images/Purple.png) 0 171px;
+    background: url(images/Purple.png) 0 -171px;
     width: 57px;
     height: 57px;
     margin-top: 3px;
@@ -270,8 +233,11 @@ img.zig {
 	    console.log("selected hex " + x[1] + ", " + x[2]);
 	    // e.classList.toggle("selected");
 	    let c = e.firstElementChild.classList;
-	    // cyclePieces(c);
-	    cycleCities(c);
+	    if (x[2] % 2 == 0) {
+		cyclePieces(c);
+	    } else {
+		cycleCities(c);
+	    }
 	}
 	event.stopPropagation();
     }
@@ -294,7 +260,6 @@ img.zig {
       <div class="container" id="container" onClick="selectHex(event)">
 	<script>
 	  let c = document.getElementById("container");
-	  /*
 	  for (let j = 0; j < 9; j++) {
 	      for (let i = 0; i < 12; i++) {
 		  let top = i * 63 + 6;
@@ -311,11 +276,10 @@ img.zig {
 		  let left = 93 + (j * 110);
 		  c.insertAdjacentHTML(
 		      `beforeend`,
-		      `<div id="hex_${i+1}_${1+j*2}" style="top:${top}px; left:${left}px;"><div></div></div>`
+		      `<div id="hex_${i+1}_${1+j*2}" style="top:${top}px; left:${left}px;"><img></img></div>`
 		  );
 	      }
 	      }
-	      */
 	  c.insertAdjacentHTML(
 	      `beforeend`,
 	      `<div id="sample_hx" style="top:10px; left: 400px;"><img></img></div>`);
