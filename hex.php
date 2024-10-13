@@ -3,15 +3,15 @@
 enum Piece: string {
     case ZIGGURAT = 'ziggurat';
     case PRIEST = 'priest';
-    case CIVIL = 'civil';
+    case SERVANT = 'servant';
     case MERCHANT = 'merchant';
     case CITY_P = 'city_p';
-    case CITY_C = 'city_c';
+    case CITY_S = 'city_s';
     case CITY_M = 'city_m';
-    case CITY_PC = 'city_pc';
-    case CITY_PM = 'city_pm';
-    case CITY_MC = 'city_mc';
-    case CITY_PCM = 'city_pcm';
+    case CITY_SP = 'city_sp';
+    case CITY_MP = 'city_mp';
+    case CITY_MS = 'city_ms';
+    case CITY_MSP = 'city_msp';
     case FARM_5 = 'farm_5';
     case FARM_6 = 'farm_6';
     case FARM_7 = 'farm_7';
@@ -31,12 +31,12 @@ enum Piece: string {
     public function isCity(): bool {
         return match($this) {
             Piece::CITY_P,
-            Piece::CITY_C,
+            Piece::CITY_S,
             Piece::CITY_M,
-            Piece::CITY_PC,
-            Piece::CITY_PM,
-            Piece::CITY_MC,
-            Piece::CITY_PCM => true,
+            Piece::CITY_SP,
+            Piece::CITY_MP,
+            Piece::CITY_MS,
+            Piece::CITY_MSP => true,
             default => false,
         };
     }
@@ -48,7 +48,7 @@ class Ziggurat {
 
 enum PieceType: string {
     case Priest = 'priest';
-    case Civil = 'civil';
+    case Servant = 'servant';
     case Merchant = 'merchant';
     case Farmer = 'farmer';
 
@@ -297,11 +297,11 @@ END;
         $pool = array();
         for ($i = 0; $i < 2; $i++) {
             $pool[] = Piece::CITY_P;
-            $pool[] = Piece::CITY_C;
+            $pool[] = Piece::CITY_S;
             $pool[] = Piece::CITY_M;
-            $pool[] = Piece::CITY_PC;
-            $pool[] = Piece::CITY_MC;
-            $pool[] = Piece::CITY_PM;
+            $pool[] = Piece::CITY_SP;
+            $pool[] = Piece::CITY_MS;
+            $pool[] = Piece::CITY_MP;
         }
         for ($i = 0; $i < 3; $i++) {
             $pool[] = Piece::FARM_CITIES;
@@ -310,10 +310,10 @@ END;
         $pool[] = Piece::FARM_6;
         $pool[] = Piece::FARM_7;
         if ($numPlayers > 2) {
-            $pool[] = Piece::CITY_PC;
-            $pool[] = Piece::CITY_MC;
-            $pool[] = Piece::CITY_PM;
-            $pool[] = Piece::CITY_PCM;
+            $pool[] = Piece::CITY_PS;
+            $pool[] = Piece::CITY_MS;
+            $pool[] = Piece::CITY_MP;
+            $pool[] = Piece::CITY_MSP;
             $pool[] = Piece::FARM_5;
             $pool[] = Piece::FARM_6;
             $pool[] = Piece::FARM_7;
@@ -321,7 +321,7 @@ END;
         }
         if ($numPlayers > 3) {
             $pool[] = Piece::CITY_P;
-            $pool[] = Piece::CITY_C;
+            $pool[] = Piece::CITY_S;
             $pool[] = Piece::CITY_M;
             for ($i = 0; $i < 3; $i++) {
                 $pool[] = Piece::FARM_CITIES;
@@ -371,6 +371,46 @@ class Game {
             $game->players[] = new Player();
         }
         return $game;
+    }
+
+    public function getDatas(): array {
+    {
+        $result = [];
+
+        // WARNING: We must only return information visible by the current player.
+        $current_player_id = (int) $this->getCurrentPlayerId();
+
+        // Get information about players.
+
+        $result["players"] = $this->getCollectionFromDb(
+            "SELECT P.player_id player_id,
+                    P.player_score score,
+                    P.player_color color,
+                    COUNT(H.piece) hand_size,
+                    GROUP_CONCAT(z.ziggurat_card SEPARATOR ',') cards
+             FROM player P
+             INNER JOIN hands H ON P.player_id = H.player_id
+             INNER JOIN ziggurate_cards Z ON P.player_id = Z.player_id"
+        );
+
+        if (1 == 2) {
+            // Separately query for cards
+            $zcp = $this->getObjectListFromDB(
+                "SELECT player_id, GROUP_CONCAT(ziggurat_card SEPARATOR ',') cards FROM ziggurate_cards GROUP BY player_id"
+            );
+            foreach ($zcp as $z) {
+                $result["players"][$z["player_id"]]["ziggurate_cards"] = explode(',', $z["cards"]);
+            }
+        }
+        
+        $result['board'] = self::getObjectListFromDB(
+            "SELECT board_x x, board_y y, hextype, piece, scored, board_player FROM board" );
+
+        // Gather all information about current game situation (visible by player $current_player_id).
+        $result['current_player_hand'] = self::getCollectionFromDb(
+            "SELECT piece FROM hands WHERE player_id=" . $current_player_id");
+
+        return $result;
     }
 
     public function playPiece(Player &$player, PieceType $piece, int $row, int $col) {
@@ -427,7 +467,7 @@ class Player {
         for ($i = 0; $i < 6; $i++) {
             $pool[] = PieceType::Priest;
             $pool[] = PieceType::Merchant;
-            $pool[] = PieceType::Civil;
+            $pool[] = PieceType::Servant;
             $pool[] = PieceType::Farmer;
             $pool[] = PieceType::Farmer;
         }

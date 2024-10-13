@@ -42,6 +42,11 @@ ALTER TABLE `player` ADD `ziggurat_cards` SET ('zcard1', 'zcard2', 'zcard3', 'zc
 
 ALTER TABLE `player` ADD `won_cities` INT UNSIGNED NOT NULL DEFAULT '0';
 
+CREATE TABLE IF NOT EXISTS `hands` (
+  `player_id` int(10) unsigned NOT NULL,
+  `piece` varchar(8) DEFAULT NULL,
+) ENGINE=InnoDB DEFAULT CHARSET=utf8l
+
 CREATE TABLE IF NOT EXISTS `ziggurat_cards` (
   `player_id` int(10) unsigned NOT NULL,
   `ziggurat_card` varchar(5) NOT NULL,
@@ -52,7 +57,7 @@ CREATE TABLE IF NOT EXISTS `board` (
   `board_x` smallint(5) unsigned NOT NULL,
   `board_y` smallint(5) unsigned NOT NULL,
   `hextype` varchar(8) NOT NULL, -- PLAIN or WATER
-  `piece` varchar(8) DEFAULT NULL, -- CITY_P, CITY_C, CITY_M, CITY_PN, CITY_CM, CITY_MP, CITY_PCM, FARM_5, FARM_6, FARM_7, FARM_C, ZIGGURAT, FARMER, MERCHANT, PRIEST, CIVIL
+  `piece` varchar(8) DEFAULT NULL, -- CITY_P, CITY_S, CITY_M, CITY_MP, CITY_MS, CITY_MP, CITY_MSP, FARM_5, FARM_6, FARM_7, FARM_C, ZIGGURAT, FARMER, MERCHANT, PRIEST, SERVANT
   `scored` boolean DEFAULT FALSE,
   `board_player` int(10) unsigned DEFAULT NULL,
   PRIMARY KEY (`board_x`,`board_y`)

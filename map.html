@@ -39,8 +39,8 @@
 }
 
 
-img.city_p {
-    content: url(imgs/zigurat.png);
+img.zig {
+    content: url(images/zigurat.png);
     width: 100%;
     display: block;
     margin-top: 1px;
@@ -57,6 +57,24 @@ img.city_p {
 /*    margin-right: auto; */
 }
 
+
+.city-back { background-image: url('images/cityfarms-sprites.png') background-position: 0px 0px; width: 244px; height: 208px; }
+.city-m { background-image: url('images/cityfarms-sprites.png') background-position: -244px 0px; width: 241px; height: 208px; }
+.city-sp { background-image: url('images/cityfarms-sprites.png') background-position: -488px 0px; width: 228px; height: 201px; }
+.city-msp { background-image: url('images/cityfarms-sprites.png') background-position: -732px 0px; width: 238px; height: 203px; }
+.city-p { background-image: url('images/cityfarms-sprites.png') background-position: 0px -208px; width: 232px; height: 202px; }
+.city-mp { background-image: url('images/cityfarms-sprites.png') background-position: -244px -208px; width: 241px; height: 207px; }
+.city-s { background-image: url('images/cityfarms-sprites.png') background-position: -488px -208px; width: 229px; height: 202px; }
+.city-ms { background-image: url('images/cityfarms-sprites.png') background-position: -732px -208px; width: 234px; height: 202px; }
+.farm5 { background-image: url('images/cityfarms-sprites.png') background-position: 0px -416px; width: 232px; height: 200px; }
+.farm6 { background-image: url('images/cityfarms-sprites.png') background-position: -244px -416px; width: 232px; height: 200px; }
+.farmX { background-image: url('images/cityfarms-sprites.png') background-position: -488px -416px; width: 237px; height: 206px; }
+.farm7 { background-image: url('images/cityfarms-sprites.png') background-position: -732px -416px; width: 232px; height: 200px; }
+
+
+
+
+
 .farmer {
     background: url(images/Purple.png) 0 0px;
 }
@@ -65,7 +83,7 @@ img.city_p {
     background: url(images/Purple.png) 0 57px;
 }
 
-.civil {
+.servant {
     background: url(images/Purple.png) 0 114px;
 }
 
@@ -119,12 +137,48 @@ img.city_p {
 		c.add("priest");
 	    } else if (c.contains("priest")) {
 		c.remove("priest");
-		c.add("civil");
-	    } else if (c.contains("civil")) {
-		c.remove("civil");
+		c.add("servant");
+	    } else if (c.contains("servant")) {
+		c.remove("servant");
 	    } else {
 		c.add("farmer");
 	    }
+
+	    /*
+	    if (c.contains("farm5")) {
+		c.remove("farm5");
+		c.add("farm6");
+	    } else if (c.contains("farm6")) {
+		c.remove("farm6");
+		c.add("farm7");
+	    } else if (c.contains("farm7")) {
+		c.remove("farm7");
+		c.add("farmX");
+	    } else if (c.contains("farmX")) {
+		c.remove("farmX");
+		c.add("city-m");
+	    } else if (c.contains("farmcity-m")) {
+		c.remove("city-m");
+		c.add("city-p");
+	    } else if (c.contains("city-m")) {
+		c.remove("city-p");
+		c.add("city-s");
+	    } else if (c.contains("city-s")) {
+		c.remove("city-s");
+		c.add("city-mp");
+	    } else if (c.contains("city-mp")) {
+		c.remove("city-mp");
+		c.add("city-ms");
+	    } else if (c.contains("city-ms")) {
+		c.remove("city-ms");
+		c.add("city-sp");
+	    } else if (c.contains("city-sp")) {
+		c.remove("city-sp");
+		c.add("city-msp");
+	    } else {
+		c.add("farm5");
+		}
+	*/
 	}
 	event.stopPropagation();
     }
