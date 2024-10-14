@@ -6,6 +6,7 @@
     --hw: 70px;
     --hw2: calc(var(--hw) + 1px);
     --hh: 61px;
+    --w2: calc(var(--hh) - 4px);
 }
 
 .container {
@@ -33,7 +34,7 @@
     foreground-color: #000000;
     clip-path: polygon(0 50%, 25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%);
     position: absolute;
-    background-color: rgba(255, 22, 255, 0.2);
+/*    background-color: rgba(255, 22, 255, 0.2); */
 }
 
 
@@ -76,7 +77,7 @@ img.zig {
 
 /* for img src */
 .container > div > img {
-    background-color: #ff8888;
+/*    background-color: #ff8888; */
     object-fit: cover;
     height: var(--hh);
     width: var(--hw);
@@ -90,7 +91,7 @@ img.zig {
 /*    margin-right: auto; */
 }
 
-/* 4 + 71*index */
+/* unsure why the -4px; maybe has to do with sprites image creation? */
 .city-back { content: url('images/cityfarmsprites.png'); object-position: 0px 0px; }
 .city-m    { content: url('images/cityfarmsprites.png'); object-position: calc(-4px - 1*var(--hw2)) 0px; }
 .city-msp  { content: url('images/cityfarmsprites.png'); object-position: calc(-4px - 2*var(--hw2)) 0px; }
@@ -107,34 +108,12 @@ img.zig {
 
 
 
+.farmer   { background: url(images/Purple.png) 0 calc(-0*var(--w2)); }
+.servant  { background: url(images/Purple.png) 0 calc(-2*var(--w2)); }
+.merchant { background: url(images/Purple.png) 0 calc(-1*var(--w2)); }
+.priest   { background: url(images/Purple.png) 0 calc(-3*var(--w2)); }
 
-.farmer {
-    background: url(images/Purple.png) 0 0px;
-}
 
-.priest {
-    background: url(images/Purple.png) 0 -57px;
-    width: 57px;
-    height: 57px;
-    margin-top: 3px;
-    margin-left: 6px;
-}
-
-.servant {
-    background: url(images/Purple.png) 0 -114px;
-    width: 57px;
-    height: 57px;
-    margin-top: 3px;
-    margin-left: 6px;
-}
-
-.merchant {
-    background: url(images/Purple.png) 0 -171px;
-    width: 57px;
-    height: 57px;
-    margin-top: 3px;
-    margin-left: 6px;
-}
 
 .hand {
     display: inline-block;
@@ -279,10 +258,7 @@ img.zig {
 		      `<div id="hex_${i+1}_${1+j*2}" style="top:${top}px; left:${left}px;"><img></img></div>`
 		  );
 	      }
-	      }
-	  c.insertAdjacentHTML(
-	      `beforeend`,
-	      `<div id="sample_hx" style="top:10px; left: 400px;"><img></img></div>`);
+	  }
 	</script>
       </div>
     </div>
