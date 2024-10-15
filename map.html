@@ -4,7 +4,7 @@
 
 .main {
     --hw: 70px;
-    --hw2: calc(var(--hw) + 1px);
+    --cfh: calc(var(--hh) - 0px);
     --hh: 61px;
     --w2: calc(var(--hh) - 4px);
 }
@@ -62,62 +62,37 @@ img.zig {
 /*    margin-right: auto; */
 }
 
-.xcity-back { background: url('imgs/city-back.png'); }
-.xcity-m { background: url('imgs/c2-x3.png'); }
-.xcity-sp { background: url('imgs/city3x3.png'); }
-.xcity-msp { background: url('imgs/3cityx1.png'); }
-.xcity-p { background: url('imgs/city5x3.png'); }
-.xcity-mp { background: url('imgs/city6x3.png'); }
-.xcity-s { background: url('imgs/city7x3.png'); }
-.xcity-ms { background: url('imgs/city4x3.png'); }
-.xfarm5 { background: url('imgs/f5x2.png'); }
-.xfarm6 { background: url('imgs/f6x2.png'); }
-.xfarmX { background: url('imgs/f7x2.png'); }
-.xfarm7 { background: url('imgs/fx7.png'); }
-
-/* for img src */
 .container > div > img {
 /*    background-color: #ff8888; */
     object-fit: cover;
     height: var(--hh);
     width: var(--hw);
-/*    margin-top: 3px; */
-        display: block; 
-    margin-top: 1px;
-    margin-bottom: 0px;
-    margin-left: 1px;
-    margin-right: 0;
+    display: block; 
+    margin: 0;
+    padding-top: 1px;
+    padding-left: 0px;
     border: 0;
     border-style: none;
-/*    margin-left: 0px;
-    margin-right: 0px; */
     background-size: cover;
-/*    margin-right: auto; */
 }
 
-/* unsure why the -4px; maybe has to do with sprites image creation? */
-.city-back { content: url('images/cityfarmsprites.png'); object-position: 0px 0px; }
-.city-m    { content: url('images/cityfarmsprites.png'); object-position: calc(-4px - 1*var(--hw2)) 0px; }
-.city-msp  { content: url('images/cityfarmsprites.png'); object-position: calc(-4px - 2*var(--hw2)) 0px; }
-.city-s    { content: url('images/cityfarmsprites.png'); object-position: calc(-4px - 3*var(--hw2)) 0px; }
-.farm5     { content: url('images/cityfarmsprites.png'); object-position: calc(-4px - 4*var(--hw2)) 0px; }
-.city-p    { content: url('images/cityfarmsprites.png'); object-position: calc(-4px - 5*var(--hw2)) 0px; }
-.city-mp   { content: url('images/cityfarmsprites.png'); object-position: calc(-4px - 6*var(--hw2)) 0px; }
-.city-ms   { content: url('images/cityfarmsprites.png'); object-position: calc(-4px - 7*var(--hw2)) 0px; }
-.city-sp   { content: url('images/cityfarmsprites.png'); object-position: calc(-4px - 8*var(--hw2)) 0px; }
-.farm6     { content: url('images/cityfarmsprites.png'); object-position: calc(-4px - 9*var(--hw2)) 0px; }
-.farm7     { content: url('images/cityfarmsprites.png'); object-position: calc(-4px - 10*var(--hw2)) 0px; }
-.farmX     { content: url('images/cityfarmsprites.png'); object-position: calc(-4px - 11*var(--hw2)) 0px; }
-
-
-
+.city-msp  { content: url('images/cityfarms-sprites.png'); object-position: 0px calc(-0*var(--cfh)); }
+.city-m    { content: url('images/cityfarms-sprites.png'); object-position: 0px calc(-1*var(--cfh)); }
+.city-back { content: url('images/cityfarms-sprites.png'); object-position: 0px calc(-2*var(--cfh)); }
+.city-p    { content: url('images/cityfarms-sprites.png'); object-position: 0px calc(-3*var(--cfh)); }
+.city-s    { content: url('images/cityfarms-sprites.png'); object-position: 0px calc(-4*var(--cfh)); }
+.city-mp   { content: url('images/cityfarms-sprites.png'); object-position: 0px calc(-5*var(--cfh)); }
+.city-ms   { content: url('images/cityfarms-sprites.png'); object-position: 0px calc(-6*var(--cfh)); }
+.city-sp   { content: url('images/cityfarms-sprites.png'); object-position: 0px calc(-7*var(--cfh)); }
+.farm5     { content: url('images/cityfarms-sprites.png'); object-position: 0px calc(-8*var(--cfh)); }
+.farm6     { content: url('images/cityfarms-sprites.png'); object-position: 0px calc(-9*var(--cfh)); }
+.farm7     { content: url('images/cityfarms-sprites.png'); object-position: 0px calc(-10*var(--cfh)); }
+.farmX     { content: url('images/cityfarms-sprites.png'); object-position: 0px calc(-11*var(--cfh)); }
 
 .farmer   { background: url(images/Purple.png) 0 calc(-0*var(--w2)); }
 .servant  { background: url(images/Purple.png) 0 calc(-2*var(--w2)); }
 .merchant { background: url(images/Purple.png) 0 calc(-1*var(--w2)); }
 .priest   { background: url(images/Purple.png) 0 calc(-3*var(--w2)); }
-
-
 
 .hand {
     display: inline-block;
@@ -166,44 +141,30 @@ img.zig {
     }
 
     function cycleCities(c) {
-	    if (c.contains("city-back")) {
-		c.remove("city-back");
-		c.add("farm5");
-	    } else if (c.contains("farm5")) {
-		c.remove("farm5");
-		c.add("farm6");
-	    } else if (c.contains("farm6")) {
-		c.remove("farm6");
-		c.add("farm7");
-	    } else if (c.contains("farm7")) {
-		c.remove("farm7");
-		c.add("farmX");
-	    } else if (c.contains("farmX")) {
-		c.remove("farmX");
-		c.add("city-m");
-	    } else if (c.contains("city-m")) {
-		c.remove("city-m");
-		c.add("city-p");
-	    } else if (c.contains("city-p")) {
-		c.remove("city-p");
-		c.add("city-s");
-	    } else if (c.contains("city-s")) {
-		c.remove("city-s");
-		c.add("city-mp");
-	    } else if (c.contains("city-mp")) {
-		c.remove("city-mp");
-		c.add("city-ms");
-	    } else if (c.contains("city-ms")) {
-		c.remove("city-ms");
-		c.add("city-sp");
-	    } else if (c.contains("city-sp")) {
-		c.remove("city-sp");
-		c.add("city-msp");
-	    } else if (c.contains("city-msp")) {
-		c.remove("city-msp");
-	    } else {
-		c.add("city-back");
+	let tiles = [
+	    "city-msp",
+	    "city-m",
+	    "city-back",
+	    "city-p",
+	    "city-s",
+	    "city-ms",
+	    "city-sp",
+	    "city-mp",
+	    "farm5",
+	    "farm6",
+	    "farm7",
+	    "farmX"
+	];
+	for (i = 0; i < tiles.length; ++i) {
+	    if (c.contains(tiles[i])) {
+		c.remove(tiles[i]);
+		if (i < tiles.length-1) {
+		    c.add(tiles[i+1]);
 		}
+		return
+	    }
+	}
+	c.add(tiles[0]);
     }
     
     function selectHex(event) {
