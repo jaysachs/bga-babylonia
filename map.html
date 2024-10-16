@@ -2,20 +2,23 @@
   <link rel="stylesheet" type="text/css" href="babylonia.css" />
   <script>
     function cyclePieces(c) {
-	if (c.contains("farmer")) {
-	    c.remove("farmer");
-	    c.add("merchant");
-	} else if (c.contains("merchant")) {
-	    c.remove("merchant");
-	    c.add("priest");
-	} else if (c.contains("priest")) {
-	    c.remove("priest");
-	    c.add("servant");
-	} else if (c.contains("servant")) {
-	    c.remove("servant");
-	} else {
-	    c.add("farmer");
+	let tiles = [
+	    "farmer",
+	    "merchant",
+	    "servant",
+	    "priest",
+	    "blank"
+	];
+	for (i = 0; i < tiles.length; ++i) {
+	    if (c.contains(tiles[i])) {
+		c.remove(tiles[i]);
+		if (i < tiles.length-1) {
+		    c.add(tiles[i+1]);
+		}
+		return;
+	    }
 	}
+	c.add(tiles[0]);
     }
 
     function cycleCities(c) {
