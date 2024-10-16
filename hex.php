@@ -475,7 +475,7 @@ class Game {
                  // requires scoring
                 return ($this->board->anyNeighborMatches($hex, function ($h) {
                     return is_a($h->piece, PlayedPiece)
-                        && $h->piece->player == $player
+                        && $h->piece->player_id == $player->player_id
                         && $h->piece->type->isNoble();
                 }));
             }
@@ -491,9 +491,11 @@ class Game {
         if (!isPlayPermitted($player, $piece, $row, $col)) {
             throw new InvalidArgumentException("not permitted to play $piece at $row $col");
         }
+        /*
         if (!array_search($this->players, $player)) {
             throw new InvalidArgumentException("unknown player: $player");
         }
+        */
         $hex = $this->board->hexAt($row, $col);
         if ($hex->piece == null || $hex->piece == Piece::PLACEHOLDER) {
             $hex->playPiece($piece);
