@@ -317,7 +317,7 @@ END;
         $adjacent = 0;
         foreach ($this->hexes as &$hex) {
             if ($hex->piece == Piece::ZIGGURAT) {
-                $nb = $this->neighbors($hex, function(&$nh) {
+                $nb = $this->neighbors($hex, function(&$nh) use ($player_id) {
                     return $nh->piece->isPlayerPiece() && $nh->piece->player_id == $player_id;
                 });
                 if (count($nb) > 0) {
