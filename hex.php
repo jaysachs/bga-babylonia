@@ -368,7 +368,7 @@ class Game {
             array_pop($game->ziggurats);
         }
         for ($i = 0; $i < $numPlayers; $i++) {
-            $game->players[] = new Player();
+            $game->players[] = Player::newPlayer($i);
         }
         return $game;
     }
@@ -461,9 +461,12 @@ class Player {
     private $pool = array(); /* PieceType */
     public $ziggurats = array(); /* ZigguratCard */
     public $score = 0;
+    public $id = 0;
 
-    public function __construct() {
-        $pool = &$this->pool;
+    public static function newPlayer($pid) {
+        let $p = new Player();
+        $p->id = $pid;
+        $pool = &$p->pool;
         for ($i = 0; $i < 6; $i++) {
             $pool[] = PieceType::Priest;
             $pool[] = PieceType::Merchant;
@@ -472,7 +475,7 @@ class Player {
             $pool[] = PieceType::Farmer;
         }
         shuffle($pool);
-        $this->refreshHand();
+        $p->refreshHand();
     }
     
     /* returns false if pool is empty */
