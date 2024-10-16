@@ -1,143 +1,21 @@
 <html>
-  <style>
-/* from https://css-tricks.com/hexagons-and-beyond-flexible-responsive-grid-patterns-sans-media-queries/ */
-
-.main {
-    --hw: 70px;
-    --cfh: calc(var(--hh) - 0px);
-    --hh: 61px;
-    --w2: calc(var(--hh) - 4px);
-}
-
-.container {
-    font-size: 0; /* disable white space between inline block element */
-    background: url(images/mapb.jpg) no-repeat center;
-    background-size: cover;
-    display: block;
-    width: 1024px;
-    height: 768px;
-    position: absolute;
-    left: 0px;
-    top: 100px;
-}
-
-.container > div {
-    height: calc(var(--hh));
-    width: calc(var(--hw));
-    margin: 0;
-    padding: 0;
-    background-color: transparent;
-    display: inline-block;
-    font-size:10pt;
-    text-align: center;
-    align-items: center;
-    foreground-color: #000000;
-    clip-path: polygon(0 50%, 25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%);
-    position: absolute;
-/*    background-color: rgba(255, 22, 255, 0.2); */
-}
-
-
-.container > div.selected {
-    background-color: rgba(22, 255, 22, 0.1);
-}
-
-
-img.zig {
-    content: url(images/zigurat.png);
-    width: 100%;
-    display: block;
-    margin-top: 1px;
-    margin-left: auto;
-    margin-right: auto;
-}
-
-.container > div > div {
-    /* use hh for width since smaller and want it to be square */
-    width: calc(var(--hh) - 4px);
-    height: calc(var(--hh) - 4px);
-    margin-top: 3px;
-    margin-left: 6px;
-    background-size: cover;
-/*    margin-right: auto; */
-}
-
-.container > div > img {
-/*    background-color: #ff8888; */
-    object-fit: cover;
-    height: var(--hh);
-    width: var(--hw);
-    display: block; 
-    margin: 0;
-    padding-top: 1px;
-    padding-left: 0px;
-    border: 0;
-    border-style: none;
-    background-size: cover;
-}
-
-.city-msp  { content: url('images/cityfarms-sprites.png'); object-position: 0px calc(-0*var(--cfh)); }
-.city-m    { content: url('images/cityfarms-sprites.png'); object-position: 0px calc(-1*var(--cfh)); }
-.city-back { content: url('images/cityfarms-sprites.png'); object-position: 0px calc(-2*var(--cfh)); }
-.city-p    { content: url('images/cityfarms-sprites.png'); object-position: 0px calc(-3*var(--cfh)); }
-.city-s    { content: url('images/cityfarms-sprites.png'); object-position: 0px calc(-4*var(--cfh)); }
-.city-mp   { content: url('images/cityfarms-sprites.png'); object-position: 0px calc(-5*var(--cfh)); }
-.city-ms   { content: url('images/cityfarms-sprites.png'); object-position: 0px calc(-6*var(--cfh)); }
-.city-sp   { content: url('images/cityfarms-sprites.png'); object-position: 0px calc(-7*var(--cfh)); }
-.farm5     { content: url('images/cityfarms-sprites.png'); object-position: 0px calc(-8*var(--cfh)); }
-.farm6     { content: url('images/cityfarms-sprites.png'); object-position: 0px calc(-9*var(--cfh)); }
-.farm7     { content: url('images/cityfarms-sprites.png'); object-position: 0px calc(-10*var(--cfh)); }
-.farmX     { content: url('images/cityfarms-sprites.png'); object-position: 0px calc(-11*var(--cfh)); }
-
-.farmer   { background: url(images/Purple.png) 0 calc(-0*var(--w2)); }
-.servant  { background: url(images/Purple.png) 0 calc(-2*var(--w2)); }
-.merchant { background: url(images/Purple.png) 0 calc(-1*var(--w2)); }
-.priest   { background: url(images/Purple.png) 0 calc(-3*var(--w2)); }
-
-.hand {
-    display: inline-block;
-    width: auto;
-    margin: 5px;
-    background-color: transparent;
-    text-align: center;
-    align-items: center;
-    border-style: groove;
-    font-size:10pt;
-}
-
-.hand > div {
-    display: inline-block;
-    width: 57px;
-    height: 57px;
-    margin-top: 3px;
-    margin-left: 6px;
-    background-size: cover;
-}
-
-.handlabel {
-    display: inline;
-    vertical-align: center;
-    font-size: 20pt;
-}
-
-  </style>
+  <link rel="stylesheet" type="text/css" href="babylonia.css" />
   <script>
-
     function cyclePieces(c) {
-	    if (c.contains("farmer")) {
-		c.remove("farmer");
-		c.add("merchant");
-	    } else if (c.contains("merchant")) {
-		c.remove("merchant");
-		c.add("priest");
-	    } else if (c.contains("priest")) {
-		c.remove("priest");
-		c.add("servant");
-	    } else if (c.contains("servant")) {
-		c.remove("servant");
-	    } else {
-		c.add("farmer");
-	    }
+	if (c.contains("farmer")) {
+	    c.remove("farmer");
+	    c.add("merchant");
+	} else if (c.contains("merchant")) {
+	    c.remove("merchant");
+	    c.add("priest");
+	} else if (c.contains("priest")) {
+	    c.remove("priest");
+	    c.add("servant");
+	} else if (c.contains("servant")) {
+	    c.remove("servant");
+	} else {
+	    c.add("farmer");
+	}
     }
 
     function cycleCities(c) {
@@ -161,13 +39,15 @@ img.zig {
 		if (i < tiles.length-1) {
 		    c.add(tiles[i+1]);
 		}
-		return
+		return;
 	    }
 	}
 	c.add(tiles[0]);
     }
     
     function selectHex(event) {
+        event.preventDefault();
+	event.stopPropagation();
 	let e = event.target;
 	while (e.parentElement != null && e.parentElement.id != "container") {
 	    e = e.parentElement;
@@ -183,20 +63,45 @@ img.zig {
 		cycleCities(c);
 	    }
 	}
+    }
+
+    function selectPieceToPlay(event) {
+        event.preventDefault();
 	event.stopPropagation();
+	let e = event.target;
+	let hc = e.parentElement.parentElement;
+	if (hc.id == "hand") {
+	    let c = e.parentElement.classList;
+	    if (c.contains("unplayable")) {
+		return;
+	    }
+	    if (!c.contains("selected")) {
+                hc.querySelectorAll('.selected').forEach(div => div.classList.remove('selected'));
+	    }
+	    c.toggle("selected");
+	}
     }
   </script>
   <body>
     <div class="main">
-
       <div style="display: inline">
 	<div class="handlabel">Hand:</div>
-	<div class="hand" id="hand">
-	  <div class="farmer"></div>
-	  <div class="priest"></div>
-	  <div class="merchant"></div>
-	  <div class="farmer"></div>
-	  <div class="merchant"></div>
+	<div class="hand" id="hand" onClick="selectPieceToPlay(event)">
+	  <div>
+	    <div class="farmer"></div>
+	  </div>
+	  <div class="selected">
+	    <div class="priest"></div>
+	  </div>
+	  <div class="unplayable">
+	    <div class="merchant"></div>
+	  </div>
+	  <div>
+	    <div class="farmer"></div>
+	  </div>
+	  <div>
+	    <div class="merchant"></div>
+	  </div>
 	  <div></div>
 	  <div></div>
 	</div>
