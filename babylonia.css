@@ -74,18 +74,18 @@ img.zig {
     background-size: cover;
 }
 
-.city-msp  { content: url('images/cityfarms-sprites.png'); object-position: 0px calc(-0*var(--cfh)); }
-.city-m    { content: url('images/cityfarms-sprites.png'); object-position: 0px calc(-1*var(--cfh)); }
-.city-back { content: url('images/cityfarms-sprites.png'); object-position: 0px calc(-2*var(--cfh)); }
-.city-p    { content: url('images/cityfarms-sprites.png'); object-position: 0px calc(-3*var(--cfh)); }
-.city-s    { content: url('images/cityfarms-sprites.png'); object-position: 0px calc(-4*var(--cfh)); }
-.city-mp   { content: url('images/cityfarms-sprites.png'); object-position: 0px calc(-5*var(--cfh)); }
-.city-ms   { content: url('images/cityfarms-sprites.png'); object-position: 0px calc(-6*var(--cfh)); }
-.city-sp   { content: url('images/cityfarms-sprites.png'); object-position: 0px calc(-7*var(--cfh)); }
-.farm5     { content: url('images/cityfarms-sprites.png'); object-position: 0px calc(-8*var(--cfh)); }
-.farm6     { content: url('images/cityfarms-sprites.png'); object-position: 0px calc(-9*var(--cfh)); }
-.farm7     { content: url('images/cityfarms-sprites.png'); object-position: 0px calc(-10*var(--cfh)); }
-.farmX     { content: url('images/cityfarms-sprites.png'); object-position: 0px calc(-11*var(--cfh)); }
+.city_msp  { content: url('images/cityfarms-sprites.png'); object-position: 0px calc(-0*var(--cfh)); }
+.city_m    { content: url('images/cityfarms-sprites.png'); object-position: 0px calc(-1*var(--cfh)); }
+.city_back { content: url('images/cityfarms-sprites.png'); object-position: 0px calc(-2*var(--cfh)); }
+.city_p    { content: url('images/cityfarms-sprites.png'); object-position: 0px calc(-3*var(--cfh)); }
+.city_s    { content: url('images/cityfarms-sprites.png'); object-position: 0px calc(-4*var(--cfh)); }
+.city_mp   { content: url('images/cityfarms-sprites.png'); object-position: 0px calc(-5*var(--cfh)); }
+.city_ms   { content: url('images/cityfarms-sprites.png'); object-position: 0px calc(-6*var(--cfh)); }
+.city_sp   { content: url('images/cityfarms-sprites.png'); object-position: 0px calc(-7*var(--cfh)); }
+.farm_5     { content: url('images/cityfarms-sprites.png'); object-position: 0px calc(-8*var(--cfh)); }
+.farm_6     { content: url('images/cityfarms-sprites.png'); object-position: 0px calc(-9*var(--cfh)); }
+.farm_7     { content: url('images/cityfarms-sprites.png'); object-position: 0px calc(-10*var(--cfh)); }
+.farm_X     { content: url('images/cityfarms-sprites.png'); object-position: 0px calc(-11*var(--cfh)); }
 
 .blank    { background: url(images/Purple.png) 0 calc(-0*var(--w2)); }
 .farmer   { background: url(images/Purple.png) 0 calc(-1*var(--w2)); }
