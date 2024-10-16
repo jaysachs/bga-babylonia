@@ -5,6 +5,8 @@ enum Piece: string {
     case PRIEST = 'priest';
     case SERVANT = 'servant';
     case MERCHANT = 'merchant';
+    case FARMER = 'farmer';
+    case SECRET = 'secret';
     case CITY_P = 'city_p';
     case CITY_S = 'city_s';
     case CITY_M = 'city_m';
@@ -15,7 +17,7 @@ enum Piece: string {
     case FARM_5 = 'farm_5';
     case FARM_6 = 'farm_6';
     case FARM_7 = 'farm_7';
-    case FARM_CITIES = 'farm_c';
+    case FARM_CITIES = 'farm_X';
     case PLACEHOLDER = '';
 
     public function isFarm(): bool {
@@ -40,20 +42,24 @@ enum Piece: string {
             default => false,
         };
     }
+
+    public function isPlayerPiece(): bool {
+        return $this->isFarmer() || $this->isNoble() || $this->isSecret();
+    }
+    public function isSecret(): bool { return $this == Piece::SECRET; }
+    public function isFarmer(): bool { return $this == Piece::FARMER; }
+    public function isNoble(): bool {
+        return match ($this) {
+            Piece::MERCHANT,
+            Piece::SERVANT,
+            Piece::PRIEST => true,
+            default => false,
+        };
+    }
 }
 
 class Ziggurat {
     public $scored = false;
-}
-
-enum PieceType: string {
-    case Priest = 'priest';
-    case Servant = 'servant';
-    case Merchant = 'merchant';
-    case Farmer = 'farmer';
-
-    public function isFarmer(): bool { return $this == PieceType::Farmer; }
-    public function isNoble(): bool { return $this != PieceType::Farmer; }
 }
 
 class PlayedPiece {
@@ -62,8 +68,8 @@ class PlayedPiece {
 }
 
 enum HexType: string {
-    case Land = 'Land';
-    case Water = 'Water';
+    case LAND = 'LAND';
+    case WATER = 'WATER';
 }
 
 /*
@@ -79,48 +85,52 @@ class Hex {
     public function __construct(public HexType $type,
                                 public int $row,
                                 public int $col,
-                                public ?Piece $piece) {
+                                public Piece|PlayedPiece|null $piece) {
     }
 
     public function isPlayable(): bool {
         return $this->piece == null || $this->piece->isCity() || $this->piece->isFarm();
     }
     
-    public function placeCityOrFarm(Piece $city_or_farm) {
+    public function placeFeature(Piece $feature) {
         if ($this->piece != Piece::PLACEHOLDER) {
             throw new LogicException("attempt to place city or farm where it is not expected");
         }
-        if (!$city_or_farm->isCity() && !$city_or_farm->isFarm()) {
+        if (!$feature->isCity() && !$feature->isFarm() && $feature != Piece::ZIGGURAT) {
             throw new LogicException("attempt to place a non-city or farm");
         }
-        $this->piece = $city_or_farm;
+        $this->piece = $feature;
     }
     
-    public function play(PlayedPiece $p) {
-        if ($this->piece != null) {
-            // throw exception
+    public function playPiece(PlayedPiece $p) {
+        if ($this->piece != Piece::PLACEHOLDER && $this->piece != null) {
+            throw new LogicException("attempt to play a piece $p in occupied hex $this");
         }
-        $this->piece = $p;
+        if ($this->type == Hextype::WATER) {
+            $this->piece = new PlayedPiece(Piece::SECRET, $p->player_id);
+        } else {
+            $this->piece = $p;
+        }
     }
 
     public function needsCityOrFarm(): bool {
         return $this->piece == Piece::PLACEHOLDER;
     }
 
-    public static function plain(int $row, int $col):Hex {
-        return new Hex(HexType::Land, $row, $col, null);
+    public static function land(int $row, int $col):Hex {
+        return new Hex(HexType::LAND, $row, $col, null);
     }
 
     public static function city(int $row, int $col): Hex {
-        return new Hex(HexType::Land, $row, $col, Piece::PLACEHOLDER);
+        return new Hex(HexType::LAND, $row, $col, Piece::PLACEHOLDER);
     }
 
     public static function water(int $row, int $col): Hex {
-        return new Hex(HexType::Water, $row, $col, null);
+        return new Hex(HexType::WATER, $row, $col, null);
     }
 
     public static function ziggurat(int $row, int $col): Hex {
-        return new Hex(HexType::Water, $row, $col, Piece::ZIGGURAT);
+        return new Hex(HexType::LAND, $row, $col, Piece::ZIGGURAT);
     }
 
 }
@@ -186,7 +196,7 @@ END;
                 case '.':
                     break;
                 case '_':
-                    $board->addHex(Hex::plain($row, $col));
+                    $board->addHex(Hex::land($row, $col));
                     break;
                 case 'C':
                     $board->addHex(Hex::city($row, $col));
@@ -225,7 +235,7 @@ END;
                 if ($hex->needsCityOrFarm()) {
                     $x = array_pop($pool);
                     printf("%d:%d %s\n", $hex->row, $hex->col, $x->value);
-                    $hex->placeCityOrFarm($x);
+                    $hex->placeFeature($x);
                 }
             }
         );
@@ -237,6 +247,35 @@ END;
                 $visit($hex);
             }
         }
+    }
+
+    /* "SELECT board_x x, board_y y, hextype, piece, scored, board_player FROM board" ); */
+    public static function fromDbResult($dbresults): Board {
+        $hexes = [];
+        $board = new Board($hexes);
+        foreach ($dbresults as &$result) {
+            $row = $result['board_y'];
+            $col = $result['board_x'];
+            
+            $hex = null;
+            $type = $result['hextype'];
+            switch ($type) {
+            case HexType::LAND :
+                $hex = Hex::land($row, $col);
+                break;
+            case HexType::WATER :
+                $hex = Hex::water($row, $col);
+                break;
+            }
+            $board->addHex($hex);
+            $p = Piece::from($result['piece']);
+            if ($p->isPlayerPiece()) {
+                $board->playPiece(new PlayedPiece($p, $result['board_player']));
+            } else {
+                $hex->placeFeature($p);
+            }
+        }
+        return $board;
     }
 
     public function __construct(private array &$hexes) {}
@@ -264,7 +303,7 @@ END;
             $start_row,
             $start_col,
             function($hex) {
-                if ($hex->type == HexType::Land) {
+                if ($hex->type == HexType::LAND) {
                   $hexrow = &$this->hexes[$hex->row];
                   unset($hexrow[$hex->col]);
                   return true;
@@ -310,7 +349,7 @@ END;
         $pool[] = Piece::FARM_6;
         $pool[] = Piece::FARM_7;
         if ($numPlayers > 2) {
-            $pool[] = Piece::CITY_PS;
+            $pool[] = Piece::CITY_SP;
             $pool[] = Piece::CITY_MS;
             $pool[] = Piece::CITY_MP;
             $pool[] = Piece::CITY_MSP;
@@ -373,6 +412,7 @@ class Game {
         return $game;
     }
 
+    /*
     public function getDatas(): array {
     {
         $result = [];
@@ -392,7 +432,7 @@ class Game {
              INNER JOIN hands H ON P.player_id = H.player_id
              INNER JOIN ziggurate_cards Z ON P.player_id = Z.player_id"
         );
-
+        
         if (1 == 2) {
             // Separately query for cards
             $zcp = $this->getObjectListFromDB(
@@ -405,52 +445,64 @@ class Game {
         
         $result['board'] = self::getObjectListFromDB(
             "SELECT board_x x, board_y y, hextype, piece, scored, board_player FROM board" );
-
+        
         // Gather all information about current game situation (visible by player $current_player_id).
         $result['current_player_hand'] = self::getCollectionFromDb(
-            "SELECT piece FROM hands WHERE player_id=" . $current_player_id");
-
+            "SELECT piece FROM hands WHERE player_id=" . $current_player_id);
+        
         return $result;
     }
+    */
 
-    public function playPiece(Player &$player, PieceType $piece, int $row, int $col) {
+    public function isPlayPermitted(Player &$player, Piece $piece, int $row, int $col): bool {
+        if (!$piece->isPlayerPiece()) {
+            throw new InvalidArgumentException("attempt to place a non-player piece: $piece at $row $col");
+        }
         if (!array_search($this->players, $player)) {
-            throw new InvalidArgumentException("");
+            throw new InvalidArgumentException("unknown player: $player");
         }
         $hex = $this->board->hexAt($row, $col);
         if ($hex == null) {
-            // TODO: illegal
+            throw new InvalidArgumentException("Unknown row,col: $row, $col");
         }
-        if (!$hex->canBePlayed()) {
-            // TODO: illegal
+        
+        if ($hex->piece == null || $hex->piece == Piece::PLACEHOLDER) {
+            return true;
         }
-        if (!$player->pickUp($piece)) {
-            // TODO: illegal
-        }
-        if ($hex->piece == null) {
-            $hex->play($piece);
-        } else if ($hex->piece->isFarm()) {
+
+        if ($hex->piece->isFarm()) {
             if ($piece->isFarmer()) {
-                if ($this->board->anyNeighborMatches($hex, function ($h) {
+                 // requires scoring
+                return ($this->board->anyNeighborMatches($hex, function ($h) {
                     return is_a($h->piece, PlayedPiece)
                         && $h->piece->player == $player
                         && $h->piece->type->isNoble();
-                })) {
-                    $hex->play($piece);
-                    // TODO: score farm
-                } else {
-                    // TODO: illegal
-                }
-            } else {
-                if ($player->hasZigguratCard(ZigguratCard::NoblesInFields)) {
-                    $hex->play($piece);
-                    // TODO: score farm
-                } else {
-                    // TODO: illegal
-                }
+                }));
+            }
+            if ($player->hasZigguratCard(ZigguratCard::NoblesInFields)) {
+                return true;
             }
         }
-        
+
+        return false;
+    }
+    
+    public function playPiece(PlayedPiece $piece, int $row, int $col) {
+        if (!isPlayPermitted($player, $piece, $row, $col)) {
+            throw new InvalidArgumentException("not permitted to play $piece at $row $col");
+        }
+        if (!array_search($this->players, $player)) {
+            throw new InvalidArgumentException("unknown player: $player");
+        }
+        $hex = $this->board->hexAt($row, $col);
+        if ($hex->piece == null || $hex->piece == Piece::PLACEHOLDER) {
+            $hex->playPiece($piece);
+        } else if ($hex->piece->isFarm()) {
+            $hex->playPiece($piece);
+            // TODO: score farm
+        } else {
+            throw new InvalidArgumentException("Attempt to place $piece on hex $hex not permitted");
+        }
     }
 }
 
@@ -464,15 +516,15 @@ class Player {
     public $id = 0;
 
     public static function newPlayer($pid) {
-        let $p = new Player();
+        $p = new Player();
         $p->id = $pid;
         $pool = &$p->pool;
         for ($i = 0; $i < 6; $i++) {
-            $pool[] = PieceType::Priest;
-            $pool[] = PieceType::Merchant;
-            $pool[] = PieceType::Servant;
-            $pool[] = PieceType::Farmer;
-            $pool[] = PieceType::Farmer;
+            $pool[] = Piece::PRIEST;
+            $pool[] = Piece::MERCHANT;
+            $pool[] = Piece::SERVANT;
+            $pool[] = Piece::FARMER;
+            $pool[] = Piece::FARMER;
         }
         shuffle($pool);
         $p->refreshHand();
