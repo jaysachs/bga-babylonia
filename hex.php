@@ -270,7 +270,7 @@ END;
             $board->addHex($hex);
             $p = Piece::from($result['piece']);
             if ($p->isPlayerPiece()) {
-                $board->playPiece(new PlayedPiece($p, $result['board_player']));
+                $hex->playPiece(new PlayedPiece($p, $result['board_player']));
             } else {
                 $hex->placeFeature($p);
             }
@@ -302,7 +302,7 @@ END;
         $this->bfs(
             $start_row,
             $start_col,
-            function($hex) {
+            function(&$hex) {
                 if ($hex->type == HexType::LAND) {
                   $hexrow = &$this->hexes[$hex->row];
                   unset($hexrow[$hex->col]);
@@ -312,6 +312,22 @@ END;
             }
         );
     }
+
+    public function adjacentZiggurats(string $player_id): int {
+        $adjacent = 0;
+        foreach ($this->hexes as &$hex) {
+            if ($hex->piece == Piece::ZIGGURAT) {
+                $nb = $this->neighbors($hex, function(&$nh) {
+                    return $nh->piece->isPlayerPiece() && $nh->piece->player_id == $player_id;
+                });
+                if (count($nb) > 0) {
+                    $adjacent++;
+                }
+            }
+        }
+        return $adjacent;
+    }
+
 
     private function neighbors(Hex &$hex, Closure $matching): array {
         $r = $hex->row;
@@ -461,6 +477,11 @@ class Game {
         if (!array_search($this->players, $player)) {
             throw new InvalidArgumentException("unknown player: $player");
         }
+        
+        // TODO: check that player has this piece
+
+        // TODO: pass in current moves this turn and verify playing is allowed
+        
         $hex = $this->board->hexAt($row, $col);
         if ($hex == null) {
             throw new InvalidArgumentException("Unknown row,col: $row, $col");
@@ -488,14 +509,11 @@ class Game {
     }
     
     public function playPiece(PlayedPiece $piece, int $row, int $col) {
+        // TODO:  pass in moves this turn and update/return it
+        
         if (!isPlayPermitted($player, $piece, $row, $col)) {
             throw new InvalidArgumentException("not permitted to play $piece at $row $col");
         }
-        /*
-        if (!array_search($this->players, $player)) {
-            throw new InvalidArgumentException("unknown player: $player");
-        }
-        */
         $hex = $this->board->hexAt($row, $col);
         if ($hex->piece == null || $hex->piece == Piece::PLACEHOLDER) {
             $hex->playPiece($piece);
