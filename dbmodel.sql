@@ -45,6 +45,22 @@ ALTER TABLE `player` ADD `won_cities` INT UNSIGNED NOT NULL DEFAULT '0';
 CREATE TABLE IF NOT EXISTS `hands` (
   `player_id` int(10) unsigned NOT NULL,
   `piece` varchar(8) DEFAULT NULL,
+  PRIMARY KEY (`player_id`, `piece`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8l
+
+-- Needed to determine allowable plays (e.g. 3+ if all farmers, some ziggurat powers)
+-- Also useful for incremental undo.
+CREATE TABLE IF NOT EXISTS `played_pieces` (
+  `player_id` int(10) unsigned NOT NULL,
+  `seq_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `piece` varchar(8) DEFAULT NULL,
+  -- where it was placed
+  `board_x` int(10) unsigned NOT NULL,
+  `board_y` int(10) unsigned NOT NULL,
+  -- what piece was "captured", and what it scored
+  `farm` varchar(8) DEFAULT NULL,
+  `points` int(10) unsigned DEFAULT NULL,
+  PRIMARY KEY (`player_id`, `seq_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8l
 
 CREATE TABLE IF NOT EXISTS `ziggurat_cards` (
