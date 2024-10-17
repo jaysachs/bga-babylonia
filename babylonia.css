@@ -56,7 +56,6 @@ img.zig {
     height: calc(var(--hh) - 4px);
     margin-top: 3px;
     margin-left: 6px;
-    background-size: cover;
 /*    margin-right: auto; */
 }
 
@@ -87,11 +86,29 @@ img.zig {
 .farm_7     { content: url('images/cityfarms-sprites.png'); object-position: 0px calc(-10*var(--cfh)); }
 .farm_X     { content: url('images/cityfarms-sprites.png'); object-position: 0px calc(-11*var(--cfh)); }
 
-.blank    { background: url(images/Purple.png) 0 calc(-0*var(--w2)); }
-.farmer   { background: url(images/Purple.png) 0 calc(-1*var(--w2)); }
-.servant  { background: url(images/Purple.png) 0 calc(-4*var(--w2)); }
-.merchant { background: url(images/Purple.png) 0 calc(-2*var(--w2)); }
-.priest   { background: url(images/Purple.png) 0 calc(-3*var(--w2)); }
+
+/* 100% is for wood-toned. */
+.blank    {
+    background: url(images/pieces.png) 100% 0;
+    background-size: 400% 500%;
+
+}
+.farmer   {
+    background: url(images/pieces.png) 100% -100%;
+    background-size: 400% 500%;
+}
+.servant  {
+    background: url(images/pieces.png) 100% -200%;
+    background-size: 400% 500%;
+}
+.merchant {
+    background: url(images/pieces.png) 100% -300%;
+    background-size: 400% 500%;
+}
+.priest   {
+    background: url(images/pieces.png) 100% -400%;
+    background-size: 400% 500%;
+}
 
 
 /*
@@ -129,7 +146,6 @@ img.zig {
     margin-top: calc(var(--pp));
     width: calc(var(--ps));
     height: calc(var(--ps));
-    background-size: cover;
 }
 
 .handlabel {
