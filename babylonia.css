@@ -126,26 +126,19 @@ img.zig {
     border-color: black;
     border-style: inset;
     padding: 4px;
-
-    --ps: 57px;
-    --pp: 2px;
 }
 
 .hand > div {
     clip-path: circle();
     display: inline-block;
-    width: calc(var(--ps) + 2 * var(--pp));
-    height: calc(var(--ps) + 2 * var(--pp));
+    padding: 3px;
+    margin-top: 4px;
     margin-left: 8px;
 }
 
 .hand > div > div {
-    clip-path: circle();
-    display: inline-block;
-    /*    border: 3px 3px 3px 3px;*/
-    margin-top: calc(var(--pp));
-    width: calc(var(--ps));
-    height: calc(var(--ps));
+    width: 57px;
+    height: 57px;
 }
 
 .handlabel {
@@ -166,6 +159,6 @@ img.zig {
 }
 
 .selected {
-    background-color: #22DDDD;
+    background-color: black;
     opacity: 0.8;
 }
