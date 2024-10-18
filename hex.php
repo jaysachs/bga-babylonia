@@ -446,7 +446,7 @@ class Game {
                     GROUP_CONCAT(z.ziggurat_card SEPARATOR ',') cards
              FROM player P
              INNER JOIN hands H ON P.player_id = H.player_id
-             INNER JOIN ziggurate_cards Z ON P.player_id = Z.player_id"
+             INNER JOIN ziggurat_cards Z ON P.player_id = Z.player_id"
         );
         
         if (1 == 2) {
