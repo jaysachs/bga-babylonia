@@ -81,17 +81,18 @@ class Hex {
     public function __toString(): string {
         return sprintf("%s %d:%d %s", $this->type->value, $this->row, $this->col, $this->piece);
     }
-    
+
     public function __construct(public HexType $type,
                                 public int $row,
                                 public int $col,
-                                public Piece|PlayedPiece|null $piece) {
+                                public Piece|PlayedPiece|null $piece,
+                                public bool $scored = false) {
     }
 
     public function isPlayable(): bool {
         return $this->piece == null || $this->piece->isCity() || $this->piece->isFarm();
     }
-    
+
     public function placeFeature(Piece $feature) {
         if ($this->piece != Piece::PLACEHOLDER) {
             throw new LogicException("attempt to place city or farm where it is not expected");
@@ -101,7 +102,7 @@ class Hex {
         }
         $this->piece = $feature;
     }
-    
+
     public function playPiece(PlayedPiece $p) {
         if ($this->piece != Piece::PLACEHOLDER && $this->piece != null) {
             throw new LogicException("attempt to play a piece $p in occupied hex $this");
@@ -241,7 +242,7 @@ END;
         );
     }
 
-    private function visitAll(Closure $visit) {
+    public function visitAll(Closure $visit) {
         foreach ($this->hexes as &$hexrow) {
             foreach ($hexrow as &$hex) {
                 $visit($hex);
@@ -256,7 +257,7 @@ END;
         foreach ($dbresults as &$result) {
             $row = $result['board_y'];
             $col = $result['board_x'];
-            
+
             $hex = null;
             $type = $result['hextype'];
             switch ($type) {
@@ -428,9 +429,27 @@ class Game {
         return $game;
     }
 
-    /*
+    public function saveBoardToDb(): void {
+        $sql = "INSERT INTO board (board_x, board_y, hextype, piece, scored, player_id) VALUES ";
+        $sql_values = [];
+        $this->board->visitAll(function ($hex) use (&$sql_values) {
+            $player_id = 'NULL';
+            $piece = 'NULL';
+            if (is_a($hex->piece, 'PlayedPiece')) {
+                $piece = "'" . $hex->piece->type->value . "'";
+                $player_id = $hex->piece->player_id;
+            } else if ($hex->piece != null) {
+                $piece = "'" . $hex->piece->value . "'";
+            }
+            $t = $hex->type->value;
+            $scored = $hex->scored ? 'TRUE' : 'FALSE';
+            $sql_values[] = "($hex->col, $hex->row, '$t', $piece, $scored, $player_id)";
+        });
+        $sql .= implode(',', $sql_values);
+        $this->DbQuery( $sql );
+    }
+
     public function getDatas(): array {
-    {
         $result = [];
 
         // WARNING: We must only return information visible by the current player.
@@ -448,27 +467,16 @@ class Game {
              INNER JOIN hands H ON P.player_id = H.player_id
              INNER JOIN ziggurat_cards Z ON P.player_id = Z.player_id"
         );
-        
-        if (1 == 2) {
-            // Separately query for cards
-            $zcp = $this->getObjectListFromDB(
-                "SELECT player_id, GROUP_CONCAT(ziggurat_card SEPARATOR ',') cards FROM ziggurate_cards GROUP BY player_id"
-            );
-            foreach ($zcp as $z) {
-                $result["players"][$z["player_id"]]["ziggurate_cards"] = explode(',', $z["cards"]);
-            }
-        }
-        
+
         $result['board'] = self::getObjectListFromDB(
             "SELECT board_x x, board_y y, hextype, piece, scored, board_player FROM board" );
-        
+
         // Gather all information about current game situation (visible by player $current_player_id).
         $result['current_player_hand'] = self::getCollectionFromDb(
-            "SELECT piece FROM hands WHERE player_id=" . $current_player_id);
-        
+            "SELECT pos, piece FROM hands WHERE player_id=" . $current_player_id);
+
         return $result;
     }
-    */
 
     public function isPlayPermitted(Player &$player, Piece $piece, int $row, int $col): bool {
         if (!$piece->isPlayerPiece()) {
@@ -477,16 +485,16 @@ class Game {
         if (!array_search($this->players, $player)) {
             throw new InvalidArgumentException("unknown player: $player");
         }
-        
+
         // TODO: check that player has this piece
 
         // TODO: pass in current moves this turn and verify playing is allowed
-        
+
         $hex = $this->board->hexAt($row, $col);
         if ($hex == null) {
             throw new InvalidArgumentException("Unknown row,col: $row, $col");
         }
-        
+
         if ($hex->piece == null || $hex->piece == Piece::PLACEHOLDER) {
             return true;
         }
@@ -507,10 +515,10 @@ class Game {
 
         return false;
     }
-    
+
     public function playPiece(PlayedPiece $piece, int $row, int $col) {
         // TODO:  pass in moves this turn and update/return it
-        
+
         if (!isPlayPermitted($player, $piece, $row, $col)) {
             throw new InvalidArgumentException("not permitted to play $piece at $row $col");
         }
@@ -549,7 +557,7 @@ class Player {
         shuffle($pool);
         $p->refreshHand();
     }
-    
+
     /* returns false if pool is empty */
     public function refreshHand() : bool {
         $handSize = $this->handSize();
@@ -573,5 +581,5 @@ class Player {
 
 $g = Game::newGame($argv[1], $argv[2]);
 var_dump($g);
-
+$g->saveBoardToDb();
 ?>
