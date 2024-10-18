@@ -71,7 +71,7 @@ var jstpl_some_game_item='<div class="my_game_item" id="my_game_item_${MY_ITEM_I
 
     <div id="main"> 
       <div style="width: 1024px; display: flex; flex-direction:row; flex-wrap: nowrap; justify-content:center;">
-	<div class="hand wood" id="hand" onClick="selectPieceToPlay(event)">
+	<div class="hand blue" id="hand" onClick="selectPieceToPlay(event)">
 	  <div>
 	    <div class="farmer"></div>
 	  </div>
