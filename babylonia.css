@@ -41,57 +41,72 @@
 }
 
 
-img.zig {
-    content: url(images/zigurat.png);
-    width: 100%;
-    display: block;
-    margin-top: 1px;
-    margin-left: auto;
-    margin-right: auto;
+.container > div > div.city {
+    height: var(--hh);
+    width: var(--hw);
+    background-size: 100% 1200%;
 }
 
-.container > div > div {
-    /* use hh for width since smaller and want it to be square */
+.city_msp  {
+    background: url('images/cityfarms-sprites.png') 0% 0%;
+    background-size: 100% 1200%;
+}
+.city_m    {
+    background: url('images/cityfarms-sprites.png') 0% -100%;
+    background-size: 100% 1200%;
+}
+.city_back {
+    background: url('images/cityfarms-sprites.png') 0% -200%;
+    background-size: 100% 1200%;
+}
+.city_p    {
+    background: url('images/cityfarms-sprites.png') 0% -300%;
+    background-size: 100% 1200%;
+}
+.city_s    {
+    background: url('images/cityfarms-sprites.png') 0% -400%;
+    background-size: 100% 1200%;
+}
+.city_mp   {
+    background: url('images/cityfarms-sprites.png') 0% -500%;
+    background-size: 100% 1200%;
+}
+.city_ms   {
+    background: url('images/cityfarms-sprites.png') 0% -600%;
+    background-size: 100% 1200%;
+}
+.city_sp   {
+    background: url('images/cityfarms-sprites.png') 0% -700%;
+    background-size: 100% 1200%;
+}
+.farm_5     {
+    background: url('images/cityfarms-sprites.png') 0% -800%;
+    background-size: 100% 1200%;
+}
+.farm_6     {
+    background: url('images/cityfarms-sprites.png') 0% -900%;
+    background-size: 100% 1200%;
+}
+.farm_7     {
+    background: url('images/cityfarms-sprites.png') 0% -1000%;
+    background-size: 100% 1200%;
+}
+.farm_X     {
+    background: url('images/cityfarms-sprites.png') 0% -1100%;
+    background-size: 100% 1200%;
+}
+
+.container > div > div.piece {
     width: calc(var(--hh) - 4px);
     height: calc(var(--hh) - 4px);
     margin-top: 3px;
     margin-left: 6px;
-/*    margin-right: auto; */
 }
-
-.container > div > img {
-/*    background-color: #ff8888; */
-    object-fit: cover;
-    height: var(--hh);
-    width: var(--hw);
-    display: block; 
-    margin: 0;
-    padding-top: 1px;
-    padding-left: 0px;
-    border: 0;
-    border-style: none;
-    background-size: cover;
-}
-
-.city_msp  { content: url('images/cityfarms-sprites.png'); object-position: 0px calc(-0*var(--cfh)); }
-.city_m    { content: url('images/cityfarms-sprites.png'); object-position: 0px calc(-1*var(--cfh)); }
-.city_back { content: url('images/cityfarms-sprites.png'); object-position: 0px calc(-2*var(--cfh)); }
-.city_p    { content: url('images/cityfarms-sprites.png'); object-position: 0px calc(-3*var(--cfh)); }
-.city_s    { content: url('images/cityfarms-sprites.png'); object-position: 0px calc(-4*var(--cfh)); }
-.city_mp   { content: url('images/cityfarms-sprites.png'); object-position: 0px calc(-5*var(--cfh)); }
-.city_ms   { content: url('images/cityfarms-sprites.png'); object-position: 0px calc(-6*var(--cfh)); }
-.city_sp   { content: url('images/cityfarms-sprites.png'); object-position: 0px calc(-7*var(--cfh)); }
-.farm_5     { content: url('images/cityfarms-sprites.png'); object-position: 0px calc(-8*var(--cfh)); }
-.farm_6     { content: url('images/cityfarms-sprites.png'); object-position: 0px calc(-9*var(--cfh)); }
-.farm_7     { content: url('images/cityfarms-sprites.png'); object-position: 0px calc(-10*var(--cfh)); }
-.farm_X     { content: url('images/cityfarms-sprites.png'); object-position: 0px calc(-11*var(--cfh)); }
-
 
 /* 100% is for wood-toned. */
 .blank    {
     background: url(images/pieces.png) 100% 0;
     background-size: 400% 500%;
-
 }
 .farmer   {
     background: url(images/pieces.png) 100% -100%;
