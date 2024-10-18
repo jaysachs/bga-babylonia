@@ -26,9 +26,6 @@
 -->
 
 
-This is your game interface. You can edit this HTML in your ".tpl" file.
-
-
 <script type="text/javascript">
 
 // Javascript HTML templates
@@ -40,7 +37,17 @@ var jstpl_some_game_item='<div class="my_game_item" id="my_game_item_${MY_ITEM_I
 */
 
   function selectHex(event) {
-      window.alert("Selected " + event.target.id);
+        event.preventDefault();
+	event.stopPropagation();
+	let e = event.target;
+	while (e.parentElement != null && e.parentElement.id != "board") {
+	    e = e.parentElement;
+	}
+//	if (e.parentElement != null) {
+	    let x = e.id.split("_");
+	    console.log("selected hex " + x[1] + ", " + x[2]);
+	    window.alert("Selected " + e.id);
+//	}
   }
 
     function selectPieceToPlay(event) {

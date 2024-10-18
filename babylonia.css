@@ -16,7 +16,7 @@
 
 /* inspired from https://css-tricks.com/hexagons-and-beyond-flexible-responsive-grid-patterns-sans-media-queries/ */
 
-.main {
+#main {
     --hw: 70px;
     --cfh: calc(var(--hh) - 0px);
     --hh: 61px;

@@ -49,15 +49,15 @@ CREATE TABLE IF NOT EXISTS `handpools` (
   --  in fact, we could probably just retrieve the "first"
   `seq_id` int(2) unsigned NOT NULL AUTO_INCREMENT,
   `piece` varchar(8) NOT NULL,
-  PRIMARY KEY (`player_id`, `seq_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8l
+  PRIMARY KEY (`seq_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8  AUTO_INCREMENT=1 ;
 
 CREATE TABLE IF NOT EXISTS `hands` (
   `player_id` int(10) unsigned NOT NULL,
   `pos` int(2) unsigned NOT NULL,
   `piece` varchar(8) DEFAULT NULL,
   PRIMARY KEY (`player_id`, `pos`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8l
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- Needed to determine allowable plays (e.g. 3+ if all farmers, some ziggurat powers)
 -- Also useful for incremental undo.
@@ -75,14 +75,14 @@ CREATE TABLE IF NOT EXISTS `moves_this_turn` (
   `captured` varchar(8) DEFAULT NULL,
   -- what was immediately scored (farm and/or ziggurat adjacency)
   `points` int(10) unsigned DEFAULT NULL,
-  PRIMARY KEY (`player_id`, `seq_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8l
+  PRIMARY KEY (`seq_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 CREATE TABLE IF NOT EXISTS `ziggurat_cards` (
   `player_id` int(10) unsigned NOT NULL,
   `ziggurat_card` varchar(5) NOT NULL,
   PRIMARY KEY (`player_id`, `ziggurat_card`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8l
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `board` (
   `board_x` smallint(5) unsigned NOT NULL,
