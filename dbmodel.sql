@@ -40,25 +40,40 @@
 
 ALTER TABLE `player` ADD `ziggurat_cards` SET ('zcard1', 'zcard2', 'zcard3', 'zcard4', 'zcard5', 'zcard6', 'zcard7', 'zcard8', 'zcard9') DEFAULT NULL;
 
-ALTER TABLE `player` ADD `won_cities` INT UNSIGNED NOT NULL DEFAULT '0';
+ALTER TABLE `player` ADD `won_city_count` INT UNSIGNED NOT NULL DEFAULT '0';
+
+CREATE TABLE IF NOT EXISTS `handpools` (
+  `player_id` int(10) unsigned NOT NULL,
+  -- we seed this from a random sequence of the pools, so to refill a hand
+  --  just retrieve and DELETE the MIN(seq_id) for a player
+  --  in fact, we could probably just retrieve the "first"
+  `seq_id` int(2) unsigned NOT NULL AUTO_INCREMENT,
+  `piece` varchar(8) NOT NULL,
+  PRIMARY KEY (`player_id`, `seq_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8l
 
 CREATE TABLE IF NOT EXISTS `hands` (
   `player_id` int(10) unsigned NOT NULL,
+  `pos` int(2) unsigned NOT NULL,
   `piece` varchar(8) DEFAULT NULL,
-  PRIMARY KEY (`player_id`, `piece`)
+  PRIMARY KEY (`player_id`, `pos`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8l
 
 -- Needed to determine allowable plays (e.g. 3+ if all farmers, some ziggurat powers)
 -- Also useful for incremental undo.
-CREATE TABLE IF NOT EXISTS `played_pieces` (
+CREATE TABLE IF NOT EXISTS `moves_this_turn` (
   `player_id` int(10) unsigned NOT NULL,
   `seq_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `piece` varchar(8) DEFAULT NULL,
+  -- position in hand
+  `piece_pos` int(2) NOT NULL,
   -- where it was placed
   `board_x` int(10) unsigned NOT NULL,
   `board_y` int(10) unsigned NOT NULL,
-  -- what piece was "captured", and what it scored
-  `farm` varchar(8) DEFAULT NULL,
+  -- no need to record "inversion", as the hextype will tell us
+  -- what farm was "captured" if any
+  `captured` varchar(8) DEFAULT NULL,
+  -- what was immediately scored (farm and/or ziggurat adjacency)
   `points` int(10) unsigned DEFAULT NULL,
   PRIMARY KEY (`player_id`, `seq_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8l
@@ -72,9 +87,14 @@ CREATE TABLE IF NOT EXISTS `ziggurat_cards` (
 CREATE TABLE IF NOT EXISTS `board` (
   `board_x` smallint(5) unsigned NOT NULL,
   `board_y` smallint(5) unsigned NOT NULL,
-  `hextype` varchar(8) NOT NULL, -- PLAIN or WATER
-  `piece` varchar(8) DEFAULT NULL, -- CITY_P, CITY_S, CITY_M, CITY_MP, CITY_MS, CITY_MP, CITY_MSP, FARM_5, FARM_6, FARM_7, FARM_C, ZIGGURAT, FARMER, MERCHANT, PRIEST, SERVANT
+   -- LAND or WATER
+  `hextype` varchar(8) NOT NULL,
+   -- one of: CITY_{P,S,M,MS,MP,SP,MSP}, FARM_{5,6,7,X}, ZIGGURAT,
+   -- or a played piece: FARMER, MERCHANT, PRIEST, SERVANT
+   -- note that "inverted" will be based on hextype and we'll sanitize played pieces
+   --   to PLAIN before returning to client
+  `piece` varchar(8) DEFAULT NULL,
   `scored` boolean DEFAULT FALSE,
-  `board_player` int(10) unsigned DEFAULT NULL,
+  `player_id` int(10) unsigned DEFAULT NULL,
   PRIMARY KEY (`board_x`,`board_y`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
