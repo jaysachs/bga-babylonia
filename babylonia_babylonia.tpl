@@ -39,9 +39,26 @@ var jstpl_some_game_item='<div class="my_game_item" id="my_game_item_${MY_ITEM_I
 
 */
 
+    function selectPieceToPlay(event) {
+        event.preventDefault();
+	event.stopPropagation();
+	let e = event.target;
+	let hc = e.parentElement.parentElement;
+	if (hc.id == "hand") {
+	    let c = e.parentElement.classList;
+	    if (c.contains("unplayable")) {
+		return;
+	    }
+	    if (!c.contains("selected")) {
+                hc.querySelectorAll('.selected').forEach(div => div.classList.remove('selected'));
+	    }
+	    c.toggle("selected");
+	}
+    }
+
 </script>  
 
-
+    <div id="main"> 
       <div style="width: 1024px; display: flex; flex-direction:row; flex-wrap: nowrap; justify-content:center;">
 	<div class="hand wood" id="hand" onClick="selectPieceToPlay(event)">
 	  <div>
@@ -63,9 +80,9 @@ var jstpl_some_game_item='<div class="my_game_item" id="my_game_item_${MY_ITEM_I
 	  <div></div>
 	</div>
       </div>
-      <div class="container" id="container" onClick="selectHex(event)">
+      <div class="board" id="board" onClick="selectHex(event)">
 	<script>
-	  let c = document.getElementById("container");
+	  let c = document.getElementById("board");
 	  for (let j = 0; j < 16; j++) {
 	      let odd = j % 2 == 0;
 	      let rows = odd ? 12 : 11;
@@ -80,5 +97,6 @@ var jstpl_some_game_item='<div class="my_game_item" id="my_game_item_${MY_ITEM_I
 	  }
 	</script>
       </div>
+    </div>
 
 {OVERALL_GAME_FOOTER}

@@ -1,7 +1,7 @@
 /**
  *------
  * BGA framework: Gregory Isabelli & Emmanuel Colin & BoardGameArena
- * babylonia implementation : © <Your name here> <Your email address here>
+ * babylonia implementation : © Jay Sachs <jay@covariant.org>
  *
  * This code has been produced on the BGA studio platform for use on http://boardgamearena.com.
  * See http://en.boardgamearena.com/#!doc/Studio for more information.
@@ -13,60 +13,222 @@
  *
  */
 
-/*
-    This is the CSS stylesheet of your game User Interface.
-    
-    Styles defined on this file will be applied to the HTML elements you define in your
-    HTML template (babylonia_babylonia.tpl), and to HTML elements you create dynamically
-    (in babylonia.js).
-    
-    Usually, you are using CSS to:
-    
-    1°) define the overall layout of your game
-        (ex: place the board on the top left, place player's hand beside, place the deck on the right, ...).
 
-    2°) create your CSS-sprites:
-        All images of your games should be gathered into a small number of image files. Then, using
-        background-image and background-position CSS properties, you create HTML blocks that can 
-        display these images correctly (see example below).
-    
-    3°) ... anything else:
-        It is really easy to add and remove CSS classes dynamically from your Javascript with
-        dojo.addClass and dojo.removeClass. It is also easy to check if an element has a class
-        (dojo.hasClass) or to get all elements with a specific class (dojo.query). This is why,
-        very often, using CSS classes for the logic of your user interface allow you to do complex
-        thing easily.
-        
-        
-     Note: on the production platform, this file will be compressed and comments will be removed.
-           Consequently, don't hesitate to put as many comments as necessary.
+/* inspired from https://css-tricks.com/hexagons-and-beyond-flexible-responsive-grid-patterns-sans-media-queries/ */
+
+.main {
+    --hw: 70px;
+    --cfh: calc(var(--hh) - 0px);
+    --hh: 61px;
+    --w2: calc(var(--hh) - 4px);
+}
+
+.board {
+    font-size: 0; /* disable white space between inline block element */
+    background: url(img/mapb.jpg) no-repeat center;
+    background-size: cover;
+    display: block;
+    width: 1024px;
+    height: 768px;
+    position: absolute;
+    left: 0px;
+    top: 100px;
+}
+
+.board > div {
+    height: calc(var(--hh));
+    width: calc(var(--hw));
+    margin: 0;
+    padding: 0;
+    background-color: transparent;
+    display: inline-block;
+    font-size:10pt;
+    text-align: center;
+    align-items: center;
+    foreground-color: #000000;
+    clip-path: polygon(0 50%, 25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%);
+    position: absolute;
+/*    background-color: rgba(255, 22, 255, 0.2); */
+}
+
+
+.board > div.selected {
+    background-color: rgba(22, 255, 22, 0.1);
+}
+
+
+.board > div > div.city {
+    height: var(--hh);
+    width: var(--hw);
+    background-size: 100% 1300%;
+}
+
+.city {
+    background-size: 100% 1300%;
+}
+
+.city_msp  {
+    background: url(img/cities.png) 0% 0%;
+}
+.city_m    {
+    background: url(img/cities.png) 0% -100%;
+}
+.city_back {
+    background: url(img/cities.png) 0% -200%;
+}
+.city_p    {
+    background: url(img/cities.png) 0% -300%;
+}
+.city_s    {
+    background: url(img/cities.png) 0% -400%;
+}
+.city_mp   {
+    background: url(img/cities.png) 0% -500%;
+}
+.city_ms   {
+    background: url(img/cities.png) 0% -600%;
+}
+.city_sp   {
+    background: url(img/cities.png) 0% -700%;
+}
+.farm_5     {
+    background: url(img/cities.png) 0% -800%;
+}
+.farm_6     {
+    background: url(img/cities.png) 0% -900%;
+}
+.farm_7     {
+    background: url(img/cities.png) 0% -1000%;
+}
+.farm_X     {
+    background: url(img/cities.png) 0% -1100%;
+}
+.ziggurat   {
+    background: url(img/cities.png) 0% -1200%;
+}
+
+.board > div > div.piece {
+    width: calc(var(--hh) - 4px);
+    height: calc(var(--hh) - 4px);
+    margin-top: 3px;
+    margin-left: 7px;
+    background-image: url(img/pieces.png);
+    background-size: 400% 500%;
+}
+
+.white .blank    {
+    background-position: 0% 0;
+}
+.wood .blank    {
+    background-position: 100% 0;
+}
+.grey .blank    {
+    background-position: 200% 0;
+}
+.blue .blank    {
+    background-position: 300% 0;
+}
+.white .farmer    {
+    background-position: 0% -100%;
+}
+.wood .farmer   {
+    background-position: 100% -100%;
+}
+.grey .farmer {
+    background-position: 200% -100%;
+}
+.blue .farmer {
+    background-position: 300% -100%;
+}
+.white .merchant {
+    background-position: 0% -200%;
+}
+.wood .merchant {
+    background-position: 100% -200%;
+}
+.grey .merchant {
+    background-position: 200% -200%;
+}
+.blue .merchant {
+    background-position: 300% -200%;
+}
+.white .servant  {
+    background-position: 0% -300%;
+}
+.wood .servant  {
+    background-position: 100% -300%;
+}
+.grey .servant  {
+    background-position: 200% -300%;
+}
+.blue .servant  {
+    background-position: 300% -300%;
+}
+.white .priest   {
+    background-position: 0% -400%;
+}
+.wood .priest   {
+    background-position: 100% -400%;
+}
+.grey .priest   {
+    background-position: 200% -400%;
+}
+.blue .priest   {
+    background-position: 300% -400%;
+}
+
+
+/*
+ Styles for the hand and "rack".
 */
 
+.hand {
+    display: inline-block;
+    width: auto;
+    margin: 5px;
+    background-color: transparent;
+    text-align: center;
+    align-items: center;
+    border: 2px;
+    border-color: black;
+    border-style: inset;
+    padding: 4px;
+}
 
-/* Note: you must not use any @import directive */
+.hand > div {
+    clip-path: circle();
+    display: inline-block;
+    padding: 3px;
+    margin-top: 4px;
+    margin-left: 8px;
+}
 
+.hand > div > div {
+    width: 57px;
+    height: 57px;
+    /* shared with .piece */
+    background-image: url(img/pieces.png);
+    background-size: 400% 500%;
+}
 
-/********* You can start writing your CSS below this line: **********/
+.handlabel {
+    display: inline;
+    vertical-align: center;
+    font-size: 20pt;
+}
 
+.possibleMove {
+    background-color: white;
+    opacity: 0.2; 
+    cursor: pointer;  
+}
 
-/*
-    Example of CSS sprites (a black token and a white token, 20x20px each, embedded in the same "tokens.png" 40x20px image):
+.unplayable {
+    background-color: white;
+    opacity: 0.3;
+}
 
-    .white_token {
-        background-image: url('img/tokens.png');
-        background-position: 0px 0px;
-    }
-    .black_token {
-        background-image: url('img/tokens.png');
-        background-position: -20px 0px;
-    }
-    .token {
-        width: 20px;
-        height: 20px;
-        background-repeat: none;
-    }
-*/
-
-
-
-
+.selected {
+    background-color: black;
+    opacity: 0.8;
+}

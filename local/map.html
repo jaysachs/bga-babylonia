@@ -1,5 +1,5 @@
 <html>
-  <link rel="stylesheet" type="text/css" href="babylonia.css" />
+  <link rel="stylesheet" type="text/css" href="../babylonia.css" />
   <script>
     var currentColor = 3;
     function cycleThings(e) {
@@ -75,7 +75,7 @@
         event.preventDefault();
 	event.stopPropagation();
 	let e = event.target;
-	while (e.parentElement != null && e.parentElement.id != "container") {
+	while (e.parentElement != null && e.parentElement.id != "board") {
 	    e = e.parentElement;
 	}
 	if (e.parentElement != null) {
@@ -126,9 +126,9 @@
 	  <div></div>
 	</div>
       </div>
-      <div class="container" id="container" onClick="selectHex(event)">
+      <div class="board" id="board" onClick="selectHex(event)">
 	<script>
-	  let c = document.getElementById("container");
+	  let c = document.getElementById("board");
 	  for (let j = 0; j < 16; j++) {
 	      let odd = j % 2 == 0;
 	      let rows = odd ? 12 : 11;
