@@ -46,8 +46,8 @@ CREATE TABLE IF NOT EXISTS `handpools` (
   `player_id` int(10) unsigned NOT NULL,
   -- we seed this from a random sequence of the pools, so to refill a hand
   --  just retrieve and DELETE the MIN(seq_id) for a player
-  --  in fact, we could probably just retrieve the "first"
-  `seq_id` int(2) unsigned NOT NULL AUTO_INCREMENT,
+  --  in fact, we could probably just retrieve the "first" via LIMIT 1.
+  `seq_id` int(3) unsigned NOT NULL AUTO_INCREMENT,
   `piece` varchar(8) NOT NULL,
   PRIMARY KEY (`seq_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8  AUTO_INCREMENT=1 ;
