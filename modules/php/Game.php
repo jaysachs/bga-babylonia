@@ -20,6 +20,9 @@ namespace Bga\Games\babylonia;
 
 require_once(APP_GAMEMODULE_PATH . "module/table/table.game.php");
 
+require_once('Board.php');
+
+
 class Game extends \Table
 {
     /**
@@ -265,6 +268,23 @@ class Game extends \Table
 
         // TODO: Setup the initial game situation here.
 
+        $board = Board::forPlayerCount($numPlayers);
+        $ziggurats = [
+            ZigguratCard::PLUS_10,
+            ZigguratCard::EXTRA_TURN,
+            ZigguratCard::SEVEN_TOKENS,
+            ZigguratCard::THREE_NOBLES,
+            ZigguratCard::NOBLE_WITH_3_FARMERS,
+            ZigguratCard::NOBLES_IN_FIELDS,
+            ZigguratCard::EXTRA_CITY_POINTS ];
+        if (!(array_search($options, 'advanced_ziggurats') === false)) {
+            $ziggurats[] = ZigguratCard::FREE_CENTRAL_LAND_CONNECTS;
+            $ziggurats[] = ZigguratCard::FREE_RIVER_CONNECTS;
+            shuffle($game->ziggurats);
+            array_pop($game->ziggurats);
+            array_pop($game->ziggurats);
+        }
+        
         // Activate first player once everything has been initialized and ready.
         $this->activeNextPlayer();
     }
