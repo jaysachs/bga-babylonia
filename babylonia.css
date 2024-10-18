@@ -99,64 +99,64 @@
 
 
 /* 100% is for wood-toned, 300 blue, 200 grey, 0 white. */
-.white .blank, .white.blank    {
+.white .blank    {
     background-position: 0% 0;
 }
-.wood .blank, .wood.blank    {
+.wood .blank    {
     background-position: 100% 0;
 }
-.grey.blank    {
+.grey .blank    {
     background-position: 200% 0;
 }
-.blue.blank    {
+.blue .blank    {
     background-position: 300% 0;
 }
-.white.farmer    {
+.white .farmer    {
     background-position: 0% -100%;
 }
-.wood.farmer, .wood .farmer   {
+.wood .farmer   {
     background-position: 100% -100%;
 }
-.grey.farmer {
+.grey .farmer {
     background-position: 200% -100%;
 }
-.blue.farmer {
+.blue .farmer {
     background-position: 300% -100%;
 }
-.white.merchant {
+.white .merchant {
     background-position: 0% -200%;
 }
-.wood.merchant, .wood .merchant {
+.wood .merchant {
     background-position: 100% -200%;
 }
-.grey.merchant {
+.grey .merchant {
     background-position: 200% -200%;
 }
-.blue.merchant {
+.blue .merchant {
     background-position: 300% -200%;
 }
-.white.servant  {
+.white .servant  {
     background-position: 0% -300%;
 }
-.wood.servant, .wood .servant  {
+.wood .servant  {
     background-position: 100% -300%;
 }
-.grey.servant  {
+.grey .servant  {
     background-position: 200% -300%;
 }
-.blue.servant  {
+.blue .servant  {
     background-position: 300% -300%;
 }
-.white.priest   {
+.white .priest   {
     background-position: 0% -400%;
 }
-.wood.priest, .wood .priest   {
+.wood .priest   {
     background-position: 100% -400%;
 }
-.grey.priest   {
+.grey .priest   {
     background-position: 200% -400%;
 }
-.blue.priest   {
+.blue .priest   {
     background-position: 300% -400%;
 }
 

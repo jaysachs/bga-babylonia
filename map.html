@@ -2,7 +2,7 @@
   <link rel="stylesheet" type="text/css" href="babylonia.css" />
   <script>
     var currentColor = 0;
-    function cycleThings(c) {
+    function cycleThings(e) {
 	let colors = [
 	    "wood",
 	    "blue",
@@ -30,7 +30,10 @@
 	    "farm_7",
 	    "farm_X"
 	];
-	c.add(colors[currentColor]);
+
+	cc = e.parentElement.classList;
+	c = e.classList;
+	cc.add(colors[currentColor]);
 	for (i = 0; i < pieces.length; ++i) {
 	    if (c.contains(pieces[i])) {
 		c.remove(pieces[i]);
@@ -40,12 +43,12 @@
 		    c.remove("piece");
 		    c.add("city");
 		    c.add(cities[0]);
-		    c.remove(colors[currentColor]);
+		    cc.remove(colors[currentColor]);
 		}
 		return;
 	    }
 	}
-	c.remove(colors[currentColor]);
+	cc.remove(colors[currentColor]);
 	for (i = 0; i < cities.length; ++i) {
 	    if (c.contains(cities[i])) {
 		c.remove(cities[i]);
@@ -62,7 +65,7 @@
 	if (currentColor == colors.length) {
 	    currentColor = 0;
 	}
-	c.add(colors[currentColor]);
+	cc.add(colors[currentColor]);
 	c.add(pieces[0]);
 	c.add("piece");
     }
@@ -78,7 +81,7 @@
 	    let x = e.id.split("_");
 	    console.log("selected hex " + x[1] + ", " + x[2]);
 	    // e.classList.toggle("selected");
-	    cycleThings(e.firstElementChild.classList);
+	    cycleThings(e.firstElementChild);
 	}
     }
 
