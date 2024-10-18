@@ -47,53 +47,45 @@
     background-size: 100% 1200%;
 }
 
+.city {
+    background-size: 100% 1200%;
+}
+
 .city_msp  {
     background: url('images/cityfarms-sprites.png') 0% 0%;
-    background-size: 100% 1200%;
 }
 .city_m    {
     background: url('images/cityfarms-sprites.png') 0% -100%;
-    background-size: 100% 1200%;
 }
 .city_back {
     background: url('images/cityfarms-sprites.png') 0% -200%;
-    background-size: 100% 1200%;
 }
 .city_p    {
     background: url('images/cityfarms-sprites.png') 0% -300%;
-    background-size: 100% 1200%;
 }
 .city_s    {
     background: url('images/cityfarms-sprites.png') 0% -400%;
-    background-size: 100% 1200%;
 }
 .city_mp   {
     background: url('images/cityfarms-sprites.png') 0% -500%;
-    background-size: 100% 1200%;
 }
 .city_ms   {
     background: url('images/cityfarms-sprites.png') 0% -600%;
-    background-size: 100% 1200%;
 }
 .city_sp   {
     background: url('images/cityfarms-sprites.png') 0% -700%;
-    background-size: 100% 1200%;
 }
 .farm_5     {
     background: url('images/cityfarms-sprites.png') 0% -800%;
-    background-size: 100% 1200%;
 }
 .farm_6     {
     background: url('images/cityfarms-sprites.png') 0% -900%;
-    background-size: 100% 1200%;
 }
 .farm_7     {
     background: url('images/cityfarms-sprites.png') 0% -1000%;
-    background-size: 100% 1200%;
 }
 .farm_X     {
     background: url('images/cityfarms-sprites.png') 0% -1100%;
-    background-size: 100% 1200%;
 }
 
 .container > div > div.piece {
@@ -101,28 +93,71 @@
     height: calc(var(--hh) - 4px);
     margin-top: 3px;
     margin-left: 6px;
+    background-image: url(images/pieces.png);
+    background-size: 400% 500%;
 }
 
-/* 100% is for wood-toned. */
-.blank    {
-    background: url(images/pieces.png) 100% 0;
-    background-size: 400% 500%;
+
+/* 100% is for wood-toned, 300 blue, 200 grey, 0 white. */
+.white .blank, .white.blank    {
+    background-position: 0% 0;
 }
-.farmer   {
-    background: url(images/pieces.png) 100% -100%;
-    background-size: 400% 500%;
+.wood .blank, .wood.blank    {
+    background-position: 100% 0;
 }
-.servant  {
-    background: url(images/pieces.png) 100% -200%;
-    background-size: 400% 500%;
+.grey.blank    {
+    background-position: 200% 0;
 }
-.merchant {
-    background: url(images/pieces.png) 100% -300%;
-    background-size: 400% 500%;
+.blue.blank    {
+    background-position: 300% 0;
 }
-.priest   {
-    background: url(images/pieces.png) 100% -400%;
-    background-size: 400% 500%;
+.white.farmer    {
+    background-position: 0% -100%;
+}
+.wood.farmer, .wood .farmer   {
+    background-position: 100% -100%;
+}
+.grey.farmer {
+    background-position: 200% -100%;
+}
+.blue.farmer {
+    background-position: 300% -100%;
+}
+.white.merchant {
+    background-position: 0% -200%;
+}
+.wood.merchant, .wood .merchant {
+    background-position: 100% -200%;
+}
+.grey.merchant {
+    background-position: 200% -200%;
+}
+.blue.merchant {
+    background-position: 300% -200%;
+}
+.white.servant  {
+    background-position: 0% -300%;
+}
+.wood.servant, .wood .servant  {
+    background-position: 100% -300%;
+}
+.grey.servant  {
+    background-position: 200% -300%;
+}
+.blue.servant  {
+    background-position: 300% -300%;
+}
+.white.priest   {
+    background-position: 0% -400%;
+}
+.wood.priest, .wood .priest   {
+    background-position: 100% -400%;
+}
+.grey.priest   {
+    background-position: 200% -400%;
+}
+.blue.priest   {
+    background-position: 300% -400%;
 }
 
 
@@ -154,6 +189,9 @@
 .hand > div > div {
     width: 57px;
     height: 57px;
+    /* shared with .piece */
+    background-image: url(images/pieces.png);
+    background-size: 400% 500%;
 }
 
 .handlabel {

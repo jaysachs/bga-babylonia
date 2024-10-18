@@ -1,7 +1,14 @@
 <html>
   <link rel="stylesheet" type="text/css" href="babylonia.css" />
   <script>
+    var currentColor = 0;
     function cycleThings(c) {
+	let colors = [
+	    "wood",
+	    "blue",
+	    "white",
+	    "grey",
+	];
 	let pieces = [
 	    "farmer",
 	    "merchant",
@@ -23,6 +30,7 @@
 	    "farm_7",
 	    "farm_X"
 	];
+	c.add(colors[currentColor]);
 	for (i = 0; i < pieces.length; ++i) {
 	    if (c.contains(pieces[i])) {
 		c.remove(pieces[i]);
@@ -32,21 +40,29 @@
 		    c.remove("piece");
 		    c.add("city");
 		    c.add(cities[0]);
+		    c.remove(colors[currentColor]);
 		}
 		return;
 	    }
 	}
+	c.remove(colors[currentColor]);
 	for (i = 0; i < cities.length; ++i) {
 	    if (c.contains(cities[i])) {
 		c.remove(cities[i]);
 		if (i < cities.length-1) {
 		    c.add(cities[i+1]);
+		    return;
 		} else {
 		    c.remove("city");
+		    break;
 		}
-		return;
 	    }
 	}
+	currentColor++;
+	if (currentColor == colors.length) {
+	    currentColor = 0;
+	}
+	c.add(colors[currentColor]);
 	c.add(pieces[0]);
 	c.add("piece");
     }
@@ -87,7 +103,7 @@
     <div class="main">
       <div style="display: inline">
 	<div class="handlabel">Hand:</div>
-	<div class="hand" id="hand" onClick="selectPieceToPlay(event)">
+	<div class="hand wood" id="hand" onClick="selectPieceToPlay(event)">
 	  <div>
 	    <div class="farmer"></div>
 	  </div>
