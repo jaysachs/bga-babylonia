@@ -291,7 +291,7 @@ END;
             if ($visit($hex)) {
                 $nb = $this->neighbors($hex, $visit);
                 foreach ($nb as $n) {
-                    if (!array_search($n, $seen)) {
+                    if (array_search($n, $seen) === false) {
                         $queue[] = $n;
                     }
                 }
@@ -416,7 +416,10 @@ class Game {
         $game->ziggurats[] = ZigguratCard::NOBLE_WITH_3_FARMERS;
         $game->ziggurats[] = ZigguratCard::NOBLES_IN_FIELDS;
         $game->ziggurats[] = ZigguratCard::EXTRA_CITY_POINTS;
-        if ($optionalZigguarts) {
+
+        $options = ["advanced_ziggurats"];
+
+        if (!(array_search("advanced_ziggurats", $options) === false)) {
             $game->ziggurats[] = ZigguratCard::FREE_CENTRAL_LAND_CONNECTS;
             $game->ziggurats[] = ZigguratCard::FREE_RIVER_CONNECTS;
             shuffle($game->ziggurats);
@@ -446,7 +449,7 @@ class Game {
             $sql_values[] = "($hex->col, $hex->row, '$t', $piece, $scored, $player_id)";
         });
         $sql .= implode(',', $sql_values);
-        $this->DbQuery( $sql );
+        // $this->DbQuery( $sql );
     }
 
     public function getDatas(): array {
@@ -482,7 +485,7 @@ class Game {
         if (!$piece->isPlayerPiece()) {
             throw new InvalidArgumentException("attempt to place a non-player piece: $piece at $row $col");
         }
-        if (!array_search($this->players, $player)) {
+        if (array_search($this->players, $player) === false) {
             throw new InvalidArgumentException("unknown player: $player");
         }
 
@@ -571,7 +574,7 @@ class Player {
     }
 
     public function hasZigguratCard(ZigguratCard $type): bool {
-        return array_search($type, $this->ziggurats) === false;
+        return !(array_search($type, $this->ziggurats) === false);
     }
 
     public function handSize() : int {
