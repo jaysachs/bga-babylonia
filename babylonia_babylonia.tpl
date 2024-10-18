@@ -91,6 +91,8 @@ var jstpl_some_game_item='<div class="my_game_item" id="my_game_item_${MY_ITEM_I
 	  <div></div>
 	</div>
       </div>
+      <!-- needed since the board is absolutely positions / sized. for now. -->
+      <div class="board-spacer"></div>
       <div class="board" id="board" onClick="selectHex(event)">
 	<script>
 	  let c = document.getElementById("board");

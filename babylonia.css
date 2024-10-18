@@ -23,6 +23,11 @@
     --w2: calc(var(--hh) - 4px);
 }
 
+.board-spacer {
+    width: 1024px;
+    height: 768px;
+}
+
 .board {
     font-size: 0; /* disable white space between inline block element */
     background: url(img/mapb.jpg) no-repeat center;
