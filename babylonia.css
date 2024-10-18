@@ -52,53 +52,51 @@
 }
 
 .city_msp  {
-    background: url('images/cityfarms-sprites.png') 0% 0%;
+    background: url('images/cities.png') 0% 0%;
 }
 .city_m    {
-    background: url('images/cityfarms-sprites.png') 0% -100%;
+    background: url('images/cities.png') 0% -100%;
 }
 .city_back {
-    background: url('images/cityfarms-sprites.png') 0% -200%;
+    background: url('images/cities.png') 0% -200%;
 }
 .city_p    {
-    background: url('images/cityfarms-sprites.png') 0% -300%;
+    background: url('images/cities.png') 0% -300%;
 }
 .city_s    {
-    background: url('images/cityfarms-sprites.png') 0% -400%;
+    background: url('images/cities.png') 0% -400%;
 }
 .city_mp   {
-    background: url('images/cityfarms-sprites.png') 0% -500%;
+    background: url('images/cities.png') 0% -500%;
 }
 .city_ms   {
-    background: url('images/cityfarms-sprites.png') 0% -600%;
+    background: url('images/cities.png') 0% -600%;
 }
 .city_sp   {
-    background: url('images/cityfarms-sprites.png') 0% -700%;
+    background: url('images/cities.png') 0% -700%;
 }
 .farm_5     {
-    background: url('images/cityfarms-sprites.png') 0% -800%;
+    background: url('images/cities.png') 0% -800%;
 }
 .farm_6     {
-    background: url('images/cityfarms-sprites.png') 0% -900%;
+    background: url('images/cities.png') 0% -900%;
 }
 .farm_7     {
-    background: url('images/cityfarms-sprites.png') 0% -1000%;
+    background: url('images/cities.png') 0% -1000%;
 }
 .farm_X     {
-    background: url('images/cityfarms-sprites.png') 0% -1100%;
+    background: url('images/cities.png') 0% -1100%;
 }
 
 .container > div > div.piece {
     width: calc(var(--hh) - 4px);
     height: calc(var(--hh) - 4px);
     margin-top: 3px;
-    margin-left: 6px;
+    margin-left: 7px;
     background-image: url(images/pieces.png);
     background-size: 400% 500%;
 }
 
-
-/* 100% is for wood-toned, 300 blue, 200 grey, 0 white. */
 .white .blank    {
     background-position: 0% 0;
 }
