@@ -83,6 +83,26 @@ class Game extends \Table
         $this->gamestate->nextState("playCard");
     }
 
+    private function saveBoardToDb(): void {
+        $sql = "INSERT INTO board (board_x, board_y, hextype, piece, scored, player_id) VALUES ";
+        $sql_values = [];
+        $this->board->visitAll(function ($hex) use (&$sql_values) {
+            $player_id = 'NULL';
+            $piece = 'NULL';
+            if (is_a($hex->piece, 'PlayedPiece')) {
+                $piece = "'" . $hex->piece->type->value . "'";
+                $player_id = $hex->piece->player_id;
+            } else if ($hex->piece != null) {
+                $piece = "'" . $hex->piece->value . "'";
+            }
+            $t = $hex->type->value;
+            $scored = $hex->scored ? 'TRUE' : 'FALSE';
+            $sql_values[] = "($hex->col, $hex->row, '$t', $piece, $scored, $player_id)";
+        });
+        $sql .= implode(',', $sql_values);
+        // $this->DbQuery( $sql );
+        }
+
     public function actPass(): void
     {
         // Retrieve the active player ID.
@@ -196,12 +216,30 @@ class Game extends \Table
         // WARNING: We must only return information visible by the current player.
         $current_player_id = (int) $this->getCurrentPlayerId();
 
-        // Get information about players.
-        // NOTE: you can retrieve some extra field you added for "player" table in `dbmodel.sql` if you need it.
         $result["players"] = $this->getCollectionFromDb(
-            "SELECT player_id, player_score score FROM player"
-        );
+            "SELECT player_id, player_score score FROM player");
 
+        /*
+        // Get information about players.
+        $result["players"] = $this->getCollectionFromDb(
+            "SELECT P.player_id player_id,
+                    P.player_score score,
+                    P.player_color color,
+                    COUNT(H.piece) hand_size,
+                    GROUP_CONCAT(z.ziggurat_card SEPARATOR ',') cards
+             FROM player P
+             INNER JOIN hands H ON P.player_id = H.player_id
+             INNER JOIN ziggurat_cards Z ON P.player_id = Z.player_id"
+        );
+        */
+        $result['board'] = self::getObjectListFromDB(
+            "SELECT board_x x, board_y y, hextype, piece, scored, board_player FROM board" );
+
+        // Gather all information about current game situation (visible by player $current_player_id).
+        /*
+        $result['current_player_hand'] = self::getCollectionFromDb(
+            "SELECT pos, piece FROM hands WHERE player_id=" . $current_player_id);
+        */
         // TODO: Gather all information about current game situation (visible by player $current_player_id).
 
         return $result;
@@ -269,6 +307,7 @@ class Game extends \Table
         // TODO: Setup the initial game situation here.
 
         $board = Board::forPlayerCount($numPlayers);
+        $this->saveBoardtoDb($board);
         $ziggurats = [
             ZigguratCard::PLUS_10,
             ZigguratCard::EXTRA_TURN,

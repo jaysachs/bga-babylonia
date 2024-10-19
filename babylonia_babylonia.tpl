@@ -38,77 +38,62 @@ var jstpl_some_game_item='<div class="my_game_item" id="my_game_item_${MY_ITEM_I
 
   function selectHex(event) {
         event.preventDefault();
-	event.stopPropagation();
-	let e = event.target;
-	while (e.parentElement != null && e.parentElement.id != "board") {
-	    e = e.parentElement;
-	}
-//	if (e.parentElement != null) {
-	    let x = e.id.split("_");
-	    console.log("selected hex " + x[1] + ", " + x[2]);
-	    window.alert("Selected " + e.id);
-//	}
+        event.stopPropagation();
+        let e = event.target;
+        while (e.parentElement != null && e.parentElement.id != "board") {
+            e = e.parentElement;
+        }
+//      if (e.parentElement != null) {
+            let x = e.id.split("_");
+            console.log("selected hex " + x[1] + ", " + x[2]);
+            window.alert("Selected " + e.id);
+//      }
   }
 
     function selectPieceToPlay(event) {
         event.preventDefault();
-	event.stopPropagation();
-	let e = event.target;
-	let hc = e.parentElement.parentElement;
-	if (hc.id == "hand") {
-	    let c = e.parentElement.classList;
-	    if (c.contains("unplayable")) {
-		return;
-	    }
-	    if (!c.contains("selected")) {
+        event.stopPropagation();
+        let e = event.target;
+        let hc = e.parentElement.parentElement;
+        if (hc.id == "hand") {
+            let c = e.parentElement.classList;
+            if (c.contains("unplayable")) {
+                return;
+            }
+            if (!c.contains("selected")) {
                 hc.querySelectorAll('.selected').forEach(div => div.classList.remove('selected'));
-	    }
-	    c.toggle("selected");
-	}
+            }
+            c.toggle("selected");
+        }
     }
 
 </script>  
 
     <div id="main"> 
       <div style="width: 1024px; display: flex; flex-direction:row; flex-wrap: nowrap; justify-content:center;">
-	<div class="hand blue" id="hand" onClick="selectPieceToPlay(event)">
-	  <div>
-	    <div class="farmer"></div>
-	  </div>
-	  <div class="selected">
-	    <div class="priest"></div>
-	  </div>
-	  <div class="unplayable">
-	    <div class="merchant"></div>
-	  </div>
-	  <div>
-	    <div class="farmer"></div>
-	  </div>
-	  <div>
-	    <div class="merchant"></div>
-	  </div>
-	  <div></div>
-	  <div></div>
-	</div>
+        <div class="hand blue" id="hand" onClick="selectPieceToPlay(event)">
+          <div>
+            <div class="farmer"></div>
+          </div>
+          <div class="selected">
+            <div class="priest"></div>
+          </div>
+          <div class="unplayable">
+            <div class="merchant"></div>
+          </div>
+          <div>
+            <div class="farmer"></div>
+          </div>
+          <div>
+            <div class="merchant"></div>
+          </div>
+          <div></div>
+          <div></div>
+        </div>
       </div>
       <!-- needed since the board is absolutely positions / sized. for now. -->
       <div class="board-spacer"></div>
       <div class="board" id="board" onClick="selectHex(event)">
-	<script>
-	  let c = document.getElementById("board");
-	  for (let j = 0; j < 16; j++) {
-	      let odd = j % 2 == 0;
-	      let rows = odd ? 12 : 11;
-	      for (let i = 0; i < rows; i++) {
-		  let top = i * 63 + (odd ? 6 : 37);
-		  let left = 38 + (j * 55);
-		  c.insertAdjacentHTML(
-		      `beforeend`,
-		      `<div id="hex_${i}_${j}" style="top:${top}px; left:${left}px;"><div></div></div>`
-		  );
-	      }
-	  }
-	</script>
       </div>
     </div>
 
