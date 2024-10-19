@@ -71,8 +71,8 @@ $machinestates = [
 
     STATE_PLAYER_PLAY_DISC => [
         "name" => "playerTurn",
-        "description" => clienttranslate('${actplayer} must play a piece or pass'),
-        "descriptionmyturn" => clienttranslate('${you} must play a piece or pass'),
+        "description" => clienttranslate('${actplayer} must play a piece or end turn'),
+        "descriptionmyturn" => clienttranslate('${you} must play a piece or end turn'),
         "type" => "activeplayer",
         "args" => "argPlayerTurn",
         "possibleactions" => [
