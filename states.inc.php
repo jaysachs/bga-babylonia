@@ -51,11 +51,9 @@
 
 if ( !defined('STATE_END_GAME')) { // guard since this included multiple times
     define("STATE_PLAYER_PLAY_DISC", 2);
-    define("STATE_CHECK_END_OF_TURN", 3);
     define("STATE_END_OF_TURN_SCORING", 4);
-    define("STATE_NEXT_PLAYER", 5);
     define("STATE_FINISH_TURN", 6);
-    define("STATE_PLAYER_GAME_END", 98);
+    //    define("STATE_PLAYER_GAME_END", 98);
     define("STATE_END_GAME", 99);
 }
 
@@ -80,26 +78,13 @@ $machinestates = [
         "possibleactions" => [
             // these actions are called from the front with bgaPerformAction, and matched to the function on the game.php file
             "actPlayPiece",
-            "actPass",
+            "actDonePlayPieces",
+            "actUndo",
         ],
         "transitions" => [
-            "playPiece" => STATE_CHECK_END_OF_TURN,
-            "pass" => STATE_CHECK_END_OF_TURN
-        ]
-    ],
-    // does immediate (farm and ziggurat adjacency) scoring
-    //  also determines if player must (or can choose) to play more.
-    STATE_CHECK_END_OF_TURN => [
-        "name" => "checkEndOfTurn",
-        "description" => '',
-        "type" => "game",
-        "action" => "stCheckEndOfTurn",
-        "updateGameProgression" => true,
-        "transitions" => [
-            "endGame" => 99,
-            "scoring" => STATE_END_OF_TURN_SCORING,
-            "nextPlayer" => STATE_NEXT_PLAYER,
-            "continue" => STATE_PLAYER_PLAY_DISC
+            "playPiece" => STATE_PLAYER_PLAY_DISC,
+            "donePlayPieces" => STATE_END_OF_TURN_SCORING,
+            "undo" => STATE_PLAYER_PLAY_DISC
         ]
     ],
     STATE_END_OF_TURN_SCORING => [
@@ -119,6 +104,7 @@ $machinestates = [
             "finishTurn" => STATE_FINISH_TURN,
         ]
     ],
+    // replenishes, switches player or ends game
     STATE_FINISH_TURN => [
         "name" => "finishTurn",
         "description" => '',
@@ -127,17 +113,7 @@ $machinestates = [
         "updateGameProgression" => true,
         "transitions" => [
             "endGame" => 99,
-            "refilled" => STATE_NEXT_PLAYER,
-        ]
-    ],
-    STATE_NEXT_PLAYER => [
-        "name" => "nextPlayer",
-        "description" => '',
-        "type" => "game",
-        "action" => "stNextPlayer",
-        "updateGameProgression" => true,
-        "transitions" => [
-            "nextPlayer" => STATE_PLAYER_PLAY_DISC
+            "nextPlayer" => STATE_PLAYER_PLAY_DISC,
         ]
     ],
     // Final state.
