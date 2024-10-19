@@ -43,11 +43,11 @@ var jstpl_some_game_item='<div class="my_game_item" id="my_game_item_${MY_ITEM_I
         while (e.parentElement != null && e.parentElement.id != "board") {
             e = e.parentElement;
         }
-//      if (e.parentElement != null) {
+      if (e.parentElement != null) {
             let x = e.id.split("_");
             console.log("selected hex " + x[1] + ", " + x[2]);
             window.alert("Selected " + e.id);
-//      }
+      }
   }
 
     function selectPieceToPlay(event) {

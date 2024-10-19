@@ -100,8 +100,8 @@ class Game extends \Table
             $sql_values[] = "($hex->col, $hex->row, '$t', $piece, $scored, $player_id)";
         });
         $sql .= implode(',', $sql_values);
-        // $this->DbQuery( $sql );
-        }
+        $this->DbQuery( $sql );
+    }
 
     public function actPass(): void
     {

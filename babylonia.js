@@ -60,17 +60,21 @@ function (dojo, declare) {
 
             // TODO: use gamedatas
             let c = document.getElementById("board");
-            for (let j = 0; j < 16; j++) {
-                let odd = j % 2 == 0;
-                let rows = odd ? 12 : 11;
-                for (let i = 0; i < rows; i++) {
-                    let top = i * 63 + (odd ? 6 : 37);
-                    let left = 38 + (j * 55);
-                    c.insertAdjacentHTML(
-                        `beforeend`,
-                        `<div id="hex_${i}_${j}" style="top:${top}px; left:${left}px;"><div></div></div>`
-                    );
+            for( let h = 0; h < gamedatas.board.length; ++h) {
+                var hex = gamedatas.board[h];
+                var i = hex.x;
+                var j = hex.y;
+                let top = j * 31.75 + 6; // j / 2 * 63 + 6;
+                let left = 38 + (i * 55);
+                var p = hex.piece;
+                var cl = "";
+                // fix this
+                if (p != null) {
+                    cl = "class='city " + p + "'";
                 }
+                c.insertAdjacentHTML(
+                    `beforeend`,
+                    `<div id="hex_${i}_${j}" style="top:${top}px; left:${left}px;"><div ${cl}></div></div>`);
             }
 
             // Setup game notifications to handle (see "setupNotifications" method below)
