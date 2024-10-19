@@ -10,7 +10,7 @@
  * babylonia.js
  *
  * babylonia user interface script
- * 
+ *
  * In this file, you are describing the logic of your user interface, in Javascript language.
  *
  */
@@ -58,7 +58,6 @@ function (dojo, declare) {
 
             // TODO: Set up your game interface here, according to "gamedatas"
 
-            // TODO: use gamedatas
             let c = document.getElementById("board");
             for( let h = 0; h < gamedatas.board.length; ++h) {
                 var hex = gamedatas.board[h];
@@ -76,6 +75,19 @@ function (dojo, declare) {
                     `beforeend`,
                     `<div id="hex_${i}_${j}" style="top:${top}px; left:${left}px;"><div ${cl}></div></div>`);
             }
+
+	    // TODO: need to handle empty better; they should be just
+	    //  circle outline with background showing through
+
+	    // remove existing
+	    for (i = 0; i < 7; ++i) {
+		document.getElementById("hand_" + i).className = "";
+	    }
+	    // set up hand.
+	    for (i = 0; i < gamedatas.hand.length; ++i) {
+		var p = gamedatas.hand[i].piece;
+		document.getElementById("hand_" + i).classList.add(p);
+	    }
 
             // Setup game notifications to handle (see "setupNotifications" method below)
             this.setupNotifications();
@@ -136,33 +148,33 @@ function (dojo, declare) {
 
             case 'dummmy':
                 break;
-            }               
-        }, 
+            }
+        },
 
         // onUpdateActionButtons: in this method you can manage "action buttons" that are displayed in the
         //                        action status bar (ie: the HTML links in the status bar).
-        //        
+        //
         onUpdateActionButtons: function( stateName, args )
         {
             console.log( 'onUpdateActionButtons: '+stateName, args );
 
             if( this.isCurrentPlayerActive() )
-            {            
+            {
                 switch( stateName )
                 {
-                 case 'playerTurn':    
+                 case 'playerTurn':
                     const playableCardsIds = args.playableCardsIds; // returned by the argPlayerTurn
 
                     // Add test action buttons in the action status bar, simulating a card click:
                     playableCardsIds.forEach(
                         cardId => this.addActionButton(`actPlayCard${cardId}-btn`, _('Play card with id ${card_id}').replace('${card_id}', cardId), () => this.onCardClick(cardId))
-                    ); 
+                    );
 
-                    this.addActionButton('actPass-btn', _('Pass'), () => this.bgaPerformAction("actPass"), null, null, 'gray'); 
+                    this.addActionButton('actPass-btn', _('Pass'), () => this.bgaPerformAction("actPass"), null, null, 'gray');
                     break;
                 }
             }
-        },        
+        },
 
         ///////////////////////////////////////////////////
         //// Utility methods
@@ -180,7 +192,7 @@ function (dojo, declare) {
 
         /*
 
-            Here, you are defining methods to handle player's action (ex: results of mouse click on 
+            Here, you are defining methods to handle player's action (ex: results of mouse click on
             game objects).
 
             Most of the time, these methods:
@@ -195,13 +207,13 @@ function (dojo, declare) {
         {
             console.log( 'onCardClick', card_id );
 
-            this.bgaPerformAction("actPlayCard", { 
+            this.bgaPerformAction("actPlayCard", {
                 card_id,
-            }).then(() =>  {                
+            }).then(() =>  {
                 // What to do after the server call if it succeeded
                 // (most of the time, nothing, as the game will react to notifs / change of state instead)
-            });        
-        },    
+            });
+        },
 
 
         ///////////////////////////////////////////////////
@@ -230,8 +242,8 @@ function (dojo, declare) {
             //            see what is happening in the game.
             // dojo.subscribe( 'cardPlayed', this, "notif_cardPlayed" );
             // this.notifqueue.setSynchronous( 'cardPlayed', 3000 );
-            // 
-        },  
+            //
+        },
 
         // TODO: from this point and below, you can write your game notifications handling methods
 
@@ -246,8 +258,8 @@ function (dojo, declare) {
             // Note: notif.args contains the arguments specified during you "notifyAllPlayers" / "notifyPlayer" PHP call
 
             // TODO: play the card in the user interface.
-        },    
+        },
 
         */
-   });             
+   });
 });

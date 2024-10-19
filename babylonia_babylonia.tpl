@@ -70,25 +70,25 @@ var jstpl_some_game_item='<div class="my_game_item" id="my_game_item_${MY_ITEM_I
       <div style="width: 1024px; display: flex; flex-direction:row; flex-wrap: nowrap; justify-content:center;">
         <div class="hand blue" id="hand" onClick="selectPieceToPlay(event)">
           <div>
-            <div id="hand_1" class="farmer"></div>
+            <div id="hand_0"></div>
           </div>
           <div>
-            <div id="hand_2" class="priest"></div>
+            <div id="hand_1"></div>
           </div>
           <div>
-            <div id="hand_3" class="merchant"></div>
+            <div id="hand_2"></div>
           </div>
           <div>
-            <div id="hand_4" class="farmer"></div>
+            <div id="hand_3"></div>
           </div>
           <div>
-            <div id="hand_5" class="merchant"></div>
+            <div id="hand_4"></div>
           </div>
           <div>
-	    <div id="hand_6"></div>
+	    <div id="hand_5"></div>
 	  </div>
           <div>
-	    <div id="hand_7"></div>
+	    <div id="hand_6"></div>
 	  </div>
         </div>
       </div>

@@ -149,7 +149,7 @@ class Game extends \Table
         $sql_values = [];
         foreach ($pis as $player_id => $pi) {
             foreach ($pi->pool as $p) {
-                $sql_values[] = "($player_id, NULL, $p)";
+                $sql_values[] = "($player_id, NULL, '$p->value')";
             }
         }
         $sql .= implode(',', $sql_values);
@@ -161,7 +161,7 @@ class Game extends \Table
         foreach ($pis as $player_id => $pi) {
             for ($i = 0; $i < count($pi->hand); ++$i) {
                 $p = $pi->hand[$i];
-                $sql_values[] = "($player_id, $i, $p)";
+                $sql_values[] = "($player_id, $i, '$p->value')";
             }
         }
         $sql .= implode(',', $sql_values);
@@ -282,19 +282,23 @@ class Game extends \Table
         // WARNING: We must only return information visible by the current player.
         $current_player_id = (int) $this->getCurrentPlayerId();
 
-        $result["players"] = $this->getCollectionFromDb(
-            "SELECT player_id, player_score score FROM player");
-
         // Get information about players.
+
+        // TODO: include zig cards info as well.
         $result["players"] = $this->getCollectionFromDb(
-            "SELECT P.player_id player_id,
-                    P.player_score score,
-                    P.player_color color,
-                    COUNT(H.piece) hand_size,
-                    GROUP_CONCAT(z.ziggurat_card SEPARATOR ',') cards
-             FROM player P
-             INNER JOIN hands H ON P.player_id = H.player_id
-             INNER JOIN ziggurat_cards Z ON P.player_id = Z.player_id"
+            "SELECT P.player_id, P.player_score, H.ct
+             FROM
+               (SELECT player_id, COUNT(*) ct FROM hands GROUP BY player_id) H
+             JOIN player P
+             ON P.player_id = H.player_id"
+            // "SELECT P.player_id player_id,
+            //         P.player_score score,
+            //         P.player_color color,
+            //         COUNT(H.piece) hand_size,
+            //         GROUP_CONCAT(z.ziggurat_card SEPARATOR ',') cards
+            //  FROM player P
+            //  INNER JOIN hands H ON P.player_id = H.player_id
+            //  INNER JOIN ziggurat_cards Z ON P.player_id = Z.player_id"
         );
 
         $result["hand"] = $this->getObjectListFromDB(
@@ -379,9 +383,9 @@ class Game extends \Table
         $board = Board::forPlayerCount(count($players));
         $this->saveBoardtoDb($board);
 
-        var $pis = [];
+        $pis = [];
         foreach ($players as $player_id => $player) {
-            $pis[] = PlayerInfo::newPlayerInfo($player_id);
+            $pis[$player_id] = PlayerInfo::newPlayerInfo($player_id);
         }
         $this->savePlayerInfosToDb($pis);
 

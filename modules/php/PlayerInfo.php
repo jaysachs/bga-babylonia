@@ -29,8 +29,8 @@ namespace Bga\Games\babylonia;
 class PlayerInfo {
     public $scored_cities = array();
     public $scored_farms = array();
-    private $hand = array(); /* PieceType */
-    private $pool = array(); /* PieceType */
+    public $hand = array(); /* PieceType */
+    public $pool = array(); /* PieceType */
     public $ziggurats = array(); /* ZigguratCard */
     public $score = 0;
     public $id = 0;
@@ -48,6 +48,7 @@ class PlayerInfo {
         }
         shuffle($pool);
         $p->refreshHand();
+        return $p;
     }
 
     /* returns false if pool is empty */
@@ -71,4 +72,4 @@ class PlayerInfo {
     }
 }
 
-<?
+?>

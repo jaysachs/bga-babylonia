@@ -190,6 +190,10 @@ class Player {
     }
 }
 
+$p = PlayerInfo::newPlayerInfo(0);
+var_dump($p);
+
+
 $g = Game::newGame($argv[1], $argv[2]);
 var_dump($g);
 $g->saveBoardToDb();
