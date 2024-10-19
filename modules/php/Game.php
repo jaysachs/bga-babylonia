@@ -60,15 +60,31 @@ class Game extends \Table
         // Retrieve the active player ID.
         $player_id = (int)$this->getActivePlayerId();
 
-        // verify the player has remaining moves
-        
+        // retrieve moves already made this turn
+        // retrieve ziggurat tiles held
+        // retrieve the hex from the DB
+        // retrieve the player's current hand
+
+        // verify the player has remaining moves by checking `moves_this_turn` table
+        // either less than 2, or all farmers and new piece is a farmer
+        // or matches one of the special ziggurat tiles effects
+
         // verify $handpos is not empty already
 
         // verify the piece at $handpos is legal to play at $x, $y
+        //    if existing is farm:
+        //      the piece must be a farmer with adjacent noble
+        //      or else have zig card
+        //      the farm check requires 'the whole board'
+        //    else it needs to be empty
         // "invert" it if it's in water.
         $piece_type = 'PRIEST';
 
         // score farm and/or ziggurat
+        //   will need to load board
+        //     either to compute adjacent ziggurats, or count remaining cities
+        //     (hmm, current model doesn't permit that from board, we lose track)
+        //     will need a global city-count
         $fs = 0;
         $zs = 0;
         $score_change = $fs + $zs;
@@ -79,12 +95,12 @@ class Game extends \Table
             // update score
             $sql = "UPDATE player
                     SET player_score = (
-                    SELECT player_score FROM player where player_id=$player_id) + $score_change 
+                    SELECT player_score FROM player where player_id=$player_id) + $score_change
                     ) WHERE player_id=$player_id";
         }
         // update "moves this turn"
         $sql = "INSERT INTO moves_this_turn (player_id, seq_id, piece, piece_pos, board_x, board_y, captured, points) VALUES($player_id, 0, '$piece_type', $hand_pos, $x, $y, FALSE, 0)";
-        
+
         // notify players of the move and scoring changes
 
         // Notify all players about the card played.
@@ -178,7 +194,7 @@ class Game extends \Table
         // I guess look at the database ...
         $this->gamestate->nextState("nextPlayer");
     }
-    
+
     /**
      * Game state action, example content.
      *
@@ -190,11 +206,11 @@ class Game extends \Table
 
         // Give some extra time to the active player when he completed an action
         $this->giveExtraTime($player_id);
-        
+
         $this->activeNextPlayer();
 
         // Go to another gamestate
-        // Here, we would detect if the game is over, and in this case use "endGame" transition instead 
+        // Here, we would detect if the game is over, and in this case use "endGame" transition instead
         $this->gamestate->nextState("nextPlayer");
     }
 
@@ -351,7 +367,7 @@ class Game extends \Table
             array_pop($game->ziggurats);
             array_pop($game->ziggurats);
         }
-        
+
         // Activate first player once everything has been initialized and ready.
         $this->activeNextPlayer();
     }
