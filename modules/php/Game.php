@@ -232,8 +232,9 @@ class Game extends \Table
              INNER JOIN ziggurat_cards Z ON P.player_id = Z.player_id"
         );
         */
+
         $result['board'] = self::getObjectListFromDB(
-            "SELECT board_x x, board_y y, hextype, piece, scored, board_player FROM board" );
+            "SELECT board_x x, board_y y, hextype, piece, scored, player_id board_player FROM board" );
 
         // Gather all information about current game situation (visible by player $current_player_id).
         /*
