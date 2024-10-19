@@ -2,10 +2,11 @@
 
 namespace Bga\Games\babylonia;
 
-// the double dirname is important.
-define('__ROOT__', dirname(dirname(__FILE__)));
-
-require_once(__ROOT__.'/modules/php/Board.php');
+spl_autoload_register(function ($class_name) {
+    $parts = explode("\\", $class_name);
+    $path = dirname(dirname(__FILE__)) . '/modules/php/' . end($parts) . '.php';
+    include $path;
+});
 
 class Game {
     public Board $board;
