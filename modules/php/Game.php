@@ -27,9 +27,6 @@ namespace Bga\Games\babylonia;
 
 require_once(APP_GAMEMODULE_PATH . "module/table/table.game.php");
 
-// require_once('\Board.php');
-
-
 class Game extends \Table
 {
     /**
@@ -146,6 +143,32 @@ class Game extends \Table
         $this->DbQuery( $sql );
     }
 
+    private function savePlayerInfosToDb(&$pis): void {
+        // first the pools
+        $sql = "INSERT INTO handpools (player_id, seq_id, piece) VALUES ";
+        $sql_values = [];
+        foreach ($pis as $player_id => $pi) {
+            foreach ($pi->pool as $p) {
+                $sql_values[] = "($player_id, NULL, $p)";
+            }
+        }
+        $sql .= implode(',', $sql_values);
+        $this->DbQuery( $sql );
+
+        // then the hands
+        $sql = "INSERT INTO hands (player_id, pos, piece) VALUES ";
+        $sql_values = [];
+        foreach ($pis as $player_id => $pi) {
+            for ($i = 0; $i < count($pi->hand); ++$i) {
+                $p = $pi->hand[$i];
+                $sql_values[] = "($player_id, $i, $p)";
+            }
+        }
+        $sql .= implode(',', $sql_values);
+        $this->DbQuery( $sql );
+
+    }
+
     public function actPass(): void
     {
         // Retrieve the active player ID.
@@ -195,19 +218,12 @@ class Game extends \Table
         return 0;
     }
 
-    public function stCheckEndOfTurn(): void {
-        // How do you check what the previous state was?
-        // How to pass information here to figure out what next state is?
-        // I guess look at the database ...
-        $this->gamestate->nextState("nextPlayer");
-    }
-
     /**
      * Game state action, example content.
      *
      * The action method of state `nextPlayer` is called everytime the current game state is set to `nextPlayer`.
      */
-    public function stNextPlayer(): void {
+    public function stFinishTurn(): void {
         // Retrieve the active player ID.
         $player_id = (int)$this->getActivePlayerId();
 
@@ -269,7 +285,6 @@ class Game extends \Table
         $result["players"] = $this->getCollectionFromDb(
             "SELECT player_id, player_score score FROM player");
 
-        /*
         // Get information about players.
         $result["players"] = $this->getCollectionFromDb(
             "SELECT P.player_id player_id,
@@ -281,10 +296,14 @@ class Game extends \Table
              INNER JOIN hands H ON P.player_id = H.player_id
              INNER JOIN ziggurat_cards Z ON P.player_id = Z.player_id"
         );
-        */
+
+        $result["hand"] = $this->getObjectListFromDB(
+            "SELECT piece from hands WHERE player_id = $current_player_id ORDER BY pos"
+        );
 
         $result['board'] = self::getObjectListFromDB(
-            "SELECT board_x x, board_y y, hextype, piece, scored, player_id board_player FROM board" );
+            "SELECT board_x x, board_y y, hextype, piece, scored, player_id board_player FROM board"
+        );
 
         // Gather all information about current game situation (visible by player $current_player_id).
         /*
@@ -339,8 +358,8 @@ class Game extends \Table
             )
         );
 
-        $this->reattributeColorsBasedOnPreferences($players, $gameinfos["player_colors"]);
-        $this->reloadPlayersBasicInfos();
+        // $this->reattributeColorsBasedOnPreferences($players, $gameinfos["player_colors"]);
+        // $this->reloadPlayersBasicInfos();
 
         // Init global values with their initial values.
 
@@ -359,6 +378,13 @@ class Game extends \Table
 
         $board = Board::forPlayerCount(count($players));
         $this->saveBoardtoDb($board);
+
+        var $pis = [];
+        foreach ($players as $player_id => $player) {
+            $pis[] = PlayerInfo::newPlayerInfo($player_id);
+        }
+        $this->savePlayerInfosToDb($pis);
+
         $ziggurats = [
             ZigguratCard::PLUS_10,
             ZigguratCard::EXTRA_TURN,
