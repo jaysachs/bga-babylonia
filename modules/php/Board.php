@@ -249,7 +249,6 @@ END;
             function (&$hex) use (&$pool) {
                 if ($hex->needsCityOrFarm()) {
                     $x = array_pop($pool);
-                    printf("%d:%d %s\n", $hex->row, $hex->col, $x->value);
                     $hex->placeFeature($x);
                 }
             }
