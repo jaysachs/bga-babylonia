@@ -20,7 +20,7 @@ namespace Bga\Games\babylonia;
 
 require_once(APP_GAMEMODULE_PATH . "module/table/table.game.php");
 
-require_once('Board.php');
+// require_once('\Board.php');
 
 
 class Game extends \Table
@@ -83,10 +83,10 @@ class Game extends \Table
         $this->gamestate->nextState("playCard");
     }
 
-    private function saveBoardToDb(): void {
+    private function saveBoardToDb(&$board): void {
         $sql = "INSERT INTO board (board_x, board_y, hextype, piece, scored, player_id) VALUES ";
         $sql_values = [];
-        $this->board->visitAll(function ($hex) use (&$sql_values) {
+        $board->visitAll(function ($hex) use (&$sql_values) {
             $player_id = 'NULL';
             $piece = 'NULL';
             if (is_a($hex->piece, 'PlayedPiece')) {
@@ -306,7 +306,7 @@ class Game extends \Table
 
         // TODO: Setup the initial game situation here.
 
-        $board = Board::forPlayerCount($numPlayers);
+        $board = Board::forPlayerCount(count($players));
         $this->saveBoardtoDb($board);
         $ziggurats = [
             ZigguratCard::PLUS_10,
@@ -316,7 +316,7 @@ class Game extends \Table
             ZigguratCard::NOBLE_WITH_3_FARMERS,
             ZigguratCard::NOBLES_IN_FIELDS,
             ZigguratCard::EXTRA_CITY_POINTS ];
-        if (!(array_search($options, 'advanced_ziggurats') === false)) {
+        if (!(array_search('advanced_ziggurats', $options) === false)) {
             $ziggurats[] = ZigguratCard::FREE_CENTRAL_LAND_CONNECTS;
             $ziggurats[] = ZigguratCard::FREE_RIVER_CONNECTS;
             shuffle($game->ziggurats);

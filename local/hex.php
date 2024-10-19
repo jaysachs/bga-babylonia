@@ -1,5 +1,7 @@
 <?php
 
+namespace Bga\Games\babylonia;
+
 // the double dirname is important.
 define('__ROOT__', dirname(dirname(__FILE__)));
 

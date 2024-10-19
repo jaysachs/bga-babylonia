@@ -1,5 +1,7 @@
 <?php
 
+namespace Bga\Games\babylonia;
+
 enum ZigguratCard : string {
     case PLUS_10 = 'zcard1';
     case EXTRA_TURN = 'zcard2';
@@ -254,7 +256,7 @@ END;
         );
     }
 
-    public function visitAll(Closure $visit) {
+    public function visitAll(\Closure $visit) {
         foreach ($this->hexes as &$hexrow) {
             foreach ($hexrow as &$hex) {
                 $visit($hex);
@@ -294,7 +296,7 @@ END;
     public function __construct(private array &$hexes) {}
 
     /* visit should return true if continue exploring */
-    private function bfs(int $start_row, int $start_col, Closure $visit) {
+    private function bfs(int $start_row, int $start_col, \Closure $visit) {
         $seen = [];
         $queue = [ $this->hexAt($start_row, $start_col) ];
         while ($queue) {
@@ -342,7 +344,7 @@ END;
     }
 
 
-    private function neighbors(Hex &$hex, Closure $matching): array {
+    private function neighbors(Hex &$hex, \Closure $matching): array {
         $r = $hex->row;
         $c = $hex->col;
 
