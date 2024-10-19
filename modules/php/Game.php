@@ -55,32 +55,52 @@ class Game extends \Table
      *
      * @throws BgaUserException
      */
-    public function actPlayCard(int $card_id): void
+    public function actPlayDisc(int $handpos, int $x, int $y): void
     {
         // Retrieve the active player ID.
         $player_id = (int)$this->getActivePlayerId();
 
-        // check input values
-        $args = $this->argPlayerTurn();
-        $playableCardsIds = $args['playableCardsIds'];
-        if (!in_array($card_id, $playableCardsIds)) {
-            throw new \BgaUserException('Invalid card choice');
-        }
+        // verify the player has remaining moves
+        
+        // verify $handpos is not empty already
 
-        // Add your game logic to play a card here.
-        $card_name = $this->card_types[$card_id]['card_name'];
+        // verify the piece at $handpos is legal to play at $x, $y
+        // "invert" it if it's in water.
+        $piece_type = 'PRIEST';
+
+        // score farm and/or ziggurat
+        $fs = 0;
+        $zs = 0;
+        $score_change = $fs + $zs;
+        // update the database
+        // update board state
+        $sql = "UPDATE board (piece, player_id) VALUES ('$piece_type', $player_id) WHERE board_x=$x AND board_y=$y";
+        if ($score_change > 0) {
+            // update score
+            $sql = "UPDATE player
+                    SET player_score = (
+                    SELECT player_score FROM player where player_id=$player_id) + $score_change 
+                    ) WHERE player_id=$player_id";
+        }
+        // update "moves this turn"
+        $sql = "INSERT INTO moves_this_turn (player_id, seq_id, piece, piece_pos, board_x, board_y, captured, points) VALUES($player_id, 0, '$piece_type', $hand_pos, $x, $y, FALSE, 0)";
+        
+        // notify players of the move and scoring changes
 
         // Notify all players about the card played.
-        $this->notifyAllPlayers("cardPlayed", clienttranslate('${player_name} plays ${card_name}'), [
+        $this->notifyAllPlayers("piecePlayed", clienttranslate('${player_name} plays ${piece_type}'), [
             "player_id" => $player_id,
             "player_name" => $this->getActivePlayerName(),
-            "card_name" => $card_name,
-            "card_id" => $card_id,
-            "i18n" => ['card_name'],
+            "piece_type" => $piece_type,
+            "x" => $x,
+            "y" => $y,
+            "ziggurat_score" => $zs,
+            "farm_score" => $fs,
+            "i18n" => ['piece_type'],
         ]);
 
         // at the end of the action, move to the next state
-        $this->gamestate->nextState("playCard");
+        $this->gamestate->nextState("playPiece");
     }
 
     private function saveBoardToDb(&$board): void {
@@ -152,6 +172,13 @@ class Game extends \Table
         return 0;
     }
 
+    public function stCheckEndOfTurn(): void {
+        // How do you check what the previous state was?
+        // How to pass information here to figure out what next state is?
+        // I guess look at the database ...
+        $this->gamestate->nextState("nextPlayer");
+    }
+    
     /**
      * Game state action, example content.
      *

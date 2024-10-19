@@ -2,7 +2,7 @@
 /**
  *------
  * BGA framework: Gregory Isabelli & Emmanuel Colin & BoardGameArena
- * babylonia implementation : © <Your name here> <Your email address here>
+ * babylonia implementation : © Jay Sachs <jay@covariant.org>
  *
  * This code has been produced on the BGA studio platform for use on http://boardgamearena.com.
  * See http://en.boardgamearena.com/#!doc/Studio for more information.
@@ -49,6 +49,15 @@
 
 //    !! It is not a good idea to modify this file when a game is running !!
 
+if ( !defined('STATE_END_GAME')) { // guard since this included multiple times
+    define("STATE_PLAYER_PLAY_DISC", 2);
+    define("STATE_CHECK_END_OF_TURN", 3);
+    define("STATE_END_OF_TURN_SCORING", 4);
+    define("STATE_NEXT_PLAYER", 5);
+    define("STATE_FINISH_TURN", 6);
+    define("STATE_PLAYER_GAME_END", 98);
+    define("STATE_END_GAME", 99);
+}
 
 $machinestates = [
 
@@ -59,34 +68,78 @@ $machinestates = [
         "description" => "",
         "type" => "manager",
         "action" => "stGameSetup",
-        "transitions" => ["" => 2]
+        "transitions" => ["" => STATE_PLAYER_PLAY_DISC]
     ),
 
-    // Note: ID=2 => your first state
-
-    2 => [
+    STATE_PLAYER_PLAY_DISC => [
         "name" => "playerTurn",
-        "description" => clienttranslate('${actplayer} must play a card or pass'),
-        "descriptionmyturn" => clienttranslate('${you} must play a card or pass'),
+        "description" => clienttranslate('${actplayer} must play a piece or pass'),
+        "descriptionmyturn" => clienttranslate('${you} must play a piece or pass'),
         "type" => "activeplayer",
         "args" => "argPlayerTurn",
         "possibleactions" => [
             // these actions are called from the front with bgaPerformAction, and matched to the function on the game.php file
-            "actPlayCard", 
+            "actPlayPiece",
             "actPass",
         ],
-        "transitions" => ["playCard" => 3, "pass" => 3]
+        "transitions" => [
+            "playPiece" => STATE_CHECK_END_OF_TURN,
+            "pass" => STATE_CHECK_END_OF_TURN
+        ]
     ],
-
-    3 => [
+    // does immediate (farm and ziggurat adjacency) scoring
+    //  also determines if player must (or can choose) to play more.
+    STATE_CHECK_END_OF_TURN => [
+        "name" => "checkEndOfTurn",
+        "description" => '',
+        "type" => "game",
+        "action" => "stCheckEndOfTurn",
+        "updateGameProgression" => true,
+        "transitions" => [
+            "endGame" => 99,
+            "scoring" => STATE_END_OF_TURN_SCORING,
+            "nextPlayer" => STATE_NEXT_PLAYER,
+            "continue" => STATE_PLAYER_PLAY_DISC
+        ]
+    ],
+    STATE_END_OF_TURN_SCORING => [
+        "name" => "endOfTurnScoring",
+        "description" => clienttranslate('${actplayer} must choose what to score'),
+        "descriptionmyturn" => clienttranslate('${you} must choose what to score'),
+        "type" => "activeplayer",
+        "action" => "stEndOfTurnScoring",
+        "possibleactions" => [
+            // these actions are called from the front with bgaPerformAction, and matched to the function on the game.php file
+            "actChooseTileToScore",
+            "actFinishTurn",
+        ],
+        "updateGameProgression" => true,
+        "transitions" => [
+            "moreTilesToScore" => STATE_END_OF_TURN_SCORING,
+            "finishTurn" => STATE_FINISH_TURN,
+        ]
+    ],
+    STATE_FINISH_TURN => [
+        "name" => "finishTurn",
+        "description" => '',
+        "type" => "game",
+        "action" => "stFinishTurn",
+        "updateGameProgression" => true,
+        "transitions" => [
+            "endGame" => 99,
+            "refilled" => STATE_NEXT_PLAYER,
+        ]
+    ],
+    STATE_NEXT_PLAYER => [
         "name" => "nextPlayer",
         "description" => '',
         "type" => "game",
         "action" => "stNextPlayer",
         "updateGameProgression" => true,
-        "transitions" => ["endGame" => 99, "nextPlayer" => 2]
+        "transitions" => [
+            "nextPlayer" => STATE_PLAYER_PLAY_DISC
+        ]
     ],
-
     // Final state.
     // Please do not modify (and do not overload action/args methods).
     99 => [
@@ -98,6 +151,3 @@ $machinestates = [
     ],
 
 ];
-
-
-
