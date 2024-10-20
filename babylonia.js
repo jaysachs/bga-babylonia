@@ -115,7 +115,7 @@ function (dojo, declare) {
 		console.log("No piece selected.");
 		return;
 	    }
-	    if (s.length > 0) {
+	    if (s.length > 1) {
 		console.log("More than one piece selected?!");
 	    }
 	    console.log("Selected hand piece div id: " + s[0].id);
@@ -133,9 +133,6 @@ function (dojo, declare) {
 	    let y = id[2];
 	    console.log("selected hex " + x + "," + y);
 
-	    // TODO: be more careful/precise?
-	    s[0].className = "";
-
 	    this.bgaPerformAction("actPlayPiece", {
                 handpos: pos,
 		x: x,
@@ -143,17 +140,20 @@ function (dojo, declare) {
             }).then(() =>  {
                 // What to do after the server call if it succeeded
                 // (most of the time, nothing, as the game will react to notifs / change of state instead)
+		// remove the piece from hand
+		// TODO: be more careful/precise?
+		s[0].className = "";
+
             });
 	},
 
 	onPieceSelection: function(event) {
 	    console.log("onPieceSelection");
 	    event.preventDefault();
+            event.stopPropagation();
             if(! this.isCurrentPlayerActive() ) {
 		return false;
 	    }
-            event.preventDefault();
-            event.stopPropagation();
             let e = event.target;
             let hc = e.parentElement;
             if (hc.id == "hand") {

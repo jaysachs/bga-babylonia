@@ -65,6 +65,8 @@ class Game extends \Table
         $player_id = (int)$this->getActivePlayerId();
 
         // retrieve moves already made this turn
+        $played_turn = PlayedTurn::dbLoad($player_id, $this);
+        
         // retrieve ziggurat tiles held
         // retrieve the hex from the DB
         // retrieve the player's current hand
@@ -94,35 +96,12 @@ class Game extends \Table
         //     will need a global city-count
         $fs = 0;
         $zs = 0;
-        $score_change = $fs + $zs;
+        $points = $fs + $zs;
+
+        $move = new Move($player_id, $played_piece, $handpos, $x, $y, false, $points);
+        
         // update the database
-        // update board state
-        $sql = "UPDATE board
-                SET piece='$played_piece', player_id='$player_id'
-                WHERE board_x=$x AND board_y=$y";
-        $this->DbQuery( $sql );
-        if ($score_change > 0) {
-            // update score
-            $sql = "UPDATE player
-                    SET player_score = (
-                    SELECT player_score FROM player
-                    WHERE player_id=$player_id) + $score_change
-                    ) WHERE player_id=$player_id";
-            $this->DbQuery( $sql );
-        }
-        // update hands
-
-        $this->DbQuery( $sql );
-        $sql = "UPDATE hands
-                SET piece = NULL
-                WHERE player_id=$player_id AND pos=$handpos";
-        $this->DbQuery( $sql );
-
-        // update "moves this turn"
-        $sql = "INSERT INTO moves_this_turn
-                (player_id, seq_id, piece, piece_pos, board_x, board_y, captured, points)
-                VALUES($player_id, 0, '$played_piece', $handpos, $x, $y, FALSE, 0)";
-        $this->DbQuery( $sql );
+        $move->dbUpdate($this);
 
         // notify players of the move and scoring changes
 
@@ -135,8 +114,8 @@ class Game extends \Table
             "handpos" => $handpos,
             "x" => $x,
             "y" => $y,
-            "ziggurat_score" => $zs,
-            "farm_score" => $fs,
+            "ziggurat_points" => $zs,
+            "farm_points" => $fs,
             "i18n" => ['played_piece'],
         ]);
 
@@ -182,7 +161,8 @@ class Game extends \Table
         foreach ($pis as $player_id => $pi) {
             for ($i = 0; $i < count($pi->hand); ++$i) {
                 $p = $pi->hand[$i];
-                $sql_values[] = "($player_id, $i, '$p->value')";
+                $piece = ($p == null) ? "NULL" : "'$p->value'";
+                $sql_values[] = "($player_id, $i, $piece)";
             }
         }
         $sql .= implode(',', $sql_values);

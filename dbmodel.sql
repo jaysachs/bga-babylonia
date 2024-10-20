@@ -66,15 +66,15 @@ CREATE TABLE IF NOT EXISTS `moves_this_turn` (
   `seq_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `piece` varchar(8) DEFAULT NULL,
   -- position in hand
-  `piece_pos` int(2) NOT NULL,
+  `handpos` int(2) NOT NULL,
   -- where it was placed
   `board_x` int(10) unsigned NOT NULL,
   `board_y` int(10) unsigned NOT NULL,
-  -- no need to record "inversion", as the hextype will tell us
   -- what farm was "captured" if any
   `captured` varchar(8) DEFAULT NULL,
   -- what was immediately scored (farm and/or ziggurat adjacency)
   `points` int(10) unsigned DEFAULT NULL,
+  -- no need to record "inversion", as the hextype will tell us
   PRIMARY KEY (`seq_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 

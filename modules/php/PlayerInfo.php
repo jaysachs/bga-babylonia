@@ -37,6 +37,9 @@ class PlayerInfo {
 
     public static function newPlayerInfo($pid) {
         $p = new PlayerInfo();
+        for ($i = 0; $i < 7; $i++) {
+            $p->hand[] = null;
+        }
         $p->id = $pid;
         $pool = &$p->pool;
         for ($i = 0; $i < 6; $i++) {
@@ -51,14 +54,22 @@ class PlayerInfo {
         return $p;
     }
 
+    public function dbSave($db): void {
+    }
+    
+    public static function fromDbResults(array $dbresults): PlayerInfo {
+    }
+
     /* returns false if pool is empty */
     public function refreshHand() : bool {
         $handSize = $this->handSize();
-        while (count($this->hand) < $handSize) {
-            if (count($this->pool) == 0) {
-                return false;
+        for ($i = 0; $i < $handSize; $i++) {
+            if ($this->hand[$i] == null) {
+                if (count($this->pool) == 0) {
+                    return false;
+                }
+                $this->hand[$i] = array_pop($this->pool);
             }
-            $this->hand[] = array_pop($this->pool);
         }
         return true;
     }
