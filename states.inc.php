@@ -83,7 +83,8 @@ $machinestates = [
         ],
         "transitions" => [
             "playPiece" => STATE_PLAYER_PLAY_DISC,
-            "donePlayPieces" => STATE_END_OF_TURN_SCORING,
+            "scoringNeeded" => STATE_END_OF_TURN_SCORING,
+            "done" => STATE_FINISH_TURN,
             "undo" => STATE_PLAYER_PLAY_DISC
         ]
     ],

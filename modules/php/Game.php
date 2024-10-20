@@ -120,69 +120,29 @@ class Game extends \Table
         ]);
 
         // at the end of the action, move to the next state
-        $this->gamestate->nextState("playPiece");
-    }
 
-    private function saveBoardToDb(&$board): void {
-        $sql = "INSERT INTO board (board_x, board_y, hextype, piece, scored, player_id) VALUES ";
-        $sql_values = [];
-        $board->visitAll(function ($hex) use (&$sql_values) {
-            $player_id = 'NULL';
-            $piece = 'NULL';
-            if (is_a($hex->piece, 'PlayedPiece')) {
-                $piece = "'" . $hex->piece->type->value . "'";
-                $player_id = $hex->piece->player_id;
-            } else if ($hex->piece != null) {
-                $piece = "'" . $hex->piece->value . "'";
-            }
-            $t = $hex->type->value;
-            $scored = $hex->scored ? 'TRUE' : 'FALSE';
-            $sql_values[] = "($hex->col, $hex->row, '$t', $piece, $scored, $player_id)";
-        });
-        $sql .= implode(',', $sql_values);
-        $this->DbQuery( $sql );
-    }
-
-    private function savePlayerInfosToDb(&$pis): void {
-        // first the pools
-        $sql = "INSERT INTO handpools (player_id, seq_id, piece) VALUES ";
-        $sql_values = [];
-        foreach ($pis as $player_id => $pi) {
-            foreach ($pi->pool as $p) {
-                $sql_values[] = "($player_id, NULL, '$p->value')";
-            }
+        if (count($played_turn->moves) >= 1) {
+            $this->gamestate->nextState("done");
+        } else {
+            $this->gamestate->nextState("playPiece");
         }
-        $sql .= implode(',', $sql_values);
-        $this->DbQuery( $sql );
-
-        // then the hands
-        $sql = "INSERT INTO hands (player_id, pos, piece) VALUES ";
-        $sql_values = [];
-        foreach ($pis as $player_id => $pi) {
-            for ($i = 0; $i < count($pi->hand); ++$i) {
-                $p = $pi->hand[$i];
-                $piece = ($p == null) ? "NULL" : "'$p->value'";
-                $sql_values[] = "($player_id, $i, $piece)";
-            }
-        }
-        $sql .= implode(',', $sql_values);
-        $this->DbQuery( $sql );
-
     }
 
-    public function actPass(): void
+    public function actDonePlayPieces(): void
     {
         // Retrieve the active player ID.
         $player_id = (int)$this->getActivePlayerId();
 
         // Notify all players about the choice to pass.
-        $this->notifyAllPlayers("cardPlayed", clienttranslate('${player_name} passes'), [
+        $this->notifyAllPlayers("donePlayed", clienttranslate('${player_name} finishes playing pieces'), [
             "player_id" => $player_id,
             "player_name" => $this->getActivePlayerName(),
         ]);
 
-        // at the end of the action, move to the next state
-        $this->gamestate->nextState("pass");
+        // TODO: remove all played moves.
+        
+        // TODO: if scoring needed, go to scoring
+        $this->gamestate->nextState("done");
     }
 
     /**
@@ -375,13 +335,13 @@ class Game extends \Table
         // TODO: Setup the initial game situation here.
 
         $board = Board::forPlayerCount(count($players));
-        $this->saveBoardtoDb($board);
+        $board->dbInsert($this);
 
         $pis = [];
         foreach ($players as $player_id => $player) {
             $pis[$player_id] = PlayerInfo::newPlayerInfo($player_id);
         }
-        $this->savePlayerInfosToDb($pis);
+        PlayerInfo::dbInsertAll($pis, $this);
 
         $ziggurats = [
             ZigguratCard::PLUS_10,
