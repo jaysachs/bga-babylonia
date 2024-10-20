@@ -90,10 +90,10 @@
         event.preventDefault();
 	event.stopPropagation();
 	let e = event.target;
-	let hc = e.parentElement.parentElement;
+	let hc = e.parentElement;
 	if (hc.id == "hand") {
-	    let c = e.parentElement.classList;
-	    if (c.contains("unplayable")) {
+	    let c = e.classList;
+	    if (c.length == 0) {
 		return;
 	    }
 	    if (!c.contains("selected")) {
@@ -103,27 +103,18 @@
 	}
     }
   </script>
-  <body>
+  <body style="background-color: #CCFFCC">
     <div id="main">
       <div style="width: 1024px; display: flex; flex-direction:row; flex-wrap: nowrap; justify-content:center;">
 	<div class="hand blue" id="hand" onClick="selectPieceToPlay(event)">
-	  <div>
-	    <div id="hand_0" class="farmer"></div>
-	  </div>
-	  <div class="selected">
-	    <div id="hand_1"  class="priest"></div>
-	  </div>
-	  <div class="unplayable">
-	    <div id="hand_2"  class="merchant"></div>
-	  </div>
-	  <div>
-	    <div  id="hand_3" class="farmer"></div>
-	  </div>
-	  <div>
-	    <div  id="hand_4" class="merchant"></div>
-	  </div>
-	  <div  id="hand_5" ></div>
-	  <div  id="hand_6" ></div>
+          <div id="hand_0" class="farmer"></div>
+          <div id="hand_1"  class="priest"></div>
+	  <!-- this one was already played -->
+	  <div id="hand_2"  class=""></div>
+	  <div  id="hand_3" class="farmer" foo=""></div>
+	  <div  id="hand_4" class="merchant"></div>
+	  <div  id="hand_5" class="unavailable"></div>
+	  <div  id="hand_6" class="unavailable"></div>
 	</div>
       </div>
       <div class="board-spacer"></div>
@@ -143,6 +134,7 @@
 	      }
 	  }
 
+	  /*
 	  for (i = 0; i < 7; ++i) {
 	      console.log(i);
 	      let h = document.getElementById("hand_" + i);
@@ -153,7 +145,8 @@
 	      console.log(d);
 	      h.className = "";
 	      console.log(h.classList);
-	  }
+	      }
+	  */
 	  // for (i = 0; i < gamedatas.hand.length; ++i) {
 	  //     let p = gamedatas.hand[i];
 	  //     let c = document.getElementById("hand_" + i).classList;

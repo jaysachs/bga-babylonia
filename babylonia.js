@@ -88,6 +88,9 @@ function (dojo, declare) {
 		var p = gamedatas.hand[i].piece;
 		document.getElementById("hand_" + i).classList.add(p);
 	    }
+	    for (i = gamedatas.hand.length; i < 7; ++i) {
+		document.getElementById("hand_" + i).classList.add("unavailable");
+	    }
 
             // Setup game notifications to handle (see "setupNotifications" method below)
             this.setupNotifications();
