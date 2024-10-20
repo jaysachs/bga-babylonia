@@ -70,18 +70,14 @@ function (dojo, declare) {
                 var j = hex.y;
                 let top = j * 31.75 + 6; // j / 2 * 63 + 6;
                 let left = 38 + (i * 55);
-                var p = hex.piece;
-                var cl = "";
-                if (p != null) {
-		    if (hex.board_player != null) {
-			cl = "class='" + p + "_" + gamedatas.players[hex.board_player].player_number + "'";
-		    } else {
-			cl = "class='" + p + "'";
-		    }
-                }
                 c.insertAdjacentHTML(
                     `beforeend`,
-                    `<div id="hex_${i}_${j}" style="top:${top}px; left:${left}px;"><div ${cl}></div></div>`);
+                    `<div id="hex_${i}_${j}" style="top:${top}px; left:${left}px;"><div></div></div>`);
+                var p = hex.piece;
+                if (p != null) {
+		    let n = hex.board_player == null ? null : gamedatas.players[hex.board_player].player_number;
+		    this.renderPlayedPiece(i, j, p, n);
+                }
             }
 
 	    // TODO: need to handle empty better; they should be just
@@ -93,8 +89,10 @@ function (dojo, declare) {
 	    }
 	    // set up hand.
 	    for (i = 0; i < gamedatas.hand.length; ++i) {
-		var p = gamedatas.hand[i].piece + "_" + current_player.player_number;
-		document.getElementById("hand_" + i).classList.add(p);
+		if (gamedatas.hand[i].piece != null) {
+		    var p = gamedatas.hand[i].piece + "_" + current_player.player_number;
+		    document.getElementById("hand_" + i).classList.add(p);
+		}
 	    }
 	    for (i = gamedatas.hand.length; i < 7; ++i) {
 		document.getElementById("hand_" + i).classList.add("unavailable");
@@ -134,6 +132,9 @@ function (dojo, declare) {
 	    let x = id[1];
 	    let y = id[2];
 	    console.log("selected hex " + x + "," + y);
+
+	    // TODO: be more careful/precise?
+	    s[0].className = "";
 
 	    this.bgaPerformAction("actPlayPiece", {
                 handpos: pos,
@@ -248,6 +249,24 @@ function (dojo, declare) {
         ///////////////////////////////////////////////////
         //// Utility methods
 
+	hexDiv: function (x, y) {
+	    return document.getElementById("hex_" + x + "_" + y);
+	},
+
+	renderPlayedPiece: function (x, y, piece, playerNumber) {
+	    console.log("renderpiece: " + x + "," + y + "," + piece + "," + playerNumber);
+	    let hex = this.hexDiv(x, y);
+	    if (hex == null) {
+		return;
+	    }
+	    // TODO: be more careful here?
+	    if (playerNumber == null) {
+		hex.firstElementChild.className = piece;
+	    } else {
+		hex.firstElementChild.className = piece + "_" + playerNumber;
+	    }
+	},
+
         /*
 
             Here, you can defines some utility methods that you can use everywhere in your javascript
@@ -301,6 +320,8 @@ function (dojo, declare) {
         {
             console.log( 'notifications subscriptions setup' );
 
+	    dojo.subscribe( 'piecePlayed', this, 'notif_piecePlayed' );
+
             // TODO: here, associate your game notifications with local methods
 
             // Example 1: standard notification handling
@@ -316,19 +337,10 @@ function (dojo, declare) {
 
         // TODO: from this point and below, you can write your game notifications handling methods
 
-        /*
-        Example:
-
-        notif_cardPlayed: function( notif )
-        {
-            console.log( 'notif_cardPlayed' );
+	notif_piecePlayed: function( notif ) {
+            console.log( 'notif_piecePlayed' );
             console.log( notif );
-
-            // Note: notif.args contains the arguments specified during you "notifyAllPlayers" / "notifyPlayer" PHP call
-
-            // TODO: play the card in the user interface.
-        },
-
-        */
+	    this.renderPlayedPiece( notif.args.x, notif.args.y, notif.args.played_piece, notif.args.player_number );
+	},
    });
 });

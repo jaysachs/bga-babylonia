@@ -127,8 +127,9 @@ class Game extends \Table
         // notify players of the move and scoring changes
 
         // Notify all players about the card played.
-        $this->notifyAllPlayers("piecePlayed", clienttranslate('${player_name} plays ${played_piece}'), [
+        $this->notifyAllPlayers("piecePlayed", clienttranslate('${player_name} plays ${played_piece} to ${x} ${y}'), [
             "player_id" => $player_id,
+            "player_number" => $this->getPlayerNoById($player_id),
             "player_name" => $this->getActivePlayerName(),
             "played_piece" => $played_piece,
             "handpos" => $handpos,
