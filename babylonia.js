@@ -118,8 +118,9 @@ function (dojo, declare) {
 
 	onPieceSelection: function(event) {
 	    console.log("onPieceSelection");
+	    event.preventDefault();
             if(! this.isCurrentPlayerActive() ) {
-		return;
+		return false;
 	    }
             event.preventDefault();
             event.stopPropagation();
@@ -132,6 +133,7 @@ function (dojo, declare) {
 		}
 		c.toggle("selected");
             }
+	    return false;
 	},
 
         ///////////////////////////////////////////////////
