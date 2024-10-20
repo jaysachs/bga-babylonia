@@ -59,7 +59,7 @@ function (dojo, declare) {
             }
 
 	    var current_player = gamedatas.players[this.player_id];
-	    
+
             // TODO: Set up your game interface here, according to "gamedatas"
 
             let c = document.getElementById("board");
@@ -110,6 +110,18 @@ function (dojo, declare) {
 	    console.log("onHexSelection:" + event.target.id);
             event.preventDefault();
             event.stopPropagation();
+
+	    // first find selected hand piece, if any.
+	    var s = dojo.query( '#hand .selected' );
+	    if (s.length == 0) {
+		console.log("No piece selected.");
+		return;
+	    }
+	    if (s.length > 0) {
+		console.log("More than one piece selected?!");
+	    }
+	    console.log("Selected hand piece div id: " + s[0].id);
+	    let pos = s[0].id.split("_")[1];
             let e = event.target;
             while (e.parentElement != null && e.parentElement.id != "board") {
 		e = e.parentElement;
@@ -122,7 +134,7 @@ function (dojo, declare) {
 	    let x = id[1];
 	    let y = id[2];
 	    console.log("selected hex " + x + "," + y);
-	    let pos = "0";
+
 	    this.bgaPerformAction("actPlayPiece", {
                 handpos: pos,
 		x: x,

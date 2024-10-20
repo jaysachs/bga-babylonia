@@ -69,6 +69,10 @@ class Game extends \Table
         // retrieve the hex from the DB
         // retrieve the player's current hand
 
+        $played_piece = $this->getUniqueValueFromDB(
+            "SELECT piece from hands WHERE player_id = $player_id AND pos=$handpos"
+        );
+
         // verify the player has remaining moves by checking `moves_this_turn` table
         // either less than 2, or all farmers and new piece is a farmer
         // or matches one of the special ziggurat tiles effects
@@ -82,7 +86,6 @@ class Game extends \Table
         //      the farm check requires 'the whole board'
         //    else it needs to be empty
         // "invert" it if it's in water.
-        $piece_type = "priest"; // Piece::PRIEST.value;
 
         // score farm and/or ziggurat
         //   will need to load board
@@ -95,7 +98,7 @@ class Game extends \Table
         // update the database
         // update board state
         $sql = "UPDATE board
-                SET piece='$piece_type', player_id='$player_id'
+                SET piece='$played_piece', player_id='$player_id'
                 WHERE board_x=$x AND board_y=$y";
         $this->DbQuery( $sql );
         if ($score_change > 0) {
@@ -108,7 +111,7 @@ class Game extends \Table
             $this->DbQuery( $sql );
         }
         // update hands
-        
+
         $this->DbQuery( $sql );
         $sql = "UPDATE hands
                 SET piece = NULL
@@ -118,21 +121,22 @@ class Game extends \Table
         // update "moves this turn"
         $sql = "INSERT INTO moves_this_turn
                 (player_id, seq_id, piece, piece_pos, board_x, board_y, captured, points)
-                VALUES($player_id, 0, '$piece_type', $handpos, $x, $y, FALSE, 0)";
+                VALUES($player_id, 0, '$played_piece', $handpos, $x, $y, FALSE, 0)";
         $this->DbQuery( $sql );
 
         // notify players of the move and scoring changes
 
         // Notify all players about the card played.
-        $this->notifyAllPlayers("piecePlayed", clienttranslate('${player_name} plays ${piece_type}'), [
+        $this->notifyAllPlayers("piecePlayed", clienttranslate('${player_name} plays ${played_piece}'), [
             "player_id" => $player_id,
             "player_name" => $this->getActivePlayerName(),
-            "piece_type" => $piece_type,
+            "played_piece" => $played_piece,
+            "handpos" => $handpos,
             "x" => $x,
             "y" => $y,
             "ziggurat_score" => $zs,
             "farm_score" => $fs,
-            "i18n" => ['piece_type'],
+            "i18n" => ['played_piece'],
         ]);
 
         // at the end of the action, move to the next state
