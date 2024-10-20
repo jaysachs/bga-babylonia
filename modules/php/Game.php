@@ -54,26 +54,58 @@ class Game extends \Table
         $this->db = new Db($this);
     }
 
-    /**
-     * Player action, example content.
-     *
-     * In this scenario, each time a player plays a card, this method will be called. This method is called directly
-     * by the action trigger on the front side with `bgaPerformAction`.
-     *
-     * @throws BgaUserException
-     */
+    private function isPlayAllowed(Board $board, Piece $piece, int $x, int $y, PlayedTurn $played_turn) {
+        $hex = $board->hexAt($x, $y);
+        // first check move limits per turn
+        if (count($played_turn->moves) >= 2) {
+            if ($hex->type == HexType::WATER) {
+                return false;
+            }
+            if ($piece == Piece::FARMER) {
+                if (! $played_turn->allMovesFarmersOnLand($board)) {
+                    return false;
+                }
+            } else {
+                // Now check if player has zig tiles to permit another move
+            }
+        }
+        // now check if piece is allowed
+        if ($hex->piece == null) {
+            // empty
+            return true;
+        }
+        if (is_a($hex->piece, 'PlayedPiece')) {
+            return false;
+        }
+        if ($hex->piece->isFarm()) {
+            if ($piece == Piece::FARMER) {
+                // ensure player has at least one noble adjacent.
+                return count($board->neighbors($hex,
+                                               function ($h) use ($player_id): bool {
+                    return $h != null
+                        && $h->piece != null
+                        && is_a($h->piece, 'PlayedPiece')
+                        && $h->piece->player_id == $player_id
+                        && $h->piece->type->isNoble();
+                                               }
+                                               )) > 0;
+            }
+        }
+    }
+
+    private function hasAdjacentNoble(Board $board, int $player_id, int $x, $int y): bool {
+    }
+    
     public function actPlayPiece(int $handpos, int $x, int $y): void
     {
-        // Retrieve the active player ID.
         $player_id = (int)$this->getActivePlayerId();
 
-        // retrieve moves already made this turn
         $played_turn = $this->db->retrievePlayedTurn($player_id);
         
-        // retrieve ziggurat tiles held
-        // retrieve the hex from the DB
-        // retrieve the player's current hand
+        // also retrieve ziggurat tiles held
 
+        $board = $this->db->retrieveBoard();
+        $hex = $board->hexAt($x, $y);
         $played_piece = $this->db->retrieveHandPiece($player_id, $handpos);
 
         // verify the player has remaining moves by checking `moves_this_turn` table

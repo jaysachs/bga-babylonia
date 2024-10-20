@@ -61,7 +61,7 @@ class Hex {
         if ($this->piece != Piece::PLACEHOLDER && $this->piece != null) {
             throw new LogicException("attempt to play a piece $p in occupied hex $this");
         }
-        if ($this->type == Hextype::WATER) {
+        if ($this->type == HexType::WATER) {
             $this->piece = new PlayedPiece(Piece::SECRET, $p->player_id);
         } else {
             $this->piece = $p;

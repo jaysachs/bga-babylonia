@@ -79,6 +79,10 @@ class Db {
         );
     }
 
+    public function retrieveBoard(): Board {
+        return Board::fromDbResult($this->retrieveBoardData());
+    }
+    
     public function retrieveBoardData(): array {
         return $this->db->getObjectListFromDB2(
             "SELECT board_x x, board_y y, hextype, piece, scored, player_id board_player FROM board"

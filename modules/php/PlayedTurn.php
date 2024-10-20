@@ -28,6 +28,19 @@ namespace Bga\Games\babylonia;
 
 class PlayedTurn {
     function __construct(public array &$moves) {}
+
+    public function allMovesFarmersOnLand(Board $board): bool {
+        foreach ($this->moves as $move) {
+            if ($move->piece != Piece::FARMER) {
+                return false;
+            }
+            $hex = $board->hexAt($move->x, $move->y);
+            if ($hex->type == HexType::WATER) {
+                return false;
+            }
+        }
+        return true;
+    }
 }
 
 ?>

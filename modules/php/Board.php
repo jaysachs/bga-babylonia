@@ -218,8 +218,7 @@ END;
         return $adjacent;
     }
 
-
-    private function neighbors(Hex &$hex, \Closure $matching): array {
+    public function neighbors(Hex &$hex, \Closure $matching): array {
         $r = $hex->row;
         $c = $hex->col;
 
