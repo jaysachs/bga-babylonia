@@ -40,30 +40,6 @@ class Move {
                         intval($dbresults['points']));
     }
 
-    public function dbUpdate($db): void {
-        $c = $this->captured ? 'TRUE' : 'FALSE';
-        $db->DbQuery( "INSERT INTO moves_this_turn
-                      (player_id, seq_id, piece, handpos, board_x, board_y, captured, points)
-                      VALUES($this->player_id, 0, '$this->piece', $this->handpos, $this->x, $this->y, $c, $this->points)");
-        // update board state
-        $db->DbQuery("UPDATE board
-                     SET piece='$this->piece', player_id=$this->player_id
-                     WHERE board_x=$this->x AND board_y=$this->y");
-
-        // update player scores
-        if ($this->points > 0) {
-            $db->DbQuery("UPDATE player
-                          SET player_score =
-                              (SELECT player_score FROM player
-                               WHERE player_id=$this->player_id) + $this->points)
-                          WHERE player_id=$this->player_id");
-        }
-        // update hands
-        $db->DbQuery(
-            "UPDATE hands
-             SET piece = NULL
-             WHERE player_id=$this->player_id AND pos=$this->handpos");
-    }
 }
 
 ?>

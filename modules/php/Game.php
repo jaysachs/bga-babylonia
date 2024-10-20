@@ -29,6 +29,7 @@ require_once(APP_GAMEMODULE_PATH . "module/table/table.game.php");
 
 class Game extends \Table
 {
+    private Db $db;
     /**
      * Your global variables labels:
      *
@@ -49,6 +50,8 @@ class Game extends \Table
             "my_first_game_variant" => 100,
             "my_second_game_variant" => 101,
         ]);
+
+        $this->db = new Db($this);
     }
 
     /**
@@ -65,7 +68,7 @@ class Game extends \Table
         $player_id = (int)$this->getActivePlayerId();
 
         // retrieve moves already made this turn
-        $played_turn = PlayedTurn::dbLoad($player_id, $this);
+        $played_turn = $this->db->retrievePlayedTurn($player_id);
         
         // retrieve ziggurat tiles held
         // retrieve the hex from the DB
@@ -101,7 +104,7 @@ class Game extends \Table
         $move = new Move($player_id, $played_piece, $handpos, $x, $y, false, $points);
         
         // update the database
-        $move->dbUpdate($this);
+        $this->db->updateMove($move);
 
         // notify players of the move and scoring changes
 
@@ -335,13 +338,13 @@ class Game extends \Table
         // TODO: Setup the initial game situation here.
 
         $board = Board::forPlayerCount(count($players));
-        $board->dbInsert($this);
+        $this->db->insertBoard($board);
 
         $pis = [];
         foreach ($players as $player_id => $player) {
             $pis[$player_id] = PlayerInfo::newPlayerInfo($player_id);
         }
-        PlayerInfo::dbInsertAll($pis, $this);
+        $this->db->insertPlayerInfos($pis);
 
         $ziggurats = [
             ZigguratCard::PLUS_10,

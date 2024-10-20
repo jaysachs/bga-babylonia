@@ -28,19 +28,6 @@ namespace Bga\Games\babylonia;
 
 class PlayedTurn {
     function __construct(public array &$moves) {}
-
-    public static function dbLoad(int $player_id, $db): PlayedTurn {
-        $dbresults = $db->getCollectionFromDb(
-            "SELECT player_id, handpos, piece, board_x, board_y, captured, points
-             FROM moves_this_turn
-             WHERE player_id = $player_id
-             ORDER BY seq_id");
-        $moves = [];
-        foreach ($dbresults as &$res) {
-            $moves[] = Move::fromDbResults($res);
-        }
-        return new PlayedTurn($moves);
-    }
 }
 
 ?>

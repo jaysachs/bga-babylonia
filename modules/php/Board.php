@@ -275,26 +275,6 @@ END;
         shuffle($pool);
         return $pool;
     }
-
-    public function dbInsert($db): void {
-        $sql = "INSERT INTO board (board_x, board_y, hextype, piece, scored, player_id) VALUES ";
-        $sql_values = [];
-        $this->visitAll(function ($hex) use (&$sql_values) {
-            $player_id = 'NULL';
-            $piece = 'NULL';
-            if (is_a($hex->piece, 'PlayedPiece')) {
-                $piece = "'" . $hex->piece->type->value . "'";
-                $player_id = $hex->piece->player_id;
-            } else if ($hex->piece != null) {
-                $piece = "'" . $hex->piece->value . "'";
-            }
-            $t = $hex->type->value;
-            $scored = $hex->scored ? 'TRUE' : 'FALSE';
-            $sql_values[] = "($hex->col, $hex->row, '$t', $piece, $scored, $player_id)";
-        });
-        $sql .= implode(',', $sql_values);
-        $db->DbQuery( $sql );
-    }
 }
 
 ?>

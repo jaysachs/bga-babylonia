@@ -56,32 +56,6 @@ class PlayerInfo {
 
     public function dbSave($db): void {
     }
-
-    public static function dbInsertAll(array $player_infos, $db): void {
-        // first the pools
-        $sql = "INSERT INTO handpools (player_id, seq_id, piece) VALUES ";
-        $sql_values = [];
-        foreach ($player_infos as $player_id => $pi) {
-            foreach ($pi->pool as $piece) {
-                $sql_values[] = "($player_id, NULL, '$piece->value')";
-            }
-        }
-        $sql .= implode(',', $sql_values);
-        $db->DbQuery( $sql );
-
-        // then the hands
-        $sql = "INSERT INTO hands (player_id, pos, piece) VALUES ";
-        $sql_values = [];
-        foreach ($player_infos as $player_id => $pi) {
-            for ($i = 0; $i < count($pi->hand); ++$i) {
-                $p = $pi->hand[$i];
-                $piece = ($p == null) ? "NULL" : "'$p->value'";
-                $sql_values[] = "($player_id, $i, $piece)";
-            }
-        }
-        $sql .= implode(',', $sql_values);
-        $db->DbQuery( $sql );
-    }
     
     public static function fromDbResults(array $dbresults): PlayerInfo {
     }
