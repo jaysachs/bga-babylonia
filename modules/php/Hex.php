@@ -39,16 +39,17 @@ class Hex {
     public function __construct(public HexType $type,
                                 public int $row,
                                 public int $col,
-                                public Piece|PlayedPiece|null $piece,
+                                public Piece|null $piece,
+                                public int $player_id = 0,
                                 public bool $scored = false) {
     }
 
     public function isPlayable(): bool {
-        return $this->piece == null || $this->piece->isCity() || $this->piece->isFarm();
+        return $this->piece == null || $this->piece->isFarm();
     }
 
     public function placeFeature(Piece $feature) {
-        if ($this->piece != Piece::PLACEHOLDER) {
+        if ($this->piece != null) {
             throw new LogicException("attempt to place city or farm where it is not expected");
         }
         if (!$feature->isCity() && !$feature->isFarm() && $feature != Piece::ZIGGURAT) {
@@ -57,27 +58,21 @@ class Hex {
         $this->piece = $feature;
     }
 
-    public function playPiece(PlayedPiece $p) {
-        if ($this->piece != Piece::PLACEHOLDER && $this->piece != null) {
+    public function playPiece(Piece $piece, int $player_id) {
+        if ($this->piece != null) {
+            // TODO: need to allow farmer on crop field
             throw new LogicException("attempt to play a piece $p in occupied hex $this");
         }
         if ($this->type == HexType::WATER) {
-            $this->piece = new PlayedPiece(Piece::SECRET, $p->player_id);
+            $this->piece = Piece::SECRET;
         } else {
             $this->piece = $p;
         }
-    }
-
-    public function needsCityOrFarm(): bool {
-        return $this->piece == Piece::PLACEHOLDER;
+        $this->player_id = $p->player_id;
     }
 
     public static function land(int $row, int $col):Hex {
         return new Hex(HexType::LAND, $row, $col, null);
-    }
-
-    public static function city(int $row, int $col): Hex {
-        return new Hex(HexType::LAND, $row, $col, Piece::PLACEHOLDER);
     }
 
     public static function water(int $row, int $col): Hex {

@@ -44,7 +44,6 @@ enum Piece: string {
     case FARM_6 = 'farm_6';
     case FARM_7 = 'farm_7';
     case FARM_CITIES = 'farm_X';
-    case PLACEHOLDER = '';
 
     public function isFarm(): bool {
         return match($this) {

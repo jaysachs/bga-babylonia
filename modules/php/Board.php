@@ -77,6 +77,7 @@ END;
         $board = new Board($empty);
         $lines = explode("\n", Board::MAP);
         $row = 0;
+        $cityfarms = [];
         foreach ($lines as &$s) {
             $col = ($row & 1) ? 1 : 0;
             foreach (str_split($s) as $ch) {
@@ -90,7 +91,8 @@ END;
                     $board->addHex(Hex::land($row, $col));
                     break;
                 case 'C':
-                    $board->addHex(Hex::city($row, $col));
+                    $board->addHex(Hex::land($row, $col));
+                    $cityfarms[] = [ $row, $col ];
                     break;
                 case '!':
                     $board->addHex(Hex::ziggurat($row, $col));
@@ -113,22 +115,21 @@ END;
         }
 
         $pool = self::initializePool($numPlayers);
-        $board->placeCitiesAndFarms($pool);
+        $board->placeCitiesAndFarms($pool, $cityfarms);
         if (count($pool) != 0) {
             throw new LogicException("placed all cities and farms but tiles leftover");
         }
         return $board;
     }
 
-    private function placeCitiesAndFarms(array &$pool) {
-        $this->visitAll(
-            function (&$hex) use (&$pool) {
-                if ($hex->needsCityOrFarm()) {
-                    $x = array_pop($pool);
-                    $hex->placeFeature($x);
-                }
+    private function placeCitiesAndFarms(array &$pool, array &$cityfarms) {
+        foreach ($cityfarms as $rc) {
+            $hex = $this->hexAt($rc[0], $rc[1]);
+            if ($hex != null) {
+                $x = array_pop($pool);
+                $hex->placeFeature($x);
             }
-        );
+        }
     }
 
     public function visitAll(\Closure $visit) {
