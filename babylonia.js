@@ -70,9 +70,13 @@ function (dojo, declare) {
                 let left = 38 + (i * 55);
                 var p = hex.piece;
                 var cl = "";
-                // fix this
                 if (p != null) {
-                    cl = "class='city " + p + "'";
+		    if (hex.board_player != null) {
+			// TODO: fix color to match player!
+			cl = "class='blue " + p +" piece'";
+		    } else {
+			cl = "class='city " + p + "'";
+		    }
                 }
                 c.insertAdjacentHTML(
                     `beforeend`,
@@ -109,11 +113,23 @@ function (dojo, declare) {
             while (e.parentElement != null && e.parentElement.id != "board") {
 		e = e.parentElement;
             }
-	    if (e.parentElement != null) {
-		let x = e.id.split("_");
-		console.log("selected hex " + x[1] + ", " + x[2]);
-		window.alert("Selected " + e.id);
+	    if (e.parentElement == null) {
+		console.log("didn't click on a hex");
+		return;
 	    }
+	    let id = e.id.split("_");
+	    let x = id[1];
+	    let y = id[2];
+	    console.log("selected hex " + x + "," + y);
+	    let pos = "0";
+	    this.bgaPerformAction("actPlayPiece", {
+                handpos: pos,
+		x: x,
+		y: y
+            }).then(() =>  {
+                // What to do after the server call if it succeeded
+                // (most of the time, nothing, as the game will react to notifs / change of state instead)
+            });
 	},
 
 	onPieceSelection: function(event) {

@@ -59,7 +59,7 @@ class Game extends \Table
      *
      * @throws BgaUserException
      */
-    public function actPlayDisc(int $handpos, int $x, int $y): void
+    public function actPlayPiece(int $handpos, int $x, int $y): void
     {
         // Retrieve the active player ID.
         $player_id = (int)$this->getActivePlayerId();
@@ -82,7 +82,7 @@ class Game extends \Table
         //      the farm check requires 'the whole board'
         //    else it needs to be empty
         // "invert" it if it's in water.
-        $piece_type = 'PRIEST';
+        $piece_type = "priest"; // Piece::PRIEST.value;
 
         // score farm and/or ziggurat
         //   will need to load board
@@ -94,16 +94,32 @@ class Game extends \Table
         $score_change = $fs + $zs;
         // update the database
         // update board state
-        $sql = "UPDATE board (piece, player_id) VALUES ('$piece_type', $player_id) WHERE board_x=$x AND board_y=$y";
+        $sql = "UPDATE board
+                SET piece='$piece_type', player_id='$player_id'
+                WHERE board_x=$x AND board_y=$y";
+        $this->DbQuery( $sql );
         if ($score_change > 0) {
             // update score
             $sql = "UPDATE player
                     SET player_score = (
-                    SELECT player_score FROM player where player_id=$player_id) + $score_change
+                    SELECT player_score FROM player
+                    WHERE player_id=$player_id) + $score_change
                     ) WHERE player_id=$player_id";
+            $this->DbQuery( $sql );
         }
+        // update hands
+        
+        $this->DbQuery( $sql );
+        $sql = "UPDATE hands
+                SET piece = NULL
+                WHERE player_id=$player_id AND pos=$handpos";
+        $this->DbQuery( $sql );
+
         // update "moves this turn"
-        $sql = "INSERT INTO moves_this_turn (player_id, seq_id, piece, piece_pos, board_x, board_y, captured, points) VALUES($player_id, 0, '$piece_type', $hand_pos, $x, $y, FALSE, 0)";
+        $sql = "INSERT INTO moves_this_turn
+                (player_id, seq_id, piece, piece_pos, board_x, board_y, captured, points)
+                VALUES($player_id, 0, '$piece_type', $handpos, $x, $y, FALSE, 0)";
+        $this->DbQuery( $sql );
 
         // notify players of the move and scoring changes
 
@@ -308,13 +324,6 @@ class Game extends \Table
         $result['board'] = self::getObjectListFromDB(
             "SELECT board_x x, board_y y, hextype, piece, scored, player_id board_player FROM board"
         );
-
-        // Gather all information about current game situation (visible by player $current_player_id).
-        /*
-        $result['current_player_hand'] = self::getCollectionFromDb(
-            "SELECT pos, piece FROM hands WHERE player_id=" . $current_player_id);
-        */
-        // TODO: Gather all information about current game situation (visible by player $current_player_id).
 
         return $result;
     }
