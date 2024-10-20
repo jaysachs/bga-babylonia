@@ -58,6 +58,8 @@ function (dojo, declare) {
                 // TODO: Setting up players boards if needed
             }
 
+	    var current_player = gamedatas.players[this.player_id];
+	    
             // TODO: Set up your game interface here, according to "gamedatas"
 
             let c = document.getElementById("board");
@@ -72,8 +74,7 @@ function (dojo, declare) {
                 var cl = "";
                 if (p != null) {
 		    if (hex.board_player != null) {
-			// TODO: fix color to match player!
-			cl = "class='blue " + p +" piece'";
+			cl = "class='" + p + "_" + gamedatas.players[hex.board_player].player_number + "'";
 		    } else {
 			cl = "class='city " + p + "'";
 		    }
@@ -92,7 +93,7 @@ function (dojo, declare) {
 	    }
 	    // set up hand.
 	    for (i = 0; i < gamedatas.hand.length; ++i) {
-		var p = gamedatas.hand[i].piece;
+		var p = gamedatas.hand[i].piece + "_" + current_player.player_number;
 		document.getElementById("hand_" + i).classList.add(p);
 	    }
 	    for (i = gamedatas.hand.length; i < 7; ++i) {

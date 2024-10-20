@@ -302,9 +302,9 @@ class Game extends \Table
 
         // TODO: include zig cards info as well.
         $result["players"] = $this->getCollectionFromDb(
-            "SELECT P.player_id, P.player_score, H.ct
+            "SELECT P.player_id, P.player_score score, P.player_no player_number, H.hand_size
              FROM
-               (SELECT player_id, COUNT(*) ct FROM hands GROUP BY player_id) H
+               (SELECT player_id, COUNT(*) hand_size FROM hands GROUP BY player_id) H
              JOIN player P
              ON P.player_id = H.player_id"
             // "SELECT P.player_id player_id,

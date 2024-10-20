@@ -112,7 +112,27 @@
     background: url(img/cities.png) 0% -1200%;
 }
 
-.board > div > div.piece {
+.board  .farmer_1,
+.board  .merchant_1,
+.board  .servant_1,
+.board  .priest_1,
+.board  .blank_1,
+.board  .farmer_2,
+.board  .merchant_2,
+.board  .servant_2,
+.board  .priest_2,
+.board  .blank_2,
+.board  .farmer_3,
+.board  .merchant_3,
+.board  .servant_3,
+.board  .priest_3,
+.board  .blank_3,
+.board  .farmer_4,
+.board  .merchant_4,
+.board  .servant_4,
+.board  .priest_4,
+.board  .blank_4
+{
     width: calc(var(--hh) - 4px);
     height: calc(var(--hh) - 4px);
     margin-top: 3px;
@@ -121,64 +141,64 @@
     background-size: 400% 500%;
 }
 
-.white .blank    {
+.blank_1    {
     background-position: 0% 0;
 }
-.wood .blank    {
+.blank_2    {
     background-position: 100% 0;
 }
-.grey .blank    {
+.blank_3    {
     background-position: 200% 0;
 }
-.blue .blank    {
+.blank_4    {
     background-position: 300% 0;
 }
-.white .farmer    {
+.farmer_1    {
     background-position: 0% -100%;
 }
-.wood .farmer   {
+.farmer_2   {
     background-position: 100% -100%;
 }
-.grey .farmer {
+.farmer_3 {
     background-position: 200% -100%;
 }
-.blue .farmer {
+.farmer_4 {
     background-position: 300% -100%;
 }
-.white .merchant {
+.merchant_1 {
     background-position: 0% -200%;
 }
-.wood .merchant {
+.merchant_2 {
     background-position: 100% -200%;
 }
-.grey .merchant {
+.merchant_3 {
     background-position: 200% -200%;
 }
-.blue .merchant {
+.merchant_4 {
     background-position: 300% -200%;
 }
-.white .servant  {
+.servant_1  {
     background-position: 0% -300%;
 }
-.wood .servant  {
+.servant_2  {
     background-position: 100% -300%;
 }
-.grey .servant  {
+.servant_3  {
     background-position: 200% -300%;
 }
-.blue .servant  {
+.servant_4  {
     background-position: 300% -300%;
 }
-.white .priest   {
+.priest_1   {
     background-position: 0% -400%;
 }
-.wood .priest   {
+.priest_2   {
     background-position: 100% -400%;
 }
-.grey .priest   {
+.priest_3   {
     background-position: 200% -400%;
 }
-.blue.priest   {
+.priest_4  {
     background-position: 300% -400%;
 }
 
