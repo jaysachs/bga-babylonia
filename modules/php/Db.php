@@ -49,6 +49,42 @@ class Db {
         $this->db->DbQuery( $sql );
     }
 
+    public function retrieveHandPiece(int $player_id, $handpos): string {
+        return $this->db->getUniqueValueFromDB(
+            "SELECT piece from hands WHERE player_id = $player_id AND pos=$handpos"
+        );
+    }
+
+    public function retrievePlayersData(): array {
+        return $this->db->getCollectionFromDb(
+            "SELECT P.player_id, P.player_score score, P.player_no player_number, H.hand_size
+             FROM
+               (SELECT player_id, COUNT(*) hand_size FROM hands GROUP BY player_id) H
+             JOIN player P
+             ON P.player_id = H.player_id"
+            // "SELECT P.player_id player_id,
+            //         P.player_score score,
+            //         P.player_color color,
+            //         COUNT(H.piece) hand_size,
+            //         GROUP_CONCAT(z.ziggurat_card SEPARATOR ',') cards
+            //  FROM player P
+            //  INNER JOIN hands H ON P.player_id = H.player_id
+            //  INNER JOIN ziggurat_cards Z ON P.player_id = Z.player_id"
+        );
+    }
+
+    public function retrieveHandData(int $player_id): array {
+        return $this->db->getObjectListFromDB2(
+            "SELECT piece from hands WHERE player_id = $player_id ORDER BY pos"
+        );
+    }
+
+    public function retrieveBoardData(): array {
+        return $this->db->getObjectListFromDB2(
+            "SELECT board_x x, board_y y, hextype, piece, scored, player_id board_player FROM board"
+        );
+    }
+
     public function updateMove($move) {
         $c = ($move->captured) ? 'TRUE' : 'FALSE';
         $this->db->DbQuery( "INSERT INTO moves_this_turn

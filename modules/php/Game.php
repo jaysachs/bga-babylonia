@@ -74,9 +74,7 @@ class Game extends \Table
         // retrieve the hex from the DB
         // retrieve the player's current hand
 
-        $played_piece = $this->getUniqueValueFromDB(
-            "SELECT piece from hands WHERE player_id = $player_id AND pos=$handpos"
-        );
+        $played_piece = $this->db->retrieveHandPiece($player_id, $handpos);
 
         // verify the player has remaining moves by checking `moves_this_turn` table
         // either less than 2, or all farmers and new piece is a farmer
@@ -246,34 +244,12 @@ class Game extends \Table
         // WARNING: We must only return information visible by the current player.
         $current_player_id = (int) $this->getCurrentPlayerId();
 
-        // Get information about players.
-
         // TODO: include zig cards info as well.
-        $result["players"] = $this->getCollectionFromDb(
-            "SELECT P.player_id, P.player_score score, P.player_no player_number, H.hand_size
-             FROM
-               (SELECT player_id, COUNT(*) hand_size FROM hands GROUP BY player_id) H
-             JOIN player P
-             ON P.player_id = H.player_id"
-            // "SELECT P.player_id player_id,
-            //         P.player_score score,
-            //         P.player_color color,
-            //         COUNT(H.piece) hand_size,
-            //         GROUP_CONCAT(z.ziggurat_card SEPARATOR ',') cards
-            //  FROM player P
-            //  INNER JOIN hands H ON P.player_id = H.player_id
-            //  INNER JOIN ziggurat_cards Z ON P.player_id = Z.player_id"
-        );
-
-        $result["hand"] = $this->getObjectListFromDB(
-            "SELECT piece from hands WHERE player_id = $current_player_id ORDER BY pos"
-        );
-
-        $result['board'] = self::getObjectListFromDB(
-            "SELECT board_x x, board_y y, hextype, piece, scored, player_id board_player FROM board"
-        );
-
-        return $result;
+        return [
+            'players' => $this->db->retrievePlayersData(),
+            'hand' => $this->db->retrieveHandData($current_player_id),
+            'board' => $this->db->retrieveBoardData()
+        ];
     }
 
     /**
@@ -405,5 +381,14 @@ class Game extends \Table
         }
 
         throw new \feException("Zombie mode not supported at this game state: \"{$state_name}\".");
+    }
+
+
+    /*
+     * forwarder method
+     */
+    final static public function getObjectListFromDB2(string $sql, bool $bUniqueValue = false): array
+    {
+        return self::getObjectListFromDB($sql, $bUniqueValue);
     }
 }
