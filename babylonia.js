@@ -29,6 +29,8 @@ function (dojo, declare) {
             // Example:
             // this.myGlobalValue = 0;
 
+	    dojo.connect( $('hand'), 'onclick', this, 'onPieceSelection' );
+	    dojo.connect( $('board'), 'onclick', this, 'onHexSelection' );
         },
 
         /*
@@ -59,6 +61,7 @@ function (dojo, declare) {
             // TODO: Set up your game interface here, according to "gamedatas"
 
             let c = document.getElementById("board");
+	    console.log(gamedatas.board);
             for( let h = 0; h < gamedatas.board.length; ++h) {
                 var hex = gamedatas.board[h];
                 var i = hex.x;
@@ -98,6 +101,38 @@ function (dojo, declare) {
             console.log( "Ending game setup" );
         },
 
+	onHexSelection:   function (event) {
+	    console.log("onHexSelection:" + event.target.id);
+            event.preventDefault();
+            event.stopPropagation();
+            let e = event.target;
+            while (e.parentElement != null && e.parentElement.id != "board") {
+		e = e.parentElement;
+            }
+	    if (e.parentElement != null) {
+		let x = e.id.split("_");
+		console.log("selected hex " + x[1] + ", " + x[2]);
+		window.alert("Selected " + e.id);
+	    }
+	},
+
+	onPieceSelection: function(event) {
+	    console.log("onPieceSelection");
+            if(! this.isCurrentPlayerActive() ) {
+		return;
+	    }
+            event.preventDefault();
+            event.stopPropagation();
+            let e = event.target;
+            let hc = e.parentElement;
+            if (hc.id == "hand") {
+		let c = e.classList;
+		if (!c.contains("selected")) {
+                    hc.querySelectorAll('.selected').forEach(div => div.classList.remove('selected'));
+		}
+		c.toggle("selected");
+            }
+	},
 
         ///////////////////////////////////////////////////
         //// Game & client states

@@ -35,40 +35,11 @@
 var jstpl_some_game_item='<div class="my_game_item" id="my_game_item_${MY_ITEM_ID}"></div>';
 
 */
-
-  function selectHex(event) {
-        event.preventDefault();
-        event.stopPropagation();
-        let e = event.target;
-        while (e.parentElement != null && e.parentElement.id != "board") {
-            e = e.parentElement;
-        }
-      if (e.parentElement != null) {
-            let x = e.id.split("_");
-            console.log("selected hex " + x[1] + ", " + x[2]);
-            window.alert("Selected " + e.id);
-      }
-  }
-
-    function selectPieceToPlay(event) {
-        event.preventDefault();
-        event.stopPropagation();
-        let e = event.target;
-        let hc = e.parentElement;
-        if (hc.id == "hand") {
-            let c = e.classList;
-            if (!c.contains("selected")) {
-                hc.querySelectorAll('.selected').forEach(div => div.classList.remove('selected'));
-            }
-            c.toggle("selected");
-        }
-    }
-
 </script>
 
     <div id="main">
       <div style="width: 1024px; display: flex; flex-direction:row; flex-wrap: nowrap; justify-content:center;">
-        <div class="hand blue" id="hand" onClick="selectPieceToPlay(event)">
+        <div class="hand blue" id="hand">
           <div id="hand_0" class=""></div>
           <div id="hand_1" class=""></div>
           <div id="hand_2" class=""></div>
@@ -76,13 +47,11 @@ var jstpl_some_game_item='<div class="my_game_item" id="my_game_item_${MY_ITEM_I
           <div id="hand_4" class=""></div>
 	  <div id="hand_5" class="unavailable"></div>
 	  <div id="hand_6" class="unavailable"></div>
-	  </div>
-        </div>
+	</div>
       </div>
       <!-- needed since the board is absolutely positions / sized. for now. -->
       <div class="board-spacer"></div>
-      <div class="board" id="board" onClick="selectHex(event)">
-      </div>
+      <div class="board" id="board"></div>
     </div>
 
 {OVERALL_GAME_FOOTER}
