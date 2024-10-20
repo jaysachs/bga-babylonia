@@ -47,7 +47,6 @@
 		if (i < pieces.length-1) {
 		    c.add(pieces[i+1]);
 		} else {
-		    c.add("city");
 		    c.add(cities[0]);
 		}
 		return;
@@ -60,7 +59,6 @@
 		    c.add(cities[i+1]);
 		    return;
 		} else {
-		    c.remove("city");
 		    break;
 		}
 	    }

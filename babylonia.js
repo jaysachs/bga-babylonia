@@ -76,7 +76,7 @@ function (dojo, declare) {
 		    if (hex.board_player != null) {
 			cl = "class='" + p + "_" + gamedatas.players[hex.board_player].player_number + "'";
 		    } else {
-			cl = "class='city " + p + "'";
+			cl = "class='" + p + "'";
 		    }
                 }
                 c.insertAdjacentHTML(

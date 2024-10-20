@@ -61,14 +61,22 @@
     background-color: rgba(22, 255, 22, 0.1);
 }
 
-
-.board > div > div.city {
+.board .city_msp,
+.board .city_m,
+.board .city_back,
+.board .city_p,
+.board .city_s,
+.board .city_mp,
+.board .city_ms,
+.board .city_sp,
+.board .farm_5,
+.board .farm_6,
+.board .farm_7,
+.board .farm_X,
+.board .ziggurat
+{
     height: var(--hh);
     width: var(--hw);
-    background-size: 100% 1300%;
-}
-
-.city {
     background-size: 100% 1300%;
 }
 
