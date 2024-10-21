@@ -94,13 +94,13 @@ class Game extends \Table
         }
         return false;
     }
-    
+
     public function actPlayPiece(int $handpos, int $row, int $col): void
     {
         $player_id = (int)$this->getActivePlayerId();
 
         $played_turn = $this->db->retrievePlayedTurn($player_id);
-        
+
         // also retrieve ziggurat tiles held
 
         $board = $this->db->retrieveBoard();
@@ -136,13 +136,13 @@ class Game extends \Table
         $points = $fs + $zs;
 
         $move = new Move($player_id, $piece, $handpos, $row, $col, false, $points);
-        
+
         // update the database
         $this->db->updateMove($move);
 
         // notify players of the move and scoring changes
 
-        // Notify all players about the card played.
+        // Notify all players about the piece played.
         $this->notifyAllPlayers("piecePlayed", clienttranslate('${player_name} plays ${piece} to ${row} ${col}'), [
             "player_id" => $player_id,
             "player_number" => $this->getPlayerNoById($player_id),
@@ -177,7 +177,7 @@ class Game extends \Table
         ]);
 
         // TODO: remove all played moves.
-        
+
         // TODO: if scoring needed, go to scoring
         $this->gamestate->nextState("done");
     }
@@ -224,6 +224,29 @@ class Game extends \Table
     public function stFinishTurn(): void {
         // Retrieve the active player ID.
         $player_id = (int)$this->getActivePlayerId();
+
+        $info = $this->db->retrievePlayerInfo($player_id);
+        if (!$info->refillHand()) {
+            $this->notifyAllPlayers("gameEnded", clienttranslate('${player_name} unable to refill their hand'), [
+                "player_id" => $player_id,
+                "player_name" => $this->getActivePlayerName(),
+            ]);
+            $this->gamestate->nextState("endGame");
+            return;
+        }
+
+        $this->db->updatePlayerInfo($player_id, $info);
+
+        $hand = [];
+        foreach ($info->hand as $piece) {
+            $hand[] = ["piece" => ($piece == null ? null : $piece->value)];
+        }
+        
+        $this->notifyPlayer($player_id, "handRefilled", "You refilled your hand", [
+            "player_id" => $player_id,
+            "player_number" => $this->getPlayerNoById($player_id),
+            "hand" => $hand,
+        ]);
 
         // Give some extra time to the active player when he completed an action
         $this->giveExtraTime($player_id);

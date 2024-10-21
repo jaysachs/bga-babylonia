@@ -44,12 +44,9 @@ ALTER TABLE `player` ADD `won_city_count` INT UNSIGNED NOT NULL DEFAULT '0';
 
 CREATE TABLE IF NOT EXISTS `handpools` (
   `player_id` int(10) unsigned NOT NULL,
-  -- we seed this from a random sequence of the pools, so to refill a hand
-  --  just retrieve and DELETE the MIN(seq_id) for a player
-  --  in fact, we could probably just retrieve the "first" via LIMIT 1.
-  `seq_id` int(3) unsigned NOT NULL AUTO_INCREMENT,
+  `seq_id` int(3) unsigned NOT NULL,
   `piece` varchar(8) NOT NULL,
-  PRIMARY KEY (`seq_id`)
+  PRIMARY KEY (`player_id`, `seq_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8  AUTO_INCREMENT=1 ;
 
 CREATE TABLE IF NOT EXISTS `hands` (

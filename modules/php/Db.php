@@ -130,13 +130,36 @@ class Db {
         return new PlayedTurn($moves);
     }
 
+    public function updatePlayerInfo(int $player_id, PlayerInfo $info) {
+        $sql = "DELETE FROM handpools WHERE player_id = $player_id";
+        $this->db->DbQuery( $sql );
+        $sql = "DELETE FROM hands WHERE player_id = $player_id";
+        $this->db->DbQuery( $sql );
+
+        $this->insertPlayerInfos([$player_id => $info]);
+    }
+
+    public function retrievePlayerInfo(int $player_id): PlayerInfo {
+        $sql = "SELECT pos, piece
+                FROM hands
+                WHERE player_id = $player_id
+                ORDER BY pos";
+        $handdata = $this->db->getObjectListFromDB2( $sql );
+        $sql = "SELECT seq_id, piece
+                FROM handpools
+                WHERE player_id = $player_id
+                ORDER by seq_id";
+        $pooldata = $this->db->getObjectListFromDB2( $sql );
+        return PlayerInfo::fromDbResults( $player_id, $handdata, $pooldata );
+    }
+
     public function insertPlayerInfos(array $player_infos): void {
         // first the pools
         $sql = "INSERT INTO handpools (player_id, seq_id, piece) VALUES ";
         $sql_values = [];
         foreach ($player_infos as $player_id => $pi) {
-            foreach ($pi->pool as $piece) {
-                $sql_values[] = "($player_id, NULL, '$piece->value')";
+            foreach ($pi->pool as $seq_id => $piece) {
+                $sql_values[] = "($player_id, $seq_id, '$piece->value')";
             }
         }
         $sql .= implode(',', $sql_values);

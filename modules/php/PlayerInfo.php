@@ -50,18 +50,29 @@ class PlayerInfo {
             $pool[] = Piece::FARMER;
         }
         shuffle($pool);
-        $p->refreshHand();
+        $p->refillHand();
         return $p;
     }
 
-    public function dbSave($db): void {
-    }
-    
-    public static function fromDbResults(array $dbresults): PlayerInfo {
+    public static function fromDbResults(int $player_id, array $handdata, array $pooldata): PlayerInfo {
+        $p = new PlayerInfo();
+        for ($i = 0; $i < 7; $i++) {
+            $p->hand[] = null;
+        }
+        foreach ($handdata as $hp) {
+            $x = $hp["piece"];
+            $p->pool[$hp["pos"]] = ($x == null) ? null : Piece::from($hp["piece"]);
+        }
+        $p->id = $player_id;
+        $pool = &$p->pool;
+        foreach ($pooldata as $pp) {
+            $p->pool[$pp["seq_id"]] = Piece::from($pp["piece"]);
+        }
+        return $p;
     }
 
     /* returns false if pool is empty */
-    public function refreshHand() : bool {
+    public function refillHand() : bool {
         $handSize = $this->handSize();
         for ($i = 0; $i < $handSize; $i++) {
             if ($this->hand[$i] == null) {

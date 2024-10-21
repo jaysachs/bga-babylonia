@@ -80,23 +80,8 @@ function (dojo, declare) {
                 }
             }
 
-	    // TODO: need to handle empty better; they should be just
-	    //  circle outline with background showing through
-
-	    // remove existing
-	    for (i = 0; i < 7; ++i) {
-		document.getElementById("hand_" + i).className = "";
-	    }
-	    // set up hand.
-	    for (i = 0; i < gamedatas.hand.length; ++i) {
-		if (gamedatas.hand[i].piece != null) {
-		    var p = gamedatas.hand[i].piece + "_" + current_player.player_number;
-		    document.getElementById("hand_" + i).classList.add(p);
-		}
-	    }
-	    for (i = gamedatas.hand.length; i < 7; ++i) {
-		document.getElementById("hand_" + i).classList.add("unavailable");
-	    }
+	    this.renderHand(gamedatas.hand, current_player.player_number);
+	    console.log("setting up notifications");
 
             // Setup game notifications to handle (see "setupNotifications" method below)
             this.setupNotifications();
@@ -255,6 +240,26 @@ function (dojo, declare) {
 	    return document.getElementById("hex_" + row + "_" + col);
 	},
 
+	renderHand: function(hand, playerNumber) {
+	    // TODO: need to handle empty better; they should be just
+	    //  circle outline with background showing through
+	    console.log("renderHand: " + hand);
+	    // remove existing
+	    for (i = 0; i < 7; ++i) {
+		document.getElementById("hand_" + i).className = "";
+	    }
+	    for (i = 0; i < hand.length; ++i) {
+		if (hand[i].piece != null) {
+		    var p = hand[i].piece + "_" + playerNumber;
+		    document.getElementById("hand_" + i).classList.add(p);
+		}
+	    }
+	    for (i = hand.length; i < 7; ++i) {
+		document.getElementById("hand_" + i).classList.add("unavailable");
+	    }
+	    console.log("renderHand done");
+	},
+	
 	renderPlayedPiece: function (row, col, piece, playerNumber) {
 	    console.log("renderpiece: " + row + "," + col + "," + piece + "," + playerNumber);
 	    let hex = this.hexDiv(row, col);
@@ -323,6 +328,7 @@ function (dojo, declare) {
             console.log( 'notifications subscriptions setup' );
 
 	    dojo.subscribe( 'piecePlayed', this, 'notif_piecePlayed' );
+	    dojo.subscribe( 'handRefilled', this, 'notif_handRefilled' );
 
             // TODO: here, associate your game notifications with local methods
 
@@ -344,5 +350,11 @@ function (dojo, declare) {
             console.log( notif );
 	    this.renderPlayedPiece( notif.args.row, notif.args.col, notif.args.piece, notif.args.player_number );
 	},
-   });
+
+	notif_handRefilled: function( notif ) {
+            console.log( 'notif_handRefilled' );
+            console.log( notif );
+	    this.renderHand( notif.args.hand, notif.args.player_number );
+	},
+    });
 });
