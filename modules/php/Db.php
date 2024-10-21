@@ -29,21 +29,23 @@ namespace Bga\Games\babylonia;
 class Db {
     public function __construct(private mixed $db) {}
 
+    private function boolValue(bool $b): string {
+        return $b ? 'TRUE' : 'FALSE';
+    }
+
+    private function enumValue($e): string {
+        return $e == null ? 'NULL' : "'$e->value'";
+    }
+
     public function insertBoard($board): void {
         $sql = "INSERT INTO board (board_x, board_y, hextype, piece, scored, player_id) VALUES ";
         $sql_values = [];
         $board->visitAll(function ($hex) use (&$sql_values) {
-            $player_id = 'NULL';
-            $piece = 'NULL';
-            if (is_a($hex->piece, 'PlayedPiece')) {
-                $piece = "'" . $hex->piece->type->value . "'";
-                $player_id = $hex->piece->player_id;
-            } else if ($hex->piece != null) {
-                $piece = "'" . $hex->piece->value . "'";
-            }
+            $piece = $this->enumValue($hex->piece);
+            $player_id = $hex->player_id;
+            $scored = $this->boolValue($hex->scored);
             $t = $hex->type->value;
-            $scored = $hex->scored ? 'TRUE' : 'FALSE';
-            $sql_values[] = "($hex->col, $hex->row, '$t', $piece, $scored, $player_id)";
+            $sql_values[] = "($hex->col, $hex->row, '$t', $piece, $scored, $hex->player_id)";
         });
         $sql .= implode(',', $sql_values);
         $this->db->DbQuery( $sql );
@@ -82,7 +84,7 @@ class Db {
     public function retrieveBoard(): Board {
         return Board::fromDbResult($this->retrieveBoardData());
     }
-    
+
     public function retrieveBoardData(): array {
         return $this->db->getObjectListFromDB2(
             "SELECT board_x x, board_y y, hextype, piece, scored, player_id board_player FROM board"
@@ -90,7 +92,7 @@ class Db {
     }
 
     public function updateMove($move) {
-        $c = ($move->captured) ? 'TRUE' : 'FALSE';
+        $c = $this->boolValue($move->captured);
         $this->db->DbQuery( "INSERT INTO moves_this_turn
                       (player_id, seq_id, piece, handpos, board_x, board_y, captured, points)
                       VALUES($move->player_id, 0, '$move->piece', $move->handpos, $move->x, $move->y, $c, $move->points)");
@@ -113,7 +115,7 @@ class Db {
              SET piece = NULL
              WHERE player_id=$move->player_id AND pos=$move->handpos");
     }
-    
+
     public function retrievePlayedTurn(int $player_id): PlayedTurn {
         $dbresults = $this->db->getCollectionFromDb(
             "SELECT player_id, handpos, piece, board_x, board_y, captured, points
@@ -152,8 +154,8 @@ class Db {
         $sql .= implode(',', $sql_values);
         $this->db->DbQuery( $sql );
     }
-}    
+}
 
-        
+
 
 ?>

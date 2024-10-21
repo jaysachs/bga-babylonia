@@ -36,7 +36,7 @@ class Board {
         $hexrow[$hex->col] = $hex;
     }
 
-    private function hexAt(int $row, int $col) : ?Hex {
+    public function hexAt(int $row, int $col) : ?Hex {
         if (key_exists($row, $this->hexes)) {
             return @ $this->hexes[$row][$col];
         }
@@ -145,11 +145,11 @@ END;
         $hexes = [];
         $board = new Board($hexes);
         foreach ($dbresults as &$result) {
-            $row = $result['board_y'];
-            $col = $result['board_x'];
+            $row = intval($result['y']);
+            $col = intval($result['x']);
 
             $hex = null;
-            $type = $result['hextype'];
+            $type = HexType::from($result['hextype']);
             switch ($type) {
             case HexType::LAND :
                 $hex = Hex::land($row, $col);
@@ -157,13 +157,18 @@ END;
             case HexType::WATER :
                 $hex = Hex::water($row, $col);
                 break;
+            default:
+                throw new \LogicException("Unexpected hextype $type");
             }
             $board->addHex($hex);
-            $p = Piece::from($result['piece']);
-            if ($p->isPlayerPiece()) {
-                $hex->playPiece(new PlayedPiece($p, $result['board_player']));
-            } else {
-                $hex->placeFeature($p);
+            $ps = $result['piece'];
+            if ($ps != null) {
+                $p = Piece::from($ps);
+                if ($p->isPlayerPiece()) {
+                    $hex->playPiece($p, intval($result['board_player']));
+                } else {
+                    $hex->placeFeature($p);
+                }
             }
         }
         return $board;

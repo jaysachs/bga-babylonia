@@ -49,6 +49,9 @@ class Hex {
     }
 
     public function placeFeature(Piece $feature) {
+        if ($this->type == HexType::WATER) {
+            throw new LogicException("attempt to place city or farm on water");
+        }
         if ($this->piece != null) {
             throw new LogicException("attempt to place city or farm where it is not expected");
         }
@@ -59,16 +62,23 @@ class Hex {
     }
 
     public function playPiece(Piece $piece, int $player_id) {
+        if ($player_id == 0) {
+            throw new InvalidArgumentException("playing a piece requires a non-zero player_id");
+        }
+        if ($this->player_id != 0) {
+            throw new LogicException("attempt to play piece $p to occupied hex $this");
+        }
         if ($this->piece != null) {
-            // TODO: need to allow farmer on crop field
-            throw new LogicException("attempt to play a piece $p in occupied hex $this");
+            if (!$this->piece.isFarm()) {
+                throw new LogicException("attempt to play a piece $p on non-empty non-crop field hex $this");
+            }
         }
         if ($this->type == HexType::WATER) {
             $this->piece = Piece::SECRET;
         } else {
-            $this->piece = $p;
+            $this->piece = $piece;
         }
-        $this->player_id = $p->player_id;
+        $this->player_id = $player_id;
     }
 
     public static function land(int $row, int $col):Hex {

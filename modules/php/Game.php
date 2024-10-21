@@ -54,6 +54,7 @@ class Game extends \Table
         $this->db = new Db($this);
     }
 
+    /*
     private function isPlayAllowed(Board $board, Piece $piece, int $x, int $y, PlayedTurn $played_turn) {
         $hex = $board->hexAt($x, $y);
         // first check move limits per turn
@@ -67,6 +68,7 @@ class Game extends \Table
                 }
             } else {
                 // Now check if player has zig tiles to permit another move
+                return false;
             }
         }
         // now check if piece is allowed
@@ -74,27 +76,22 @@ class Game extends \Table
             // empty
             return true;
         }
-        if (is_a($hex->piece, 'PlayedPiece')) {
+        if ($hex->player_id != 0) {
             return false;
         }
         if ($hex->piece->isFarm()) {
             if ($piece == Piece::FARMER) {
                 // ensure player has at least one noble adjacent.
-                return count($board->neighbors($hex,
-                                               function ($h) use ($player_id): bool {
-                    return $h != null
-                        && $h->piece != null
-                        && is_a($h->piece, 'PlayedPiece')
+                $is_noble = function ($h) use ($player_id): bool {
+                    return $h->piece != null
                         && $h->piece->player_id == $player_id
-                        && $h->piece->type->isNoble();
-                                               }
-                                               )) > 0;
+                        && $h->piece->isNoble();
+                };
+                return count($board->neighbors($hex, $is_noble)) > 0;
             }
         }
     }
-
-    private function hasAdjacentNoble(Board $board, int $player_id, int $x, $int y): bool {
-    }
+    */
     
     public function actPlayPiece(int $handpos, int $x, int $y): void
     {
@@ -106,8 +103,13 @@ class Game extends \Table
 
         $board = $this->db->retrieveBoard();
         $hex = $board->hexAt($x, $y);
-        $played_piece = $this->db->retrieveHandPiece($player_id, $handpos);
+        $piece = $this->db->retrieveHandPiece($player_id, $handpos);
 
+        /*
+        if (!$this->isPlayAllowed($board, $piece, $x, $y, $played_turn)) {
+            throw new BgaUserException("Illegal to play $piece to $x, $y by $player_id");
+        }
+        */
         // verify the player has remaining moves by checking `moves_this_turn` table
         // either less than 2, or all farmers and new piece is a farmer
         // or matches one of the special ziggurat tiles effects
@@ -131,7 +133,7 @@ class Game extends \Table
         $zs = 0;
         $points = $fs + $zs;
 
-        $move = new Move($player_id, $played_piece, $handpos, $x, $y, false, $points);
+        $move = new Move($player_id, $piece, $handpos, $x, $y, false, $points);
         
         // update the database
         $this->db->updateMove($move);
@@ -139,17 +141,17 @@ class Game extends \Table
         // notify players of the move and scoring changes
 
         // Notify all players about the card played.
-        $this->notifyAllPlayers("piecePlayed", clienttranslate('${player_name} plays ${played_piece} to ${x} ${y}'), [
+        $this->notifyAllPlayers("piecePlayed", clienttranslate('${player_name} plays ${piece} to ${x} ${y}'), [
             "player_id" => $player_id,
             "player_number" => $this->getPlayerNoById($player_id),
             "player_name" => $this->getActivePlayerName(),
-            "played_piece" => $played_piece,
+            "piece" => $piece,
             "handpos" => $handpos,
             "x" => $x,
             "y" => $y,
             "ziggurat_points" => $zs,
             "farm_points" => $fs,
-            "i18n" => ['played_piece'],
+            "i18n" => ['piece'],
         ]);
 
         // at the end of the action, move to the next state
