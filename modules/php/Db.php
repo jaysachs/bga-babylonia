@@ -51,10 +51,10 @@ class Db {
         $this->db->DbQuery( $sql );
     }
 
-    public function retrieveHandPiece(int $player_id, $handpos): string {
-        return $this->db->getUniqueValueFromDB(
+    public function retrieveHandPiece(int $player_id, $handpos): Piece {
+        return Piece::from($this->db->getUniqueValueFromDB(
             "SELECT piece from hands WHERE player_id = $player_id AND pos=$handpos"
-        );
+        ));
     }
 
     public function retrievePlayersData(): array {
@@ -93,12 +93,13 @@ class Db {
 
     public function updateMove($move) {
         $c = $this->boolValue($move->captured);
+        $piece = $move->piece->value;
         $this->db->DbQuery( "INSERT INTO moves_this_turn
                       (player_id, seq_id, piece, handpos, board_x, board_y, captured, points)
-                      VALUES($move->player_id, 0, '$move->piece', $move->handpos, $move->x, $move->y, $c, $move->points)");
+                      VALUES($move->player_id, 0, '$piece', $move->handpos, $move->x, $move->y, $c, $move->points)");
         // update board state
         $this->db->DbQuery("UPDATE board
-                     SET piece='$move->piece', player_id=$move->player_id
+                     SET piece='$piece', player_id=$move->player_id
                      WHERE board_x=$move->x AND board_y=$move->y");
 
         // update player scores
