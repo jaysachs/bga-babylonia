@@ -75,7 +75,7 @@ function (dojo, declare) {
                     `<div id="hex_${i}_${j}" style="top:${top}px; left:${left}px;"><div></div></div>`);
                 var p = hex.piece;
                 if (p != null) {
-		    let n = hex.board_player == null ? null : gamedatas.players[hex.board_player].player_number;
+   		    let n = (hex.board_player == null || hex.board_player == 0) ? null : gamedatas.players[hex.board_player].player_number;
 		    this.renderPlayedPiece(i, j, p, n);
                 }
             }
