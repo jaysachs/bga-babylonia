@@ -340,7 +340,7 @@ function (dojo, declare) {
 	notif_piecePlayed: function( notif ) {
             console.log( 'notif_piecePlayed' );
             console.log( notif );
-	    this.renderPlayedPiece( notif.args.x, notif.args.y, notif.args.played_piece, notif.args.player_number );
+	    this.renderPlayedPiece( notif.args.x, notif.args.y, notif.args.piece, notif.args.player_number );
 	},
    });
 });
