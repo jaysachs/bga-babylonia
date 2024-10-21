@@ -107,7 +107,7 @@ class Game extends \Table
 
         /*
         if (!$this->isPlayAllowed($board, $piece, $x, $y, $played_turn)) {
-            throw new BgaUserException("Illegal to play $piece to $x, $y by $player_id");
+            throw new \BgaUserException("Illegal to play $piece to $x, $y by $player_id");
         }
         */
         // verify the player has remaining moves by checking `moves_this_turn` table

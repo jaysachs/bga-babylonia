@@ -71,7 +71,7 @@ END;
 
     public static function forPlayerCount(int $numPlayers): Board {
         if ($numPlayers < 2 || $numPlayers > 4) {
-            throw new InvalidArgumentException(sprintf("invalid number of players: %s", $numPlayers));
+            throw new \InvalidArgumentException(sprintf("invalid number of players: %s", $numPlayers));
         }
         $empty = [];
         $board = new Board($empty);
@@ -117,7 +117,7 @@ END;
         $pool = self::initializePool($numPlayers);
         $board->placeCitiesAndFarms($pool, $cityfarms);
         if (count($pool) != 0) {
-            throw new LogicException("placed all cities and farms but tiles leftover");
+            throw new \LogicException("placed all cities and farms but tiles leftover");
         }
         return $board;
     }

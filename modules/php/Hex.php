@@ -50,27 +50,27 @@ class Hex {
 
     public function placeFeature(Piece $feature) {
         if ($this->type == HexType::WATER) {
-            throw new LogicException("attempt to place city or farm on water");
+            throw new \LogicException("attempt to place city or farm on water");
         }
         if ($this->piece != null) {
-            throw new LogicException("attempt to place city or farm where it is not expected");
+            throw new \LogicException("attempt to place city or farm where it is not expected");
         }
         if (!$feature->isCity() && !$feature->isFarm() && $feature != Piece::ZIGGURAT) {
-            throw new LogicException("attempt to place a non-city or farm");
+            throw new \LogicException("attempt to place a non-city or farm");
         }
         $this->piece = $feature;
     }
 
     public function playPiece(Piece $piece, int $player_id) {
         if ($player_id == 0) {
-            throw new InvalidArgumentException("playing a piece requires a non-zero player_id");
+            throw new \InvalidArgumentException("playing a piece requires a non-zero player_id");
         }
         if ($this->player_id != 0) {
-            throw new LogicException("attempt to play piece $p to occupied hex $this");
+            throw new \LogicException("attempt to play piece $p to occupied hex $this");
         }
         if ($this->piece != null) {
             if (!$this->piece.isFarm()) {
-                throw new LogicException("attempt to play a piece $p on non-empty non-crop field hex $this");
+                throw new \LogicException("attempt to play a piece $p on non-empty non-crop field hex $this");
             }
         }
         if ($this->type == HexType::WATER) {
