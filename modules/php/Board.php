@@ -140,13 +140,12 @@ END;
         }
     }
 
-    /* "SELECT board_x x, board_y y, hextype, piece, scored, board_player FROM board" ); */
     public static function fromDbResult($dbresults): Board {
         $hexes = [];
         $board = new Board($hexes);
         foreach ($dbresults as &$result) {
-            $row = intval($result['y']);
-            $col = intval($result['x']);
+            $row = intval($result['row']);
+            $col = intval($result['col']);
 
             $hex = null;
             $type = HexType::from($result['hextype']);

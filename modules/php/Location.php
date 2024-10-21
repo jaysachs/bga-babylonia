@@ -28,10 +28,10 @@ declare(strict_types=1);
 namespace Bga\Games\babylonia;
 
 class Location {
-    public __construct(public int $x, public int $y) {}
+    public __construct(public int $row, public int $col) {}
 
     public function toKey(): string {
-        return "_" . $x . "_" . $y;
+        return "_" . $row . "_" . $col;
     }
 }
 

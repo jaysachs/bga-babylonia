@@ -66,17 +66,17 @@ function (dojo, declare) {
 	    console.log(gamedatas.board);
             for( let h = 0; h < gamedatas.board.length; ++h) {
                 var hex = gamedatas.board[h];
-                var i = hex.x;
-                var j = hex.y;
-                let top = j * 31.75 + 6; // j / 2 * 63 + 6;
-                let left = 38 + (i * 55);
+                var row = hex.row;
+                var col = hex.col;
+                let top = row * 31.75 + 6; // row / 2 * 63 + 6;
+                let left = 38 + (col * 55);
                 c.insertAdjacentHTML(
                     `beforeend`,
-                    `<div id="hex_${i}_${j}" style="top:${top}px; left:${left}px;"><div></div></div>`);
+                    `<div id="hex_${row}_${col}" style="top:${top}px; left:${left}px;"><div></div></div>`);
                 var p = hex.piece;
                 if (p != null) {
    		    let n = (hex.board_player == null || hex.board_player == 0) ? null : gamedatas.players[hex.board_player].player_number;
-		    this.renderPlayedPiece(i, j, p, n);
+		    this.renderPlayedPiece(row, col, p, n);
                 }
             }
 
@@ -129,14 +129,14 @@ function (dojo, declare) {
 		return;
 	    }
 	    let id = e.id.split("_");
-	    let x = id[1];
-	    let y = id[2];
-	    console.log("selected hex " + x + "," + y);
+	    let row = id[1];
+	    let col = id[2];
+	    console.log("selected hex " + row + "," + col);
 
 	    this.bgaPerformAction("actPlayPiece", {
                 handpos: pos,
-		x: x,
-		y: y
+		row: row,
+		col: col
             }).then(() =>  {
                 // What to do after the server call if it succeeded
                 // (most of the time, nothing, as the game will react to notifs / change of state instead)
@@ -251,13 +251,13 @@ function (dojo, declare) {
         ///////////////////////////////////////////////////
         //// Utility methods
 
-	hexDiv: function (x, y) {
-	    return document.getElementById("hex_" + x + "_" + y);
+	hexDiv: function (row, col) {
+	    return document.getElementById("hex_" + row + "_" + col);
 	},
 
-	renderPlayedPiece: function (x, y, piece, playerNumber) {
-	    console.log("renderpiece: " + x + "," + y + "," + piece + "," + playerNumber);
-	    let hex = this.hexDiv(x, y);
+	renderPlayedPiece: function (row, col, piece, playerNumber) {
+	    console.log("renderpiece: " + row + "," + col + "," + piece + "," + playerNumber);
+	    let hex = this.hexDiv(row, col);
 	    if (hex == null) {
 		return;
 	    }
@@ -342,7 +342,7 @@ function (dojo, declare) {
 	notif_piecePlayed: function( notif ) {
             console.log( 'notif_piecePlayed' );
             console.log( notif );
-	    this.renderPlayedPiece( notif.args.x, notif.args.y, notif.args.piece, notif.args.player_number );
+	    this.renderPlayedPiece( notif.args.row, notif.args.col, notif.args.piece, notif.args.player_number );
 	},
    });
 });

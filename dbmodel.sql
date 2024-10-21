@@ -68,8 +68,8 @@ CREATE TABLE IF NOT EXISTS `moves_this_turn` (
   -- position in hand
   `handpos` int(2) NOT NULL,
   -- where it was placed
-  `board_x` int(10) unsigned NOT NULL,
-  `board_y` int(10) unsigned NOT NULL,
+  `board_row` int(10) unsigned NOT NULL,
+  `board_col` int(10) unsigned NOT NULL,
   -- what farm was "captured" if any
   `captured` varchar(8) DEFAULT NULL,
   -- what was immediately scored (farm and/or ziggurat adjacency)
@@ -85,8 +85,8 @@ CREATE TABLE IF NOT EXISTS `ziggurat_cards` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `board` (
-  `board_x` smallint(5) unsigned NOT NULL,
-  `board_y` smallint(5) unsigned NOT NULL,
+  `board_row` smallint(5) unsigned NOT NULL,
+  `board_col` smallint(5) unsigned NOT NULL,
    -- LAND or WATER
   `hextype` varchar(8) NOT NULL,
    -- one of: CITY_{P,S,M,MS,MP,SP,MSP}, FARM_{5,6,7,X}, ZIGGURAT,
@@ -96,5 +96,5 @@ CREATE TABLE IF NOT EXISTS `board` (
   `piece` varchar(8) DEFAULT NULL,
   `scored` boolean DEFAULT FALSE,
   `player_id` int(10) unsigned DEFAULT NULL,
-  PRIMARY KEY (`board_x`,`board_y`)
+  PRIMARY KEY (`board_row`,`board_col`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

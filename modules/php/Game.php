@@ -54,10 +54,10 @@ class Game extends \Table
         $this->db = new Db($this);
     }
 
-    private function isPlayAllowed(Board $board, Piece $piece, int $x, int $y, PlayedTurn $played_turn) {
-        $hex = $board->hexAt($x, $y);
+    private function isPlayAllowed(Board $board, Piece $piece, int $row, int $col, PlayedTurn $played_turn) {
+        $hex = $board->hexAt($row, $col);
         if ($hex == null) {
-            throw new \LogicException("Hex at $x $y was null?");
+            throw new \LogicException("Hex at $row $col was null?");
         }
         // first check move limits per turn
         if (count($played_turn->moves) >= 2) {
@@ -95,7 +95,7 @@ class Game extends \Table
         return false;
     }
     
-    public function actPlayPiece(int $handpos, int $x, int $y): void
+    public function actPlayPiece(int $handpos, int $row, int $col): void
     {
         $player_id = (int)$this->getActivePlayerId();
 
@@ -108,8 +108,8 @@ class Game extends \Table
 
         $pv = $piece->value;
         // TODO: re-enable this
-        // if (!$this->isPlayAllowed($board, $piece, $x, $y, $played_turn)) {
-        //     throw new \InvalidArgumentException("Illegal to play ${pv} to $x, $y by $player_id");
+        // if (!$this->isPlayAllowed($board, $piece, $row, $col, $played_turn)) {
+        //     throw new \InvalidArgumentException("Illegal to play ${pv} to $row, $col by $player_id");
         // }
 
         // verify the player has remaining moves by checking `moves_this_turn` table
@@ -118,7 +118,7 @@ class Game extends \Table
 
         // verify $handpos is not empty already
 
-        // verify the piece at $handpos is legal to play at $x, $y
+        // verify the piece at $handpos is legal to play at $row, $col
         //    if existing is farm:
         //      the piece must be a farmer with adjacent noble
         //      or else have zig card
@@ -135,7 +135,7 @@ class Game extends \Table
         $zs = 0;
         $points = $fs + $zs;
 
-        $move = new Move($player_id, $piece, $handpos, $x, $y, false, $points);
+        $move = new Move($player_id, $piece, $handpos, $row, $col, false, $points);
         
         // update the database
         $this->db->updateMove($move);
@@ -143,14 +143,14 @@ class Game extends \Table
         // notify players of the move and scoring changes
 
         // Notify all players about the card played.
-        $this->notifyAllPlayers("piecePlayed", clienttranslate('${player_name} plays ${piece} to ${x} ${y}'), [
+        $this->notifyAllPlayers("piecePlayed", clienttranslate('${player_name} plays ${piece} to ${row} ${col}'), [
             "player_id" => $player_id,
             "player_number" => $this->getPlayerNoById($player_id),
             "player_name" => $this->getActivePlayerName(),
             "piece" => $piece,
             "handpos" => $handpos,
-            "x" => $x,
-            "y" => $y,
+            "row" => $row,
+            "col" => $col,
             "ziggurat_points" => $zs,
             "farm_points" => $fs,
             "i18n" => ['piece'],

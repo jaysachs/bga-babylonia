@@ -38,14 +38,14 @@ class Db {
     }
 
     public function insertBoard($board): void {
-        $sql = "INSERT INTO board (board_x, board_y, hextype, piece, scored, player_id) VALUES ";
+        $sql = "INSERT INTO board (board_row, board_col, hextype, piece, scored, player_id) VALUES ";
         $sql_values = [];
         $board->visitAll(function ($hex) use (&$sql_values) {
             $piece = $this->enumValue($hex->piece);
             $player_id = $hex->player_id;
             $scored = $this->boolValue($hex->scored);
             $t = $hex->type->value;
-            $sql_values[] = "($hex->col, $hex->row, '$t', $piece, $scored, $hex->player_id)";
+            $sql_values[] = "($hex->row, $hex->col, '$t', $piece, $scored, $hex->player_id)";
         });
         $sql .= implode(',', $sql_values);
         $this->db->DbQuery( $sql );
@@ -87,7 +87,7 @@ class Db {
 
     public function retrieveBoardData(): array {
         return $this->db->getObjectListFromDB2(
-            "SELECT board_x x, board_y y, hextype, piece, scored, player_id board_player FROM board"
+            "SELECT board_row row, board_col col, hextype, piece, scored, player_id board_player FROM board"
         );
     }
 
@@ -95,12 +95,12 @@ class Db {
         $c = $this->boolValue($move->captured);
         $piece = $move->piece->value;
         $this->db->DbQuery( "INSERT INTO moves_this_turn
-                      (player_id, seq_id, piece, handpos, board_x, board_y, captured, points)
-                      VALUES($move->player_id, 0, '$piece', $move->handpos, $move->x, $move->y, $c, $move->points)");
+                      (player_id, seq_id, piece, handpos, board_row, board_col, captured, points)
+                      VALUES($move->player_id, 0, '$piece', $move->handpos, $move->row, $move->col, $c, $move->points)");
         // update board state
         $this->db->DbQuery("UPDATE board
                      SET piece='$piece', player_id=$move->player_id
-                     WHERE board_x=$move->x AND board_y=$move->y");
+                     WHERE board_row=$move->row AND board_col=$move->col");
 
         // update player scores
         if ($move->points > 0) {
@@ -119,7 +119,7 @@ class Db {
 
     public function retrievePlayedTurn(int $player_id): PlayedTurn {
         $dbresults = $this->db->getCollectionFromDb(
-            "SELECT player_id, handpos, piece, board_x, board_y, captured, points
+            "SELECT player_id, handpos, piece, board_row, board_col, captured, points
              FROM moves_this_turn
              WHERE player_id = $player_id
              ORDER BY seq_id");
