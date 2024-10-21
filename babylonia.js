@@ -158,10 +158,12 @@ function (dojo, declare) {
             let hc = e.parentElement;
             if (hc.id == "hand") {
 		let c = e.classList;
-		if (!c.contains("selected")) {
-                    hc.querySelectorAll('.selected').forEach(div => div.classList.remove('selected'));
+		if (c.length != 0) {
+		    if (!c.contains("selected")) {
+			hc.querySelectorAll('.selected').forEach(div => div.classList.remove('selected'));
+		    }
+		    c.toggle("selected");
 		}
-		c.toggle("selected");
             }
 	    return false;
 	},
