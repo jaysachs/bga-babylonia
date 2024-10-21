@@ -193,8 +193,13 @@ class Player {
 $p = PlayerInfo::newPlayerInfo(0);
 var_dump($p);
 
+$p->hand[1] = null;
+$p->hand[3] = null;
+$b = $p->refillHand();
 
-$g = Game::newGame($argv[1], $argv[2]);
-var_dump($g);
-$g->saveBoardToDb();
+var_dump($p);
+
+// $g = Game::newGame($argv[1], $argv[2]);
+// var_dump($g);
+// $g->saveBoardToDb();
 ?>

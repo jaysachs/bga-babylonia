@@ -125,10 +125,8 @@ function (dojo, declare) {
             }).then(() =>  {
                 // What to do after the server call if it succeeded
                 // (most of the time, nothing, as the game will react to notifs / change of state instead)
-		// remove the piece from hand
 		// TODO: be more careful/precise?
-		s[0].className = "";
-
+		s[0].classList.remove("selected");
             });
 	},
 

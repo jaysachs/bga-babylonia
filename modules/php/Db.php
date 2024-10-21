@@ -145,25 +145,27 @@ class Db {
                 WHERE player_id = $player_id
                 ORDER BY pos";
         $handdata = $this->db->getObjectListFromDB2( $sql );
-        $sql = "SELECT seq_id, piece
+        $sql = "SELECT piece
                 FROM handpools
-                WHERE player_id = $player_id
-                ORDER by seq_id";
+                WHERE player_id = $player_id";
         $pooldata = $this->db->getObjectListFromDB2( $sql );
         return PlayerInfo::fromDbResults( $player_id, $handdata, $pooldata );
     }
 
     public function insertPlayerInfos(array $player_infos): void {
         // first the pools
-        $sql = "INSERT INTO handpools (player_id, seq_id, piece) VALUES ";
         $sql_values = [];
         foreach ($player_infos as $player_id => $pi) {
-            foreach ($pi->pool as $seq_id => $piece) {
-                $sql_values[] = "($player_id, $seq_id, '$piece->value')";
+            foreach ($pi->pool as $piece) {
+                $x = $piece->value;
+                $sql_values[] = "($player_id, '$x')";
             }
         }
-        $sql .= implode(',', $sql_values);
-        $this->db->DbQuery( $sql );
+        if (count($sql_values) > 0) {
+            $sql = "INSERT INTO handpools (player_id, piece) VALUES "
+                . implode(',', $sql_values);
+            $this->db->DbQuery( $sql );
+        }
 
         // then the hands
         $sql = "INSERT INTO hands (player_id, pos, piece) VALUES ";

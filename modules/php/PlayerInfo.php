@@ -61,12 +61,11 @@ class PlayerInfo {
         }
         foreach ($handdata as $hp) {
             $x = $hp["piece"];
-            $p->pool[$hp["pos"]] = ($x == null) ? null : Piece::from($hp["piece"]);
+            $p->hand[$hp["pos"]] = ($x == null) ? null : Piece::from($hp["piece"]);
         }
         $p->id = $player_id;
-        $pool = &$p->pool;
         foreach ($pooldata as $pp) {
-            $p->pool[$pp["seq_id"]] = Piece::from($pp["piece"]);
+            $p->pool[] = Piece::from($pp["piece"]);
         }
         return $p;
     }
