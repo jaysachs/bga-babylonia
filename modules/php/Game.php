@@ -54,9 +54,11 @@ class Game extends \Table
         $this->db = new Db($this);
     }
 
-    /*
     private function isPlayAllowed(Board $board, Piece $piece, int $x, int $y, PlayedTurn $played_turn) {
         $hex = $board->hexAt($x, $y);
+        if ($hex == null) {
+            throw new \LogicException("Hex at $x $y was null?");
+        }
         // first check move limits per turn
         if (count($played_turn->moves) >= 2) {
             if ($hex->type == HexType::WATER) {
@@ -71,10 +73,10 @@ class Game extends \Table
                 return false;
             }
         }
+        throw new \LogicException("Trying to play in hex $hex");
         // now check if piece is allowed
         if ($hex->piece == null) {
-            // empty
-            return true;
+            return false;
         }
         if ($hex->player_id != 0) {
             return false;
@@ -90,8 +92,8 @@ class Game extends \Table
                 return count($board->neighbors($hex, $is_noble)) > 0;
             }
         }
+        return false;
     }
-    */
     
     public function actPlayPiece(int $handpos, int $x, int $y): void
     {
@@ -102,14 +104,14 @@ class Game extends \Table
         // also retrieve ziggurat tiles held
 
         $board = $this->db->retrieveBoard();
-        $hex = $board->hexAt($x, $y);
         $piece = $this->db->retrieveHandPiece($player_id, $handpos);
 
-        /*
-        if (!$this->isPlayAllowed($board, $piece, $x, $y, $played_turn)) {
-            throw new \BgaUserException("Illegal to play $piece to $x, $y by $player_id");
-        }
-        */
+        $pv = $piece->value;
+        // TODO: re-enable this
+        // if (!$this->isPlayAllowed($board, $piece, $x, $y, $played_turn)) {
+        //     throw new \InvalidArgumentException("Illegal to play ${pv} to $x, $y by $player_id");
+        // }
+
         // verify the player has remaining moves by checking `moves_this_turn` table
         // either less than 2, or all farmers and new piece is a farmer
         // or matches one of the special ziggurat tiles effects
