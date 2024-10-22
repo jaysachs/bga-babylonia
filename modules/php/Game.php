@@ -66,35 +66,48 @@ class Game extends \Table
     }
 
     private function isPlayAllowed(Board $board, Piece $piece, Hex $hex, PlayedTurn $played_turn) {
+        $this->debug("isPlayAllowed: " . $piece->value . " " . $hex . " " . var_export($played_turn, true));
         // first check move limits per turn
         if (count($played_turn->moves) >= 2) {
+            $this->debug("isPlayAllowed: played turn moves count " . count($played_turn->moves));
             if ($hex->isWater()) {
+                $this->debug("isPlayAllowed: hex is water " . $hex->isWater());
                 return false;
             }
-            if ($piece == Piece::FARMER) {
+            if ($piece->isFarmer()) {
+                $this->debug("isPlayAllowed: piece is farmer");
                 if ($played_turn->allMovesFarmersOnLand($board)) {
+                    $this->debug("isPlayAllowed: all moves farmers on land");
                     return true;
                 }
+                $this->debug("isPlayAllowed: all moves not farmers on land");
                 return false;
             } else {
+                $this->debug("isPlayAllowed: checking for 3+ move non-farmer");
                 // Now check if player has zig tiles to permit another move
                 return false;
             }
         }
         // now check if piece is allowed
         if ($hex->piece == Piece::EMPTY) {
+            $this->debug("isPlayAllowed: hex piece is empty");
             return true;
         }
         if ($hex->piece->isField()) {
-            if ($piece == Piece::FARMER) {
+            $this->debug("isPlayAllowed: hex piece is field");
+            if ($piece->isFarmer()) {
+                $this->debug("isPlayAllowed: piece is farmer");
                 // ensure player has at least one noble adjacent.
                 $is_noble = function ($h) use ($player_id): bool {
                     return $h->piece->player_id == $player_id
                         && $h->piece->isNoble();
                 };
-                return count($board->neighbors($hex, $is_noble)) > 0;
+                $n = count($board->neighbors($hex, $is_noble)) > 0;
+                $this->debug("isPlayAllowed: count of neighboring nobles is $n");
+                return $n;
             }
         }
+        $this->debug("isPlayAllowed: final false");
         return false;
     }
 
@@ -103,7 +116,6 @@ class Game extends \Table
         $player_id = (int)$this->getActivePlayerId();
 
         $played_turn = $this->db->retrievePlayedTurn($player_id);
-
         // also retrieve ziggurat tiles held
 
         $board = $this->db->retrieveBoard();
@@ -146,7 +158,7 @@ class Game extends \Table
         $played_turn->addMove($move);
 
         // update the database
-        $this->db->updateMove($move);
+        $this->db->insertMove($move);
         // TODO: need an updated hand
 
         // notify players of the move and scoring changes

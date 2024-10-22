@@ -98,12 +98,12 @@ class Db {
         $this->db->DbQuery( $sql );
     }
 
-    public function updateMove($move) {
+    public function insertMove($move) {
         $c = $this->boolValue($move->captured);
         $piece = $move->piece->value;
         $this->db->DbQuery( "INSERT INTO moves_this_turn
                       (player_id, seq_id, piece, handpos, board_row, board_col, captured, points)
-                      VALUES($move->player_id, 0, '$piece', $move->handpos, $move->row, $move->col, $c, $move->points)");
+                      VALUES($move->player_id, NULL, '$piece', $move->handpos, $move->row, $move->col, $c, $move->points)");
         // update board state
         $this->db->DbQuery("UPDATE board
                      SET piece='$piece', player_id=$move->player_id
@@ -127,7 +127,7 @@ class Db {
 
     public function retrievePlayedTurn(int $player_id): PlayedTurn {
         $dbresults = $this->db->getCollectionFromDb(
-            "SELECT player_id, handpos, piece, board_row, board_col, captured, points
+            "SELECT seq_id, player_id, handpos, piece, board_row, board_col, captured, points
              FROM moves_this_turn
              WHERE player_id = $player_id
              ORDER BY seq_id");
