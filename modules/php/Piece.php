@@ -27,6 +27,7 @@ declare(strict_types=1);
 namespace Bga\Games\babylonia;
 
 enum Piece: string {
+
     case ZIGGURAT = 'ziggurat';
     case PRIEST = 'priest';
     case SERVANT = 'servant';
@@ -44,6 +45,7 @@ enum Piece: string {
     case FARM_6 = 'farm_6';
     case FARM_7 = 'farm_7';
     case FARM_CITIES = 'farm_X';
+    case EMPTY = 'empty';
 
     public function isFarm(): bool {
         return match($this) {

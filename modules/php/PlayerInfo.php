@@ -74,7 +74,7 @@ class PlayerInfo {
     public function refillHand() : bool {
         $handSize = $this->handSize();
         for ($i = 0; $i < $handSize; $i++) {
-            if ($this->hand[$i] == null) {
+            if ($this->hand[$i] == Piece::EMPTY) {
                 if (count($this->pool) == 0) {
                     return false;
                 }

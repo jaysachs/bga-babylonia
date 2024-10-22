@@ -34,7 +34,7 @@ class PlayedTurn {
             if ($move->piece != Piece::FARMER) {
                 return false;
             }
-            $hex = $board->hexAt($move->x, $move->y);
+            $hex = $board->hexAt($move->row, $move->col);
             if ($hex->type == HexType::WATER) {
                 return false;
             }

@@ -75,7 +75,7 @@ class Game extends \Table
         }
         throw new \LogicException("Trying to play in hex $hex");
         // now check if piece is allowed
-        if ($hex->piece == null) {
+        if ($hex->piece == Piece::EMPTY) {
             return false;
         }
         if ($hex->player_id != 0) {
@@ -85,8 +85,7 @@ class Game extends \Table
             if ($piece == Piece::FARMER) {
                 // ensure player has at least one noble adjacent.
                 $is_noble = function ($h) use ($player_id): bool {
-                    return $h->piece != null
-                        && $h->piece->player_id == $player_id
+                    return $h->piece->player_id == $player_id
                         && $h->piece->isNoble();
                 };
                 return count($board->neighbors($hex, $is_noble)) > 0;
@@ -240,7 +239,7 @@ class Game extends \Table
 
         $hand = [];
         foreach ($info->hand as $piece) {
-            $hand[] = ["piece" => ($piece == null ? null : $piece->value)];
+            $hand[] = ["piece" => ($piece == null) ? null : $piece->value];
         }
 
         $this->db->removePlayedMoves($player_id);

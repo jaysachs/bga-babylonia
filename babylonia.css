@@ -149,16 +149,16 @@
     background-size: 400% 500%;
 }
 
-.blank_1    {
+.blank_1, .empty_1 {
     background-position: 0% 0;
 }
-.blank_2    {
+.blank_2, .empty_2    {
     background-position: 100% 0;
 }
-.blank_3    {
+.blank_3, .empty_3    {
     background-position: 200% 0;
 }
-.blank_4    {
+.blank_4, .empty_4    {
     background-position: 300% 0;
 }
 .farmer_1    {
@@ -242,7 +242,11 @@
     border-width: 0px;
 }
 
-#hand > div[class=""] {
+#hand > div.empty_1,
+#hand > div.empty_2,
+#hand > div.empty_3,
+#hand > div.empty_4
+{
     margin: 0px;
     background-image: unset;
     border-width: 5px;

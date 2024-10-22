@@ -33,30 +33,26 @@ namespace Bga\Games\babylonia;
 class Hex {
 
     public function __toString(): string {
-        return sprintf("%s %d:%d %s", $this->type->value, $this->row, $this->col, $this->piece);
+        return sprintf("%s %d:%d %s", $this->type->value, $this->row, $this->col, $this->piece->value);
     }
 
     public function __construct(public HexType $type,
                                 public int $row,
                                 public int $col,
-                                public Piece|null $piece,
+                                public Piece $piece = Piece::EMPTY,
                                 public int $player_id = 0,
                                 public bool $scored = false) {
     }
 
-    public function isPlayable(): bool {
-        return $this->piece == null || $this->piece->isFarm();
-    }
-
     public function placeFeature(Piece $feature) {
-        if ($this->type == HexType::WATER) {
-            throw new \LogicException("attempt to place city or farm on water");
+        if ($this->piece != Piece::EMPTY) {
+            throw new \LogicException("attempt to place city or farm on top of $this");
         }
-        if ($this->piece != null) {
-            throw new \LogicException("attempt to place city or farm where it is not expected");
+        if ($this->type == HexType::WATER) {
+            throw new \LogicException("attempt to place city or farm on water hex $this");
         }
         if (!$feature->isCity() && !$feature->isFarm() && $feature != Piece::ZIGGURAT) {
-            throw new \LogicException("attempt to place a non-city or farm");
+            throw new \LogicException("attempt to place a non-city or farm on $this");
         }
         $this->piece = $feature;
     }
@@ -68,7 +64,7 @@ class Hex {
         if ($this->player_id != 0) {
             throw new \LogicException("attempt to play piece $p to occupied hex $this");
         }
-        if ($this->piece != null) {
+        if ($this->piece != Piece::EMPTY) {
             if (!$this->piece.isFarm()) {
                 throw new \LogicException("attempt to play a piece $p on non-empty non-crop field hex $this");
             }
@@ -82,11 +78,11 @@ class Hex {
     }
 
     public static function land(int $row, int $col):Hex {
-        return new Hex(HexType::LAND, $row, $col, null);
+        return new Hex(HexType::LAND, $row, $col);
     }
 
     public static function water(int $row, int $col): Hex {
-        return new Hex(HexType::WATER, $row, $col, null);
+        return new Hex(HexType::WATER, $row, $col);
     }
 
     public static function ziggurat(int $row, int $col): Hex {

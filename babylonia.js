@@ -46,6 +46,8 @@ function (dojo, declare) {
             "gamedatas" argument contains all datas retrieved by your "getAllDatas" PHP method.
         */
 
+        playerNumber: -1,
+
         setup: function( gamedatas )
         {
             console.log( "Starting game setup" );
@@ -57,8 +59,7 @@ function (dojo, declare) {
 
                 // TODO: Setting up players boards if needed
             }
-
-            var current_player = gamedatas.players[this.player_id];
+            this.playerNumber = gamedatas.players[this.player_id].player_number;
 
             // TODO: Set up your game interface here, according to "gamedatas"
 
@@ -80,7 +81,7 @@ function (dojo, declare) {
                 }
             }
 
-            this.renderHand(gamedatas.hand, current_player.player_number);
+            this.renderHand(gamedatas.hand);
             console.log("setting up notifications");
 
             // Setup game notifications to handle (see "setupNotifications" method below)
@@ -125,8 +126,6 @@ function (dojo, declare) {
             }).then(() =>  {
                 // What to do after the server call if it succeeded
                 // (most of the time, nothing, as the game will react to notifs / change of state instead)
-                // TODO: be more careful/precise?
-                s[0].classList.remove("selected");
             });
         },
 
@@ -238,33 +237,37 @@ function (dojo, declare) {
             return document.getElementById("hex_" + row + "_" + col);
         },
 
-        renderHand: function(hand, playerNumber) {
-            // TODO: need to handle empty better; they should be just
-            //  circle outline with background showing through
+        handDiv: function (i) {
+            return document.getElementById("hand_" + i);
+        },
+
+        handClass: function(piece) {
+            if (piece == null) {
+                return "unavailable";
+            }
+            return piece + "_" + this.playerNumber;
+        },
+
+        renderHand: function(hand) {
             console.log("renderHand: " + hand);
-            // remove existing
+
+            // TODO: render refilled pieces
             for (i = 0; i < 7; ++i) {
-                document.getElementById("hand_" + i).className = "";
-            }
-            for (i = 0; i < hand.length; ++i) {
-                if (hand[i].piece != null) {
-                    var p = hand[i].piece + "_" + playerNumber;
-                    document.getElementById("hand_" + i).classList.add(p);
-                }
-            }
-            for (i = hand.length; i < 7; ++i) {
-                document.getElementById("hand_" + i).classList.add("unavailable");
+                let div = this.handDiv(i);
+                // if (i >= hand.length) {
+                //     div.className = "unavailable";
+                // } else {
+                    let h = hand[i];
+                    div.className = this.handClass(h.piece);
+                // }
             }
             console.log("renderHand done");
         },
-        
+
         renderPlayedPiece: function (row, col, piece, playerNumber) {
             console.log("renderpiece: " + row + "," + col + "," + piece + "," + playerNumber);
+            // TODO: animate this
             let hex = this.hexDiv(row, col);
-            if (hex == null) {
-                return;
-            }
-            // TODO: be more careful here?
             if (playerNumber == null) {
                 hex.firstElementChild.className = piece;
             } else {
@@ -347,6 +350,9 @@ function (dojo, declare) {
             console.log( 'notif_piecePlayed' );
             console.log( notif );
             this.renderPlayedPiece( notif.args.row, notif.args.col, notif.args.piece, notif.args.player_number );
+            if (notif.args.player_number == this.playerNumber) {
+                this.handDiv(notif.args.handpos).className = this.handClass("empty");
+            }
         },
 
         notif_handRefilled: function( notif ) {

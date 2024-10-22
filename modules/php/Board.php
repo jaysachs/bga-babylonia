@@ -146,29 +146,10 @@ END;
         foreach ($dbresults as &$result) {
             $row = intval($result['row']);
             $col = intval($result['col']);
-
-            $hex = null;
+            $piece = Piece::from($result['piece']);
             $type = HexType::from($result['hextype']);
-            switch ($type) {
-            case HexType::LAND :
-                $hex = Hex::land($row, $col);
-                break;
-            case HexType::WATER :
-                $hex = Hex::water($row, $col);
-                break;
-            default:
-                throw new \LogicException("Unexpected hextype $type");
-            }
-            $board->addHex($hex);
-            $ps = $result['piece'];
-            if ($ps != null) {
-                $p = Piece::from($ps);
-                if ($p->isPlayerPiece()) {
-                    $hex->playPiece($p, intval($result['board_player']));
-                } else {
-                    $hex->placeFeature($p);
-                }
-            }
+            $player_id = intval($result['board_player']);
+            $board->addHex(new Hex($type, $row, $col, $piece, $player_id));
         }
         return $board;
     }

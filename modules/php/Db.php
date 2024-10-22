@@ -116,9 +116,10 @@ class Db {
                           WHERE player_id=$move->player_id");
         }
         // update hands
+        $empty = Piece::EMPTY->value;
         $this->db->DbQuery(
             "UPDATE hands
-             SET piece = NULL
+             SET piece = '$empty'
              WHERE player_id=$move->player_id AND pos=$move->handpos");
     }
 
