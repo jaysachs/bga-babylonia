@@ -182,27 +182,43 @@ class Game extends \Table
         // and if any pieces have legal plays, player can continue.
         // Also need to offer "pass" if have played at least 2 pieces.
 
-        if (!$this->canMakeAnotherMove($board, $player_id, $played_turn)) {
+        $player_info = $this->db->retrievePlayerInfo($player_id);
+
+        // [ [FARMER => [(1, 3), (2, 4), ...], ... ];
+        $allowed_moves = $this->getAllowedMovesByPiece($player_id, $board, $player_info, $played_turn);
+
+        if ($this->getNumberAllowedMoves($player_info, $allowed_moves) == 0) {
             $this->gamestate->nextState("done");
         } else {
             // $this->gamestate->nextState("playPiece");
         }
     }
 
-    private function canMakeAnotherMove(Board $board, int $player_id, PlayedTurn $played_turn): bool {
-        if ($played_turn->allMovesFarmersOnLand($board)) {
-            $pi = $this->db->retrievePlayerInfo($player_id);
-            if ($pi->handContains(Piece::FARMER)) {
-                return true;
+    private function getNumberAllowedMoves(PlayerInfo $player_info, array $allowed_moves) {
+        $num_allowed_moves = 0;
+        $seen = [];
+        foreach ($allowed_moves as $piece => $moves) {
+            if ($player_info->handContains(Piece::from($piece)) && !array_search($piece, $seen)) {
+                $num_allowed_moves += count($moves);
+                $seen[] = $piece;
             }
         }
+        return $num_allowed_moves;
+    }
 
-        // check for ziggurats letting extra noble plays
- 
-        if (count($played_turn->moves) < 2) {
-            return true;
-        }
-        return false;
+    private function getAllowedMovesByPiece(int $player_id, Board $board, PlayerInfo $player_info, PlayedTurn $played_turn) {
+        $result = [];
+        $board->visitAll(function (&$hex) use (&$result, $player_id, $board, $played_turn) :void {
+            foreach (Piece::playerPieces() as $piece) {
+                if ($this->isPlayAllowed($player_id, $board, $piece, $hex, $played_turn)) {
+                    if (!isset($result[$piece->value])) {
+                        $result[$piece->value] = [];
+                    }
+                    $result[$piece->value][] = $hex;
+                }
+            }
+        });
+        return $result;
     }
 
     public function actDonePlayPieces(): void
