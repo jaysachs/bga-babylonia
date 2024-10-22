@@ -70,6 +70,10 @@ enum Piece: string {
         };
     }
 
+    public static function playerPieces(): array {
+        return [Piece::FARMER, Piece::MERCHANT, Piece::SERVANT, Piece::PRIEST];
+    }
+
     public function isPlayerPiece(): bool {
         return $this->isFarmer() || $this->isNoble() || $this->isHidden();
     }
