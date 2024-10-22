@@ -124,22 +124,22 @@
 .board  .merchant_1,
 .board  .servant_1,
 .board  .priest_1,
-.board  .blank_1,
+.board  .secret_1,
 .board  .farmer_2,
 .board  .merchant_2,
 .board  .servant_2,
 .board  .priest_2,
-.board  .blank_2,
+.board  .secret_2,
 .board  .farmer_3,
 .board  .merchant_3,
 .board  .servant_3,
 .board  .priest_3,
-.board  .blank_3,
+.board  .secret_3,
 .board  .farmer_4,
 .board  .merchant_4,
 .board  .servant_4,
 .board  .priest_4,
-.board  .blank_4
+.board  .secret_4
 {
     width: calc(var(--hh) - 4px);
     height: calc(var(--hh) - 4px);
@@ -149,16 +149,16 @@
     background-size: 400% 500%;
 }
 
-.blank_1, .empty_1 {
+.secret_1, .empty_1 {
     background-position: 0% 0;
 }
-.blank_2, .empty_2    {
+.secret_2, .empty_2    {
     background-position: 100% 0;
 }
-.blank_3, .empty_3    {
+.secret_3, .empty_3    {
     background-position: 200% 0;
 }
-.blank_4, .empty_4    {
+.secret_4, .empty_4    {
     background-position: 300% 0;
 }
 .farmer_1    {

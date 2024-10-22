@@ -139,6 +139,9 @@ class Game extends \Table
         $zs = 0;
         $points = $fs + $zs;
 
+        if ($hex->isWater()) {
+            $piece = Piece::SECRET;
+        }
         $move = new Move($player_id, $piece, $handpos, $row, $col, false, $points);
         $played_turn->addMove($move);
 
