@@ -97,6 +97,15 @@ class Hex {
         return new Hex(HexType::LAND, $row, $col, Piece::ZIGGURAT);
     }
 
+    public static function fromDbResult(array &$dbresult): Hex {
+        $row = intval($dbresult['row']);
+        $col = intval($dbresult['col']);
+        $piece = Piece::from($dbresult['piece']);
+        $type = HexType::from($dbresult['hextype']);
+        $player_id = intval($dbresult['board_player']);
+        return new Hex($type, $row, $col, $piece, $player_id);
+    }
+
 }
 
 ?>

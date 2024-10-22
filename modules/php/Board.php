@@ -144,12 +144,7 @@ END;
         $hexes = [];
         $board = new Board($hexes);
         foreach ($dbresults as &$result) {
-            $row = intval($result['row']);
-            $col = intval($result['col']);
-            $piece = Piece::from($result['piece']);
-            $type = HexType::from($result['hextype']);
-            $player_id = intval($result['board_player']);
-            $board->addHex(new Hex($type, $row, $col, $piece, $player_id));
+            $board->addHex(Hex::fromDbResult($result));
         }
         return $board;
     }
