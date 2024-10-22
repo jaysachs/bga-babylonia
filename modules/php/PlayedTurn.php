@@ -26,11 +26,16 @@ declare(strict_types=1);
 
 namespace Bga\Games\babylonia;
 
+// TODO: need better name for this. "TurnSoFar"? "TurnProgress"?
 class PlayedTurn {
     function __construct(public array &$moves) {}
 
+    public function addMove(Move $move) {
+        $this->moves[] = $move;
+    }
+
     public function allMovesFarmersOnLand(Board $board): bool {
-        foreach ($this->moves as $move) {
+        foreach ($this->moves as &$move) {
             if ($move->piece != Piece::FARMER) {
                 return false;
             }
