@@ -27,7 +27,9 @@ declare(strict_types=1);
 namespace Bga\Games\babylonia;
 
 class Db {
-    public function __construct(private mixed $db) {}
+    public function __construct(private mixed $db) {
+        Logging::debug("Db initialized");
+    }
 
     private function boolValue(bool $b): string {
         return $b ? 'TRUE' : 'FALSE';
