@@ -36,7 +36,7 @@ class Move {
                         intval($dbresults['handpos']),
                         intval($dbresults['board_row']),
                         intval($dbresults['board_col']),
-                        $dbresults['captured'],
+                        boolval($dbresults['captured']),
                         intval($dbresults['points']));
     }
 
