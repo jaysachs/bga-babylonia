@@ -48,7 +48,7 @@ class Hex {
         if ($this->piece != Piece::EMPTY) {
             throw new \LogicException("attempt to place city or field on top of $this");
         }
-        if ($this->type == HexType::WATER) {
+        if ($this->isWater()) {
             throw new \LogicException("attempt to place city or field on water hex $this");
         }
         if (!$feature->isCity() && !$feature->isField() && $feature != Piece::ZIGGURAT) {
@@ -69,7 +69,7 @@ class Hex {
                 throw new \LogicException("attempt to play a piece $p on non-empty non-crop field hex $this");
             }
         }
-        if ($this->type == HexType::WATER) {
+        if ($this->isWater()) {
             $this->piece = Piece::SECRET;
         } else {
             $this->piece = $piece;
