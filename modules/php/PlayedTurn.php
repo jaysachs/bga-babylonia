@@ -40,7 +40,7 @@ class PlayedTurn {
                 return false;
             }
             $hex = $board->hexAt($move->row, $move->col);
-            if ($hex->type == HexType::WATER) {
+            if ($hex->isWater()) {
                 return false;
             }
         }
