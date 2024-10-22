@@ -77,6 +77,14 @@ class Hex {
         $this->player_id = $player_id;
     }
 
+    public function isLand(): bool {
+        return $this->type == HexType::LAND;
+    }
+
+    public function isWater(): bool {
+        return $this->type == HexType::WATER;
+    }
+
     public static function land(int $row, int $col):Hex {
         return new Hex(HexType::LAND, $row, $col);
     }
