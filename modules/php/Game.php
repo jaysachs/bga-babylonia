@@ -51,6 +51,7 @@ class Game extends \Table
             "my_second_game_variant" => 101,
         ]);
 
+        Logging::init($this);
         $this->db = new Db($this);
     }
 
