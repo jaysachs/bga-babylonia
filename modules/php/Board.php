@@ -179,7 +179,7 @@ END;
             $start_row,
             $start_col,
             function(&$hex) {
-                if ($hex->type == HexType::LAND) {
+                if ($hex->isLand()) {
                   $hexrow = &$this->hexes[$hex->row];
                   unset($hexrow[$hex->col]);
                   return true;
