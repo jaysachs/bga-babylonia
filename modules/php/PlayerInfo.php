@@ -74,7 +74,7 @@ class PlayerInfo {
         return $p;
     }
 
-    public function handContians(Piece $piece): bool {
+    public function handContains(Piece $piece): bool {
         foreach ($this->hand as $p) {
             if ($piece == $p) {
                 return true;
