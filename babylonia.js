@@ -29,8 +29,8 @@ function (dojo, declare) {
             // Example:
             // this.myGlobalValue = 0;
 
-	    dojo.connect( $('hand'), 'onclick', this, 'onPieceSelection' );
-	    dojo.connect( $('board'), 'onclick', this, 'onHexSelection' );
+            dojo.connect( $('hand'), 'onclick', this, 'onPieceSelection' );
+            dojo.connect( $('board'), 'onclick', this, 'onHexSelection' );
         },
 
         /*
@@ -58,12 +58,12 @@ function (dojo, declare) {
                 // TODO: Setting up players boards if needed
             }
 
-	    var current_player = gamedatas.players[this.player_id];
+            var current_player = gamedatas.players[this.player_id];
 
             // TODO: Set up your game interface here, according to "gamedatas"
 
             let c = document.getElementById("board");
-	    console.log(gamedatas.board);
+            console.log(gamedatas.board);
             for( let h = 0; h < gamedatas.board.length; ++h) {
                 var hex = gamedatas.board[h];
                 var row = hex.row;
@@ -75,13 +75,13 @@ function (dojo, declare) {
                     `<div id="hex_${row}_${col}" style="top:${top}px; left:${left}px;"><div></div></div>`);
                 var p = hex.piece;
                 if (p != null) {
-   		    let n = (hex.board_player == null || hex.board_player == 0) ? null : gamedatas.players[hex.board_player].player_number;
-		    this.renderPlayedPiece(row, col, p, n);
+                    let n = (hex.board_player == null || hex.board_player == 0) ? null : gamedatas.players[hex.board_player].player_number;
+                    this.renderPlayedPiece(row, col, p, n);
                 }
             }
 
-	    this.renderHand(gamedatas.hand, current_player.player_number);
-	    console.log("setting up notifications");
+            this.renderHand(gamedatas.hand, current_player.player_number);
+            console.log("setting up notifications");
 
             // Setup game notifications to handle (see "setupNotifications" method below)
             this.setupNotifications();
@@ -89,67 +89,67 @@ function (dojo, declare) {
             console.log( "Ending game setup" );
         },
 
-	onHexSelection:   function (event) {
-	    console.log("onHexSelection:" + event.target.id);
+        onHexSelection:   function (event) {
+            console.log("onHexSelection:" + event.target.id);
             event.preventDefault();
             event.stopPropagation();
 
-	    // first find selected hand piece, if any.
-	    var s = dojo.query( '#hand .selected' );
-	    if (s.length == 0) {
-		console.log("No piece selected.");
-		return;
-	    }
-	    if (s.length > 1) {
-		console.log("More than one piece selected?!");
-	    }
-	    console.log("Selected hand piece div id: " + s[0].id);
-	    let pos = s[0].id.split("_")[1];
+            // first find selected hand piece, if any.
+            var s = dojo.query( '#hand .selected' );
+            if (s.length == 0) {
+                console.log("No piece selected.");
+                return;
+            }
+            if (s.length > 1) {
+                console.log("More than one piece selected?!");
+            }
+            console.log("Selected hand piece div id: " + s[0].id);
+            let pos = s[0].id.split("_")[1];
             let e = event.target;
             while (e.parentElement != null && e.parentElement.id != "board") {
-		e = e.parentElement;
+                e = e.parentElement;
             }
-	    if (e.parentElement == null) {
-		console.log("didn't click on a hex");
-		return;
-	    }
-	    let id = e.id.split("_");
-	    let row = id[1];
-	    let col = id[2];
-	    console.log("selected hex " + row + "," + col);
+            if (e.parentElement == null) {
+                console.log("didn't click on a hex");
+                return;
+            }
+            let id = e.id.split("_");
+            let row = id[1];
+            let col = id[2];
+            console.log("selected hex " + row + "," + col);
 
-	    this.bgaPerformAction("actPlayPiece", {
+            this.bgaPerformAction("actPlayPiece", {
                 handpos: pos,
-		row: row,
-		col: col
+                row: row,
+                col: col
             }).then(() =>  {
                 // What to do after the server call if it succeeded
                 // (most of the time, nothing, as the game will react to notifs / change of state instead)
-		// TODO: be more careful/precise?
-		s[0].classList.remove("selected");
+                // TODO: be more careful/precise?
+                s[0].classList.remove("selected");
             });
-	},
+        },
 
-	onPieceSelection: function(event) {
-	    console.log("onPieceSelection");
-	    event.preventDefault();
+        onPieceSelection: function(event) {
+            console.log("onPieceSelection");
+            event.preventDefault();
             event.stopPropagation();
             if(! this.isCurrentPlayerActive() ) {
-		return false;
-	    }
+                return false;
+            }
             let e = event.target;
             let hc = e.parentElement;
             if (hc.id == "hand") {
-		let c = e.classList;
-		if (c.length != 0) {
-		    if (!c.contains("selected")) {
-			hc.querySelectorAll('.selected').forEach(div => div.classList.remove('selected'));
-		    }
-		    c.toggle("selected");
-		}
+                let c = e.classList;
+                if (c.length != 0) {
+                    if (!c.contains("selected")) {
+                        hc.querySelectorAll('.selected').forEach(div => div.classList.remove('selected'));
+                    }
+                    c.toggle("selected");
+                }
             }
-	    return false;
-	},
+            return false;
+        },
 
         ///////////////////////////////////////////////////
         //// Game & client states
@@ -234,43 +234,43 @@ function (dojo, declare) {
         ///////////////////////////////////////////////////
         //// Utility methods
 
-	hexDiv: function (row, col) {
-	    return document.getElementById("hex_" + row + "_" + col);
-	},
+        hexDiv: function (row, col) {
+            return document.getElementById("hex_" + row + "_" + col);
+        },
 
-	renderHand: function(hand, playerNumber) {
-	    // TODO: need to handle empty better; they should be just
-	    //  circle outline with background showing through
-	    console.log("renderHand: " + hand);
-	    // remove existing
-	    for (i = 0; i < 7; ++i) {
-		document.getElementById("hand_" + i).className = "";
-	    }
-	    for (i = 0; i < hand.length; ++i) {
-		if (hand[i].piece != null) {
-		    var p = hand[i].piece + "_" + playerNumber;
-		    document.getElementById("hand_" + i).classList.add(p);
-		}
-	    }
-	    for (i = hand.length; i < 7; ++i) {
-		document.getElementById("hand_" + i).classList.add("unavailable");
-	    }
-	    console.log("renderHand done");
-	},
-	
-	renderPlayedPiece: function (row, col, piece, playerNumber) {
-	    console.log("renderpiece: " + row + "," + col + "," + piece + "," + playerNumber);
-	    let hex = this.hexDiv(row, col);
-	    if (hex == null) {
-		return;
-	    }
-	    // TODO: be more careful here?
-	    if (playerNumber == null) {
-		hex.firstElementChild.className = piece;
-	    } else {
-		hex.firstElementChild.className = piece + "_" + playerNumber;
-	    }
-	},
+        renderHand: function(hand, playerNumber) {
+            // TODO: need to handle empty better; they should be just
+            //  circle outline with background showing through
+            console.log("renderHand: " + hand);
+            // remove existing
+            for (i = 0; i < 7; ++i) {
+                document.getElementById("hand_" + i).className = "";
+            }
+            for (i = 0; i < hand.length; ++i) {
+                if (hand[i].piece != null) {
+                    var p = hand[i].piece + "_" + playerNumber;
+                    document.getElementById("hand_" + i).classList.add(p);
+                }
+            }
+            for (i = hand.length; i < 7; ++i) {
+                document.getElementById("hand_" + i).classList.add("unavailable");
+            }
+            console.log("renderHand done");
+        },
+        
+        renderPlayedPiece: function (row, col, piece, playerNumber) {
+            console.log("renderpiece: " + row + "," + col + "," + piece + "," + playerNumber);
+            let hex = this.hexDiv(row, col);
+            if (hex == null) {
+                return;
+            }
+            // TODO: be more careful here?
+            if (playerNumber == null) {
+                hex.firstElementChild.className = piece;
+            } else {
+                hex.firstElementChild.className = piece + "_" + playerNumber;
+            }
+        },
 
         /*
 
@@ -325,8 +325,8 @@ function (dojo, declare) {
         {
             console.log( 'notifications subscriptions setup' );
 
-	    dojo.subscribe( 'piecePlayed', this, 'notif_piecePlayed' );
-	    dojo.subscribe( 'handRefilled', this, 'notif_handRefilled' );
+            dojo.subscribe( 'piecePlayed', this, 'notif_piecePlayed' );
+            dojo.subscribe( 'handRefilled', this, 'notif_handRefilled' );
 
             // TODO: here, associate your game notifications with local methods
 
@@ -343,16 +343,16 @@ function (dojo, declare) {
 
         // TODO: from this point and below, you can write your game notifications handling methods
 
-	notif_piecePlayed: function( notif ) {
+        notif_piecePlayed: function( notif ) {
             console.log( 'notif_piecePlayed' );
             console.log( notif );
-	    this.renderPlayedPiece( notif.args.row, notif.args.col, notif.args.piece, notif.args.player_number );
-	},
+            this.renderPlayedPiece( notif.args.row, notif.args.col, notif.args.piece, notif.args.player_number );
+        },
 
-	notif_handRefilled: function( notif ) {
+        notif_handRefilled: function( notif ) {
             console.log( 'notif_handRefilled' );
             console.log( notif );
-	    this.renderHand( notif.args.hand, notif.args.player_number );
-	},
+            this.renderHand( notif.args.hand, notif.args.player_number );
+        },
     });
 });
