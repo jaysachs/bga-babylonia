@@ -109,12 +109,12 @@ class Game extends \Table
         $board = $this->db->retrieveBoard();
         $piece = $this->db->retrieveHandPiece($player_id, $handpos);
         $hex = $board->hexAt($row, $col);
-        $pv = $piece->value;
         if ($hex == null) {
             throw new \LogicException("Hex at $row $col was null");
         }
         if (!$this->isPlayAllowed($board, $piece, $hex, $played_turn)) {
-             throw new \InvalidArgumentException("Illegal to play ${pv} to $row, $col by $player_id");
+            $pv = $piece->value;
+            throw new \InvalidArgumentException("Illegal to play ${pv} to $row, $col by $player_id");
         }
 
         // verify the player has remaining moves by checking `moves_this_turn` table
