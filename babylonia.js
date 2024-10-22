@@ -143,7 +143,7 @@ function (dojo, declare) {
             let hc = e.parentElement;
             if (hc.id == "hand") {
                 let c = e.classList;
-                if (!c.contains("unavailable"() && !c.contains("empty")) {
+                if (!c.contains("unavailable") && !c.contains(this.handClass("empty"))) {
                     if (!c.contains("selected")) {
                         hc.querySelectorAll('.selected').forEach(div => div.classList.remove('selected'));
                     }
