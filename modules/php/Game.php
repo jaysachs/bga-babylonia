@@ -55,32 +55,43 @@ class Game extends \Table
         $this->db = new Db($this);
     }
 
+    private function playableHexes(Board $board, Piece $piece, PlayedTurn $played_turn): array {
+        $result = [];
+        $board->visitAll(function (&$hex) use (&$result, &$board, $piece, &$played_turn) {
+            if ($this->isHexPlayAllowed($board, $piece, $hex, $played_turn)) {
+                $result[] = $hex;
+            }
+        });
+        return result;
+    }
+
     private function isPlayAllowed(Board $board, Piece $piece, int $row, int $col, PlayedTurn $played_turn) {
         $hex = $board->hexAt($row, $col);
         if ($hex == null) {
             throw new \LogicException("Hex at $row $col was null?");
         }
+        return $this->isHexPlayAllowed($board, $piece, $hex, $played_turn);
+    }
+
+    private function isHexPlayAllowed(Board $board, Piece $piece, Hex $hex, PlayedTurn $played_turn) {
         // first check move limits per turn
         if (count($played_turn->moves) >= 2) {
             if ($hex->type == HexType::WATER) {
                 return false;
             }
             if ($piece == Piece::FARMER) {
-                if (! $played_turn->allMovesFarmersOnLand($board)) {
-                    return false;
+                if ($played_turn->allMovesFarmersOnLand($board)) {
+                    return true;
                 }
+                return false;
             } else {
                 // Now check if player has zig tiles to permit another move
                 return false;
             }
         }
-        throw new \LogicException("Trying to play in hex $hex");
         // now check if piece is allowed
         if ($hex->piece == Piece::EMPTY) {
-            return false;
-        }
-        if ($hex->player_id != 0) {
-            return false;
+            return true;
         }
         if ($hex->piece->isField()) {
             if ($piece == Piece::FARMER) {
@@ -108,9 +119,9 @@ class Game extends \Table
 
         $pv = $piece->value;
         // TODO: re-enable this
-        // if (!$this->isPlayAllowed($board, $piece, $row, $col, $played_turn)) {
-        //     throw new \InvalidArgumentException("Illegal to play ${pv} to $row, $col by $player_id");
-        // }
+        if (!$this->isPlayAllowed($board, $piece, $row, $col, $played_turn)) {
+             throw new \InvalidArgumentException("Illegal to play ${pv} to $row, $col by $player_id");
+        }
 
         // verify the player has remaining moves by checking `moves_this_turn` table
         // either less than 2, or all farmers and new piece is a farmer
@@ -136,9 +147,11 @@ class Game extends \Table
         $points = $fs + $zs;
 
         $move = new Move($player_id, $piece, $handpos, $row, $col, false, $points);
+        $played_turn->addMove($move);
 
         // update the database
         $this->db->updateMove($move);
+        // TODO: need an updated hand
 
         // notify players of the move and scoring changes
 
@@ -161,11 +174,27 @@ class Game extends \Table
         // and if any pieces have legal plays, player can continue.
         // Also need to offer "pass" if have played at least 2 pieces.
 
-        if (count($played_turn->moves) >= 1) {
+        if (!$this->canMakeAnotherMove($board, $player_id, $played_turn)) {
             $this->gamestate->nextState("done");
         } else {
-            $this->gamestate->nextState("playPiece");
+            // $this->gamestate->nextState("playPiece");
         }
+    }
+
+    private function canMakeAnotherMove(Board $board, int $player_id, PlayedTurn $played_turn): bool {
+        if ($played_turn->allMovesFarmersOnLand($board)) {
+            $pi = $this->db->retrievePlayerInfo($player_id);
+            if ($pi->handHas(Piece::FARMER)) {
+                return true;
+            }
+        }
+
+        // check for ziggurats letting extra noble plays
+ 
+        if (count($played_turn->moves) < 2) {
+            return true;
+        }
+        return false;
     }
 
     public function actDonePlayPieces(): void
