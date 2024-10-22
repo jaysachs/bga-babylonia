@@ -157,6 +157,9 @@ class Game extends \Table
         ]);
 
         // at the end of the action, move to the next state
+        // use a previously-retrieved PlayerInfo (including hand)
+        // and if any pieces have legal plays, player can continue.
+        // Also need to offer "pass" if have played at least 2 pieces.
 
         if (count($played_turn->moves) >= 1) {
             $this->gamestate->nextState("done");
@@ -175,8 +178,6 @@ class Game extends \Table
             "player_id" => $player_id,
             "player_name" => $this->getActivePlayerName(),
         ]);
-
-        // TODO: remove all played moves.
 
         // TODO: if scoring needed, go to scoring
         $this->gamestate->nextState("done");
@@ -241,7 +242,12 @@ class Game extends \Table
         foreach ($info->hand as $piece) {
             $hand[] = ["piece" => ($piece == null ? null : $piece->value)];
         }
-        
+
+        $this->db->removePlayedMoves($player_id);
+
+        // TODO: this shouldn't return the whole hand, just the refilled parts
+        // Capture the delta and return *that*. Then it can be animated on
+        // the client.
         $this->notifyPlayer($player_id, "handRefilled", "You refilled your hand", [
             "player_id" => $player_id,
             "player_number" => $this->getPlayerNoById($player_id),

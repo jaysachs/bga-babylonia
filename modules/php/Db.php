@@ -91,6 +91,11 @@ class Db {
         );
     }
 
+    public function removePlayedMoves(int $player_id): void {
+        $sql = "DELETE FROM moves_this_turn WHERE player_id=$player_id";
+        $this->db->DbQuery( $sql );
+    }
+
     public function updateMove($move) {
         $c = $this->boolValue($move->captured);
         $piece = $move->piece->value;
