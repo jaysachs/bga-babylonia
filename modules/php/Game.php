@@ -184,7 +184,7 @@ class Game extends \Table
     private function canMakeAnotherMove(Board $board, int $player_id, PlayedTurn $played_turn): bool {
         if ($played_turn->allMovesFarmersOnLand($board)) {
             $pi = $this->db->retrievePlayerInfo($player_id);
-            if ($pi->handHas(Piece::FARMER)) {
+            if ($pi->handContains(Piece::FARMER)) {
                 return true;
             }
         }
