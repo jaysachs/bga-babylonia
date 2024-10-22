@@ -69,11 +69,10 @@ class Hex {
                 throw new \LogicException("attempt to play a piece $p on non-empty non-crop field hex $this");
             }
         }
-        if ($this->isWater()) {
-            $this->piece = Piece::SECRET;
-        } else {
-            $this->piece = $piece;
+        if ($this->isWater() && !$piece->isHidden()) {
+            throw new \LogicException("attempt to play piece $p unhidden in water hex $this");
         }
+        $this->piece = $piece;
         $this->player_id = $player_id;
     }
 

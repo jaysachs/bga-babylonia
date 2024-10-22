@@ -33,7 +33,7 @@ enum Piece: string {
     case SERVANT = 'servant';
     case MERCHANT = 'merchant';
     case FARMER = 'farmer';
-    case SECRET = 'secret';
+    case HIDDEN = 'hidden';
     case CITY_P = 'city_p';
     case CITY_S = 'city_s';
     case CITY_M = 'city_m';
@@ -71,9 +71,9 @@ enum Piece: string {
     }
 
     public function isPlayerPiece(): bool {
-        return $this->isFarmer() || $this->isNoble() || $this->isSecret();
+        return $this->isFarmer() || $this->isNoble() || $this->isHidden();
     }
-    public function isSecret(): bool { return $this == Piece::SECRET; }
+    public function isHidden(): bool { return $this == Piece::HIDDEN; }
     public function isFarmer(): bool { return $this == Piece::FARMER; }
     public function isNoble(): bool {
         return match ($this) {
