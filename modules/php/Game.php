@@ -65,7 +65,7 @@ class Game extends \Table
         return result;
     }
 
-    private function isPlayAllowed(Board $board, Piece $piece, Hex $hex, PlayedTurn $played_turn) {
+    private function isPlayAllowed(int $player_id, Board $board, Piece $piece, Hex $hex, PlayedTurn $played_turn) {
         $this->debug("isPlayAllowed: " . $piece->value . " " . $hex . " " . var_export($played_turn, true));
         // first check move limits per turn
         if (count($played_turn->moves) >= 2) {
@@ -76,12 +76,12 @@ class Game extends \Table
             }
             if ($piece->isFarmer()) {
                 $this->debug("isPlayAllowed: piece is farmer");
-                if ($played_turn->allMovesFarmersOnLand($board)) {
-                    $this->debug("isPlayAllowed: all moves farmers on land");
-                    return true;
+                if (!$played_turn->allMovesFarmersOnLand($board)) {
+                    $this->debug("isPlayAllowed: NOT all moves farmers on land");
+                    return false;
                 }
-                $this->debug("isPlayAllowed: all moves not farmers on land");
-                return false;
+                $this->debug("isPlayAllowed: all moves farmers on land");
+                // fall through
             } else {
                 $this->debug("isPlayAllowed: checking for 3+ move non-farmer");
                 // Now check if player has zig tiles to permit another move
@@ -99,7 +99,7 @@ class Game extends \Table
                 $this->debug("isPlayAllowed: piece is farmer");
                 // ensure player has at least one noble adjacent.
                 $is_noble = function ($h) use ($player_id): bool {
-                    return $h->piece->player_id == $player_id
+                    return $h->player_id == $player_id
                         && $h->piece->isNoble();
                 };
                 $n = count($board->neighbors($hex, $is_noble)) > 0;
@@ -124,7 +124,7 @@ class Game extends \Table
         if ($hex == null) {
             throw new \LogicException("Hex at $row $col was null");
         }
-        if (!$this->isPlayAllowed($board, $piece, $hex, $played_turn)) {
+        if (!$this->isPlayAllowed($player_id, $board, $piece, $hex, $played_turn)) {
             $pv = $piece->value;
             throw new \InvalidArgumentException("Illegal to play ${pv} to $row, $col by $player_id");
         }
