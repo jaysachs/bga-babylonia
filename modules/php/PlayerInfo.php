@@ -26,6 +26,7 @@ declare(strict_types=1);
 
 namespace Bga\Games\babylonia;
 
+// TODO: consider factoring out a "Hand" class.
 class PlayerInfo {
     public $scored_cities = array();
     public $scored_fields = array();
@@ -71,6 +72,15 @@ class PlayerInfo {
             $p->pool[] = Piece::from($pp["piece"]);
         }
         return $p;
+    }
+
+    public function handContians(Piece $piece): bool {
+        foreach ($this->hand as $p) {
+            if ($piece == $p) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /* returns false if pool is empty */
