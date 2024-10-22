@@ -41,18 +41,18 @@ enum Piece: string {
     case CITY_MP = 'city_mp';
     case CITY_MS = 'city_ms';
     case CITY_MSP = 'city_msp';
-    case FARM_5 = 'farm_5';
-    case FARM_6 = 'farm_6';
-    case FARM_7 = 'farm_7';
-    case FARM_CITIES = 'farm_X';
+    case FIELD_5 = 'field_5';
+    case FIELD_6 = 'field_6';
+    case FIELD_7 = 'field_7';
+    case FIELD_CITIES = 'field_X';
     case EMPTY = 'empty';
 
-    public function isFarm(): bool {
+    public function isField(): bool {
         return match($this) {
-            Piece::FARM_5,
-            Piece::FARM_6,
-            Piece::FARM_7,
-            Piece::FARM_CITIES => true,
+            Piece::FIELD_5,
+            Piece::FIELD_6,
+            Piece::FIELD_7,
+            Piece::FIELD_CITIES => true,
             default => false,
         };
     }

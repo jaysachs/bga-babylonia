@@ -46,13 +46,13 @@ class Hex {
 
     public function placeFeature(Piece $feature) {
         if ($this->piece != Piece::EMPTY) {
-            throw new \LogicException("attempt to place city or farm on top of $this");
+            throw new \LogicException("attempt to place city or field on top of $this");
         }
         if ($this->type == HexType::WATER) {
-            throw new \LogicException("attempt to place city or farm on water hex $this");
+            throw new \LogicException("attempt to place city or field on water hex $this");
         }
-        if (!$feature->isCity() && !$feature->isFarm() && $feature != Piece::ZIGGURAT) {
-            throw new \LogicException("attempt to place a non-city or farm on $this");
+        if (!$feature->isCity() && !$feature->isField() && $feature != Piece::ZIGGURAT) {
+            throw new \LogicException("attempt to place a non-city or field on $this");
         }
         $this->piece = $feature;
     }
@@ -65,7 +65,7 @@ class Hex {
             throw new \LogicException("attempt to play piece $p to occupied hex $this");
         }
         if ($this->piece != Piece::EMPTY) {
-            if (!$this->piece.isFarm()) {
+            if (!$this->piece.isField()) {
                 throw new \LogicException("attempt to play a piece $p on non-empty non-crop field hex $this");
             }
         }

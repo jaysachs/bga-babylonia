@@ -69,10 +69,10 @@
 .board .city_mp,
 .board .city_ms,
 .board .city_sp,
-.board .farm_5,
-.board .farm_6,
-.board .farm_7,
-.board .farm_X,
+.board .field_5,
+.board .field_6,
+.board .field_7,
+.board .field_X,
 .board .ziggurat
 {
     height: var(--hh);
@@ -104,16 +104,16 @@
 .city_sp   {
     background: url(img/cities.png) 0% -700%;
 }
-.farm_5     {
+.field_5     {
     background: url(img/cities.png) 0% -800%;
 }
-.farm_6     {
+.field_6     {
     background: url(img/cities.png) 0% -900%;
 }
-.farm_7     {
+.field_7     {
     background: url(img/cities.png) 0% -1000%;
 }
-.farm_X     {
+.field_X     {
     background: url(img/cities.png) 0% -1100%;
 }
 .ziggurat   {

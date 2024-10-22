@@ -15,6 +15,9 @@
  *
  */
 
+var thegamedatas = null;
+
+
 define([
     "dojo","dojo/_base/declare",
     "ebg/core/gamegui",
@@ -51,7 +54,7 @@ function (dojo, declare) {
         setup: function( gamedatas )
         {
             console.log( "Starting game setup" );
-
+	    thegamedatas = gamedatas;
             // Setting up player boards
             for( var player_id in gamedatas.players )
             {

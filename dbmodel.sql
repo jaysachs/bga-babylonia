@@ -65,9 +65,9 @@ CREATE TABLE IF NOT EXISTS `moves_this_turn` (
   -- where it was placed
   `board_row` int(10) unsigned NOT NULL,
   `board_col` int(10) unsigned NOT NULL,
-  -- what farm was "captured" if any
+  -- what field was "captured" if any
   `captured` varchar(8) DEFAULT NULL,
-  -- what was immediately scored (farm and/or ziggurat adjacency)
+  -- what was immediately scored (field and/or ziggurat adjacency)
   `points` int(10) unsigned DEFAULT NULL,
   -- no need to record "inversion", as the hextype will tell us
   PRIMARY KEY (`seq_id`)
@@ -84,7 +84,7 @@ CREATE TABLE IF NOT EXISTS `board` (
   `board_col` smallint(5) unsigned NOT NULL,
    -- LAND or WATER
   `hextype` varchar(8) NOT NULL,
-   -- one of: CITY_{P,S,M,MS,MP,SP,MSP}, FARM_{5,6,7,X}, ZIGGURAT,
+   -- one of: CITY_{P,S,M,MS,MP,SP,MSP}, FIELD_{5,6,7,X}, ZIGGURAT,
    -- or a played piece: FARMER, MERCHANT, PRIEST, SERVANT
    -- note that "inverted" will be based on hextype and we'll sanitize played pieces
    --   to PLAIN before returning to client

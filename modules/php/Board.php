@@ -77,7 +77,7 @@ END;
         $board = new Board($empty);
         $lines = explode("\n", Board::MAP);
         $row = 0;
-        $cityfarms = [];
+        $cityfields = [];
         foreach ($lines as &$s) {
             $col = ($row & 1) ? 1 : 0;
             foreach (str_split($s) as $ch) {
@@ -92,7 +92,7 @@ END;
                     break;
                 case 'C':
                     $board->addHex(Hex::land($row, $col));
-                    $cityfarms[] = [ $row, $col ];
+                    $cityfields[] = [ $row, $col ];
                     break;
                 case '!':
                     $board->addHex(Hex::ziggurat($row, $col));
@@ -115,15 +115,15 @@ END;
         }
 
         $pool = self::initializePool($numPlayers);
-        $board->placeCitiesAndFarms($pool, $cityfarms);
+        $board->placeCitiesAndFields($pool, $cityfields);
         if (count($pool) != 0) {
-            throw new \LogicException("placed all cities and farms but tiles leftover");
+            throw new \LogicException("placed all cities and fields but tiles leftover");
         }
         return $board;
     }
 
-    private function placeCitiesAndFarms(array &$pool, array &$cityfarms) {
-        foreach ($cityfarms as $rc) {
+    private function placeCitiesAndFields(array &$pool, array &$cityfields) {
+        foreach ($cityfields as $rc) {
             $hex = $this->hexAt($rc[0], $rc[1]);
             if ($hex != null) {
                 $x = array_pop($pool);
@@ -234,27 +234,27 @@ END;
             $pool[] = Piece::CITY_MP;
         }
         for ($i = 0; $i < 3; $i++) {
-            $pool[] = Piece::FARM_CITIES;
+            $pool[] = Piece::FIELD_CITIES;
         }
-        $pool[] = Piece::FARM_5;
-        $pool[] = Piece::FARM_6;
-        $pool[] = Piece::FARM_7;
+        $pool[] = Piece::FIELD_5;
+        $pool[] = Piece::FIELD_6;
+        $pool[] = Piece::FIELD_7;
         if ($numPlayers > 2) {
             $pool[] = Piece::CITY_SP;
             $pool[] = Piece::CITY_MS;
             $pool[] = Piece::CITY_MP;
             $pool[] = Piece::CITY_MSP;
-            $pool[] = Piece::FARM_5;
-            $pool[] = Piece::FARM_6;
-            $pool[] = Piece::FARM_7;
-            $pool[] = Piece::FARM_CITIES;
+            $pool[] = Piece::FIELD_5;
+            $pool[] = Piece::FIELD_6;
+            $pool[] = Piece::FIELD_7;
+            $pool[] = Piece::FIELD_CITIES;
         }
         if ($numPlayers > 3) {
             $pool[] = Piece::CITY_P;
             $pool[] = Piece::CITY_S;
             $pool[] = Piece::CITY_M;
             for ($i = 0; $i < 3; $i++) {
-                $pool[] = Piece::FARM_CITIES;
+                $pool[] = Piece::FIELD_CITIES;
             }
         }
         shuffle($pool);

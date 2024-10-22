@@ -81,7 +81,7 @@ class Game extends \Table
         if ($hex->player_id != 0) {
             return false;
         }
-        if ($hex->piece->isFarm()) {
+        if ($hex->piece->isField()) {
             if ($piece == Piece::FARMER) {
                 // ensure player has at least one noble adjacent.
                 $is_noble = function ($h) use ($player_id): bool {
@@ -118,14 +118,14 @@ class Game extends \Table
         // verify $handpos is not empty already
 
         // verify the piece at $handpos is legal to play at $row, $col
-        //    if existing is farm:
+        //    if existing is field:
         //      the piece must be a farmer with adjacent noble
         //      or else have zig card
-        //      the farm check requires 'the whole board'
+        //      the field check requires 'the whole board'
         //    else it needs to be empty
         // "invert" it if it's in water.
 
-        // score farm and/or ziggurat
+        // score field and/or ziggurat
         //   will need to load board
         //     either to compute adjacent ziggurats, or count remaining cities
         //     (hmm, current model doesn't permit that from board, we lose track)
@@ -151,7 +151,7 @@ class Game extends \Table
             "row" => $row,
             "col" => $col,
             "ziggurat_points" => $zs,
-            "farm_points" => $fs,
+            "field_points" => $fs,
             "i18n" => ['piece'],
         ]);
 
