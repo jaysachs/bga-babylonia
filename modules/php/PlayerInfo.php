@@ -37,9 +37,11 @@ class PlayerInfo {
 
     public static function newPlayerInfo($pid) {
         $p = new PlayerInfo();
-        for ($i = 0; $i < 7; $i++) {
-            $p->hand[] = null;
+        for ($i = 0; $i < 5; $i++) {
+            $p->hand[] = Piece::EMPTY;
         }
+        $p->hand[] = null;
+        $p->hand[] = null;
         $p->id = $pid;
         $pool = &$p->pool;
         for ($i = 0; $i < 6; $i++) {
