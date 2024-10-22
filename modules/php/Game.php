@@ -58,25 +58,17 @@ class Game extends \Table
     private function playableHexes(Board $board, Piece $piece, PlayedTurn $played_turn): array {
         $result = [];
         $board->visitAll(function (&$hex) use (&$result, &$board, $piece, &$played_turn) {
-            if ($this->isHexPlayAllowed($board, $piece, $hex, $played_turn)) {
+            if ($this->iPlayAllowed($board, $piece, $hex, $played_turn)) {
                 $result[] = $hex;
             }
         });
         return result;
     }
 
-    private function isPlayAllowed(Board $board, Piece $piece, int $row, int $col, PlayedTurn $played_turn) {
-        $hex = $board->hexAt($row, $col);
-        if ($hex == null) {
-            throw new \LogicException("Hex at $row $col was null?");
-        }
-        return $this->isHexPlayAllowed($board, $piece, $hex, $played_turn);
-    }
-
-    private function isHexPlayAllowed(Board $board, Piece $piece, Hex $hex, PlayedTurn $played_turn) {
+    private function isPlayAllowed(Board $board, Piece $piece, Hex $hex, PlayedTurn $played_turn) {
         // first check move limits per turn
         if (count($played_turn->moves) >= 2) {
-            if ($hex->type == HexType::WATER) {
+            if ($hex->isWater()) {
                 return false;
             }
             if ($piece == Piece::FARMER) {
@@ -116,10 +108,12 @@ class Game extends \Table
 
         $board = $this->db->retrieveBoard();
         $piece = $this->db->retrieveHandPiece($player_id, $handpos);
-
+        $hex = $board->hexAt($row, $col);
         $pv = $piece->value;
-        // TODO: re-enable this
-        if (!$this->isPlayAllowed($board, $piece, $row, $col, $played_turn)) {
+        if ($hex == null) {
+            throw new \LogicException("Hex at $row $col was null");
+        }
+        if (!$this->isPlayAllowed($board, $piece, $hex, $played_turn)) {
              throw new \InvalidArgumentException("Illegal to play ${pv} to $row, $col by $player_id");
         }
 
@@ -133,7 +127,6 @@ class Game extends \Table
         //    if existing is field:
         //      the piece must be a farmer with adjacent noble
         //      or else have zig card
-        //      the field check requires 'the whole board'
         //    else it needs to be empty
         // "invert" it if it's in water.
 
