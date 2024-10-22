@@ -28,16 +28,17 @@ namespace Bga\Games\babylonia;
 
 class Logging {
     private static mixed $logger = null;
-
+    private static string $prefix = "@@HERE@@ ";
     public static function init(mixed $logger): void {
         self::$logger = $logger;
+        self::debug("Logger initialized.");
     }
 
     public static function debug(string $s): void {
         if (self::$logger == null) {
             error_log($s);
         } else {
-            self::$logger->debug($s);
+            self::$logger->debug(self::$prefix . $s);
         }
     }
 }
