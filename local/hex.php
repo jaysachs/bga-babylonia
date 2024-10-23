@@ -39,110 +39,6 @@ class Game {
         }
         return $game;
     }
-
-    public function saveBoardToDb(): void {
-        $sql = "INSERT INTO board (board_x, board_y, hextype, piece, scored, player_id) VALUES ";
-        $sql_values = [];
-        $this->board->visitAll(function ($hex) use (&$sql_values) {
-            $player_id = 'NULL';
-            $piece = 'NULL';
-            if (is_a($hex->piece, 'PlayedPiece')) {
-                $piece = "'" . $hex->piece->type->value . "'";
-                $player_id = $hex->piece->player_id;
-            } else if ($hex->piece != null) {
-                $piece = "'" . $hex->piece->value . "'";
-            }
-            $t = $hex->type->value;
-            $scored = $hex->scored ? 'TRUE' : 'FALSE';
-            $sql_values[] = "($hex->col, $hex->row, '$t', $piece, $scored, $player_id)";
-        });
-        $sql .= implode(',', $sql_values);
-        // $this->DbQuery( $sql );
-    }
-
-    public function getDatas(): array {
-        $result = [];
-
-        // WARNING: We must only return information visible by the current player.
-        $current_player_id = (int) $this->getCurrentPlayerId();
-
-        // Get information about players.
-
-        $result["players"] = $this->getCollectionFromDb(
-            "SELECT P.player_id player_id,
-                    P.player_score score,
-                    P.player_color color,
-                    COUNT(H.piece) hand_size,
-                    GROUP_CONCAT(z.ziggurat_card SEPARATOR ',') cards
-             FROM player P
-             INNER JOIN hands H ON P.player_id = H.player_id
-             INNER JOIN ziggurat_cards Z ON P.player_id = Z.player_id"
-        );
-
-        $result['board'] = self::getObjectListFromDB(
-            "SELECT board_x x, board_y y, hextype, piece, scored, board_player FROM board" );
-
-        // Gather all information about current game situation (visible by player $current_player_id).
-        $result['current_player_hand'] = self::getCollectionFromDb(
-            "SELECT pos, piece FROM hands WHERE player_id=" . $current_player_id);
-
-        return $result;
-    }
-
-    public function isPlayPermitted(Player &$player, Piece $piece, int $row, int $col): bool {
-        if (!$piece->isPlayerPiece()) {
-            throw new InvalidArgumentException("attempt to place a non-player piece: $piece at $row $col");
-        }
-        if (array_search($this->players, $player) === false) {
-            throw new InvalidArgumentException("unknown player: $player");
-        }
-
-        // TODO: check that player has this piece
-
-        // TODO: pass in current moves this turn and verify playing is allowed
-
-        $hex = $this->board->hexAt($row, $col);
-        if ($hex == null) {
-            throw new InvalidArgumentException("Unknown row,col: $row, $col");
-        }
-
-        if ($hex->piece == null || $hex->piece == Piece::PLACEHOLDER) {
-            return true;
-        }
-
-        if ($hex->piece->isFarm()) {
-            if ($piece->isFarmer()) {
-                 // requires scoring
-                return ($this->board->anyNeighborMatches($hex, function ($h) {
-                    return is_a($h->piece, PlayedPiece)
-                        && $h->piece->player_id == $player->player_id
-                        && $h->piece->type->isNoble();
-                }));
-            }
-            if ($player->hasZigguratCard(ZigguratCard::NoblesInFields)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    public function playPiece(PlayedPiece $piece, int $row, int $col) {
-        // TODO:  pass in moves this turn and update/return it
-
-        if (!isPlayPermitted($player, $piece, $row, $col)) {
-            throw new InvalidArgumentException("not permitted to play $piece at $row $col");
-        }
-        $hex = $this->board->hexAt($row, $col);
-        if ($hex->piece == null || $hex->piece == Piece::PLACEHOLDER) {
-            $hex->playPiece($piece);
-        } else if ($hex->piece->isFarm()) {
-            $hex->playPiece($piece);
-            // TODO: score farm
-        } else {
-            throw new InvalidArgumentException("Attempt to place $piece on hex $hex not permitted");
-        }
-    }
 }
 
 class Player {
@@ -191,15 +87,31 @@ class Player {
 }
 
 $p = PlayerInfo::newPlayerInfo(0);
-var_dump($p);
+// var_dump($p);
 
 $p->hand[1] = null;
 $p->hand[3] = null;
 $b = $p->refillHand();
 
-var_dump($p);
+// var_dump($p);
 
-// $g = Game::newGame($argv[1], $argv[2]);
+$g = Game::newGame($argv[1], $argv[2]);
 // var_dump($g);
-// $g->saveBoardToDb();
+
+$hex = $g->board->hexAt(2, 0);
+var_dump($hex);
+$hex->piece = Piece::PRIEST;
+$hex->player_id = 1;
+$hex = $g->board->hexAt(2, 0);
+var_dump($hex);
+
+$zigs = $g->board->neighbors($hex, function (&$h): bool {
+    return $h->piece == Piece::ZIGGURAT;
+});
+
+var_dump($zigs);
+print "\n";
+print $g->board->adjacentZiggurats(1);
+print "\n";
+
 ?>
