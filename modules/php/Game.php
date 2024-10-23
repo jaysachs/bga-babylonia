@@ -253,7 +253,7 @@ class Game extends \Table
         $played_turn = $this->db->retrievePlayedTurn($player_id);
         $player_info = $this->db->retrievePlayerInfo($player_id);
         $board = $this->db->retrieveBoard();
-        // [ [FARMER => [hex1, hex2, ...] ];
+        // [ ["farmer" => [hex1, hex2, ...] ];
         $allowed_moves = $this->getAllowedMovesByPiece(
             $player_id,
             $board,
