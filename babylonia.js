@@ -218,31 +218,30 @@ function (dojo, declare) {
             {
                 switch( stateName )
                 {
-                 case 'mustPlayPiece':
-			this.addActionButton(
-			    'undo-btn',
-			    'Undo your turn',
-			    () => window.alert('undo not supported'));
-                    break;
-                 case 'mayPlayPiece':
-			this.addActionButton(
-			    'end-btn',
-			    'End your turn',
-			    () => this.bgaPerformAction("actDonePlayPieces"));
-			this.addActionButton(
-			    'undo-btn',
-			    'Undo',
-			    () => window.alert('undo not supported'));
-                    break;
-                 case 'mustFinishTurn':
+		    // If we want to get fancy, can even roll own HTML for buttons:
+		    // this.addActionButton(
+		    // 	'gear_button',
+		    // 	'<div id="gear_token" class="skills_and_techniques gear_token"></div>',
+		    // 	'onSelectAssetType', null, false, 'blue');
+
+                    case 'mayPlayPiece':
+		    if (args.canEndTurn) {
+			if (args.allowedMoves.length == 0) {
+			    this.updateStatusBar('You must end your turn');
+			} else {
+			    this.updateStatusBar('You may play a piece or end your turn');
+			}
 			this.addActionButton(
 			    'end-btn',
-			    'End your turn',
+			    'End turn',
 			    () => this.bgaPerformAction("actDonePlayPieces"));
-			this.addActionButton(
-			    'undo-btn',
-			    'Undo',
-			    () => window.alert('undo not supported'));
+		    } else {
+			this.updateStatusBar('You must play a piece');
+		    }
+		    this.addActionButton(
+			'undo-btn',
+			'Undo',
+			() => window.alert('undo not supported'));
                     break;
                 }
             }
@@ -250,6 +249,11 @@ function (dojo, declare) {
 
         ///////////////////////////////////////////////////
         //// Utility methods
+
+	updateStatusBar: function(message) {
+            $('gameaction_status').innerHTML = _(message);
+            $('pagemaintitletext').innerHTML = _(message);
+	},
 
         hexDiv: function (row, col) {
             return document.getElementById("hex_" + row + "_" + col);

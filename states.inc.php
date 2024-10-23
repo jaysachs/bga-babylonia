@@ -50,9 +50,7 @@
 //    !! It is not a good idea to modify this file when a game is running !!
 
 if ( !defined('STATE_END_GAME')) { // guard since this included multiple times
-    define("STATE_MUST_PLAY_PIECE", 2);
     define("STATE_MAY_PLAY_PIECE", 3);
-    define("STATE_MUST_FINISH_TURN", 4);
 
     define("STATE_END_OF_TURN_SCORING", 5);
     define("STATE_FINISH_TURN", 6);
@@ -69,45 +67,8 @@ $machinestates = [
         "description" => "",
         "type" => "manager",
         "action" => "stGameSetup",
-        "transitions" => ["" => STATE_MUST_PLAY_PIECE]
+        "transitions" => ["" => STATE_MAY_PLAY_PIECE]
     ),
-
-    STATE_MUST_PLAY_PIECE => [
-        "name" => "mustPlayPiece",
-        "description" => clienttranslate('${actplayer} must play a piece'),
-        "descriptionmyturn" => clienttranslate('${you} must play a piece'),
-        "type" => "activeplayer",
-        "args" => "argPlayerTurn",
-        "possibleactions" => [
-            // these actions are called from the front with bgaPerformAction, and matched to the function on the game.php file
-            "actPlayPiece",
-            "actUndo",
-        ],
-        "transitions" => [
-            "noMorePlayable" => STATE_MUST_FINISH_TURN,
-            "mustPlayPiece" => STATE_MUST_PLAY_PIECE,
-            "mayPlayPiece" => STATE_MAY_PLAY_PIECE,
-            "undo" => STATE_MUST_PLAY_PIECE,
-        ]
-    ],
-
-    STATE_MUST_FINISH_TURN => [
-        "name" => "mustFinishTurn",
-        "description" => clienttranslate('${actplayer} must end their turn'),
-        "descriptionmyturn" => clienttranslate('${you} must end your turn'),
-        "type" => "activeplayer",
-        "args" => "argPlayerTurn",
-        "possibleactions" => [
-            // these actions are called from the front with bgaPerformAction, and matched to the function on the game.php file
-            "actDonePlayPieces",
-            "actUndo",
-        ],
-        "transitions" => [
-            "undoToMay" => STATE_MAY_PLAY_PIECE,
-            "undoToMust" => STATE_MUST_PLAY_PIECE,
-            "done" => STATE_FINISH_TURN,
-        ]
-    ],
 
     STATE_MAY_PLAY_PIECE => [
         "name" => "mayPlayPiece",
@@ -119,13 +80,11 @@ $machinestates = [
             // these actions are called from the front with bgaPerformAction, and matched to the function on the game.php file
             "actPlayPiece",
             "actDonePlayPieces",
-            "actUndo",
+            //            "actUndo",
         ],
         "transitions" => [
-            "noMorePlayable" => STATE_MUST_FINISH_TURN,
             "mayPlayPiece" => STATE_MAY_PLAY_PIECE,
-            "undoToMay" => STATE_MAY_PLAY_PIECE,
-            "undoToMust" => STATE_MUST_PLAY_PIECE,
+            //            "undoToMay" => STATE_MAY_PLAY_PIECE,
             "done" => STATE_FINISH_TURN,
         ]
     ],
@@ -157,7 +116,7 @@ $machinestates = [
         "updateGameProgression" => true,
         "transitions" => [
             "endGame" => 99,
-            "nextPlayer" => STATE_MUST_PLAY_PIECE,
+            "nextPlayer" => STATE_MAY_PLAY_PIECE,
         ]
     ],
     // Final state.

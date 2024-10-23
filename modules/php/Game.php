@@ -182,25 +182,18 @@ class Game extends \Table
         // and if any pieces have legal plays, player can continue.
         // Also need to offer "pass" if have played at least 2 pieces.
 
-        $player_info = $this->db->retrievePlayerInfo($player_id);
-
-        // [ [FARMER => [hex1, hex2, ...] ];
-        $allowed_moves = $this->getAllowedMovesByPiece($player_id, $board, $player_info, $played_turn);
-
-        if (count($played_turn->moves) < 2) {
-            $this->gamestate->nextState("mustPlayPiece");
-        }
-        else if ($this->getNumberAllowedMoves($player_info, $allowed_moves) == 0) {
-            $this->gamestate->nextState("noMorePlayable");
-        } else {
-            $this->gamestate->nextState("mayPlayPiece");
-        }
+        $this->gamestate->nextState("mayPlayPiece");
     }
 
     public function actDonePlayPieces(): void
     {
         // Retrieve the active player ID.
         $player_id = intval($this->getActivePlayerId());
+
+        // $played_turn = $this->db->retrievePlayedTurn($player_id);
+        // if (count($played_turn->moves) < 2) {
+        //     throw new \BgaUserException("Attempt to end turn but less than 2 pieces played");
+        // }
 
         // Notify all players about the choice to pass.
         $this->notifyAllPlayers("donePlayed", clienttranslate('${player_name} finishes playing pieces'), [
@@ -270,6 +263,7 @@ class Game extends \Table
         }
         return [
             "allowedMoves" => $am,
+            "canEndTurn" => count($played_turn->moves) >= 2,
         ];
     }
 
