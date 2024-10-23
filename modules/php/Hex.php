@@ -33,7 +33,7 @@ namespace Bga\Games\babylonia;
 class Hex {
 
     public function __toString(): string {
-        return sprintf("%s %d:%d %s", $this->type->value, $this->row, $this->col, $this->piece->value);
+        return sprintf("%s %d:%d %s(%d)", $this->type->value, $this->row, $this->col, $this->piece->value, $this->player_id);
     }
 
     public function __construct(public HexType $type,
