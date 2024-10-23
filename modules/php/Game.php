@@ -126,7 +126,7 @@ class Game extends \Table
         }
         if (!$this->isPlayAllowed($player_id, $board, $piece, $hex, $played_turn)) {
             $pv = $piece->value;
-            throw new \InvalidArgumentException("Illegal to play ${pv} to $row, $col by $player_id");
+            throw new \InvalidArgumentException("Illegal to play $pv to $row, $col by $player_id");
         }
 
         // verify the player has remaining moves by checking `moves_this_turn` table
@@ -184,14 +184,32 @@ class Game extends \Table
 
         $player_info = $this->db->retrievePlayerInfo($player_id);
 
-        // [ [FARMER => [(1, 3), (2, 4), ...], ... ];
+        // [ [FARMER => [hex1, hex2, ...] ];
         $allowed_moves = $this->getAllowedMovesByPiece($player_id, $board, $player_info, $played_turn);
 
-        if ($this->getNumberAllowedMoves($player_info, $allowed_moves) == 0) {
-            $this->gamestate->nextState("done");
-        } else {
-            // $this->gamestate->nextState("playPiece");
+        if (count($played_turn->moves) < 2) {
+            $this->gamestate->nextState("mustPlayPiece");
         }
+        else if ($this->getNumberAllowedMoves($player_info, $allowed_moves) == 0) {
+            $this->gamestate->nextState("noMorePlayable");
+        } else {
+            $this->gamestate->nextState("mayPlayPiece");
+        }
+    }
+
+    public function actDonePlayPieces(): void
+    {
+        // Retrieve the active player ID.
+        $player_id = (int)$this->getActivePlayerId();
+
+        // Notify all players about the choice to pass.
+        $this->notifyAllPlayers("donePlayed", clienttranslate('${player_name} finishes playing pieces'), [
+            "player_id" => $player_id,
+            "player_name" => $this->getActivePlayerName(),
+        ]);
+
+        // TODO: if scoring needed, go to scoring
+        $this->gamestate->nextState("done");
     }
 
     private function getNumberAllowedMoves(PlayerInfo $player_info, array $allowed_moves) {
@@ -221,21 +239,6 @@ class Game extends \Table
         return $result;
     }
 
-    public function actDonePlayPieces(): void
-    {
-        // Retrieve the active player ID.
-        $player_id = (int)$this->getActivePlayerId();
-
-        // Notify all players about the choice to pass.
-        $this->notifyAllPlayers("donePlayed", clienttranslate('${player_name} finishes playing pieces'), [
-            "player_id" => $player_id,
-            "player_name" => $this->getActivePlayerName(),
-        ]);
-
-        // TODO: if scoring needed, go to scoring
-        $this->gamestate->nextState("done");
-    }
-
     /**
      * Game state arguments, example content.
      *
@@ -246,10 +249,21 @@ class Game extends \Table
      */
     public function argPlayerTurn(): array
     {
-        // Get some values from the current game situation from the database.
-
+        //        $played_turn = $this->db->retrievePlayedTurn(intval($this->getCurrentPlayerId()));
+        /*
+        $player_info = $this->db->retrievePlayerInfo($player_id);
+        $board = $this->db->retrieveBoard();
+        // [ [FARMER => [hex1, hex2, ...] ];
+        $allowed_moves = $this->getAllowedMovesByPiece(
+            $this->current_player_id(),
+            $board,
+            $player_info,
+            $played_turn
+        );
+        */
         return [
-            "playableCardsIds" => [1, 2],
+            //            "showFinishTurn" => true, count($played_turn->moves) >= 2,
+            "allowedMoves" => []
         ];
     }
 
