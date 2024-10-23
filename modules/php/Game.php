@@ -249,21 +249,27 @@ class Game extends \Table
      */
     public function argPlayerTurn(): array
     {
-        //        $played_turn = $this->db->retrievePlayedTurn(intval($this->getCurrentPlayerId()));
-        /*
+        $player_id = intval($this->getCurrentPlayerId());
+        $played_turn = $this->db->retrievePlayedTurn($player_id);
         $player_info = $this->db->retrievePlayerInfo($player_id);
         $board = $this->db->retrieveBoard();
         // [ [FARMER => [hex1, hex2, ...] ];
         $allowed_moves = $this->getAllowedMovesByPiece(
-            $this->current_player_id(),
+            $player_id,
             $board,
             $player_info,
             $played_turn
         );
-        */
+        $am = [];
+        foreach ($allowed_moves as $piece => &$hexlist) {
+            $m = [];
+            foreach ($hexlist as &$hex) {
+                $m[] = [ 'row'=> $hex->row, 'col' => $hex->col ];
+            }
+            $am[$piece] = $m;
+        }
         return [
-            //            "showFinishTurn" => true, count($played_turn->moves) >= 2,
-            "allowedMoves" => []
+            "allowedMoves" => $am,
         ];
     }
 
