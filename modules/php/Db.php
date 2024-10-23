@@ -39,7 +39,7 @@ class Db {
         return $e == null ? 'NULL' : "'$e->value'";
     }
 
-    public function insertBoard($board): void {
+    public function insertBoard(Board $board): void {
         $sql = "INSERT INTO board (board_row, board_col, hextype, piece, scored, player_id) VALUES ";
         $sql_values = [];
         $board->visitAll(function ($hex) use (&$sql_values) {
@@ -53,10 +53,11 @@ class Db {
         $this->db->DbQuery( $sql );
     }
 
-    public function retrieveHandPiece(int $player_id, $handpos): Piece {
-        return Piece::from($this->db->getUniqueValueFromDB(
+    public function retrieveHandPiece(int $player_id, int $handpos): ?Piece {
+        $v = $this->db->getUniqueValueFromDB(
             "SELECT piece from hands WHERE player_id = $player_id AND pos=$handpos"
-        ));
+        );
+        return $v == null ? null : Piece::from($v);
     }
 
     public function retrievePlayersData(): array {
@@ -98,7 +99,7 @@ class Db {
         $this->db->DbQuery( $sql );
     }
 
-    public function insertMove($move) {
+    public function insertMove(Move $move) {
         $c = $this->boolValue($move->captured);
         $piece = $move->piece->value;
         $this->db->DbQuery( "INSERT INTO moves_this_turn
@@ -111,11 +112,14 @@ class Db {
 
         // update player scores
         if ($move->points > 0) {
-            $this->db->DbQuery("UPDATE player
-                          SET player_score =
-                              (SELECT player_score FROM player
-                               WHERE player_id=$move->player_id) + $move->points)
-                          WHERE player_id=$move->player_id");
+            $this->db->DbQuery(
+                "UPDATE player q
+                 SET q.player_score = (
+                     SELECT p.sc + $move->points
+                     FROM (SELECT player_score sc
+                           FROM player
+                           WHERE player_id = $move->player_id) p)
+                     WHERE q.player_id = $move->player_id" );
         }
         // update hands
         $empty = Piece::EMPTY->value;
@@ -187,6 +191,14 @@ class Db {
         }
         $sql .= implode(',', $sql_values);
         $this->db->DbQuery( $sql );
+    }
+
+    public function retrieveScore(int $player_id): int {
+        // $this->getCollectionFromDb( "SELECT player_id, player_score FROM player", true );
+        $v = $this->db->getUniqueValueFromDB(
+            "SELECT player_score from player WHERE player_id = $player_id "
+        );
+        return $v == null ? null : intval($v);
     }
 }
 
