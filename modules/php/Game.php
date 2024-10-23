@@ -132,35 +132,35 @@ class Game extends \Table
             throw new \InvalidArgumentException("Illegal to play $pv to $row, $col by $player_id");
         }
 
-        $fs = 0;
-        $zs = 0;
-        if ($hex->piece->isField()) {
-            // score field
-            switch ($hex->piece) {
-            case Piece::FIELD_5:
-                $fs = 5; break;
-            case Piece::FIELD_6:
-                $fs = 6; break;
-            case Piece::FIELD_7:
-                $fs = 7; break;
-            case Piece::FIELD_CITIES:
-                // TODO: need a global captured city-count
-                $fs = 0; // $overall_captured_city_count;
-                break;
-            }
-        } else {
-            $zigs = $board->neighbors($hex, function (&$h): bool {
-                return $h->piece == Piece::ZIGGURAT;
-            });
-            if (count($zigs) > 0) {
-                $zs = $board->adjacentZiggurats($player_id);
-            }
-        }
-        $points = $fs + $zs;
-
         if ($hex->isWater()) {
             $piece = Piece::HIDDEN;
         }
+        $original = $hex->playPiece($piece, $player_id);
+
+        $fs = 0;
+        $zs = 0;
+        // score field
+        switch ($original) {
+        case Piece::FIELD_5:
+            $fs = 5; break;
+        case Piece::FIELD_6:
+            $fs = 6; break;
+        case Piece::FIELD_7:
+            $fs = 7; break;
+        case Piece::FIELD_CITIES:
+            // TODO: need a global captured city-count
+            $fs = 0; // $overall_captured_city_count;
+            break;
+        }
+        $zigs = $board->neighbors($hex, function (&$h): bool {
+            return $h->piece == Piece::ZIGGURAT;
+        });
+        if (count($zigs) > 0) {
+            $zs = $board->adjacentZiggurats($player_id);
+        }
+
+        $points = $fs + $zs;
+
         $move = new Move($player_id, $piece, $handpos, $row, $col, false, $points);
         $played_turn->addMove($move);
 

@@ -57,7 +57,7 @@ class Hex {
         $this->piece = $feature;
     }
 
-    public function playPiece(Piece $piece, int $player_id) {
+    public function playPiece(Piece $piece, int $player_id): Piece {
         if ($player_id == 0) {
             throw new \InvalidArgumentException("playing a piece requires a non-zero player_id");
         }
@@ -65,15 +65,17 @@ class Hex {
             throw new \LogicException("attempt to play piece $p to occupied hex $this");
         }
         if ($this->piece != Piece::EMPTY) {
-            if (!$this->piece.isField()) {
+            if (!$this->piece->isField()) {
                 throw new \LogicException("attempt to play a piece $p on non-empty non-crop field hex $this");
             }
         }
         if ($this->isWater() && !$piece->isHidden()) {
             throw new \LogicException("attempt to play piece $p unhidden in water hex $this");
         }
+        $result = $this->piece;
         $this->piece = $piece;
         $this->player_id = $player_id;
+        return $result;
     }
 
     public function isLand(): bool {
