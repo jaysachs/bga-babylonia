@@ -50,7 +50,7 @@
 //    !! It is not a good idea to modify this file when a game is running !!
 
 if ( !defined('STATE_END_GAME')) { // guard since this included multiple times
-    define("STATE_MAY_PLAY_PIECE", 3);
+    define("STATE_PLAYER_PLAY_PIECES", 3);
 
     define("STATE_END_OF_TURN_SCORING", 5);
     define("STATE_FINISH_TURN", 6);
@@ -67,24 +67,23 @@ $machinestates = [
         "description" => "",
         "type" => "manager",
         "action" => "stGameSetup",
-        "transitions" => ["" => STATE_MAY_PLAY_PIECE]
+        "transitions" => ["" => STATE_PLAYER_PLAY_PIECES]
     ),
 
-    STATE_MAY_PLAY_PIECE => [
-        "name" => "mayPlayPiece",
-        "description" => clienttranslate('${actplayer} may play a piece'),
+    STATE_PLAYER_PLAY_PIECES => [
+        "name" => "playPieces",
+        "description" => clienttranslate('${actplayer} is playing pieces'),
         "descriptionmyturn" => clienttranslate('${you} may play a piece or end the turn'),
         "type" => "activeplayer",
-        "args" => "argPlayerTurn",
+        "args" => "argPlayPieces",
         "possibleactions" => [
             // these actions are called from the front with bgaPerformAction, and matched to the function on the game.php file
             "actPlayPiece",
             "actDonePlayPieces",
-            //            "actUndo",
+            "actUndo",
         ],
         "transitions" => [
-            "mayPlayPiece" => STATE_MAY_PLAY_PIECE,
-            //            "undoToMay" => STATE_MAY_PLAY_PIECE,
+            "playPieces" => STATE_PLAYER_PLAY_PIECES,
             "done" => STATE_FINISH_TURN,
         ]
     ],
@@ -116,7 +115,7 @@ $machinestates = [
         "updateGameProgression" => true,
         "transitions" => [
             "endGame" => 99,
-            "nextPlayer" => STATE_MAY_PLAY_PIECE,
+            "nextPlayer" => STATE_PLAYER_PLAY_PIECES,
         ]
     ],
     // Final state.

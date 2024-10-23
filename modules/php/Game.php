@@ -182,7 +182,7 @@ class Game extends \Table
         // and if any pieces have legal plays, player can continue.
         // Also need to offer "pass" if have played at least 2 pieces.
 
-        $this->gamestate->nextState("mayPlayPiece");
+        $this->gamestate->nextState("playPieces");
     }
 
     public function actDonePlayPieces(): void
@@ -240,7 +240,7 @@ class Game extends \Table
      * @return array
      * @see ./states.inc.php
      */
-    public function argPlayerTurn(): array
+    public function argPlayPieces(): array
     {
         $player_id = intval($this->getActivePlayerId());
         $played_turn = $this->db->retrievePlayedTurn($player_id);

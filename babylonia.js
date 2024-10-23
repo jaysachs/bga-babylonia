@@ -224,7 +224,7 @@ function (dojo, declare) {
 		    // 	'<div id="gear_token" class="skills_and_techniques gear_token"></div>',
 		    // 	'onSelectAssetType', null, false, 'blue');
 
-                    case 'mayPlayPiece':
+                    case 'playPieces':
 		    if (args.canEndTurn) {
 			if (args.allowedMoves.length == 0) {
 			    this.updateStatusBar('You must end your turn');
