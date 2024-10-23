@@ -113,7 +113,7 @@ class Game extends \Table
 
     public function actPlayPiece(int $handpos, int $row, int $col): void
     {
-        $player_id = (int)$this->getActivePlayerId();
+        $player_id = intval($this->getActivePlayerId());
 
         $played_turn = $this->db->retrievePlayedTurn($player_id);
         // also retrieve ziggurat tiles held
@@ -200,7 +200,7 @@ class Game extends \Table
     public function actDonePlayPieces(): void
     {
         // Retrieve the active player ID.
-        $player_id = (int)$this->getActivePlayerId();
+        $player_id = intval($this->getActivePlayerId());
 
         // Notify all players about the choice to pass.
         $this->notifyAllPlayers("donePlayed", clienttranslate('${player_name} finishes playing pieces'), [
@@ -249,7 +249,7 @@ class Game extends \Table
      */
     public function argPlayerTurn(): array
     {
-        $player_id = intval($this->getCurrentPlayerId());
+        $player_id = intval($this->getActivePlayerId());
         $played_turn = $this->db->retrievePlayedTurn($player_id);
         $player_info = $this->db->retrievePlayerInfo($player_id);
         $board = $this->db->retrieveBoard();
@@ -297,7 +297,7 @@ class Game extends \Table
      */
     public function stFinishTurn(): void {
         // Retrieve the active player ID.
-        $player_id = (int)$this->getActivePlayerId();
+        $player_id = intval($this->getActivePlayerId());
 
         $info = $this->db->retrievePlayerInfo($player_id);
         if (!$info->refillHand()) {
@@ -380,7 +380,7 @@ class Game extends \Table
         $result = [];
 
         // WARNING: We must only return information visible by the current player.
-        $current_player_id = (int) $this->getCurrentPlayerId();
+        $current_player_id = intval($this->getCurrentPlayerId());
 
         // TODO: include zig cards info as well.
         return [
