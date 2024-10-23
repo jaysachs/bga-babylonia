@@ -184,18 +184,18 @@ END;
         );
     }
 
-    public function adjacentZiggurats(string $player_id): int {
+    public function adjacentZiggurats(int $player_id): int {
         $adjacent = 0;
-        foreach ($this->hexes as &$hex) {
+        $this->visitAll(function (&$hex) use ($player_id, &$adjacent) {
             if ($hex->piece == Piece::ZIGGURAT) {
                 $nb = $this->neighbors($hex, function(&$nh) use ($player_id) {
-                    return $nh->piece->isPlayerPiece() && $nh->piece->player_id == $player_id;
+                    return $nh->player_id == $player_id;
                 });
                 if (count($nb) > 0) {
                     $adjacent++;
                 }
             }
-        }
+        });
         return $adjacent;
     }
 
