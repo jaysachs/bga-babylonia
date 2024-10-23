@@ -120,6 +120,9 @@ class Game extends \Table
 
         $board = $this->db->retrieveBoard();
         $piece = $this->db->retrieveHandPiece($player_id, $handpos);
+        if ($piece == null) {
+            throw new \InvalidArgumentException("No piece in hand at $handpos");
+        }
         $hex = $board->hexAt($row, $col);
         if ($hex == null) {
             throw new \LogicException("Hex at $row $col was null");
@@ -129,26 +132,30 @@ class Game extends \Table
             throw new \InvalidArgumentException("Illegal to play $pv to $row, $col by $player_id");
         }
 
-        // verify the player has remaining moves by checking `moves_this_turn` table
-        // either less than 2, or all farmers and new piece is a farmer
-        // or matches one of the special ziggurat tiles effects
-
-        // verify $handpos is not empty already
-
-        // verify the piece at $handpos is legal to play at $row, $col
-        //    if existing is field:
-        //      the piece must be a farmer with adjacent noble
-        //      or else have zig card
-        //    else it needs to be empty
-        // "invert" it if it's in water.
-
-        // score field and/or ziggurat
-        //   will need to load board
-        //     either to compute adjacent ziggurats, or count remaining cities
-        //     (hmm, current model doesn't permit that from board, we lose track)
-        //     will need a global city-count
         $fs = 0;
         $zs = 0;
+        if ($hex->piece->isField()) {
+            // score field
+            switch ($hex->piece) {
+            case Piece::FIELD_5:
+                $fs = 5; break;
+            case Piece::FIELD_6:
+                $fs = 6; break;
+            case Piece::FIELD_7:
+                $fs = 7; break;
+            case Piece::FIELD_CITIES:
+                // TODO: need a global captured city-count
+                $fs = 0; // $overall_captured_city_count;
+                break;
+            }
+        } else {
+            $zigs = $board->neighbors($hex, function (&$h): bool {
+                return $h->piece == Piece::ZIGGURAT;
+            });
+            if (count($zigs) > 0) {
+                $zs = $board->adjacentZiggurats($player_id);
+            }
+        }
         $points = $fs + $zs;
 
         if ($hex->isWater()) {
@@ -159,12 +166,16 @@ class Game extends \Table
 
         // update the database
         $this->db->insertMove($move);
-        // TODO: need an updated hand
 
         // notify players of the move and scoring changes
-
+        $msg = "";
+        if ($points > 0) {
+            $msg = clienttranslate('${player_name} plays ${piece} to ${row} ${col} scoring ${points} points');
+        } else {
+            $msg = clienttranslate('${player_name} plays ${piece} to ${row} ${col}');
+        }
         // Notify all players about the piece played.
-        $this->notifyAllPlayers("piecePlayed", clienttranslate('${player_name} plays ${piece} to ${row} ${col}'), [
+        $this->notifyAllPlayers("piecePlayed", $msg, [
             "player_id" => $player_id,
             "player_number" => $this->getPlayerNoById($player_id),
             "player_name" => $this->getActivePlayerName(),
@@ -174,13 +185,10 @@ class Game extends \Table
             "col" => $col,
             "ziggurat_points" => $zs,
             "field_points" => $fs,
+            "points" => $points,
+            "newscore" => $this->db->retrieveScore( $player_id ),
             "i18n" => ['piece'],
         ]);
-
-        // at the end of the action, move to the next state
-        // use a previously-retrieved PlayerInfo (including hand)
-        // and if any pieces have legal plays, player can continue.
-        // Also need to offer "pass" if have played at least 2 pieces.
 
         $this->gamestate->nextState("playPieces");
     }

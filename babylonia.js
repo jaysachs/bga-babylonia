@@ -349,6 +349,7 @@ function (dojo, declare) {
             if (notif.args.player_number == this.playerNumber) {
                 this.handDiv(notif.args.handpos).className = this.handClass("empty");
             }
+            this.scoreCtrl[notif.args.player_id].toValue(notif.args.newscore);
         },
 
         notif_handRefilled: function( notif ) {
