@@ -161,7 +161,7 @@ END;
             if ($visit($hex)) {
                 $nb = $this->neighbors($hex, $visit);
                 foreach ($nb as $n) {
-                    if (!array_search($n, $seen)) {
+                    if (!in_array($n, $seen)) {
                         $queue[] = $n;
                     }
                 }

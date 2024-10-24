@@ -98,7 +98,7 @@ class PlayerInfo {
     }
 
     public function hasZigguratCard(ZigguratCard $type): bool {
-        return !(array_search($type, $this->ziggurats) === false);
+        return in_array($type, $this->ziggurats);
     }
 
     public function handSize() : int {

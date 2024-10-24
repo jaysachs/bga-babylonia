@@ -310,7 +310,7 @@ class Game extends \Table
     }
 
     private function optionEnabled(array $options, Option $option): bool {
-        return !(array_search($option->value, $options) === false);
+        return in_array($option->value, $options);
     }
 
     /**
