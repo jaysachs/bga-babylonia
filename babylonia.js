@@ -274,14 +274,8 @@ function (dojo, declare) {
             console.log("renderHand: " + hand);
 
             // TODO: render refilled pieces
-            for (i = 0; i < 7; ++i) {
-                let div = this.handDiv(i);
-                // if (i >= hand.length) {
-                //     div.className = "unavailable";
-                // } else {
-                    let h = hand[i];
-                    div.className = this.handClass(h.piece);
-                // }
+            for (i = 0; i < hand.length; ++i) {
+                this.handDiv(i).className = this.handClass(hand[i].piece);
             }
             console.log("renderHand done");
         },
