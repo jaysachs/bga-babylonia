@@ -117,15 +117,22 @@ class Model {
         return false;
     }
 
-    public function getAllowedMovesByPiece(): array {
+    /*
+     * Returns an array ["piece" => [hex1, hex2,...], ...]
+     * for piece types that are in hand
+     */
+    public function getAllowedMoves(): array {
         $result = [];
-        $this->board()->visitAll(function (&$hex) use (&$result) :void {
+        $hand = $this->playerInfo()->hand;
+        $this->board()->visitAll(function (&$hex) use (&$result, &$hand) :void {
             foreach (Piece::playerPieces() as $piece) {
-                if ($this->isPlayAllowed($piece, $hex)) {
-                    if (!isset($result[$piece->value])) {
-                        $result[$piece->value] = [];
+                if (in_array($piece, $hand)) {
+                    if ($this->isPlayAllowed($piece, $hex)) {
+                        if (!isset($result[$piece->value])) {
+                            $result[$piece->value] = [];
+                        }
+                        $result[$piece->value][] = $hex;
                     }
-                    $result[$piece->value][] = $hex;
                 }
             }
         });
@@ -222,20 +229,6 @@ class Model {
             "hand" => $hand
         ];
     }
-
-    
-    private function getNumberAllowedMoves(array $allowed_moves) {
-        $num_allowed_moves = 0;
-        $seen = [];
-        foreach ($allowed_moves as $piece => $moves) {
-            if ($this->playerInfo()->handContains(Piece::from($piece)) && !array_search($piece, $seen)) {
-                $num_allowed_moves += count($moves);
-                $seen[] = $piece;
-            }
-        }
-        return $num_allowed_moves;
-    }
-
 }
 
 ?>

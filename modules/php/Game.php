@@ -116,7 +116,7 @@ class Game extends \Table
     {
         $model = new Model($this->db, intval($this->getActivePlayerId()));
         // [ ["farmer" => [hex1, hex2, ...] ];
-        $allowed_moves = $model->getAllowedMovesByPiece();
+        $allowed_moves = $model->getAllowedMoves();
 
         $am = [];
         foreach ($allowed_moves as $piece => &$hexlist) {
