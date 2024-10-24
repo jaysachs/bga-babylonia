@@ -90,7 +90,7 @@ class Db {
 
     public function retrieveBoardData(): array {
         return $this->db->getObjectListFromDB2(
-            "SELECT board_row row, board_col col, hextype, piece, scored, player_id board_player FROM board"
+            "SELECT board_row row, board_col col, hextype, piece, scored, player_id board_player FROM board ORDER BY col, row"
         );
     }
 
