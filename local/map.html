@@ -7,22 +7,22 @@
 	    "merchant_1",
 	    "servant_1",
 	    "priest_1",
-	    "blank_1",
+	    "hidden_1",
 	    "farmer_2",
 	    "merchant_2",
 	    "servant_2",
 	    "priest_2",
-	    "blank_2",
+	    "hidden_2",
 	    "farmer_3",
 	    "merchant_3",
 	    "servant_3",
 	    "priest_3",
-	    "blank_3",
+	    "hidden_3",
 	    "farmer_4",
 	    "merchant_4",
 	    "servant_4",
 	    "priest_4",
-	    "blank_4"
+	    "hidden_4"
 	];
  	let cities = [
 	    "city_msp",
@@ -33,10 +33,10 @@
 	    "city_ms",
 	    "city_sp",
 	    "city_mp",
-	    "farm_5",
-	    "farm_6",
-	    "farm_7",
-	    "farm_X",
+	    "field_5",
+	    "field_6",
+	    "field_7",
+	    "field_X",
 	    "ziggurat",
 	];
 
@@ -115,16 +115,16 @@
       <div class="board-spacer"></div>
       <div class="board" id="board" onClick="selectHex(event)">
 	<script>
-	  let c = document.getElementById("board");
-	  for (let j = 0; j < 16; j++) {
-	      let odd = j % 2 == 0;
+	  let b = document.getElementById("board");
+	  for (let c = 0; c < 16; c++) {
+	      let odd = c % 2 == 0;
 	      let rows = odd ? 12 : 11;
-	      for (let i = 0; i < rows; i++) {
-		  let top = i * 63 + (odd ? 6 : 37);
-		  let left = 38 + (j * 55);
-		  c.insertAdjacentHTML(
+	      for (let r = 0; r < rows; r++) {
+		  let top = r * 63 + (odd ? 6 : 37);
+		  let left = 38 + (c * 55);
+		  b.insertAdjacentHTML(
 		      `beforeend`,
-		      `<div id="hex_${i}_${j}" style="top:${top}px; left:${left}px;"><div></div></div>`
+		      `<div id="hex_${r}_${c}" style="top:${top}px; left:${left}px;"><div></div></div>`
 		  );
 	      }
 	  }
