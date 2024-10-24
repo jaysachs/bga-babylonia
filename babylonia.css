@@ -57,6 +57,13 @@
 }
 
 
+.board > div > div > div.playable {
+    content: url(img/highlight.png);
+    object-fit: cover;
+    width: 100%;
+    height: 100%;
+}
+
 .board > div.selected {
     background-color: rgba(22, 255, 22, 0.1);
 }

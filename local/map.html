@@ -39,31 +39,21 @@
 	    "field_X",
 	    "ziggurat",
 	];
-
+	let all = cities.concat(pieces);
 	c = e.classList;
-	for (i = 0; i < pieces.length; ++i) {
-	    if (c.contains(pieces[i])) {
-		c.remove(pieces[i]);
-		if (i < pieces.length-1) {
-		    c.add(pieces[i+1]);
+	for (i = 0; i < all.length; ++i) {
+	    if (c.contains(all[i])) {
+		c.remove(all[i]);
+		if (i < all.length-1) {
+		    c.add(all[i+1]);
+		    return;
 		} else {
-		    c.add(cities[0]);
+		    c.add(all[0]);
 		}
 		return;
 	    }
 	}
-	for (i = 0; i < cities.length; ++i) {
-	    if (c.contains(cities[i])) {
-		c.remove(cities[i]);
-		if (i < cities.length-1) {
-		    c.add(cities[i+1]);
-		    return;
-		} else {
-		    break;
-		}
-	    }
-	}
-	c.add(pieces[0]);
+	c.add(all[0]);
     }
 
     function selectHex(event) {
@@ -122,9 +112,13 @@
 	      for (let r = 0; r < rows; r++) {
 		  let top = r * 63 + (odd ? 6 : 37);
 		  let left = 38 + (c * 55);
+		  var cl="";
+		  if (c % 3 == 0) {
+		      cl = "class='playable'"
+		  }
 		  b.insertAdjacentHTML(
 		      `beforeend`,
-		      `<div id="hex_${r}_${c}" style="top:${top}px; left:${left}px;"><div></div></div>`
+		      `<div id="hex_${r}_${c}" style="top:${top}px; left:${left}px;"><div><div ${cl}></div></div></div>`
 		  );
 	      }
 	  }

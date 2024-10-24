@@ -10,5 +10,6 @@ done
 # ziggurat
 CMD+=" \( canvas:none -stroke none -fill red -draw 'polygon 20,43 32,43 32,33 44,33 44,23 56,23 56,33 68,33 68,43 80,43 80,53 92,53 92,63 8,63 8,53 20,53' \) "
 
-#echo magick -size 100x87 -pointsize 36 -gravity center ${CMD} -append cities.png
-echo magick -size 100x87 -gravity center canvas:none -stroke yellow -strokewidth 3 -fill none -draw "'polygon ${HEX}'" -append highlight.png
+echo magick -size 100x87 -pointsize 36 -gravity center ${CMD} -append cities.png
+
+echo magick -size 100x87 -gravity center canvas:none -stroke yellow -strokewidth 5 -fill none -draw "'polygon ${HEX}'" -append highlight.png
