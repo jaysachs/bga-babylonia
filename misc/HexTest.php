@@ -59,14 +59,14 @@ final class HexTest extends TestCase
         $hex->playPiece(Piece::FARMER, 1);
     }
 
-    public function testPlayPieceHiddenOnWaterSucceeds(): void
+    public function test_playPiece_HiddenOnWaterSucceeds(): void
     {
         $hex = new Hex(HexType::WATER, 0, 0);
         $hex->playPiece(Piece::HIDDEN, 1);
         $this->assertSame(1, $hex->player_id);
     }
 
-    public function testPlayPieceUnHiddenOnWaterFails(): void
+    public function test_playPiece_UnHiddenOnWaterFails(): void
     {
         $hex = new Hex(HexType::WATER, 0, 0);
         $this->expectException(LogicException::class);
@@ -85,6 +85,16 @@ final class HexTest extends TestCase
         ];
         $unmarshalled = Hex::fromDbResult($dr);
         $this->assertEquals($hex, $unmarshalled);
+    }
+
+    public function test_isLandAndIsWaterSucceed() {
+        $hex = Hex::land(4, 5);
+        $this->assertTrue($hex->isLand());
+        $this->assertFalse($hex->isWater());
+
+        $hex = Hex::water(5, 5);
+        $this->assertTrue($hex->isWater());
+        $this->assertFalse($hex->isLand());
     }
 }
 
