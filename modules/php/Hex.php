@@ -62,15 +62,15 @@ class Hex {
             throw new \InvalidArgumentException("playing a piece requires a non-zero player_id");
         }
         if ($this->player_id != 0) {
-            throw new \LogicException("attempt to play piece $p to occupied hex $this");
+            throw new \LogicException("attempt to play piece $piece->value to occupied hex $this");
         }
         if ($this->piece != Piece::EMPTY) {
             if (!$this->piece->isField()) {
-                throw new \LogicException("attempt to play a piece $p on non-empty non-crop field hex $this");
+                throw new \LogicException("attempt to play piece $piece->value on non-empty non-crop field hex $this");
             }
         }
         if ($this->isWater() && !$piece->isHidden()) {
-            throw new \LogicException("attempt to play piece $p unhidden in water hex $this");
+            throw new \LogicException("attempt to play piece $piece->value unhidden in water hex $this");
         }
         $result = $this->piece;
         $this->piece = $piece;
@@ -106,7 +106,6 @@ class Hex {
         $player_id = intval($dbresult['board_player']);
         return new Hex($type, $row, $col, $piece, $player_id);
     }
-
 }
 
 ?>
