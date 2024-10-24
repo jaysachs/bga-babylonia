@@ -167,7 +167,11 @@ function (dojo, declare) {
 		return [];
 	    }
 	    console.log("hexes playable for " + p + "=" + this.allowedMoves[p]);
-	    return this.allowedMoves[p];
+	    let m = this.allowedMoves[p];
+	    if (m == null) {
+		m = [];
+	    }
+	    return m;
 	},
 	
 	addPlayableFor: function(cl) {
@@ -292,7 +296,8 @@ function (dojo, declare) {
 			this.addActionButton(
 			    'end-btn',
 			    'End turn',
-			    () => this.bgaPerformAction("actDonePlayPieces"));
+			    () => this.bgaPerformAction("actDonePlayPieces").then(() => this.removeAllAllowedMoves())
+		    );
 		    } else {
 			this.updateStatusBar('You must play a piece');
 		    }
