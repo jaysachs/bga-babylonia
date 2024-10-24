@@ -32,7 +32,7 @@ class PlayerInfo {
     public $scored_fields = array();
     public $hand = array(); /* PieceType */
     public $pool = array(); /* PieceType */
-    public $ziggurats = array(); /* ZigguratCard */
+    public $ziggurat_cards = array(); /* ZigguratCard */
     public $score = 0;
     public $id = 0;
 
@@ -58,7 +58,7 @@ class PlayerInfo {
         return $p;
     }
 
-    public static function fromDbResults(int $player_id, array $handdata, array $pooldata): PlayerInfo {
+    public static function fromDbResults(int $player_id, array $handdata, array $pooldata, array $ziggurat_data): PlayerInfo {
         $p = new PlayerInfo();
         for ($i = 0; $i < 7; $i++) {
             $p->hand[] = null;
@@ -70,6 +70,9 @@ class PlayerInfo {
         $p->id = $player_id;
         foreach ($pooldata as $pp) {
             $p->pool[] = Piece::from($pp["piece"]);
+        }
+        foreach ($ziggurat_data as $zd) {
+            $p->ziggurat_cards[] = ZigguratCard::from($zd);
         }
         return $p;
     }
@@ -98,7 +101,7 @@ class PlayerInfo {
     }
 
     public function hasZigguratCard(ZigguratCard $type): bool {
-        return in_array($type, $this->ziggurats);
+        return in_array($type, $this->ziggurat_cards);
     }
 
     public function handSize() : int {

@@ -161,7 +161,11 @@ class Db {
                 FROM handpools
                 WHERE player_id = $player_id";
         $pooldata = $this->db->getObjectListFromDB2( $sql );
-        return PlayerInfo::fromDbResults( $player_id, $handdata, $pooldata );
+        $sql = "SELECT ziggurat_card
+                FROM ziggurat_cards
+                WHERE player_id = $player_id";
+        $ziggurat_data = $this->db->getObjectListFromDB2( $sql );
+        return PlayerInfo::fromDbResults( $player_id, $handdata, $pooldata, $ziggurat_data );
     }
 
     public function insertPlayerInfos(array $player_infos): void {
