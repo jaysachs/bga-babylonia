@@ -9,5 +9,5 @@ REPEAT=
 cd "${SRC}"
 lftp "${HOST}" <<EOF
 cd "${DEST}"
-${REPEAT} mirror -R -vvv -X .git/* -X local/* -X*#* -X LICENSE_BGA -X _ide_helper.php
+${REPEAT} mirror -R -vvv -X .git/* -X .phpunit.cache/* -X local/* -X*#* -X LICENSE_BGA -X _ide_helper.php
 EOF
