@@ -76,7 +76,7 @@ function (dojo, declare) {
                 let left = 38 + (col * 55);
                 c.insertAdjacentHTML(
                     `beforeend`,
-                    `<div id="hex_${row}_${col}" style="top:${top}px; left:${left}px;"><div></div></div>`);
+                    `<div id="hex_${row}_${col}" style="top:${top}px; left:${left}px;"><div><div></div></div></div>`);
                 var p = hex.piece;
                 if (p != null) {
                     let n = (hex.board_player == null || hex.board_player == 0) ? null : gamedatas.players[hex.board_player].player_number;
@@ -108,7 +108,9 @@ function (dojo, declare) {
                 console.log("More than one piece selected?!");
             }
             console.log("Selected hand piece div id: " + s[0].id);
-            let pos = s[0].id.split("_")[1];
+	    let foo = s[0].id.split("_");
+	    let piece = foo[0];
+            let pos = foo[1];
             let e = event.target;
             while (e.parentElement != null && e.parentElement.id != "board") {
                 e = e.parentElement;
@@ -117,6 +119,13 @@ function (dojo, declare) {
                 console.log("didn't click on a hex");
                 return;
             }
+	    // now check if it's allowed
+	    let ae = e.firstElementChild.firstElementChild;
+	    if (!ae.classList.contains('playable')) {
+		console.log('not playable');
+		return;
+	    }
+	    
             let id = e.id.split("_");
             let row = id[1];
             let col = id[2];
@@ -132,6 +141,47 @@ function (dojo, declare) {
             });
         },
 
+	allowedMoves: [],
+
+	pieceClasses: [ "priest", "servant", "farmer", "merchant" ],
+
+	removeAllAllowedMoves: function() {
+            document.getElementById("board").querySelectorAll('.playable')
+		.forEach(div => div.className = '');
+	},
+	
+	pieceForHandDivClassList: function(cl) {
+	    console.log("pieceFor: " + cl);
+	    for (var i = 0; i < this.pieceClasses.length; ++i) {
+		if (cl.contains(this.handClass(this.pieceClasses[i]))) {
+		    return this.pieceClasses[i];
+		}
+	    }
+	    return null;
+	},
+
+	allowedMovesFor: function(cl) {
+	    let p = this.pieceForHandDivClassList(cl);
+	    if (p == null) {
+		console.log("no playable piece found");
+		return [];
+	    }
+	    console.log("hexes playable for " + p + "=" + this.allowedMoves[p]);
+	    return this.allowedMoves[p];
+	},
+	
+	addPlayableFor: function(cl) {
+	    this.allowedMovesFor(cl).forEach(rc => {
+		this.hexDiv(rc.row, rc.col).firstElementChild.firstElementChild.className = 'playable';
+	    });
+	},
+
+	removePlayableFor: function(cl) {
+	    this.allowedMovesFor(cl).forEach(rc => {
+		this.hexDiv(rc.row, rc.col).firstElementChild.firstElementChild.className = '';
+	    });
+	},
+
         onPieceSelection: function(event) {
             console.log("onPieceSelection");
             event.preventDefault();
@@ -145,8 +195,16 @@ function (dojo, declare) {
                 let c = e.classList;
                 if (!c.contains("unavailable") && !c.contains(this.handClass("empty"))) {
                     if (!c.contains("selected")) {
-                        hc.querySelectorAll('.selected').forEach(div => div.classList.remove('selected'));
-                    }
+                        hc.querySelectorAll('.selected').forEach(div => {
+			    if (div.classList.contains('selected')) {
+				this.removePlayableFor(div);
+			    }
+			    div.classList.remove('selected');
+			});
+			this.addPlayableFor(c);
+                    } else {
+			this.removePlayableFor(c);
+		    }
                     c.toggle("selected");
                 }
             }
@@ -238,6 +296,12 @@ function (dojo, declare) {
 		    } else {
 			this.updateStatusBar('You must play a piece');
 		    }
+
+		    // save allowedMoves so selection can highlight hexes
+		    // and enforce placement rules.
+		    this.allowedMoves = args.allowedMoves;
+		    this.removeAllAllowedMoves();
+		    
 		    this.addActionButton(
 			'undo-btn',
 			'Undo',
@@ -273,7 +337,6 @@ function (dojo, declare) {
         renderHand: function(hand) {
             console.log("renderHand: " + hand);
 
-            // TODO: render refilled pieces
             for (i = 0; i < hand.length; ++i) {
                 this.handDiv(i).className = this.handClass(hand[i].piece);
             }
