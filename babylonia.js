@@ -197,11 +197,11 @@ function (dojo, declare) {
             let hc = e.parentElement;
             if (hc.id == "hand") {
                 let c = e.classList;
-                if (!c.contains("unavailable") && !c.contains(this.handClass("empty"))) {
+		if (this.allowedMovesFor(c).length > 0) {
                     if (!c.contains("selected")) {
                         hc.querySelectorAll('.selected').forEach(div => {
 			    if (div.classList.contains('selected')) {
-				this.removePlayableFor(div);
+				this.removePlayableFor(div.classList);
 			    }
 			    div.classList.remove('selected');
 			});
