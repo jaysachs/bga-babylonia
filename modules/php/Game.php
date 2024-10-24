@@ -55,126 +55,21 @@ class Game extends \Table
         $this->db = new Db($this);
     }
 
-    private function playableHexes(Board $board, Piece $piece, PlayedTurn $played_turn): array {
-        $result = [];
-        $board->visitAll(function (&$hex) use (&$result, &$board, $piece, &$played_turn) {
-            if ($this->iPlayAllowed($board, $piece, $hex, $played_turn)) {
-                $result[] = $hex;
-            }
-        });
-        return result;
-    }
-
-    private function isPlayAllowed(int $player_id, Board $board, Piece $piece, Hex $hex, PlayedTurn $played_turn) {
-        $this->debug("isPlayAllowed: " . $piece->value . " " . $hex . " " . var_export($played_turn, true));
-        // first check move limits per turn
-        if (count($played_turn->moves) >= 2) {
-            $this->debug("isPlayAllowed: played turn moves count " . count($played_turn->moves));
-            if ($hex->isWater()) {
-                $this->debug("isPlayAllowed: hex is water " . $hex->isWater());
-                return false;
-            }
-            if ($piece->isFarmer()) {
-                $this->debug("isPlayAllowed: piece is farmer");
-                if (!$played_turn->allMovesFarmersOnLand($board)) {
-                    $this->debug("isPlayAllowed: NOT all moves farmers on land");
-                    return false;
-                }
-                $this->debug("isPlayAllowed: all moves farmers on land");
-                // fall through
-            } else {
-                $this->debug("isPlayAllowed: checking for 3+ move non-farmer");
-                // Now check if player has zig tiles to permit another move
-                return false;
-            }
-        }
-        // now check if piece is allowed
-        if ($hex->piece == Piece::EMPTY) {
-            $this->debug("isPlayAllowed: hex piece is empty");
-            return true;
-        }
-        if ($hex->piece->isField()) {
-            $this->debug("isPlayAllowed: hex piece is field");
-            if ($piece->isFarmer()) {
-                $this->debug("isPlayAllowed: piece is farmer");
-                // ensure player has at least one noble adjacent.
-                $is_noble = function ($h) use ($player_id): bool {
-                    return $h->player_id == $player_id
-                        && $h->piece->isNoble();
-                };
-                $n = count($board->neighbors($hex, $is_noble)) > 0;
-                $this->debug("isPlayAllowed: count of neighboring nobles is $n");
-                return $n;
-            }
-        }
-        $this->debug("isPlayAllowed: final false");
-        return false;
-    }
-
     public function actPlayPiece(int $handpos, int $row, int $col): void
     {
         $player_id = intval($this->getActivePlayerId());
+        $model = new Model($this->db, $player_id);
 
-        $played_turn = $this->db->retrievePlayedTurn($player_id);
-        // also retrieve ziggurat tiles held
+        $result = $model->playPiece($handpos, $row, $col);
+        $points = $result["points"];
+        $piece = $result["piece"];
 
-        $board = $this->db->retrieveBoard();
-        $piece = $this->db->retrieveHandPiece($player_id, $handpos);
-        if ($piece == null) {
-            throw new \InvalidArgumentException("No piece in hand at $handpos");
-        }
-        $hex = $board->hexAt($row, $col);
-        if ($hex == null) {
-            throw new \LogicException("Hex at $row $col was null");
-        }
-        if (!$this->isPlayAllowed($player_id, $board, $piece, $hex, $played_turn)) {
-            $pv = $piece->value;
-            throw new \InvalidArgumentException("Illegal to play $pv to $row, $col by $player_id");
-        }
-
-        if ($hex->isWater()) {
-            $piece = Piece::HIDDEN;
-        }
-        $original = $hex->playPiece($piece, $player_id);
-
-        $fs = 0;
-        $zs = 0;
-        // score field
-        switch ($original) {
-        case Piece::FIELD_5:
-            $fs = 5; break;
-        case Piece::FIELD_6:
-            $fs = 6; break;
-        case Piece::FIELD_7:
-            $fs = 7; break;
-        case Piece::FIELD_CITIES:
-            // TODO: need a global captured city-count
-            $fs = 0; // $overall_captured_city_count;
-            break;
-        }
-        $zigs = $board->neighbors($hex, function (&$h): bool {
-            return $h->piece == Piece::ZIGGURAT;
-        });
-        if (count($zigs) > 0) {
-            $zs = $board->adjacentZiggurats($player_id);
-        }
-
-        $points = $fs + $zs;
-
-        $move = new Move($player_id, $piece, $handpos, $row, $col, false, $points);
-        $played_turn->addMove($move);
-
-        // update the database
-        $this->db->insertMove($move);
-
-        // notify players of the move and scoring changes
         $msg = "";
         if ($points > 0) {
             $msg = clienttranslate('${player_name} plays ${piece} to ${row} ${col} scoring ${points} points');
         } else {
             $msg = clienttranslate('${player_name} plays ${piece} to ${row} ${col}');
         }
-        // Notify all players about the piece played.
         $this->notifyAllPlayers("piecePlayed", $msg, [
             "player_id" => $player_id,
             "player_number" => $this->getPlayerNoById($player_id),
@@ -183,8 +78,6 @@ class Game extends \Table
             "handpos" => $handpos,
             "row" => $row,
             "col" => $col,
-            "ziggurat_points" => $zs,
-            "field_points" => $fs,
             "points" => $points,
             "newscore" => $this->db->retrieveScore( $player_id ),
             "i18n" => ['piece'],
@@ -195,15 +88,12 @@ class Game extends \Table
 
     public function actDonePlayPieces(): void
     {
-        // Retrieve the active player ID.
         $player_id = intval($this->getActivePlayerId());
+        $model = new Model($this->db, $player_id);
+        if (count($model->playedTurn()->moves) < 2) {
+            throw new \BgaUserException("Attempt to end turn but less than 2 pieces played");
+        }
 
-        // $played_turn = $this->db->retrievePlayedTurn($player_id);
-        // if (count($played_turn->moves) < 2) {
-        //     throw new \BgaUserException("Attempt to end turn but less than 2 pieces played");
-        // }
-
-        // Notify all players about the choice to pass.
         $this->notifyAllPlayers("donePlayed", clienttranslate('${player_name} finishes playing pieces'), [
             "player_id" => $player_id,
             "player_name" => $this->getActivePlayerName(),
@@ -213,54 +103,21 @@ class Game extends \Table
         $this->gamestate->nextState("done");
     }
 
-    private function getNumberAllowedMoves(PlayerInfo $player_info, array $allowed_moves) {
-        $num_allowed_moves = 0;
-        $seen = [];
-        foreach ($allowed_moves as $piece => $moves) {
-            if ($player_info->handContains(Piece::from($piece)) && !array_search($piece, $seen)) {
-                $num_allowed_moves += count($moves);
-                $seen[] = $piece;
-            }
-        }
-        return $num_allowed_moves;
-    }
-
-    private function getAllowedMovesByPiece(int $player_id, Board $board, PlayerInfo $player_info, PlayedTurn $played_turn) {
-        $result = [];
-        $board->visitAll(function (&$hex) use (&$result, $player_id, $board, $played_turn) :void {
-            foreach (Piece::playerPieces() as $piece) {
-                if ($this->isPlayAllowed($player_id, $board, $piece, $hex, $played_turn)) {
-                    if (!isset($result[$piece->value])) {
-                        $result[$piece->value] = [];
-                    }
-                    $result[$piece->value][] = $hex;
-                }
-            }
-        });
-        return $result;
-    }
-
     /**
      * Game state arguments, example content.
      *
-     * This method returns some additional information that is very specific to the `playerTurn` game state.
+     * This method returns some additional information that is very
+     * specific to the `playerTurn` game state.
      *
      * @return array
      * @see ./states.inc.php
      */
     public function argPlayPieces(): array
     {
-        $player_id = intval($this->getActivePlayerId());
-        $played_turn = $this->db->retrievePlayedTurn($player_id);
-        $player_info = $this->db->retrievePlayerInfo($player_id);
-        $board = $this->db->retrieveBoard();
+        $model = new Model($this->db, intval($this->getActivePlayerId()));
         // [ ["farmer" => [hex1, hex2, ...] ];
-        $allowed_moves = $this->getAllowedMovesByPiece(
-            $player_id,
-            $board,
-            $player_info,
-            $played_turn
-        );
+        $allowed_moves = $model->getAllowedMovesByPiece();
+
         $am = [];
         foreach ($allowed_moves as $piece => &$hexlist) {
             $m = [];
@@ -271,7 +128,7 @@ class Game extends \Table
         }
         return [
             "allowedMoves" => $am,
-            "canEndTurn" => count($played_turn->moves) >= 2,
+            "canEndTurn" => count($model->playedTurn()->moves) >= 2,
         ];
     }
 
@@ -280,7 +137,8 @@ class Game extends \Table
      *
      * The number returned must be an integer between 0 and 100.
      *
-     * This method is called each time we are in a game state with the "updateGameProgression" property set to true.
+     * This method is called each time we are in a game state with the
+     * "updateGameProgression" property set to true.
      *
      * @return int
      * @see ./states.inc.php
@@ -293,16 +151,13 @@ class Game extends \Table
     }
 
     /**
-     * Game state action, example content.
-     *
-     * The action method of state `nextPlayer` is called everytime the current game state is set to `nextPlayer`.
+     * Called when state finishTurn is entered.
      */
     public function stFinishTurn(): void {
-        // Retrieve the active player ID.
         $player_id = intval($this->getActivePlayerId());
-
-        $info = $this->db->retrievePlayerInfo($player_id);
-        if (!$info->refillHand()) {
+        $model = new Model($this->db, $player_id);
+        $result = $model->finishTurn();
+        if ($result["gameOver"]) {
             $this->notifyAllPlayers("gameEnded", clienttranslate('${player_name} unable to refill their hand'), [
                 "player_id" => $player_id,
                 "player_name" => $this->getActivePlayerName(),
@@ -311,41 +166,32 @@ class Game extends \Table
             return;
         }
 
-        $this->db->updatePlayerInfo($player_id, $info);
-
-        $hand = [];
-        foreach ($info->hand as $piece) {
-            $hand[] = ["piece" => ($piece == null) ? null : $piece->value];
-        }
-
-        $this->db->removePlayedMoves($player_id);
-
         // TODO: this shouldn't return the whole hand, just the refilled parts
         // Capture the delta and return *that*. Then it can be animated on
         // the client.
         $this->notifyPlayer($player_id, "handRefilled", "You refilled your hand", [
             "player_id" => $player_id,
             "player_number" => $this->getPlayerNoById($player_id),
-            "hand" => $hand,
+            "hand" => $result["hand"],
         ]);
 
-        // Give some extra time to the active player when he completed an action
         $this->giveExtraTime($player_id);
 
         $this->activeNextPlayer();
 
-        // Go to another gamestate
-        // Here, we would detect if the game is over, and in this case use "endGame" transition instead
         $this->gamestate->nextState("nextPlayer");
     }
 
     /**
      * Migrate database.
      *
-     * You don't have to care about this until your game has been published on BGA. Once your game is on BGA, this
-     * method is called everytime the system detects a game running with your old database scheme. In this case, if you
-     * change your database scheme, you just have to apply the needed changes in order to update the game database and
-     * allow the game to continue to run with your new version.
+     * You don't have to care about this until your game has been
+     * published on BGA. Once your game is on BGA, this method is
+     * called everytime the system detects a game running with your
+     * old database scheme. In this case, if you change your database
+     * scheme, you just have to apply the needed changes in order to
+     * update the game database and allow the game to continue to run
+     * with your new version.
      *
      * @param int $from_version
      * @return void
@@ -370,9 +216,11 @@ class Game extends \Table
     }
 
     /*
-     * Gather all information about current game situation (visible by the current player).
+     * Gather all information about current game situation (visible by
+     * the current player).
      *
-     * The method is called each time the game interface is displayed to a player, i.e.:
+     * The method is called each time the game interface is displayed
+     * to a player, i.e.:
      *
      * - when the game starts
      * - when a player refreshes the game page (F5)
@@ -403,8 +251,9 @@ class Game extends \Table
     }
 
     /**
-     * This method is called only once, when a new game is launched. In this method, you must setup the game
-     *  according to the game rules, so that the game is ready to be played.
+     * This method is called only once, when a new game is
+     *  launched. In this method, you must setup the game according to
+     *  the game rules, so that the game is ready to be played.
      */
     protected function setupNewGame($players, $options = [])
     {
@@ -451,47 +300,33 @@ class Game extends \Table
         // $this->initStat("table", "table_teststat1", 0);
         // $this->initStat("player", "player_teststat1", 0);
 
-        // TODO: Setup the initial game situation here.
-
-        $board = Board::forPlayerCount(count($players));
-        $this->db->insertBoard($board);
-
-        $pis = [];
-        foreach ($players as $player_id => $player) {
-            $pis[$player_id] = PlayerInfo::newPlayerInfo($player_id);
-        }
-        $this->db->insertPlayerInfos($pis);
-
-        $ziggurats = [
-            ZigguratCard::PLUS_10,
-            ZigguratCard::EXTRA_TURN,
-            ZigguratCard::SEVEN_TOKENS,
-            ZigguratCard::THREE_NOBLES,
-            ZigguratCard::NOBLE_WITH_3_FARMERS,
-            ZigguratCard::NOBLES_IN_FIELDS,
-            ZigguratCard::EXTRA_CITY_POINTS ];
-        if (!(array_search('advanced_ziggurats', $options) === false)) {
-            $ziggurats[] = ZigguratCard::FREE_CENTRAL_LAND_CONNECTS;
-            $ziggurats[] = ZigguratCard::FREE_RIVER_CONNECTS;
-            shuffle($game->ziggurats);
-            array_pop($game->ziggurats);
-            array_pop($game->ziggurats);
-        }
+        $model = new Model($this->db, 0);
+        $model->createNewGame(
+            array_keys($players),
+            $this->optionEnabled($options, Option::ADVANCED_ZIGGURAT_TILES));
 
         // Activate first player once everything has been initialized and ready.
         $this->activeNextPlayer();
     }
 
+    private function optionEnabled(array $options, Option $option): bool {
+        return !(array_search($option->value, $options) === false);
+    }
+
     /**
-     * This method is called each time it is the turn of a player who has quit the game (= "zombie" player).
-     * You can do whatever you want in order to make sure the turn of this player ends appropriately
-     * (ex: pass).
+     * This method is called each time it is the turn of a player who
+     * has quit the game (= "zombie" player).  You can do whatever you
+     * want in order to make sure the turn of this player ends
+     * appropriately (ex: pass).
      *
-     * Important: your zombie code will be called when the player leaves the game. This action is triggered
-     * from the main site and propagated to the gameserver from a server, not from a browser.
-     * As a consequence, there is no current player associated to this action. In your zombieTurn function,
-     * you must _never_ use `getCurrentPlayerId()` or `getCurrentPlayerName()`, otherwise it will fail with a
-     * "Not logged" error message.
+     * Important: your zombie code will be called when the player
+     * leaves the game. This action is triggered from the main site
+     * and propagated to the gameserver from a server, not from a
+     * browser.  As a consequence, there is no current player
+     * associated to this action. In your zombieTurn function, you
+     * must _never_ use `getCurrentPlayerId()` or
+     * `getCurrentPlayerName()`, otherwise it will fail with a "Not
+     * logged" error message.
      *
      * @param array{ type: string, name: string } $state
      * @param int $active_player
