@@ -29,6 +29,12 @@ require_once(APP_GAMEMODULE_PATH . "module/table/table.game.php");
 
 class Game extends \Table
 {
+    // Used during scoring ziggurats in case the scoring of a ziggurat
+    //  means another player needs to choose a tile; this global holds
+    //  the ID of the "primary" player, i.e. who should become active
+    //  once the ziggurat tile is selected.
+    private const GLOBAL_PRIMARY_PLAYER_ID = 'primary_player_id';
+
     private Db $db;
     /**
      * Your global variables labels:
@@ -45,8 +51,7 @@ class Game extends \Table
         parent::__construct();
 
         $this->initGameStateLabels([
-            "my_first_global_variable" => 10,
-            "my_second_global_variable" => 11,
+            Game::GLOBAL_PRIMARY_PLAYER_ID => 10,
             Option::ADVANCED_ZIGGURAT_TILES->value => 100
         ]);
 
