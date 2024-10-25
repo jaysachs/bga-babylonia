@@ -43,7 +43,7 @@ final class ModelTest extends TestCase
         $board->hexAt(5, 3)->playPiece(Piece::MERCHANT, 3);
         $board->hexAt(8, 0)->playPiece(Piece::MERCHANT, 3);
         $board->hexAt(4, 4)->playPiece(Piece::MERCHANT, 3);
-        $this->assertEquals([2 => 1, 3 => 3],
+        $this->assertEquals([2 => 1, 3 => 3, "wonby" => 3],
                             $model->scoreCity($city));
     }
     

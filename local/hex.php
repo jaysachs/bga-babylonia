@@ -96,7 +96,7 @@ $b = $p->refillHand();
 // var_dump($p);
 
 $g = Game::newGame($argv[1], $argv[2]);
-// var_dump($g);
+var_dump($g);
 
 $hex = $g->board->hexAt(2, 0);
 var_dump($hex);

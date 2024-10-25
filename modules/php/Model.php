@@ -247,7 +247,7 @@ class Model {
         );
         $adjacent = [];
         foreach ($neighbors as $h) {
-            if (isset($adjact[$h->player_id])) {
+            if (isset($adjacent[$h->player_id])) {
                 $adjacent[$h->player_id]++;
             } else {
                 $adjacent[$h->player_id] = 1;
@@ -262,7 +262,7 @@ class Model {
             if (isset($invadj[$c])) {
                 $invadj[$c][] = $p;
             } else {
-                $invadj[$c] = [];
+                $invadj[$c] = [$p];
             }
         }
         if (count($invadj[$maxc]) == 1) {
