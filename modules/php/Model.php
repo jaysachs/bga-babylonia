@@ -253,7 +253,7 @@ class Model {
         return $result;
     }
 
-    public function zigguratsRequiringScoring(): array {
+    public function zigguratsRequiringScoring(): array /* Hex */ {
         $result = [];
         $this->board()->visitAll(
             function (&$hex) use (&$result) {
