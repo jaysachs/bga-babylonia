@@ -60,6 +60,7 @@ class Model {
             array_pop($ziggurats);
             // TODO: persist these somewhere :-)
         }
+        $this->db->insertZigguratCards($ziggurats);
     }
     
     public function board(): Board {

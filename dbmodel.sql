@@ -74,9 +74,9 @@ CREATE TABLE IF NOT EXISTS `moves_this_turn` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 CREATE TABLE IF NOT EXISTS `ziggurat_cards` (
-  `player_id` int(10) unsigned NOT NULL,
-  `ziggurat_card` varchar(5) NOT NULL,
-  PRIMARY KEY (`player_id`, `ziggurat_card`)
+  `player_id` int(10) unsigned,
+  `ziggurat_card` varchar(6) NOT NULL,
+  PRIMARY KEY (`ziggurat_card`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `board` (

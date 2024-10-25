@@ -47,8 +47,7 @@ class Game extends \Table
         $this->initGameStateLabels([
             "my_first_global_variable" => 10,
             "my_second_global_variable" => 11,
-            "my_first_game_variant" => 100,
-            "my_second_game_variant" => 101,
+            Option::ADVANCED_ZIGGURAT_TILES->value => 100
         ]);
 
         Logging::init($this);
@@ -310,7 +309,7 @@ class Game extends \Table
     }
 
     private function optionEnabled(array $options, Option $option): bool {
-        return in_array($option->value, $options);
+        return $this->getGameStateValue($option->value) > 0;
     }
 
     /**

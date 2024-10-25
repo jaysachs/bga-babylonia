@@ -204,6 +204,17 @@ class Db {
         );
         return $v == null ? null : intval($v);
     }
+
+    public function insertZigguratCards($ziggurats): void {
+        $sql = "INSERT INTO ziggurat_cards (ziggurat_card) VALUES ";
+
+        $sql_values = [];
+        foreach ($ziggurats as $zc) {
+            $sql_values[] = "('$zc->value')";
+        }
+        $sql .= implode(',', $sql_values);
+        $this->db->DbQuery( $sql );
+    }
 }
 
 

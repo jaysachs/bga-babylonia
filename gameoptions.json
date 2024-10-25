@@ -1,1 +1,10 @@
-{}
+{
+    "100": {
+	"name": "Advanced ziggurat tiles",
+	"values": {
+	    "0": { "name": "Off" },
+	    "1": { "name": "On", "nobeginner": true }
+	},
+	"default": 0
+    }
+}
