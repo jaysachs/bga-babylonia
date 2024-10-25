@@ -69,7 +69,7 @@ class Board {
         .   _   C   _   C   =   C   C   .
 END;
 
-    public static function forPlayerCount(int $numPlayers): Board {
+    public static function forPlayerCount(int $numPlayers, bool $random = true): Board {
         if ($numPlayers < 2 || $numPlayers > 4) {
             throw new \InvalidArgumentException(sprintf("invalid number of players: %s", $numPlayers));
         }
@@ -108,7 +108,7 @@ END;
             $board->removeLandmassAt(2, 0);
         }
 
-        $pool = self::initializePool($numPlayers);
+        $pool = self::initializePool($numPlayers, $random);
         $board->placeCitiesAndFields($pool, $cityfields);
         if (count($pool) != 0) {
             throw new \LogicException("placed all cities and fields but tiles leftover");
@@ -120,7 +120,7 @@ END;
         foreach ($cityfields as $rc) {
             $hex = $this->hexAt($rc[0], $rc[1]);
             if ($hex != null) {
-                $x = array_pop($pool);
+                $x = array_shift($pool);
                 $hex->placeFeature($x);
             }
         }
@@ -146,7 +146,7 @@ END;
     public function __construct(private array &$hexes) {}
 
     /* visit should return true if continue exploring */
-    private function bfs(int $start_row, int $start_col, \Closure $visit) {
+    public function bfs(int $start_row, int $start_col, \Closure $visit) {
         $seen = [];
         $queue = [ $this->hexAt($start_row, $start_col) ];
         while ($queue) {
@@ -211,7 +211,7 @@ END;
             );
     }
 
-    private static function initializePool(int $numPlayers) {
+    private static function initializePool(int $numPlayers, bool $random) {
         // set up city pool
         $pool = array();
         for ($i = 0; $i < 2; $i++) {
@@ -246,7 +246,9 @@ END;
                 $pool[] = Piece::FIELD_CITIES;
             }
         }
-        shuffle($pool);
+        if ($random) {
+            shuffle($pool);
+        }
         return $pool;
     }
 }
