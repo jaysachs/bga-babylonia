@@ -74,9 +74,8 @@ enum Piece: string {
         return [Piece::FARMER, Piece::MERCHANT, Piece::SERVANT, Piece::PRIEST];
     }
 
-    public function isEmpty(): bool {
-        return $this == Piece::EMPTY;
-    }
+    public function isEmpty(): bool { return $this == Piece::EMPTY; }
+    public function isZiggurat(): bool { return $this == Piece::ZIGGURAT; }
     public function isPlayerPiece(): bool {
         return $this->isFarmer() || $this->isNoble() || $this->isHidden();
     }
