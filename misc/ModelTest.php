@@ -8,6 +8,7 @@ use Bga\Games\babylonia\ {
     HexType,
       Model,
       Board,
+        ScoredCity,
         Piece,
         Db,
 };
@@ -16,6 +17,11 @@ class TestDb extends Db {
     private ?Board $board = null;
     public function __construct() {
         Db::__construct(null);
+    }
+    public function retrievePlayersData(): array {
+        return [1 => ["points"=> 0, "captured"=> 0],
+                2 => ["points"=> 0, "captured"=> 0],
+                3 => ["points"=> 0, "captured"=> 0]];
     }
     public function insertBoard(Board $b): void { $this->board = $b; }
     public function insertPlayerInfos(array $pis): void { }
@@ -32,7 +38,7 @@ final class ModelTest extends TestCase
         $db->insertBoard($board);
         $model = new Model($db, 0);
         $city = $board->hexAt(6,0);
-        error_log("$city");
+
         $board->hexAt(4, 0)->playPiece(Piece::PRIEST, 1);
 
         $board->hexAt(7, 1)->playPiece(Piece::MERCHANT, 2);
@@ -43,8 +49,16 @@ final class ModelTest extends TestCase
         $board->hexAt(5, 3)->playPiece(Piece::MERCHANT, 3);
         $board->hexAt(8, 0)->playPiece(Piece::MERCHANT, 3);
         $board->hexAt(4, 4)->playPiece(Piece::MERCHANT, 3);
-        $this->assertEquals([2 => 1, 3 => 3, "wonby" => 3],
-                            $model->scoreCity($city));
+        $this->assertEquals(
+            new ScoredCity(
+                [
+                    1 => [],
+                    2 => [$board->hexAt(7, 1)],
+                    3 => [$board->hexAt(5, 3), $board->hexAt(4, 4), $board->hexAt(8,0)]
+                ],
+                3
+            ),
+            $model->scoreCity($city));
     }
     
     public function testCitiesRequiringScoring(): void

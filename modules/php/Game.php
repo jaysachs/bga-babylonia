@@ -157,6 +157,24 @@ class Game extends \Table
     private function doScoring(Model $model): void {
         foreach ($model->citiesRequiringScoring() as $cityhex) {
             $scores = $model->scoreCity($cityhex);
+            $wonby = "noone";
+            if ($scores->wonby > 0) {
+                // TODO: get player name
+                $wonby = "player $scores->wonby";
+            }
+            $this->notifyAllPlayers("cityScored", clienttranslate('city ${row},${col} scored, captured by ${wonby}'), [
+                "row" => $cityhex->row,
+                "col" => $cityhex->col,
+                "wonby" => $wonby
+            ]);
+            foreach ($scores->playerHexes as $pid => $hexes) {
+                // TODO: player name.
+                $this->notifyAllPlayers("cityScoredPlayer", clienttranslate('player ${player_id} scored ${points}'), [
+                    "scored_hexes" => $hexes,
+                    "points" => count($hexes),
+                    "player_id" => $pid
+                ]);
+            }
         }
         
     }
@@ -169,7 +187,7 @@ class Game extends \Table
         $model = new Model($this->db, $player_id);
 
         // TODO: this doesn't belong here
-        $this->doScoring();
+        $this->doScoring($model);
         
         $result = $model->finishTurn();
         if ($result["gameOver"]) {
@@ -306,7 +324,7 @@ class Game extends \Table
         // Init global values with their initial values.
 
         // Dummy content.
-        $this->setGameStateInitialValue("my_first_global_variable", 0);
+        $this->setGameStateInitialValue(Game::GLOBAL_PRIMARY_PLAYER_ID, 0);
 
         // Init game statistics.
         //

@@ -31,6 +31,7 @@ class Model {
     private ?Board $_board = null;
     private ?PlayedTurn $_played_turn = null;
     private ?PlayerInfo $_player_info = null;
+    private ?array $_playerData = null;
     
     public function __construct(private Db $db, private int $player_id) { }
 
@@ -61,6 +62,17 @@ class Model {
             // TODO: persist these somewhere :-)
         }
         $this->db->insertZigguratCards($ziggurats);
+    }
+
+    public function allPlayersData(): array {
+        if ($this->_playerData == null) {
+            $this->_playerData = $this->db->retrievePlayersData();
+        }
+        return $this->_playerData;
+    }
+    
+    private function allPlayerIds(): array {
+        return array_keys($this->allPlayersData());
     }
     
     public function board(): Board {
@@ -231,12 +243,32 @@ class Model {
         ];
     }
 
-    public function scoreCity(Hex $hex): array /* player_id => int */ {
+    public function scoreCity(Hex $hex): ScoredCity {
         $scores = $this->computeCityScores($hex);
-        // TODO: remove city piece and award to winning player (or no one)
+        $pd = $this->allPlayersData();
+        foreach ($scores->playerHexes as $pid => $hexes) {
+            $pd[$pid]["points"] += count($hexes);
+        }
+        if ($scores->wonby > 0) {
+            $pd[$scores->wonby]["captured"]++;
+        }
+
+        $h = $this->board()->hexAt($hex->row, $hex->col);
+        $p = $h->captureCity();
+
+        // TODO: all players get points at 1 per every 2 cities captured
+        
         // TODO: update board hex in db
         // TODO: update players in db
         return $scores;
+    }
+
+    private function newEmptyPlayerMap(mixed $value): array {
+        $result = [];
+        foreach ($this->allPlayerIds() as $pid) {
+            $result[$pid] = $value;
+        }
+        return $result;
     }
 
     private function computeTileWinner(Hex $hex): int {
@@ -245,43 +277,30 @@ class Model {
             $hex,
             function (&$h): bool { return $h->piece->isPlayerPiece(); }
         );
-        $adjacent = [];
+        $adjacent = $this->newEmptyPlayerMap(0);
         foreach ($neighbors as $h) {
-            if (isset($adjacent[$h->player_id])) {
-                $adjacent[$h->player_id]++;
-            } else {
-                $adjacent[$h->player_id] = 1;
-            }
+            $adjacent[$h->player_id]++;
         }
-        $invadj = [];
+        $wonby = 0;
         $maxc = 0;
         foreach ($adjacent as $p => $c) {
             if ($c > $maxc) {
                 $maxc = $c;
-            }
-            if (isset($invadj[$c])) {
-                $invadj[$c][] = $p;
-            } else {
-                $invadj[$c] = [$p];
+                $wonby = $p;
+            } else if ($c > 0 && $c == $maxc) {
+                $wonby = 0;
             }
         }
-        if (count($invadj[$maxc]) == 1) {
-            return $invadj[$maxc][0];
-        }
-        return 0;
+        return $wonby;
     }
 
     // TODO: Also needs to return who won it.
-    private function computeCityScores(Hex $hex): array /* player_id => int */ {
+    private function computeCityScores(Hex $hex): ScoredCity {
         if (!$this->cityRequiresScoring($hex)) {
             throw new \InvalidArgumentException("$hex is not a city to be scored");
         }
-
-        $result = [];
-        $wonby = $this->computeTileWinner($hex);
-        if ($wonby > 0) {
-            $result["wonby"] = $wonby;
-        }
+        $result = ScoredCity::forPlayerIds($this->allPlayerIds());
+        $result->wonby = $this->computeTileWinner($hex);
     
         $seen = [];
         $neighbors = $this->board()->neighbors(
@@ -302,10 +321,8 @@ class Model {
                             if ($hex->piece->scores($h->piece)) {
                                 if (in_array($h, $seen)) {
                                     // nothing
-                                } else if (!isset($result[$h->player_id])) {
-                                    $result[$h->player_id] = 1;
                                 } else {
-                                    $result[$h->player_id]++;
+                                    $result->addScoredHex($h);
                                 }
                             }
                             $seen[] = $h;
