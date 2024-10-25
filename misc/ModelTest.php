@@ -19,9 +19,9 @@ class TestDb extends Db {
         Db::__construct(null);
     }
     public function retrievePlayersData(): array {
-        return [1 => ["points"=> 0, "captured"=> 0],
-                2 => ["points"=> 0, "captured"=> 0],
-                3 => ["points"=> 0, "captured"=> 0]];
+        return [1 => ["score"=> 0, "captured_city_count"=> 0],
+                2 => ["score"=> 0, "captured_city_count"=> 0],
+                3 => ["score"=> 0, "captured_city_count"=> 0]];
     }
     public function insertBoard(Board $b): void { $this->board = $b; }
     public function insertPlayerInfos(array $pis): void { }

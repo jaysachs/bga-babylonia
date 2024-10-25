@@ -34,13 +34,7 @@
 -- ALTER TABLE `player` ADD `player_my_custom_field` INT UNSIGNED NOT NULL DEFAULT '0';
 
 
--- which bonus tiles players own.
--- could try to shove in `players` but need an array type
---   maybe using MySQL `SET` type?
-
-ALTER TABLE `player` ADD `ziggurat_cards` SET ('zcard1', 'zcard2', 'zcard3', 'zcard4', 'zcard5', 'zcard6', 'zcard7', 'zcard8', 'zcard9') DEFAULT NULL;
-
-ALTER TABLE `player` ADD `won_city_count` INT UNSIGNED NOT NULL DEFAULT '0';
+ALTER TABLE `player` ADD `captured_city_count` INT UNSIGNED NOT NULL DEFAULT '0';
 
 CREATE TABLE IF NOT EXISTS `handpools` (
   `player_id` int(10) unsigned NOT NULL,
@@ -74,7 +68,11 @@ CREATE TABLE IF NOT EXISTS `moves_this_turn` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 CREATE TABLE IF NOT EXISTS `ziggurat_cards` (
+  -- which player holds it; if 0 still available
   `player_id` int(10) unsigned,
+  -- whether the one-shot power was activated
+  `used` boolean NOT NULL DEFAULT false,
+  -- the card itself
   `ziggurat_card` varchar(6) NOT NULL,
   PRIMARY KEY (`ziggurat_card`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

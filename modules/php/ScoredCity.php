@@ -28,7 +28,7 @@ namespace Bga\Games\babylonia;
 
 class ScoredCity {
 
-    public function __construct(public array $playerHexes = [], public int $wonby = 0) { }
+    public function __construct(public array $playerHexes = [], public int $captured_by = 0) { }
 
     public static function forPlayerIds(array $player_ids): ScoredCity {
         $h = [];

@@ -155,24 +155,27 @@ class Game extends \Table
     }
 
     private function doScoring(Model $model): void {
+
+        $pd = $this->db->retrievePlayersData();
+        
         foreach ($model->citiesRequiringScoring() as $cityhex) {
             $scores = $model->scoreCity($cityhex);
-            $wonby = "noone";
-            if ($scores->wonby > 0) {
-                // TODO: get player name
-                $wonby = "player $scores->wonby";
+            $captured_by = "noone";
+            if ($scores->captured_by > 0) {
+                $captured_by = $pd[$scores->captured_by]["player_name"];
             }
-            $this->notifyAllPlayers("cityScored", clienttranslate('city ${row},${col} scored, captured by ${wonby}'), [
+            $this->notifyAllPlayers("cityScored", clienttranslate('city ${row},${col} scored, captured by ${captured_by}'), [
                 "row" => $cityhex->row,
                 "col" => $cityhex->col,
-                "wonby" => $wonby
+                "captured_by" => $captured_by
             ]);
             foreach ($scores->playerHexes as $pid => $hexes) {
                 // TODO: player name.
-                $this->notifyAllPlayers("cityScoredPlayer", clienttranslate('player ${player_id} scored ${points}'), [
+                $this->notifyAllPlayers("cityScoredPlayer", clienttranslate('player ${player_name} scored ${points}'), [
                     "scored_hexes" => $hexes,
                     "points" => count($hexes),
-                    "player_id" => $pid
+                    "player_id" => $pid,
+                    "player_name" => $pd[$pid]["player_name"]
                 ]);
             }
         }

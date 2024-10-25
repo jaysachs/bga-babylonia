@@ -247,10 +247,10 @@ class Model {
         $scores = $this->computeCityScores($hex);
         $pd = $this->allPlayersData();
         foreach ($scores->playerHexes as $pid => $hexes) {
-            $pd[$pid]["points"] += count($hexes);
+            $pd[$pid]["score"] += count($hexes);
         }
-        if ($scores->wonby > 0) {
-            $pd[$scores->wonby]["captured"]++;
+        if ($scores->captured_by > 0) {
+            $pd[$scores->captured_by]["captured_city_count"]++;
         }
 
         $h = $this->board()->hexAt($hex->row, $hex->col);
@@ -281,26 +281,26 @@ class Model {
         foreach ($neighbors as $h) {
             $adjacent[$h->player_id]++;
         }
-        $wonby = 0;
+        $captured_by = 0;
         $maxc = 0;
         foreach ($adjacent as $p => $c) {
             if ($c > $maxc) {
                 $maxc = $c;
-                $wonby = $p;
+                $captured_by = $p;
             } else if ($c > 0 && $c == $maxc) {
-                $wonby = 0;
+                $captured_by = 0;
             }
         }
-        return $wonby;
+        return $captured_by;
     }
 
-    // TODO: Also needs to return who won it.
+    // TODO: Also needs to return who captured it.
     private function computeCityScores(Hex $hex): ScoredCity {
         if (!$this->cityRequiresScoring($hex)) {
             throw new \InvalidArgumentException("$hex is not a city to be scored");
         }
         $result = ScoredCity::forPlayerIds($this->allPlayerIds());
-        $result->wonby = $this->computeTileWinner($hex);
+        $result->captured_by = $this->computeTileWinner($hex);
     
         $seen = [];
         $neighbors = $this->board()->neighbors(
@@ -344,7 +344,7 @@ class Model {
             $hex,
             function (&$nh): bool {
                 return $nh->piece == Piece::EMPTY
-                    && $nh->type = HexType::LAND;
+                    && $nh->type == HexType::LAND;
             }
         );
         return (count($missing) == 0);
