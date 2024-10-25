@@ -53,13 +53,13 @@ var jstpl_some_game_item='<div class="my_game_item" id="my_game_item_${MY_ITEM_I
       <div class="board-spacer"></div>
       <div class="board" id="board"></div>
       <div id="available_ziggurats">
-	<div></div>
-	<div></div>
-	<div></div>
-	<div></div>
-	<div></div>
-	<div></div>
-	<div></div>
+	<div id="zig1"></div>
+	<div id="zig2"></div>
+	<div id="zig3"></div>
+	<div id="zig4"></div>
+	<div id="zig5"></div>
+	<div id="zig6"></div>
+	<div id="zig7"></div>
       </div>
     </div>
 

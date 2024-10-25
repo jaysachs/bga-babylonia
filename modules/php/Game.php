@@ -235,7 +235,8 @@ class Game extends \Table
         return [
             'players' => $this->db->retrievePlayersData(),
             'hand' => $this->db->retrieveHandData($current_player_id),
-            'board' => $this->db->retrieveBoardData()
+            'board' => $this->db->retrieveBoardData(),
+            'ziggurat_cards' => $this->db->retrieveZigguratCards()
         ];
     }
 

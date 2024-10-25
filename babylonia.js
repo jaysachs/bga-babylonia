@@ -59,13 +59,13 @@ function (dojo, declare) {
             for( var player_id in gamedatas.players )
             {
                 var player = gamedatas.players[player_id];
-
-                // TODO: Setting up players boards if needed
+                // TODO: Set up players boards if needed, updating
+                // pool size
             }
+
             this.playerNumber = gamedatas.players[this.player_id].player_number;
 
-            // TODO: Set up your game interface here, according to "gamedatas"
-
+	    // Set up the board
             let c = document.getElementById("board");
             console.log(gamedatas.board);
             for( let h = 0; h < gamedatas.board.length; ++h) {
@@ -84,7 +84,22 @@ function (dojo, declare) {
                 }
             }
 
+	    // Set up the available ziggurat tiles
+	    for( let z = 0; z < gamedatas.ziggurat_cards.length; z++) {
+		let c = document.getElementById("zig" + (z+1));
+		if ( gamedatas.ziggurat_cards[z].player_id == null
+		     || gamedatas.ziggurat_cards[z].player_id == 0 ) {
+		    c.classList = gamedatas.ziggurat_cards[z].ziggurat_card;
+		} else {
+		    c.className = "";
+		}
+	    }
+
+	    // Set up the player's hand
             this.renderHand(gamedatas.hand);
+	    //   and owned ziggurat cards
+	    // TODO
+
             console.log("setting up notifications");
 
             // Setup game notifications to handle (see "setupNotifications" method below)

@@ -206,14 +206,21 @@ class Db {
     }
 
     public function insertZigguratCards($ziggurats): void {
-        $sql = "INSERT INTO ziggurat_cards (ziggurat_card) VALUES ";
+        $sql = "INSERT INTO ziggurat_cards (ziggurat_card, player_id) VALUES ";
 
         $sql_values = [];
         foreach ($ziggurats as $zc) {
-            $sql_values[] = "('$zc->value')";
+            $sql_values[] = "('$zc->value', 0)";
         }
         $sql .= implode(',', $sql_values);
         $this->db->DbQuery( $sql );
+    }
+
+    public function retrieveZigguratCards(): array {
+        return $this->db->getObjectListFromDB2(
+            "SELECT ziggurat_card, player_id
+             FROM ziggurat_cards"
+        );
     }
 }
 
