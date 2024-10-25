@@ -52,6 +52,15 @@ var jstpl_some_game_item='<div class="my_game_item" id="my_game_item_${MY_ITEM_I
       <!-- needed since the board is absolutely positions / sized. for now. -->
       <div class="board-spacer"></div>
       <div class="board" id="board"></div>
+      <div id="available_ziggurats">
+	<div></div>
+	<div></div>
+	<div></div>
+	<div></div>
+	<div></div>
+	<div></div>
+	<div></div>
+      </div>
     </div>
 
 {OVERALL_GAME_FOOTER}

@@ -286,3 +286,53 @@
     opacity: 0.2;
     cursor: pointer;
 }
+
+#available_ziggurats {
+    display: flex;
+    justify-content: center;
+    width: 1024px;
+}
+
+#available_ziggurats > div {
+    display: inline-block;
+    border-radius: 10px;
+    height: 135px;
+    width: 90px;
+    margin: 10px;
+    background-size: 1000% 100%;
+    background-image: url(img/ziggurats.png);
+}
+
+#available_ziggurats > div:not([class]),
+#available_ziggurats > div[class=''] {
+    background-position: -900% 0%;
+    border-style: dotted;
+}
+
+#available_ziggurats > div.zig_1 {
+    background-position: 0% 0%;
+}
+#available_ziggurats > div.zig_2 {
+    background-position: -100% 0%;
+}
+#available_ziggurats > div.zig_3 {
+    background-position: -200% 0%;
+}
+#available_ziggurats > div.zig_4 {
+    background-position: -300% 0%;
+}
+#available_ziggurats > div.zig_5 {
+    background-position: -400% 0%;
+}
+#available_ziggurats > div.zig_6 {
+    background-position: -500% 0%;
+}
+#available_ziggurats > div.zig_7 {
+    background-position: -600% 0%;
+}
+#available_ziggurats > div.zig_8 {
+    background-position: -700% 0%;
+}
+#available_ziggurats > div.zig_9 {
+    background-position: -800% 0%;
+}
