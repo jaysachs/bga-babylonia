@@ -205,7 +205,7 @@ class Db {
         return $v == null ? null : intval($v);
     }
 
-    public function insertZigguratCards($ziggurats): void {
+    public function insertZigguratCards(array $ziggurats): void {
         $sql = "INSERT INTO ziggurat_cards (ziggurat_card, player_id) VALUES ";
 
         $sql_values = [];
