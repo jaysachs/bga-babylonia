@@ -87,29 +87,29 @@
     background-size: 100% 1300%;
 }
 
-.city_msp  {
+.city_back  {
     background: url(img/cities.png) 0% 0%;
 }
 .city_m    {
     background: url(img/cities.png) 0% -100%;
 }
-.city_back {
-    background: url(img/cities.png) 0% -200%;
+.city_msp {
+    background: url(img/cities.png) 0% -700%;
 }
 .city_p    {
     background: url(img/cities.png) 0% -300%;
 }
 .city_s    {
-    background: url(img/cities.png) 0% -400%;
+    background: url(img/cities.png) 0% -200%;
 }
 .city_mp   {
     background: url(img/cities.png) 0% -500%;
 }
 .city_ms   {
-    background: url(img/cities.png) 0% -600%;
+    background: url(img/cities.png) 0% -400%;
 }
 .city_sp   {
-    background: url(img/cities.png) 0% -700%;
+    background: url(img/cities.png) 0% -600%;
 }
 .field_5     {
     background: url(img/cities.png) 0% -800%;
