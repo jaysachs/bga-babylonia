@@ -231,21 +231,113 @@ class Model {
         ];
     }
 
+    public function scoreCity(Hex $hex): array /* player_id => int */ {
+        $scores = $this->computeCityScores($hex);
+        // TODO: remove city piece and award to winning player (or no one)
+        // TODO: update board hex in db
+        // TODO: update players in db
+        return $scores;
+    }
+
+    private function computeTileWinner(Hex $hex): int {
+        // first compute who will win the city tile, if anyone.
+        $neighbors = $this->board()->neighbors(
+            $hex,
+            function (&$h): bool { return $h->piece->isPlayerPiece(); }
+        );
+        $adjacent = [];
+        foreach ($neighbors as $h) {
+            if (isset($adjact[$h->player_id])) {
+                $adjacent[$h->player_id]++;
+            } else {
+                $adjacent[$h->player_id] = 1;
+            }
+        }
+        $invadj = [];
+        $maxc = 0;
+        foreach ($adjacent as $p => $c) {
+            if ($c > $maxc) {
+                $maxc = $c;
+            }
+            if (isset($invadj[$c])) {
+                $invadj[$c][] = $p;
+            } else {
+                $invadj[$c] = [];
+            }
+        }
+        if (count($invadj[$maxc]) == 1) {
+            return $invadj[$maxc][0];
+        }
+        return 0;
+    }
+
+    // TODO: Also needs to return who won it.
+    private function computeCityScores(Hex $hex): array /* player_id => int */ {
+        if (!$this->cityRequiresScoring($hex)) {
+            throw new \InvalidArgumentException("$hex is not a city to be scored");
+        }
+
+        $result = [];
+        $wonby = $this->computeTileWinner($hex);
+        if ($wonby > 0) {
+            $result["wonby"] = $wonby;
+        }
+    
+        $seen = [];
+        $neighbors = $this->board()->neighbors(
+            $hex,
+            function (&$h): bool { return $h->piece->isPlayerPiece(); }
+        );
+
+        foreach ($neighbors as $n) {
+            if (in_array($n, $seen)) {
+                continue;
+            }
+            $this->board()->bfs(
+                $n->row,
+                $n->col,
+                function (&$h) use (&$result, &$hex, &$n, &$seen) {
+                    if ($h->piece->isPlayerPiece()) {
+                        if ($h->player_id == $n->player_id) {
+                            if ($hex->piece->scores($h->piece)) {
+                                if (in_array($h, $seen)) {
+                                    // nothing
+                                } else if (!isset($result[$h->player_id])) {
+                                    $result[$h->player_id] = 1;
+                                } else {
+                                    $result[$h->player_id]++;
+                                }
+                            }
+                            $seen[] = $h;
+                            return true;
+                        }
+                    }
+                    return false;
+                }
+            );
+        }
+        return $result;
+    }
+
+    private function cityRequiresScoring(Hex $hex): bool {
+        if (!$hex->piece->isCity()) {
+            return false;
+        }
+        $missing = $this->board()->neighbors(
+            $hex,
+            function (&$nh): bool {
+                return $nh->piece == Piece::EMPTY
+                    && $nh->type = HexType::LAND;
+            }
+        );
+        return (count($missing) == 0);
+    }
+
     public function citiesRequiringScoring(): array /* Hex */ {
         $result = [];
         $this->board()->visitAll(
             function (&$hex) use (&$result) {
-                if (!$hex->piece->isCity()) {
-                    return;
-                }
-                $missing = $this->board()->neighbors(
-                    $hex,
-                    function (&$nh): bool {
-                        return $nh->piece == Piece::EMPTY
-                            && $nh->type = HexType::LAND;
-                    }
-                );
-                if (count($missing) == 0) {
+                if ($this->cityRequiresScoring($hex)) {
                     $result[] = $hex;
                 }
             }

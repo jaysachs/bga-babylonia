@@ -154,12 +154,23 @@ class Game extends \Table
         return 0;
     }
 
+    private function doScoring(Model $model): void {
+        foreach ($model->citiesRequiringScoring() as $cityhex) {
+            $scores = $model->scoreCity($cityhex);
+        }
+        
+    }
+    
     /**
      * Called when state finishTurn is entered.
      */
     public function stFinishTurn(): void {
         $player_id = intval($this->getActivePlayerId());
         $model = new Model($this->db, $player_id);
+
+        // TODO: this doesn't belong here
+        $this->doScoring();
+        
         $result = $model->finishTurn();
         if ($result["gameOver"]) {
             $this->notifyAllPlayers("gameEnded", clienttranslate('${player_name} unable to refill their hand'), [

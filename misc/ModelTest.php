@@ -25,9 +25,31 @@ class TestDb extends Db {
 
 final class ModelTest extends TestCase
 {
+    public function testCityScoring(): void
+    {
+        $board = Board::forPlayerCount(2, false);
+        $db = new TestDb();
+        $db->insertBoard($board);
+        $model = new Model($db, 0);
+        $city = $board->hexAt(6,0);
+        error_log("$city");
+        $board->hexAt(4, 0)->playPiece(Piece::PRIEST, 1);
+
+        $board->hexAt(7, 1)->playPiece(Piece::MERCHANT, 2);
+
+        $board->hexAt(2, 0)->playPiece(Piece::MERCHANT, 3);
+        $board->hexAt(5, 1)->playPiece(Piece::FARMER, 3);
+        $board->hexAt(6, 2)->playPiece(Piece::HIDDEN, 3);
+        $board->hexAt(5, 3)->playPiece(Piece::MERCHANT, 3);
+        $board->hexAt(8, 0)->playPiece(Piece::MERCHANT, 3);
+        $board->hexAt(4, 4)->playPiece(Piece::MERCHANT, 3);
+        $this->assertEquals([2 => 1, 3 => 3],
+                            $model->scoreCity($city));
+    }
+    
     public function testCitiesRequiringScoring(): void
     {
-        $board = Board::forPlayerCount(2);
+        $board = Board::forPlayerCount(2, false);
         $db = new TestDb();
         $db->insertBoard($board);
         $model = new Model($db, 0);
