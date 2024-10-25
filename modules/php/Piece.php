@@ -89,6 +89,33 @@ enum Piece: string {
             default => false,
         };
     }
+
+    public function scores(Piece $p): bool {
+        return match ($p) {
+            Piece::PRIEST => match ($this) {
+                Piece::CITY_P,
+                Piece::CITY_SP,
+                Piece::CITY_MP,
+                Piece::CITY_MSP => true,
+                default => false,
+            },
+            Piece::SERVANT => match ($this) {
+                Piece::CITY_S,
+                Piece::CITY_SP,
+                Piece::CITY_SP,
+                Piece::CITY_MSP => true,
+                default => false,
+            },
+            Piece::MERCHANT => match ($this) {
+                Piece::CITY_M,
+                Piece::CITY_MS,
+                Piece::CITY_MP,
+                Piece::CITY_MSP => true,
+                default => false,
+            },
+            default => false,
+        };
+    }
 }
 
 ?>
