@@ -99,6 +99,18 @@ class Db {
         $this->db->DbQuery( $sql );
     }
 
+    public function updatePlayers(array $player_data): void {
+        foreach ($player_data as $player_id => $pd) {
+            $score = $pd["score"];
+            $captured_city_count = $pd["captured_city_count"];
+            $this->db->DbQuery(
+                "UPDATE player q
+                 SET q.player_score = $score, q.captured_city_count=$captured_city_count
+                 WHERE q.player_id = $player_id"
+            );
+        }
+    }
+
     public function insertMove(Move $move) {
         $c = $this->boolValue($move->captured);
         $piece = $move->piece->value;
@@ -140,6 +152,13 @@ class Db {
             $moves[] = Move::fromDbResults($res);
         }
         return new PlayedTurn($moves);
+    }
+
+    public function updateHex(Hex $hex): void {
+        $piece = $hex->piece->value;
+        $this->db->DbQuery("UPDATE board
+                     SET piece='$piece', player_id=$hex->player_id
+                     WHERE board_row=$hex->row AND board_col=$hex->col");
     }
 
     public function updatePlayerInfo(int $player_id, PlayerInfo $info) {

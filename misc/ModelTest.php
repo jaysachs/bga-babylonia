@@ -27,6 +27,9 @@ class TestDb extends Db {
     public function insertPlayerInfos(array $pis): void { }
     public function insertZigguratCards(array $zs): void { }
     public function retrieveBoard(): Board { return $this->board; }
+
+    public function updateHex(Hex $hex): void { }
+    public function updatePlayers(array $pd): void { }
 }
 
 final class ModelTest extends TestCase
@@ -50,13 +53,18 @@ final class ModelTest extends TestCase
         $board->hexAt(8, 0)->playPiece(Piece::MERCHANT, 3);
         $board->hexAt(4, 4)->playPiece(Piece::MERCHANT, 3);
         $this->assertEquals(
-            new ScoredCity(
+            new ScoredCity($city->piece,
                 [
                     1 => [],
                     2 => [$board->hexAt(7, 1)],
                     3 => [$board->hexAt(5, 3), $board->hexAt(4, 4), $board->hexAt(8,0)]
                 ],
-                3
+                3,
+                [
+                    1 => 0,
+                    2 => 0,
+                    3 => 0,
+                ]
             ),
             $model->scoreCity($city));
     }

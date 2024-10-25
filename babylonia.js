@@ -403,6 +403,8 @@ function (dojo, declare) {
 
             dojo.subscribe( 'piecePlayed', this, 'notif_piecePlayed' );
             dojo.subscribe( 'handRefilled', this, 'notif_handRefilled' );
+	    dojo.subscribe( 'cityScored', this, 'notif_cityScored' );
+	    dojo.subscribe( 'cityScoredPlayer', this, 'notif_cityScoredPlayer' );
 
             // TODO: here, associate your game notifications with local methods
 
@@ -417,7 +419,21 @@ function (dojo, declare) {
             //
         },
 
-        // TODO: from this point and below, you can write your game notifications handling methods
+	notif_cityScored: function( notif ) {
+	    console.log( notif );
+	    this.renderPlayedPiece( notif.args.row, notif.args.col, 'empty', null );
+	    if ( notif.args.captured_by != 0 ) {
+		// TODO: update player and global city scored count
+	    }
+	},
+
+	notif_cityScoredPlayer: function( notif ) {
+	    console.log( notif );
+
+	    // TODO: animate hexes contributing to scoring
+
+	    this.scoreCtrl[notif.args.player_id].toValue(notif.args.score);
+	},
 
         notif_piecePlayed: function( notif ) {
             console.log( 'notif_piecePlayed' );

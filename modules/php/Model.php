@@ -245,21 +245,25 @@ class Model {
 
     public function scoreCity(Hex $hex): ScoredCity {
         $scores = $this->computeCityScores($hex);
-        $pd = $this->allPlayersData();
+        $player_data = $this->allPlayersData();
         foreach ($scores->playerHexes as $pid => $hexes) {
-            $pd[$pid]["score"] += count($hexes);
+            $player_data[$pid]["score"] += count($hexes);
         }
         if ($scores->captured_by > 0) {
-            $pd[$scores->captured_by]["captured_city_count"]++;
+            $player_data[$scores->captured_by]["captured_city_count"]++;
         }
 
         $h = $this->board()->hexAt($hex->row, $hex->col);
         $p = $h->captureCity();
 
-        // TODO: all players get points at 1 per every 2 cities captured
-        
-        // TODO: update board hex in db
-        // TODO: update players in db
+        foreach ($player_data as $pid => $pd) {
+            $scores->captured_city_points[$pid] =
+                intval(floor($pd["captured_city_count"] / 2));
+        }
+
+        $this->db->updateHex($hex);
+        $this->db->updatePlayers($player_data);
+        // TODO: update global captured city count in db globals
         return $scores;
     }
 
@@ -299,7 +303,7 @@ class Model {
         if (!$this->cityRequiresScoring($hex)) {
             throw new \InvalidArgumentException("$hex is not a city to be scored");
         }
-        $result = ScoredCity::forPlayerIds($this->allPlayerIds());
+        $result = ScoredCity::forPlayerIds($hex->piece, $this->allPlayerIds());
         $result->captured_by = $this->computeTileWinner($hex);
     
         $seen = [];

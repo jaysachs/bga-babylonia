@@ -159,21 +159,24 @@ class Game extends \Table
         $pd = $this->db->retrievePlayersData();
         
         foreach ($model->citiesRequiringScoring() as $cityhex) {
+            $city = $cityhex->piece->value;
             $scores = $model->scoreCity($cityhex);
             $captured_by = "noone";
             if ($scores->captured_by > 0) {
                 $captured_by = $pd[$scores->captured_by]["player_name"];
             }
-            $this->notifyAllPlayers("cityScored", clienttranslate('city ${row},${col} scored, captured by ${captured_by}'), [
+            $this->notifyAllPlayers("cityScored", clienttranslate('${city} ${row},${col} scored, captured by ${captured_by}'), [
+                "city" => $city,
                 "row" => $cityhex->row,
                 "col" => $cityhex->col,
                 "captured_by" => $captured_by
             ]);
             foreach ($scores->playerHexes as $pid => $hexes) {
-                // TODO: player name.
+                $points = count($hexes) + $scores->captured_city_points[$pid];
                 $this->notifyAllPlayers("cityScoredPlayer", clienttranslate('player ${player_name} scored ${points}'), [
                     "scored_hexes" => $hexes,
-                    "points" => count($hexes),
+                    "points" => $points,
+                    "score" => $pd[$pid]["score"] + $points,
                     "player_id" => $pid,
                     "player_name" => $pd[$pid]["player_name"]
                 ]);
