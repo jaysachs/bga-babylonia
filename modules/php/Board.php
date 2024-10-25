@@ -80,26 +80,20 @@ END;
         $cityfields = [];
         foreach ($lines as &$s) {
             $col = ($row & 1) ? 1 : 0;
-            foreach (str_split($s) as $ch) {
-                switch ($ch) {
-                case ' ':
-                    $col -= 2;
-                    break;
-                case '.':
-                    break;
-                case '_':
+            foreach (preg_split("/\s+/", trim($s)) as $t) {
+                if ($t == ".") {
+                    // nothing, unplayable hex
+                } else if ($t == "_") {
                     $board->addHex(Hex::land($row, $col));
-                    break;
-                case 'C':
+                } else if ($t == "C") {
                     $board->addHex(Hex::land($row, $col));
                     $cityfields[] = [ $row, $col ];
-                    break;
-                case '!':
+                } else if ($t == "!" || $t == "Z") {
                     $board->addHex(Hex::ziggurat($row, $col));
-                    break;
-                case '=':
+                } else if ($t == "=" || $t == "W") {
                     $board->addHex(Hex::water($row, $col));
-                    break;
+                } else {
+                    throw new \InvalidArgumentException("Unexpected string in board map: '$t'");
                 }
                 $col += 2;
             }
