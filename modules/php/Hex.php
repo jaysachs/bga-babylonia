@@ -44,6 +44,15 @@ class Hex {
                                 public bool $scored = false) {
     }
 
+    public function captureCity(): Piece {
+        if (!$this->piece->isCity()) {
+            throw new \LogicException("attempt to capture a non-city $this");
+        }
+        $p = $this->piece;
+        $this->piece = Piece::EMPTY;
+        return $p;
+    }
+
     public function placeFeature(Piece $feature) {
         if ($this->piece != Piece::EMPTY) {
             throw new \LogicException("attempt to place city or field on top of $this");
