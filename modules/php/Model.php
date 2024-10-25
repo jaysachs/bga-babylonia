@@ -230,6 +230,50 @@ class Model {
             "hand" => $hand
         ];
     }
+
+    public function citiesRequiringScoring(): array /* Hex */ {
+        $result = [];
+        $this->board()->visitAll(
+            function (&$hex) use (&$result) {
+                if (!$hex->piece->isCity()) {
+                    return;
+                }
+                $missing = $this->board()->neighbors(
+                    $hex,
+                    function (&$nh): bool {
+                        return $nh->piece == Piece::EMPTY
+                            && $nh->type = HexType::LAND;
+                    }
+                );
+                if (count($missing) == 0) {
+                    $result[] = $hex;
+                }
+            }
+        );
+        return $result;
+    }
+
+    public function zigguratsRequiringScoring(): array {
+        $result = [];
+        $this->board()->visitAll(
+            function (&$hex) use (&$result) {
+                if (!$hex->piece->isZiggurat() || $hex->scored) {
+                    return;
+                }
+                $missing = $this->board()->neighbors(
+                    $hex,
+                    function (&$nh): bool {
+                        return $nh->piece == Piece::EMPTY
+                            && $nh->type == HexType::LAND;
+                    }
+                );
+                if (count($missing) == 0) {
+                    $result[] = $hex;
+                }
+            }
+        );
+        return $result;
+    }
 }
 
 ?>
