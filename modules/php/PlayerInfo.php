@@ -28,8 +28,8 @@ namespace Bga\Games\babylonia;
 
 // TODO: consider factoring out a "Hand" class.
 class PlayerInfo {
-    public $scored_cities = array();
-    public $scored_fields = array();
+    public $scored_cities = 0;
+    public $scored_fields = 0;
     public $hand = array(); /* PieceType */
     public $pool = array(); /* PieceType */
     public $ziggurat_cards = array(); /* ZigguratCard */
