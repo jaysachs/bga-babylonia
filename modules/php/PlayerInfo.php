@@ -77,6 +77,20 @@ class PlayerInfo {
         return $p;
     }
 
+    public function handSize(): int {
+        $result = 0;
+        foreach ($this->hand as $p) {
+            if ($p != null & $p != Piece::EMPTY) {
+                $result++;
+            }
+        }
+        return $result;
+    }
+
+    public function poolSize(): int {
+        return count($this->pool);
+    }
+
     public function handContains(Piece $piece): bool {
         foreach ($this->hand as $p) {
             if ($piece == $p) {
@@ -88,8 +102,8 @@ class PlayerInfo {
 
     /* returns false if pool is empty */
     public function refillHand() : bool {
-        $handSize = $this->handSize();
-        for ($i = 0; $i < $handSize; $i++) {
+        $maxHandSize = $this->maxHandSize();
+        for ($i = 0; $i < $maxHandSize; $i++) {
             if ($this->hand[$i] == Piece::EMPTY) {
                 if (count($this->pool) == 0) {
                     return false;
@@ -104,7 +118,7 @@ class PlayerInfo {
         return in_array($type, $this->ziggurat_cards);
     }
 
-    public function handSize() : int {
+    public function maxHandSize() : int {
         return $this->hasZigguratCard(ZigguratCard::SEVEN_TOKENS) ? 7 : 5;
     }
 }

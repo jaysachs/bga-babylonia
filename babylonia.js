@@ -74,7 +74,7 @@ function (dojo, declare) {
 		this.updateHandCount(player_id,
 				     player.hand_size);
 		this.updatePoolCount(player_id,
-				     123);
+				     player.pool_size);
 		this.updateCapturedCityCount(player_id,
 					     player.captured_city_count);
             }
@@ -82,7 +82,7 @@ function (dojo, declare) {
             this.playerNumber = gamedatas.players[this.player_id].player_number;
 
 	    // Set up the board
-            let board = $("board");
+            let board = $('board');
             console.log(gamedatas.board);
             for( let h = 0; h < gamedatas.board.length; ++h) {
                 var hex = gamedatas.board[h];
@@ -102,7 +102,7 @@ function (dojo, declare) {
 
 	    // Set up the available ziggurat tiles
 	    for( let z = 0; z < gamedatas.ziggurat_cards.length; z++) {
-		let div = document.getElementById("zig" + (z+1));
+		let div = $(`zig${z+1}`);
 		if ( gamedatas.ziggurat_cards[z].player_id == null
 		     || gamedatas.ziggurat_cards[z].player_id == 0 ) {
 		    div.classList = gamedatas.ziggurat_cards[z].ziggurat_card;
@@ -356,11 +356,11 @@ function (dojo, declare) {
 	},
 
         hexDiv: function (row, col) {
-            return document.getElementById("hex_" + row + "_" + col);
+            return $(`hex_${row}_${col}`);
         },
 
         handDiv: function (i) {
-            return document.getElementById("hand_" + i);
+            return $(`hand_${i}`);
         },
 
         handClass: function(piece) {
@@ -371,15 +371,15 @@ function (dojo, declare) {
         },
 
 	updateHandCount: function(player_id, count) {
-	    document.getElementById("handcount_" + player_id).innerHTML = count;
+	    $(`handcount_${player_id}`).innerHTML = count;
 	},
 
 	updatePoolCount: function (player_id, count) {
-	    document.getElementById("poolcount_" + player_id).innerHTML = count;
+	    $(`poolcount_${player_id}`).innerHTML = count;
 	},
 	
 	updateCapturedCityCount: function (player_id, count) {
-	    document.getElementById("citycount_" + player_id).innerHTML = count;
+	    $(`citycount_${player_id}`).innerHTML = count;
 	},
 
         renderHand: function(hand) {
@@ -392,7 +392,6 @@ function (dojo, declare) {
         },
 
         renderPlayedPiece: function (row, col, piece, playerNumber) {
-            console.log("renderpiece: " + row + "," + col + "," + piece + "," + playerNumber);
             // TODO: animate this
             let hex = this.hexDiv(row, col);
             if (playerNumber == null) {
@@ -459,7 +458,10 @@ function (dojo, declare) {
 	    console.log( "turnFinished" );
 	    console.log( notif );
 
-	    // TODO:: update handcount and poolcount
+	    this.updateHandCount(notif.args.player_id,
+				 notif.args.handcount);
+	    this.updatePoolCount(notif.args.player_id,
+				 notif.args.poolcount);
 	},
 
 	notif_cityScoredPlayer: function( notif ) {
@@ -487,10 +489,6 @@ function (dojo, declare) {
         notif_handRefilled: function( notif ) {
             console.log( 'notif_handRefilled' );
             console.log( notif );
-	    this.updateHandCount(notif.args.player_id,
-				 notif.args.handcount);
-	    this.updatePoolCount(notif.args.player_id,
-				 notif.args.poolcount);
             this.renderHand( notif.args.hand, notif.args.player_number );
         },
     });

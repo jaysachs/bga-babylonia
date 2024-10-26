@@ -85,7 +85,7 @@ class Game extends \Table
             "points" => $points,
             "score" => $this->db->retrieveScore( $player_id ),
             "i18n" => ['piece'],
-            "handcount" => count($model->playerInfo()->hand),
+            "handcount" => $model->playerInfo()->handSize(),
         ]);
 
         $this->gamestate->nextState("playPieces");
@@ -177,7 +177,7 @@ class Game extends \Table
                 $points = count($hexes) + $scores->captured_city_points[$pid];
                 $this->notifyAllPlayers("cityScoredPlayer", clienttranslate('${player_name} scored ${points}'), [
                     // TODO: make more efficient, or only pass the delta?
-                    "captued_city_count" => $pi->scored_cities,
+                    "captured_city_count" => $pi->scored_cities,
                     "scored_hexes" => $hexes,
                     "points" => $points,
                     "score" => $pd[$pid]["score"] + $points,
@@ -217,8 +217,8 @@ class Game extends \Table
         $this->notifyAllPlayers("turnFinished", "{$player_name} finished their turn", [
             "player_id" => $player_id,
             "player_number" => $this->getPlayerNoById($player_id),
-            "handcount" => count($result["hand"]),
-            "poolcount" => 0, // TODO: fix this
+            "handcount" => $pi->handSize(),
+            "poolcount" => $pi->poolSize(),
         ]);
 
         $this->notifyPlayer($player_id, "handRefilled", "{You} refilled your hand", [
