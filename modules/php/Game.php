@@ -175,7 +175,7 @@ class Game extends \Table
             foreach ($scores->playerHexes as $pid => $hexes) {
                 $pi = $model->playerInfoForPlayer($pid);
                 $points = count($hexes) + $scores->captured_city_points[$pid];
-                $this->notifyAllPlayers("cityScoredPlayer", clienttranslate('player ${player_name} scored ${points}'), [
+                $this->notifyAllPlayers("cityScoredPlayer", clienttranslate('${player_name} scored ${points}'), [
                     // TODO: make more efficient, or only pass the delta?
                     "captued_city_count" => $pi->scored_cities,
                     "scored_hexes" => $hexes,
