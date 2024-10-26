@@ -64,7 +64,9 @@ class Db {
         return $this->db->getCollectionFromDb(
             "SELECT P.player_id, P.player_score score, P.captured_city_count captured_city_count, P.player_no player_number, P.player_name player_name, H.hand_size
              FROM
-               (SELECT player_id, COUNT(*) hand_size FROM hands GROUP BY player_id) H
+               (SELECT player_id, COUNT(*) hand_size
+                FROM hands WHERE piece IS NOT NULL AND piece <> 'empty'
+                GROUP BY player_id) H
              JOIN player P
              ON P.player_id = H.player_id"
             // "SELECT P.player_id player_id,
