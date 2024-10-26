@@ -89,6 +89,11 @@ class Model {
         return $this->_played_turn;
     }
 
+    public function playerInfoForPlayer(int $player_id): PlayerInfo {
+        // TODO: cache? do better than this?
+        return $this->db->retrievePlayerInfo($player_id);
+    }
+    
     public function playerInfo(): PlayerInfo {
         if ($this->_player_info == null) {
             $this->_player_info = $this->db->retrievePlayerInfo($this->player_id);

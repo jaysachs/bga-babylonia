@@ -336,3 +336,11 @@ div.zcard8 {
 div.zcard9 {
     background-position: -800% 0%;
 }
+
+.b_playerboard_ext {
+    display: inline-block;
+}
+
+.b_playerboard_ext > div {
+    display: inline-block;
+}

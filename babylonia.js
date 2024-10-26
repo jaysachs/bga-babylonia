@@ -51,6 +51,14 @@ function (dojo, declare) {
 
         playerNumber: -1,
 
+	jstpl_player_panel: function(id, color) {
+	    return `<div class="b_playerboard_ext">
+            <div class="b_hand">hand:<span id="handcount_${id}">0</span></div>
+            <div class="b_pool">pool:<span id="poolcount_${id}">0</span></div>
+            <div class="b_citycount">cities:<span id="citycount_${id}">0</span></div>
+            </div>`;
+	},
+
         setup: function( gamedatas )
         {
             console.log( "Starting game setup" );
@@ -59,14 +67,22 @@ function (dojo, declare) {
             for( var player_id in gamedatas.players )
             {
                 var player = gamedatas.players[player_id];
-                // TODO: Set up players boards if needed, updating
-                // pool size
+
+		this.getPlayerPanelElement(player_id).innerHTML =
+		    this.jstpl_player_panel(player_id, player.color);
+
+		this.updateHandCount(player_id,
+				     player.hand_size);
+		this.updatePoolCount(player_id,
+				     123);
+		this.updateCapturedCityCount(player_id,
+					     player.captured_city_count);
             }
 
             this.playerNumber = gamedatas.players[this.player_id].player_number;
 
 	    // Set up the board
-            let c = document.getElementById("board");
+            let board = $("board");
             console.log(gamedatas.board);
             for( let h = 0; h < gamedatas.board.length; ++h) {
                 var hex = gamedatas.board[h];
@@ -74,7 +90,7 @@ function (dojo, declare) {
                 var col = hex.col;
                 let top = row * 31.75 + 6; // row / 2 * 63 + 6;
                 let left = 38 + (col * 55);
-                c.insertAdjacentHTML(
+                board.insertAdjacentHTML(
                     `beforeend`,
                     `<div id="hex_${row}_${col}" style="top:${top}px; left:${left}px;"><div><div></div></div></div>`);
                 var p = hex.piece;
@@ -86,19 +102,19 @@ function (dojo, declare) {
 
 	    // Set up the available ziggurat tiles
 	    for( let z = 0; z < gamedatas.ziggurat_cards.length; z++) {
-		let c = document.getElementById("zig" + (z+1));
+		let div = document.getElementById("zig" + (z+1));
 		if ( gamedatas.ziggurat_cards[z].player_id == null
 		     || gamedatas.ziggurat_cards[z].player_id == 0 ) {
-		    c.classList = gamedatas.ziggurat_cards[z].ziggurat_card;
+		    div.classList = gamedatas.ziggurat_cards[z].ziggurat_card;
 		} else {
-		    c.className = "";
+		    div.className = "";
 		}
 	    }
 
 	    // Set up the player's hand
             this.renderHand(gamedatas.hand);
 	    //   and owned ziggurat cards
-	    // TODO
+	    // TODO: update player board with hand/pool/city counts
 
             console.log("setting up notifications");
 
@@ -161,7 +177,7 @@ function (dojo, declare) {
 	pieceClasses: [ "priest", "servant", "farmer", "merchant" ],
 
 	removeAllAllowedMoves: function() {
-            document.getElementById("board").querySelectorAll('.playable')
+            $("board").querySelectorAll('.playable')
 		.forEach(div => div.className = '');
 	},
 	
@@ -354,6 +370,18 @@ function (dojo, declare) {
             return piece + "_" + this.playerNumber;
         },
 
+	updateHandCount: function(player_id, count) {
+	    document.getElementById("handcount_" + player_id).innerHTML = count;
+	},
+
+	updatePoolCount: function (player_id, count) {
+	    document.getElementById("poolcount_" + player_id).innerHTML = count;
+	},
+	
+	updateCapturedCityCount: function (player_id, count) {
+	    document.getElementById("citycount_" + player_id).innerHTML = count;
+	},
+
         renderHand: function(hand) {
             console.log("renderHand: " + hand);
 
@@ -381,7 +409,6 @@ function (dojo, declare) {
 
         */
 
-
         ///////////////////////////////////////////////////
         //// Player's action
 
@@ -405,6 +432,7 @@ function (dojo, declare) {
             dojo.subscribe( 'handRefilled', this, 'notif_handRefilled' );
 	    dojo.subscribe( 'cityScored', this, 'notif_cityScored' );
 	    dojo.subscribe( 'cityScoredPlayer', this, 'notif_cityScoredPlayer' );
+            dojo.subscribe( 'turnFinished', this, 'notif_turnFinished' );
 
             // TODO: here, associate your game notifications with local methods
 
@@ -427,12 +455,21 @@ function (dojo, declare) {
 	    }
 	},
 
+	notif_turnFinished: function( notif ) {
+	    console.log( "turnFinished" );
+	    console.log( notif );
+
+	    // TODO:: update handcount and poolcount
+	},
+
 	notif_cityScoredPlayer: function( notif ) {
 	    console.log( notif );
 
 	    // TODO: animate hexes contributing to scoring
 
 	    this.scoreCtrl[notif.args.player_id].toValue(notif.args.score);
+	    this.updateCapturedCityCount(notif.args.player_id,
+					 notif.args.captured_city_count);
 	},
 
         notif_piecePlayed: function( notif ) {
@@ -442,12 +479,18 @@ function (dojo, declare) {
             if (notif.args.player_number == this.playerNumber) {
                 this.handDiv(notif.args.handpos).className = this.handClass("empty");
             }
-            this.scoreCtrl[notif.args.player_id].toValue(notif.args.newscore);
+	    this.updateHandCount(notif.args.player_id,
+				 notif.args.handcount);
+            this.scoreCtrl[notif.args.player_id].toValue(notif.args.score);
         },
 
         notif_handRefilled: function( notif ) {
             console.log( 'notif_handRefilled' );
             console.log( notif );
+	    this.updateHandCount(notif.args.player_id,
+				 notif.args.handcount);
+	    this.updatePoolCount(notif.args.player_id,
+				 notif.args.poolcount);
             this.renderHand( notif.args.hand, notif.args.player_number );
         },
     });

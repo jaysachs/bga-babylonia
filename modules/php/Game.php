@@ -83,8 +83,9 @@ class Game extends \Table
             "row" => $row,
             "col" => $col,
             "points" => $points,
-            "newscore" => $this->db->retrieveScore( $player_id ),
+            "score" => $this->db->retrieveScore( $player_id ),
             "i18n" => ['piece'],
+            "handcount" => count($model->playerInfo()->hand),
         ]);
 
         $this->gamestate->nextState("playPieces");
@@ -172,8 +173,11 @@ class Game extends \Table
                 "captured_by" => $captured_by
             ]);
             foreach ($scores->playerHexes as $pid => $hexes) {
+                $pi = $model->playerInfoForPlayer($pid);
                 $points = count($hexes) + $scores->captured_city_points[$pid];
                 $this->notifyAllPlayers("cityScoredPlayer", clienttranslate('player ${player_name} scored ${points}'), [
+                    // TODO: make more efficient, or only pass the delta?
+                    "captued_city_count" => $pi->scored_cities,
                     "scored_hexes" => $hexes,
                     "points" => $points,
                     "score" => $pd[$pid]["score"] + $points,
@@ -194,23 +198,31 @@ class Game extends \Table
 
         // TODO: this doesn't belong here
         $this->doScoring($model);
-        
+
+        $player_name = $this->getActivePlayerName();
         $result = $model->finishTurn();
         if ($result["gameOver"]) {
             $this->notifyAllPlayers("gameEnded", clienttranslate('${player_name} unable to refill their hand'), [
                 "player_id" => $player_id,
-                "player_name" => $this->getActivePlayerName(),
+                "player_name" => $player_name,
             ]);
             $this->gamestate->nextState("endGame");
             return;
         }
+        $pi = $model->playerInfo();
 
         // TODO: this shouldn't return the whole hand, just the refilled parts
         // Capture the delta and return *that*. Then it can be animated on
         // the client.
-        $this->notifyPlayer($player_id, "handRefilled", "You refilled your hand", [
+        $this->notifyAllPlayers("turnFinished", "{$player_name} finished their turn", [
             "player_id" => $player_id,
             "player_number" => $this->getPlayerNoById($player_id),
+            "handcount" => count($result["hand"]),
+            "poolcount" => 0, // TODO: fix this
+        ]);
+
+        $this->notifyPlayer($player_id, "handRefilled", "{You} refilled your hand", [
+            "player_id" => $player_id,
             "hand" => $result["hand"],
         ]);
 
@@ -266,8 +278,6 @@ class Game extends \Table
      */
     protected function getAllDatas()
     {
-        $result = [];
-
         // WARNING: We must only return information visible by the current player.
         $current_player_id = intval($this->getCurrentPlayerId());
 
