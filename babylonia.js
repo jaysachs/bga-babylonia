@@ -70,7 +70,7 @@ function (dojo, declare) {
             {
                 var player = gamedatas.players[player_id];
 
-                var player_board_div =  this.getPlayerPanelElement(player_id);
+                var player_board_div = this.getPlayerPanelElement(player_id);
                 dojo.place( this.jstpl_player_board( player ),
                              player_board_div );
 
