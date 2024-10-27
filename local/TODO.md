@@ -9,3 +9,4 @@
 7. General improvement of visuals, including hex rendering and highlighting allowed moves.
   * This may involve a bit of restructuring (div-in-div?) of the board, since we use clip to make things hex sized, so just using border won't work. Ideally though we'd get the hex divs to be a single div (or at most a single div-in-div).
 8. Consider a real class for PlayerData -- or combine with PlayerInfo?
+9. Split out "PlayerHandAndPool" (or PlayerHand or PlayerPieces -- include ziggurats?) class, and change "PlayerInfo" to just be scalar data like score, captured_city_count, etc. (And maybe PlayerInfo should have the ziggurats?)
