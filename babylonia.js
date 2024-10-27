@@ -61,6 +61,16 @@ function (dojo, declare) {
         pool_counters: [],
         city_counters: [],
 
+        jstpl_hex: function( hex ) {
+            var row = hex.row;
+            var col = hex.col;
+            let top = row * 31.75 + 6; // row / 2 * 63 + 6;
+            let left = 38 + (col * 55);
+            board.insertAdjacentHTML(
+                'beforeend',
+                `<div id="hex_${row}_${col}" style="top:${top}px; left:${left}px;"><div><div></div></div></div>`);
+        },
+
         setup: function( gamedatas )
         {
             console.log( "Starting game setup" );
@@ -91,20 +101,20 @@ function (dojo, declare) {
 
             // Set up the board
             let board = $('board');
-            console.log(gamedatas.board);
+
+            // console.log( gamedatas.board );
+
             for( let h = 0; h < gamedatas.board.length; ++h) {
-                var hex = gamedatas.board[h];
-                var row = hex.row;
-                var col = hex.col;
-                let top = row * 31.75 + 6; // row / 2 * 63 + 6;
-                let left = 38 + (col * 55);
+                let hex = gamedatas.board[h];
                 board.insertAdjacentHTML(
                     `beforeend`,
-                    `<div id="hex_${row}_${col}" style="top:${top}px; left:${left}px;"><div><div></div></div></div>`);
-                var p = hex.piece;
+                    this.jstpl_hex( hex ) );
+                let p = hex.piece;
                 if (p != null) {
-                    let n = (hex.board_player == null || hex.board_player == 0) ? null : gamedatas.players[hex.board_player].player_number;
-                    this.renderPlayedPiece(row, col, p, n);
+                    let n = (hex.board_player == null || hex.board_player == 0)
+                        ? null
+                        : gamedatas.players[hex.board_player].player_number;
+                    this.renderPlayedPiece(hex.row, hex.col, p, n);
                 }
             }
 
