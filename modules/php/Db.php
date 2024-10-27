@@ -175,6 +175,10 @@ class Db {
         $this->db->DbQuery( $sql );
 
         $this->insertPlayerInfos([$player_id => $info]);
+        $sql = "UPDATE player
+                SET captured_city_count = $info->captured_city_count
+                WHERE player_id = $player_id";
+        $this->db->DbQuery( $sql );
     }
 
     public function retrievePlayerInfo(int $player_id): PlayerInfo {
@@ -191,7 +195,11 @@ class Db {
                 FROM ziggurat_cards
                 WHERE player_id = $player_id";
         $ziggurat_data = $this->db->getObjectListFromDB2( $sql );
-        return PlayerInfo::fromDbResults( $player_id, $handdata, $pooldata, $ziggurat_data );
+        $sql = "SELECT captured_city_count, player_score score
+                FROM player
+                WHERE player_id = $player_id";
+        $player_data = $this->db->getNonEmptyObjectFromDB2( $sql );
+        return PlayerInfo::fromDbResults( $player_id, $handdata, $pooldata, $ziggurat_data, $player_data );
     }
 
     public function insertPlayerInfos(array $player_infos): void {
@@ -224,7 +232,6 @@ class Db {
     }
 
     public function retrieveScore(int $player_id): int {
-        // $this->getCollectionFromDb( "SELECT player_id, player_score FROM player", true );
         $v = $this->db->getUniqueValueFromDB(
             "SELECT player_score from player WHERE player_id = $player_id "
         );

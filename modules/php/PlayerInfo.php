@@ -28,13 +28,12 @@ namespace Bga\Games\babylonia;
 
 // TODO: consider factoring out a "Hand" class.
 class PlayerInfo {
-    public $scored_cities = 0;
-    public $scored_fields = 0;
-    public $hand = array(); /* PieceType */
-    public $pool = array(); /* PieceType */
-    public $ziggurat_cards = array(); /* ZigguratCard */
-    public $score = 0;
-    public $id = 0;
+    public int $captured_city_count = 0;
+    public array $hand = array(); /* PieceType */
+    public array $pool = array(); /* PieceType */
+    public array $ziggurat_cards = array(); /* ZigguratCard */
+    public int $score = 0;
+    public int $id = 0;
 
     public static function newPlayerInfo($pid) {
         $p = new PlayerInfo();
@@ -58,7 +57,7 @@ class PlayerInfo {
         return $p;
     }
 
-    public static function fromDbResults(int $player_id, array $handdata, array $pooldata, array $ziggurat_data): PlayerInfo {
+    public static function fromDbResults(int $player_id, array $handdata, array $pooldata, array $ziggurat_data, array $player_data): PlayerInfo {
         $p = new PlayerInfo();
         for ($i = 0; $i < 7; $i++) {
             $p->hand[] = null;
@@ -74,6 +73,8 @@ class PlayerInfo {
         foreach ($ziggurat_data as $zd) {
             $p->ziggurat_cards[] = ZigguratCard::from($zd);
         }
+        $p->captured_city_count = intval($player_data['captured_city_count']);
+        $p->score = intval($player_data['score']);
         return $p;
     }
 

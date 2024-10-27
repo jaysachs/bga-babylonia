@@ -176,8 +176,8 @@ class Game extends \Table
                 $pi = $model->playerInfoForPlayer($pid);
                 $points = count($hexes) + $scores->captured_city_points[$pid];
                 $this->notifyAllPlayers("cityScoredPlayer", clienttranslate('${player_name} scored ${points}'), [
-                    // TODO: make more efficient, or only pass the delta?
-                    "captured_city_count" => $pi->scored_cities,
+                    // TODO: make more efficient, by only passing the delta?
+                    "captured_city_count" => $pi->captured_city_count,
                     "scored_hexes" => $hexes,
                     "points" => $points,
                     "score" => $pd[$pid]["score"] + $points,
@@ -415,5 +415,13 @@ class Game extends \Table
     final static public function getObjectListFromDB2(string $sql, bool $bUniqueValue = false): array
     {
         return self::getObjectListFromDB($sql, $bUniqueValue);
+    }
+
+    /*
+     * forwarder method
+     */
+    final public function getNonEmptyObjectFromDB2(string $sql): array
+    {
+        return $this->getNonEmptyObjectFromDB($sql);
     }
 }
