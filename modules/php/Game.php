@@ -85,7 +85,8 @@ class Game extends \Table
             "points" => $points,
             "score" => $this->db->retrieveScore( $player_id ),
             "i18n" => ['piece'],
-            "handcount" => $model->playerInfo()->handSize(),
+            "hand_size" => $model->playerInfo()->handSize(),
+            "pool_size" => $model->playerInfo()->poolSize(),
         ]);
 
         $this->gamestate->nextState("playPieces");
@@ -227,8 +228,8 @@ class Game extends \Table
         $this->notifyAllPlayers("turnFinished", "{$player_name} finished their turn", [
             "player_id" => $player_id,
             "player_number" => $this->getPlayerNoById($player_id),
-            "handcount" => $pi->handSize(),
-            "poolcount" => $pi->poolSize(),
+            "hand_size" => $pi->handSize(),
+            "pool_size" => $pi->poolSize(),
         ]);
 
         $this->notifyPlayer($player_id, "handRefilled", "{You} refilled your hand", [

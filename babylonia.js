@@ -82,11 +82,9 @@ function (dojo, declare) {
                 this.city_counters[player_id]=new ebg.counter();
                 this.city_counters[player_id].create('citycount_'+player_id);
 
-                this.updateHandCount(player_id, player.hand_size, false);
-                this.updatePoolCount(player_id, player.pool_size, false);
-                this.updateCapturedCityCount(player_id,
-                                             player.captured_city_count,
-                                             false);
+                this.updateHandCount(player, false);
+                this.updatePoolCount(player, false);
+                this.updateCapturedCityCount(player, false);
             }
 
             this.playerNumber = gamedatas.players[this.player_id].player_number;
@@ -380,28 +378,30 @@ function (dojo, declare) {
             return piece + "_" + this.playerNumber;
         },
 
-        updateHandCount: function(player_id, count, animate=true) {
+        updateCounter: function(counter, value, animate) {
             if (animate) {
-                this.hand_counters[player_id].toValue(count);
+                counter.toValue(value);
             } else {
-                this.hand_counters[player_id].setValue(count);
+                counter.setValue(value);
             }
         },
 
-        updatePoolCount: function (player_id, count, animate=true) {
-            if (animate) {
-                this.pool_counters[player_id].toValue(count);
-            } else {
-                this.pool_counters[player_id].setValue(count);
-            }
+        updateHandCount: function(player, animate=true) {
+            this.updateCounter(this.hand_counters[player.player_id],
+                               player.hand_size,
+                              animate);
         },
 
-        updateCapturedCityCount: function (player_id, count, animate=true) {
-            if (animate) {
-                this.city_counters[player_id].toValue(count);
-            } else {
-                this.city_counters[player_id].setValue(count);
-            }
+        updatePoolCount: function (player, animate=true) {
+            this.updateCounter(this.pool_counters[player.player_id],
+                               player.pool_size,
+                              animate);
+        },
+
+        updateCapturedCityCount: function (player, animate=true) {
+            this.updateCounter(this.city_counters[player.player_id],
+                               player.captured_city_count,
+                              animate);
         },
 
         renderHand: function(hand) {
@@ -480,10 +480,8 @@ function (dojo, declare) {
             console.log( "turnFinished" );
             console.log( notif );
 
-            this.updateHandCount(notif.args.player_id,
-                                 notif.args.handcount);
-            this.updatePoolCount(notif.args.player_id,
-                                 notif.args.poolcount);
+            this.updateHandCount( notif.args );
+            this.updatePoolCount( notif.args );
         },
 
         notif_cityScoredPlayer: function( notif ) {
@@ -492,8 +490,7 @@ function (dojo, declare) {
             // TODO: animate hexes contributing to scoring
 
             this.scoreCtrl[notif.args.player_id].toValue(notif.args.score);
-            this.updateCapturedCityCount(notif.args.player_id,
-                                         notif.args.captured_city_count);
+            this.updateCapturedCityCount(notif.args);
         },
 
         notif_piecePlayed: function( notif ) {
@@ -503,8 +500,8 @@ function (dojo, declare) {
             if (notif.args.player_number == this.playerNumber) {
                 this.handDiv(notif.args.handpos).className = this.handClass("empty");
             }
-            this.updateHandCount(notif.args.player_id,
-                                 notif.args.handcount);
+            this.updateHandCount( notif.args );
+            this.updatePoolCount( notif.args );
             this.scoreCtrl[notif.args.player_id].toValue(notif.args.score);
         },
 
