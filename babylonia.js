@@ -17,7 +17,6 @@
 
 var thegamedatas = null;
 
-
 define([
     "dojo","dojo/_base/declare",
     "ebg/core/gamegui",
@@ -51,13 +50,16 @@ function (dojo, declare) {
 
         playerNumber: -1,
 
-        jstpl_player_panel: function(id, color) {
+        jstpl_player_board: function( player ) {
             return `<div class="b_playerboard_ext">
-            <div class="b_hand">hand:<span id="handcount_${id}">0</span></div>
-            <div class="b_pool">pool:<span id="poolcount_${id}">0</span></div>
-            <div class="b_citycount">cities:<span id="citycount_${id}">0</span></div>
-            </div>`;
+            <div class="b_hand">hand:<span id="handcount_${player.player_id}">0</span></div>
+            <div class="b_pool">pool:<span id="poolcount_${player.player_id}">0</span></div>
+            <div class="b_citycount">cities:<span id="citycount_${player.player_id}">0</span></div>
+            </div>`
         },
+        hand_counters: [],
+        pool_counters: [],
+        city_counters: [],
 
         setup: function( gamedatas )
         {
@@ -68,15 +70,23 @@ function (dojo, declare) {
             {
                 var player = gamedatas.players[player_id];
 
-                this.getPlayerPanelElement(player_id).innerHTML =
-                    this.jstpl_player_panel(player_id, player.color);
+                var player_board_div =  this.getPlayerPanelElement(player_id);
+                dojo.place( this.jstpl_player_board( player ),
+                             player_board_div );
 
-                this.updateHandCount(player_id,
-                                     player.hand_size);
-                this.updatePoolCount(player_id,
-                                     player.pool_size);
+                // create counters per player
+                this.hand_counters[player_id]=new ebg.counter();
+                this.hand_counters[player_id].create('handcount_'+player_id);
+                this.pool_counters[player_id]=new ebg.counter();
+                this.pool_counters[player_id].create('poolcount_'+player_id);
+                this.city_counters[player_id]=new ebg.counter();
+                this.city_counters[player_id].create('citycount_'+player_id);
+
+                this.updateHandCount(player_id, player.hand_size, false);
+                this.updatePoolCount(player_id, player.pool_size, false);
                 this.updateCapturedCityCount(player_id,
-                                             player.captured_city_count);
+                                             player.captured_city_count,
+                                             false);
             }
 
             this.playerNumber = gamedatas.players[this.player_id].player_number;
@@ -370,16 +380,28 @@ function (dojo, declare) {
             return piece + "_" + this.playerNumber;
         },
 
-        updateHandCount: function(player_id, count) {
-            $(`handcount_${player_id}`).innerHTML = count;
+        updateHandCount: function(player_id, count, animate=true) {
+            if (animate) {
+                this.hand_counters[player_id].toValue(count);
+            } else {
+                this.hand_counters[player_id].setValue(count);
+            }
         },
 
-        updatePoolCount: function (player_id, count) {
-            $(`poolcount_${player_id}`).innerHTML = count;
+        updatePoolCount: function (player_id, count, animate=true) {
+            if (animate) {
+                this.pool_counters[player_id].toValue(count);
+            } else {
+                this.pool_counters[player_id].setValue(count);
+            }
         },
 
-        updateCapturedCityCount: function (player_id, count) {
-            $(`citycount_${player_id}`).innerHTML = count;
+        updateCapturedCityCount: function (player_id, count, animate=true) {
+            if (animate) {
+                this.city_counters[player_id].toValue(count);
+            } else {
+                this.city_counters[player_id].setValue(count);
+            }
         },
 
         renderHand: function(hand) {
