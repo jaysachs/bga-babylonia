@@ -190,8 +190,8 @@ class Model {
         case Piece::FIELD_7:
             $fs = 7; break;
         case Piece::FIELD_CITIES:
-            // TODO: need a global captured city-count
-            $fs = 0; // $overall_captured_city_count;
+            // TODO?: use and maintain a global captured city-count?
+            $fs = $this->totalCapturedCities();
             break;
         }
         $zigs = $this->board()->neighbors($hex, function (&$h): bool {
@@ -213,6 +213,14 @@ class Model {
             "points" => $points,
             "piece" => $piece
         ];
+    }
+
+    private function totalCapturedCities(): int {
+        $result = 0;
+        foreach ($this->allPlayersData() as $pid => $pd) {
+            $result += $pd["captured_city_count"];
+        }
+        return $result;
     }
 
     public function playableHexes(Piece $piece): array {
