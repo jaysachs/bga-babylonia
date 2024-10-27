@@ -2,7 +2,7 @@
 -- ------
 -- BGA framework: Gregory Isabelli & Emmanuel Colin & BoardGameArena
 -- babylonia implementation : © Jay Sachs <jay@covariant.org>
--- 
+--
 -- This code has been produced on the BGA studio platform for use on http://boardgamearena.com.
 -- See http://en.boardgamearena.com/#!doc/Studio for more information.
 -- -----
@@ -50,7 +50,7 @@ CREATE TABLE IF NOT EXISTS `hands` (
 
 -- Needed to determine allowable plays (e.g. 3+ if all farmers, some ziggurat powers)
 -- Also useful for incremental undo.
-CREATE TABLE IF NOT EXISTS `moves_this_turn` (
+CREATE TABLE IF NOT EXISTS `turn_progress` (
   `player_id` int(10) unsigned NOT NULL,
   `seq_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `piece` varchar(8) DEFAULT NULL,

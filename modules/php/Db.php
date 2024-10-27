@@ -101,8 +101,8 @@ class Db {
         );
     }
 
-    public function removePlayedMoves(int $player_id): void {
-        $sql = "DELETE FROM moves_this_turn WHERE player_id=$player_id";
+    public function removeTurnProgress(int $player_id): void {
+        $sql = "DELETE FROM turn_progress WHERE player_id=$player_id";
         $this->db->DbQuery( $sql );
     }
 
@@ -121,7 +121,7 @@ class Db {
     public function insertMove(Move $move) {
         $c = $this->boolValue($move->captured);
         $piece = $move->piece->value;
-        $this->db->DbQuery( "INSERT INTO moves_this_turn
+        $this->db->DbQuery( "INSERT INTO turn_progress
                       (player_id, seq_id, piece, handpos, board_row, board_col, captured, points)
                       VALUES($move->player_id, NULL, '$piece', $move->handpos, $move->row, $move->col, $c, $move->points)");
         // update board state
@@ -148,17 +148,17 @@ class Db {
              WHERE player_id=$move->player_id AND pos=$move->handpos");
     }
 
-    public function retrievePlayedTurn(int $player_id): PlayedTurn {
+    public function retrieveTurnProgress(int $player_id): TurnProgress {
         $dbresults = $this->db->getCollectionFromDb(
             "SELECT seq_id, player_id, handpos, piece, board_row, board_col, captured, points
-             FROM moves_this_turn
+             FROM turn_progress
              WHERE player_id = $player_id
              ORDER BY seq_id");
         $moves = [];
         foreach ($dbresults as &$res) {
             $moves[] = Move::fromDbResults($res);
         }
-        return new PlayedTurn($moves);
+        return new TurnProgress($moves);
     }
 
     public function updateHex(Hex $hex): void {

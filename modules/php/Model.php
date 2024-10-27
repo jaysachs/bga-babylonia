@@ -29,10 +29,10 @@ namespace Bga\Games\babylonia;
 class Model {
 
     private ?Board $_board = null;
-    private ?PlayedTurn $_played_turn = null;
+    private ?TurnProgress $_turn_progress = null;
     private ?PlayerInfo $_player_info = null;
     private ?array $_playerData = null;
-    
+
     public function __construct(private Db $db, private int $player_id) { }
 
     public function createNewGame(array $player_ids, bool $use_advanced_ziggurats): void {
@@ -70,11 +70,11 @@ class Model {
         }
         return $this->_playerData;
     }
-    
+
     private function allPlayerIds(): array {
         return array_keys($this->allPlayersData());
     }
-    
+
     public function board(): Board {
         if ($this->_board == null) {
             $this->_board = $this->db->retrieveBoard();
@@ -82,18 +82,18 @@ class Model {
         return $this->_board;
     }
 
-    public function playedTurn(): PlayedTurn {
-        if ($this->_played_turn == null) {
-            $this->_played_turn = $this->db->retrievePlayedTurn($this->player_id);
+    public function turnProgress(): TurnProgress {
+        if ($this->_turn_progress == null) {
+            $this->_turn_progress = $this->db->retrieveTurnProgress($this->player_id);
         }
-        return $this->_played_turn;
+        return $this->_turn_progress;
     }
 
     public function playerInfoForPlayer(int $player_id): PlayerInfo {
         // TODO: cache? do better than this?
         return $this->db->retrievePlayerInfo($player_id);
     }
-    
+
     public function playerInfo(): PlayerInfo {
         if ($this->_player_info == null) {
             $this->_player_info = $this->db->retrievePlayerInfo($this->player_id);
@@ -103,12 +103,12 @@ class Model {
 
     public function isPlayAllowed(Piece $piece, Hex $hex): bool {
         // first check move limits per turn
-        if (count($this->playedTurn()->moves) >= 2) {
+        if (count($this->turnProgress()->moves) >= 2) {
             if ($hex->isWater()) {
                 return false;
             }
             if ($piece->isFarmer()) {
-                if (!$this->playedTurn()->allMovesFarmersOnLand($this->board())) {
+                if (!$this->turnProgress()->allMovesFarmersOnLand($this->board())) {
                     return false;
                 }
                 // fall through
@@ -158,7 +158,6 @@ class Model {
     }
 
     public function playPiece(int $handpos, int $row, int $col): array {
-        $played_turn = $this->db->retrievePlayedTurn($this->player_id);
         // also retrieve ziggurat tiles held
 
         $piece = $this->db->retrieveHandPiece($this->player_id, $handpos);
@@ -204,7 +203,7 @@ class Model {
         $points = $fs + $zs;
 
         $move = new Move($this->player_id, $piece, $handpos, $row, $col, false, $points);
-        $this->playedTurn()->addMove($move);
+        $this->turnProgress()->addMove($move);
 
         // update the database
         $this->db->insertMove($move);
@@ -241,7 +240,7 @@ class Model {
                 "gameOver" => true
             ];
         }
-        
+
         $this->db->updatePlayerInfo($this->player_id, $info);
 
         $hand = [];
@@ -249,7 +248,7 @@ class Model {
             $hand[] = ["piece" => ($piece == null) ? null : $piece->value];
         }
 
-        $this->db->removePlayedMoves($this->player_id);
+        $this->db->removeTurnProgress($this->player_id);
         return [
             "gameOver" => false,
             "hand" => $hand
@@ -329,7 +328,7 @@ class Model {
         }
         $result = new ScoredCity($hex->piece, $this->allPlayerIds());
         $result->captured_by = $this->computeTileWinner($hex);
-    
+
         $seen = [];
         $neighbors = $this->board()->neighbors(
             $hex,

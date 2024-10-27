@@ -26,8 +26,7 @@ declare(strict_types=1);
 
 namespace Bga\Games\babylonia;
 
-// TODO: need better name for this. "TurnSoFar"? "TurnProgress"?
-class PlayedTurn {
+class TurnProgress {
     function __construct(public array &$moves) {}
 
     public function addMove(Move $move) {
