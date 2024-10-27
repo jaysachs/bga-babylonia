@@ -71,30 +71,32 @@ function (dojo, declare) {
                 `<div id="hex_${row}_${col}" style="top:${top}px; left:${left}px;"><div><div></div></div></div>`);
         },
 
+        setupPlayerBoard( player ) {
+            let player_id = player.player_id;
+            let player_board_div = this.getPlayerPanelElement(player_id);
+            dojo.place( this.jstpl_player_board( player ),
+                        player_board_div );
+
+            // create counters per player
+            this.hand_counters[player_id]=new ebg.counter();
+            this.hand_counters[player_id].create('handcount_'+player_id);
+            this.pool_counters[player_id]=new ebg.counter();
+            this.pool_counters[player_id].create('poolcount_'+player_id);
+            this.city_counters[player_id]=new ebg.counter();
+            this.city_counters[player_id].create('citycount_'+player_id);
+
+            this.updateHandCount(player, false);
+            this.updatePoolCount(player, false);
+            this.updateCapturedCityCount(player, false);
+        },
+
         setup: function( gamedatas )
         {
             console.log( "Starting game setup" );
             thegamedatas = gamedatas;
             // Setting up player boards
-            for( var player_id in gamedatas.players )
-            {
-                var player = gamedatas.players[player_id];
-
-                var player_board_div = this.getPlayerPanelElement(player_id);
-                dojo.place( this.jstpl_player_board( player ),
-                             player_board_div );
-
-                // create counters per player
-                this.hand_counters[player_id]=new ebg.counter();
-                this.hand_counters[player_id].create('handcount_'+player_id);
-                this.pool_counters[player_id]=new ebg.counter();
-                this.pool_counters[player_id].create('poolcount_'+player_id);
-                this.city_counters[player_id]=new ebg.counter();
-                this.city_counters[player_id].create('citycount_'+player_id);
-
-                this.updateHandCount(player, false);
-                this.updatePoolCount(player, false);
-                this.updateCapturedCityCount(player, false);
+            for( var player_id in gamedatas.players ) {
+                this.setupPlayerBoard( gamedatas.players[player_id] );
             }
 
             this.playerNumber = gamedatas.players[this.player_id].player_number;
@@ -130,13 +132,11 @@ function (dojo, declare) {
             }
 
             // Set up the player's hand
+            console.log( 'rendering hand' );
             this.renderHand(gamedatas.hand);
             //   and owned ziggurat cards
-            // TODO: update player board with hand/pool/city counts
 
-            console.log("setting up notifications");
-
-            // Setup game notifications to handle (see "setupNotifications" method below)
+            console.log( "setting up notifications" );
             this.setupNotifications();
 
             console.log( "Ending game setup" );
