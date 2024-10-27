@@ -64,7 +64,7 @@ class Model {
         $this->db->insertZigguratCards($ziggurats);
     }
 
-    public function allPlayersData(): array {
+    public function &allPlayersData(): array {
         if ($this->_playerData == null) {
             $this->_playerData = $this->db->retrievePlayersData();
         }
@@ -250,24 +250,35 @@ class Model {
 
     public function scoreCity(Hex $hex): ScoredCity {
         $scores = $this->computeCityScores($hex);
-        $player_data = $this->allPlayersData();
-        foreach ($scores->playerHexes as $pid => $hexes) {
-            $player_data[$pid]["score"] += count($hexes);
-        }
+        $player_data = &$this->AllPlayersData();
+
+        // Increase captured_city_count for capturing player, if any
         if ($scores->captured_by > 0) {
             $player_data[$scores->captured_by]["captured_city_count"]++;
         }
 
-        $h = $this->board()->hexAt($hex->row, $hex->col);
-        $p = $h->captureCity();
-
+        // Now each player gets 1 point for city they've captured.
         foreach ($player_data as $pid => $pd) {
+            // TODO: this is weird, just tacking on data
+            // TODO: incorporate ziggurat card
             $scores->captured_city_points[$pid] =
-                intval(floor($pd["captured_city_count"] / 2));
+                $pd["captured_city_count"];
         }
 
-        $this->db->updateHex($hex);
+        // Give players points for connected pieces
+        foreach ($player_data as $pid => $unused) {
+            $player_data[$pid]["score"] += $scores->pointsForPlayer($pid);
+        }
+
+        // Mark the hex captured
+        // TODO: this is defensive, since we use the incoming hex
+        //  only as coordinates.
+        $captured_hex = $this->board()->hexAt($hex->row, $hex->col);
+        $_unused = $captured_hex->captureCity();
+
+        $this->db->updateHex($captured_hex);
         $this->db->updatePlayers($player_data);
+
         // TODO: update global captured city count in db globals
         return $scores;
     }
@@ -308,7 +319,7 @@ class Model {
         if (!$this->cityRequiresScoring($hex)) {
             throw new \InvalidArgumentException("$hex is not a city to be scored");
         }
-        $result = ScoredCity::forPlayerIds($hex->piece, $this->allPlayerIds());
+        $result = new ScoredCity($hex->piece, $this->allPlayerIds());
         $result->captured_by = $this->computeTileWinner($hex);
     
         $seen = [];

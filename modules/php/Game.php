@@ -158,37 +158,47 @@ class Game extends \Table
     private function doScoring(Model $model): void {
 
         $pd = $this->db->retrievePlayersData();
-        
+
         foreach ($model->citiesRequiringScoring() as $cityhex) {
             $city = $cityhex->piece->value;
-            $scores = $model->scoreCity($cityhex);
+            $scored_city = $model->scoreCity($cityhex);
             $captured_by = "noone";
-            if ($scores->captured_by > 0) {
-                $captured_by = $pd[$scores->captured_by]["player_name"];
+            if ($scored_city->captured_by > 0) {
+                $captured_by = $pd[$scored_city->captured_by]["player_name"];
             }
-            $this->notifyAllPlayers("cityScored", clienttranslate('${city} ${row},${col} scored, captured by ${captured_by}'), [
+
+            // First notify that the city was captured
+            $this->notifyAllPlayers(
+                "cityScored",
+                clienttranslate('${city} ${row},${col} scored, captured by ${captured_by}'
+                ), [
                 "city" => $city,
                 "row" => $cityhex->row,
                 "col" => $cityhex->col,
                 "captured_by" => $captured_by
-            ]);
-            foreach ($scores->playerHexes as $pid => $hexes) {
+                ]
+            );
+
+            // Then notify of the scoring details
+            foreach (array_keys($pd) as $pid) {
                 $pi = $model->playerInfoForPlayer($pid);
-                $points = count($hexes) + $scores->captured_city_points[$pid];
-                $this->notifyAllPlayers("cityScoredPlayer", clienttranslate('${player_name} scored ${points}'), [
-                    // TODO: make more efficient, by only passing the delta?
-                    "captured_city_count" => $pi->captured_city_count,
-                    "scored_hexes" => $hexes,
-                    "points" => $points,
-                    "score" => $pd[$pid]["score"] + $points,
-                    "player_id" => $pid,
-                    "player_name" => $pd[$pid]["player_name"]
-                ]);
+                $this->notifyAllPlayers(
+                    "cityScoredPlayer",
+                    clienttranslate('${player_name} scored ${points}'), [
+                        // TODO: make more efficient, by only passing the delta?
+                        "captured_city_count" => $pi->captured_city_count,
+                        "scored_hexes" => $scored_city->hexesScoringForPlayer($pid),
+                        "points" => $scored_city->pointsForPlayer($pid),
+                        "score" => $pi->score,
+                        "player_id" => $pid,
+                        "player_name" => $pd[$pid]["player_name"]
+                    ]
+                );
             }
         }
-        
+
     }
-    
+
     /**
      * Called when state finishTurn is entered.
      */
