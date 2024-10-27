@@ -51,37 +51,37 @@ function (dojo, declare) {
 
         playerNumber: -1,
 
-	jstpl_player_panel: function(id, color) {
-	    return `<div class="b_playerboard_ext">
+        jstpl_player_panel: function(id, color) {
+            return `<div class="b_playerboard_ext">
             <div class="b_hand">hand:<span id="handcount_${id}">0</span></div>
             <div class="b_pool">pool:<span id="poolcount_${id}">0</span></div>
             <div class="b_citycount">cities:<span id="citycount_${id}">0</span></div>
             </div>`;
-	},
+        },
 
         setup: function( gamedatas )
         {
             console.log( "Starting game setup" );
-	    thegamedatas = gamedatas;
+            thegamedatas = gamedatas;
             // Setting up player boards
             for( var player_id in gamedatas.players )
             {
                 var player = gamedatas.players[player_id];
 
-		this.getPlayerPanelElement(player_id).innerHTML =
-		    this.jstpl_player_panel(player_id, player.color);
+                this.getPlayerPanelElement(player_id).innerHTML =
+                    this.jstpl_player_panel(player_id, player.color);
 
-		this.updateHandCount(player_id,
-				     player.hand_size);
-		this.updatePoolCount(player_id,
-				     player.pool_size);
-		this.updateCapturedCityCount(player_id,
-					     player.captured_city_count);
+                this.updateHandCount(player_id,
+                                     player.hand_size);
+                this.updatePoolCount(player_id,
+                                     player.pool_size);
+                this.updateCapturedCityCount(player_id,
+                                             player.captured_city_count);
             }
 
             this.playerNumber = gamedatas.players[this.player_id].player_number;
 
-	    // Set up the board
+            // Set up the board
             let board = $('board');
             console.log(gamedatas.board);
             for( let h = 0; h < gamedatas.board.length; ++h) {
@@ -100,21 +100,21 @@ function (dojo, declare) {
                 }
             }
 
-	    // Set up the available ziggurat tiles
-	    for( let z = 0; z < gamedatas.ziggurat_cards.length; z++) {
-		let div = $(`zig${z+1}`);
-		if ( gamedatas.ziggurat_cards[z].player_id == null
-		     || gamedatas.ziggurat_cards[z].player_id == 0 ) {
-		    div.classList = gamedatas.ziggurat_cards[z].ziggurat_card;
-		} else {
-		    div.className = "";
-		}
-	    }
+            // Set up the available ziggurat tiles
+            for( let z = 0; z < gamedatas.ziggurat_cards.length; z++) {
+                let div = $(`zig${z+1}`);
+                if ( gamedatas.ziggurat_cards[z].player_id == null
+                     || gamedatas.ziggurat_cards[z].player_id == 0 ) {
+                    div.classList = gamedatas.ziggurat_cards[z].ziggurat_card;
+                } else {
+                    div.className = "";
+                }
+            }
 
-	    // Set up the player's hand
+            // Set up the player's hand
             this.renderHand(gamedatas.hand);
-	    //   and owned ziggurat cards
-	    // TODO: update player board with hand/pool/city counts
+            //   and owned ziggurat cards
+            // TODO: update player board with hand/pool/city counts
 
             console.log("setting up notifications");
 
@@ -139,8 +139,8 @@ function (dojo, declare) {
                 console.log("More than one piece selected?!");
             }
             console.log("Selected hand piece div id: " + s[0].id);
-	    let foo = s[0].id.split("_");
-	    let piece = foo[0];
+            let foo = s[0].id.split("_");
+            let piece = foo[0];
             let pos = foo[1];
             let e = event.target;
             while (e.parentElement != null && e.parentElement.id != "board") {
@@ -150,13 +150,13 @@ function (dojo, declare) {
                 console.log("didn't click on a hex");
                 return;
             }
-	    // now check if it's allowed
-	    let ae = e.firstElementChild.firstElementChild;
-	    if (!ae.classList.contains('playable')) {
-		console.log('not playable');
-		return;
-	    }
-	    
+            // now check if it's allowed
+            let ae = e.firstElementChild.firstElementChild;
+            if (!ae.classList.contains('playable')) {
+                console.log('not playable');
+                return;
+            }
+
             let id = e.id.split("_");
             let row = id[1];
             let col = id[2];
@@ -172,50 +172,50 @@ function (dojo, declare) {
             });
         },
 
-	allowedMoves: [],
+        allowedMoves: [],
 
-	pieceClasses: [ "priest", "servant", "farmer", "merchant" ],
+        pieceClasses: [ "priest", "servant", "farmer", "merchant" ],
 
-	removeAllAllowedMoves: function() {
+        removeAllAllowedMoves: function() {
             $("board").querySelectorAll('.playable')
-		.forEach(div => div.className = '');
-	},
-	
-	pieceForHandDivClassList: function(cl) {
-	    console.log("pieceFor: " + cl);
-	    for (var i = 0; i < this.pieceClasses.length; ++i) {
-		if (cl.contains(this.handClass(this.pieceClasses[i]))) {
-		    return this.pieceClasses[i];
-		}
-	    }
-	    return null;
-	},
+                .forEach(div => div.className = '');
+        },
 
-	allowedMovesFor: function(cl) {
-	    let p = this.pieceForHandDivClassList(cl);
-	    if (p == null) {
-		console.log("no playable piece found");
-		return [];
-	    }
-	    console.log("hexes playable for " + p + "=" + this.allowedMoves[p]);
-	    let m = this.allowedMoves[p];
-	    if (m == null) {
-		m = [];
-	    }
-	    return m;
-	},
-	
-	addPlayableFor: function(cl) {
-	    this.allowedMovesFor(cl).forEach(rc => {
-		this.hexDiv(rc.row, rc.col).firstElementChild.firstElementChild.className = 'playable';
-	    });
-	},
+        pieceForHandDivClassList: function(cl) {
+            console.log("pieceFor: " + cl);
+            for (var i = 0; i < this.pieceClasses.length; ++i) {
+                if (cl.contains(this.handClass(this.pieceClasses[i]))) {
+                    return this.pieceClasses[i];
+                }
+            }
+            return null;
+        },
 
-	removePlayableFor: function(cl) {
-	    this.allowedMovesFor(cl).forEach(rc => {
-		this.hexDiv(rc.row, rc.col).firstElementChild.firstElementChild.className = '';
-	    });
-	},
+        allowedMovesFor: function(cl) {
+            let p = this.pieceForHandDivClassList(cl);
+            if (p == null) {
+                console.log("no playable piece found");
+                return [];
+            }
+            console.log("hexes playable for " + p + "=" + this.allowedMoves[p]);
+            let m = this.allowedMoves[p];
+            if (m == null) {
+                m = [];
+            }
+            return m;
+        },
+
+        addPlayableFor: function(cl) {
+            this.allowedMovesFor(cl).forEach(rc => {
+                this.hexDiv(rc.row, rc.col).firstElementChild.firstElementChild.className = 'playable';
+            });
+        },
+
+        removePlayableFor: function(cl) {
+            this.allowedMovesFor(cl).forEach(rc => {
+                this.hexDiv(rc.row, rc.col).firstElementChild.firstElementChild.className = '';
+            });
+        },
 
         onPieceSelection: function(event) {
             console.log("onPieceSelection");
@@ -228,18 +228,18 @@ function (dojo, declare) {
             let hc = e.parentElement;
             if (hc.id == "hand") {
                 let c = e.classList;
-		if (this.allowedMovesFor(c).length > 0) {
+                if (this.allowedMovesFor(c).length > 0) {
                     if (!c.contains("selected")) {
                         hc.querySelectorAll('.selected').forEach(div => {
-			    if (div.classList.contains('selected')) {
-				this.removePlayableFor(div.classList);
-			    }
-			    div.classList.remove('selected');
-			});
-			this.addPlayableFor(c);
+                            if (div.classList.contains('selected')) {
+                                this.removePlayableFor(div.classList);
+                            }
+                            div.classList.remove('selected');
+                        });
+                        this.addPlayableFor(c);
                     } else {
-			this.removePlayableFor(c);
-		    }
+                        this.removePlayableFor(c);
+                    }
                     c.toggle("selected");
                 }
             }
@@ -311,37 +311,37 @@ function (dojo, declare) {
             {
                 switch( stateName )
                 {
-		    // If we want to get fancy, can even roll own HTML for buttons:
-		    // this.addActionButton(
-		    // 	'gear_button',
-		    // 	'<div id="gear_token" class="skills_and_techniques gear_token"></div>',
-		    // 	'onSelectAssetType', null, false, 'blue');
+                    // If we want to get fancy, can even roll own HTML for buttons:
+                    // this.addActionButton(
+                    //  'gear_button',
+                    //  '<div id="gear_token" class="skills_and_techniques gear_token"></div>',
+                    //  'onSelectAssetType', null, false, 'blue');
 
                     case 'playPieces':
-		    if (args.canEndTurn) {
-			if (args.allowedMoves.length == 0) {
-			    this.updateStatusBar('You must end your turn');
-			} else {
-			    this.updateStatusBar('You may play a piece or end your turn');
-			}
-			this.addActionButton(
-			    'end-btn',
-			    'End turn',
-			    () => this.bgaPerformAction("actDonePlayPieces").then(() => this.removeAllAllowedMoves())
-		    );
-		    } else {
-			this.updateStatusBar('You must play a piece');
-		    }
+                    if (args.canEndTurn) {
+                        if (args.allowedMoves.length == 0) {
+                            this.updateStatusBar('You must end your turn');
+                        } else {
+                            this.updateStatusBar('You may play a piece or end your turn');
+                        }
+                        this.addActionButton(
+                            'end-btn',
+                            'End turn',
+                            () => this.bgaPerformAction("actDonePlayPieces").then(() => this.removeAllAllowedMoves())
+                    );
+                    } else {
+                        this.updateStatusBar('You must play a piece');
+                    }
 
-		    // save allowedMoves so selection can highlight hexes
-		    // and enforce placement rules.
-		    this.allowedMoves = args.allowedMoves;
-		    this.removeAllAllowedMoves();
-		    
-		    this.addActionButton(
-			'undo-btn',
-			'Undo',
-			() => window.alert('undo not supported'));
+                    // save allowedMoves so selection can highlight hexes
+                    // and enforce placement rules.
+                    this.allowedMoves = args.allowedMoves;
+                    this.removeAllAllowedMoves();
+
+                    this.addActionButton(
+                        'undo-btn',
+                        'Undo',
+                        () => window.alert('undo not supported'));
                     break;
                 }
             }
@@ -350,10 +350,10 @@ function (dojo, declare) {
         ///////////////////////////////////////////////////
         //// Utility methods
 
-	updateStatusBar: function(message) {
+        updateStatusBar: function(message) {
             $('gameaction_status').innerHTML = _(message);
             $('pagemaintitletext').innerHTML = _(message);
-	},
+        },
 
         hexDiv: function (row, col) {
             return $(`hex_${row}_${col}`);
@@ -370,17 +370,17 @@ function (dojo, declare) {
             return piece + "_" + this.playerNumber;
         },
 
-	updateHandCount: function(player_id, count) {
-	    $(`handcount_${player_id}`).innerHTML = count;
-	},
+        updateHandCount: function(player_id, count) {
+            $(`handcount_${player_id}`).innerHTML = count;
+        },
 
-	updatePoolCount: function (player_id, count) {
-	    $(`poolcount_${player_id}`).innerHTML = count;
-	},
-	
-	updateCapturedCityCount: function (player_id, count) {
-	    $(`citycount_${player_id}`).innerHTML = count;
-	},
+        updatePoolCount: function (player_id, count) {
+            $(`poolcount_${player_id}`).innerHTML = count;
+        },
+
+        updateCapturedCityCount: function (player_id, count) {
+            $(`citycount_${player_id}`).innerHTML = count;
+        },
 
         renderHand: function(hand) {
             console.log("renderHand: " + hand);
@@ -429,8 +429,8 @@ function (dojo, declare) {
 
             dojo.subscribe( 'piecePlayed', this, 'notif_piecePlayed' );
             dojo.subscribe( 'handRefilled', this, 'notif_handRefilled' );
-	    dojo.subscribe( 'cityScored', this, 'notif_cityScored' );
-	    dojo.subscribe( 'cityScoredPlayer', this, 'notif_cityScoredPlayer' );
+            dojo.subscribe( 'cityScored', this, 'notif_cityScored' );
+            dojo.subscribe( 'cityScoredPlayer', this, 'notif_cityScoredPlayer' );
             dojo.subscribe( 'turnFinished', this, 'notif_turnFinished' );
 
             // TODO: here, associate your game notifications with local methods
@@ -446,33 +446,33 @@ function (dojo, declare) {
             //
         },
 
-	notif_cityScored: function( notif ) {
-	    console.log( notif );
-	    this.renderPlayedPiece( notif.args.row, notif.args.col, 'empty', null );
-	    if ( notif.args.captured_by != 0 ) {
-		// TODO: update player and global city scored count
-	    }
-	},
+        notif_cityScored: function( notif ) {
+            console.log( notif );
+            this.renderPlayedPiece( notif.args.row, notif.args.col, 'empty', null );
+            if ( notif.args.captured_by != 0 ) {
+                // TODO: update player and global city scored count
+            }
+        },
 
-	notif_turnFinished: function( notif ) {
-	    console.log( "turnFinished" );
-	    console.log( notif );
+        notif_turnFinished: function( notif ) {
+            console.log( "turnFinished" );
+            console.log( notif );
 
-	    this.updateHandCount(notif.args.player_id,
-				 notif.args.handcount);
-	    this.updatePoolCount(notif.args.player_id,
-				 notif.args.poolcount);
-	},
+            this.updateHandCount(notif.args.player_id,
+                                 notif.args.handcount);
+            this.updatePoolCount(notif.args.player_id,
+                                 notif.args.poolcount);
+        },
 
-	notif_cityScoredPlayer: function( notif ) {
-	    console.log( notif );
+        notif_cityScoredPlayer: function( notif ) {
+            console.log( notif );
 
-	    // TODO: animate hexes contributing to scoring
+            // TODO: animate hexes contributing to scoring
 
-	    this.scoreCtrl[notif.args.player_id].toValue(notif.args.score);
-	    this.updateCapturedCityCount(notif.args.player_id,
-					 notif.args.captured_city_count);
-	},
+            this.scoreCtrl[notif.args.player_id].toValue(notif.args.score);
+            this.updateCapturedCityCount(notif.args.player_id,
+                                         notif.args.captured_city_count);
+        },
 
         notif_piecePlayed: function( notif ) {
             console.log( 'notif_piecePlayed' );
@@ -481,8 +481,8 @@ function (dojo, declare) {
             if (notif.args.player_number == this.playerNumber) {
                 this.handDiv(notif.args.handpos).className = this.handClass("empty");
             }
-	    this.updateHandCount(notif.args.player_id,
-				 notif.args.handcount);
+            this.updateHandCount(notif.args.player_id,
+                                 notif.args.handcount);
             this.scoreCtrl[notif.args.player_id].toValue(notif.args.score);
         },
 
