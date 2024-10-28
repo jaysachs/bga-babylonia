@@ -101,7 +101,7 @@ enum Piece: string {
             },
             Piece::SERVANT => match ($this) {
                 Piece::CITY_S,
-                Piece::CITY_SP,
+                Piece::CITY_MS,
                 Piece::CITY_SP,
                 Piece::CITY_MSP => true,
                 default => false,
