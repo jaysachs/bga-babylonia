@@ -257,11 +257,11 @@ class Model {
     }
 
     /* return true if game should end */
-    public function finishTurn(): array {
+    public function finishTurn(): bool {
         $hand = $this->hand();
         $this->refillHand();
-        $this->db->updateHand($hand);
-        $this->db->updatePool($this->pool());
+        $this->db->upsertHand($this->player_id, $hand);
+        $this->db->upsertPool($this->player_id, $this->pool());
 
         // set sizes on info, persist it?
         // $info = $this->playerInfo();
