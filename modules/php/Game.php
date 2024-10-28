@@ -158,14 +158,14 @@ class Game extends \Table
 
     private function doScoring(Model $model): void {
 
-        $pd = $this->db->retrievePlayersData();
+        $player_infos = $model->allPlayerInfo();
 
         foreach ($model->citiesRequiringScoring() as $cityhex) {
             $city = $cityhex->piece->value;
             $scored_city = $model->scoreCity($cityhex);
             $captured_by = "noone";
             if ($scored_city->captured_by > 0) {
-                $captured_by = $pd[$scored_city->captured_by]["player_name"];
+                $captured_by = $player_infos[$scored_city->captured_by]->player_name;
             }
 
             // First notify that the city was captured
@@ -181,8 +181,7 @@ class Game extends \Table
             );
 
             // Then notify of the scoring details
-            foreach (array_keys($pd) as $pid) {
-                $pi = $this->db->retrievePlayerInfo($pid);
+            foreach ($player_infos as $pid => $pi) {
                 $this->notifyAllPlayers(
                     "cityScoredPlayer",
                     clienttranslate('${player_name} scored ${points}'), [
@@ -192,7 +191,7 @@ class Game extends \Table
                         "points" => $scored_city->pointsForPlayer($pid),
                         "score" => $pi->score,
                         "player_id" => $pid,
-                        "player_name" => $pd[$pid]["player_name"]
+                        "player_name" => $pi->player_name,
                     ]
                 );
             }
