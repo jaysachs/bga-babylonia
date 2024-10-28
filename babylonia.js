@@ -50,11 +50,11 @@ function (dojo, declare) {
 
         playerNumber: -1,
 
-        jstpl_player_board: function( player ) {
+        jstpl_player_board: function( player_id, player ) {
             return `<div class="b_playerboard_ext">
-            <div class="b_hand">hand:<span id="handcount_${player.player_id}">0</span></div>
-            <div class="b_pool">pool:<span id="poolcount_${player.player_id}">0</span></div>
-            <div class="b_citycount">cities:<span id="citycount_${player.player_id}">0</span></div>
+            <div class="b_hand">hand:<span id="handcount_${player_id}">0</span></div>
+            <div class="b_pool">pool:<span id="poolcount_${player_id}">0</span></div>
+            <div class="b_citycount">cities:<span id="citycount_${player_id}">0</span></div>
             </div>`
         },
         hand_counters: [],
@@ -71,10 +71,12 @@ function (dojo, declare) {
                 `<div id="hex_${row}_${col}" style="top:${top}px; left:${left}px;"><div><div></div></div></div>`);
         },
 
-        setupPlayerBoard( player ) {
+        setupPlayerBoard: function( player ) {
             let player_id = player.player_id;
+            console.log("Setting up board for player " + player_id);
+            console.log( player );
             let player_board_div = this.getPlayerPanelElement(player_id);
-            dojo.place( this.jstpl_player_board( player ),
+            dojo.place( this.jstpl_player_board( player_id, player ),
                         player_board_div );
 
             // create counters per player
@@ -95,12 +97,15 @@ function (dojo, declare) {
             console.log( "Starting game setup" );
             thegamedatas = gamedatas;
             // Setting up player boards
+            console.log("Setting up player boards");
             for( var player_id in gamedatas.players ) {
+                console.log(player_id);
                 this.setupPlayerBoard( gamedatas.players[player_id] );
             }
 
             this.playerNumber = gamedatas.players[this.player_id].player_number;
 
+            console.log("Setting the the game board");
             // Set up the board
             let board = $('board');
 
@@ -120,6 +125,7 @@ function (dojo, declare) {
                 }
             }
 
+            console.log("Setting up available ziggurat cards");
             // Set up the available ziggurat tiles
             for( let z = 0; z < gamedatas.ziggurat_cards.length; z++) {
                 let div = $(`zig${z+1}`);
@@ -399,19 +405,19 @@ function (dojo, declare) {
         updateHandCount: function(player, animate=true) {
             this.updateCounter(this.hand_counters[player.player_id],
                                player.hand_size,
-                              animate);
+                               animate);
         },
 
         updatePoolCount: function (player, animate=true) {
             this.updateCounter(this.pool_counters[player.player_id],
                                player.pool_size,
-                              animate);
+                               animate);
         },
 
         updateCapturedCityCount: function (player, animate=true) {
             this.updateCounter(this.city_counters[player.player_id],
                                player.captured_city_count,
-                              animate);
+                               animate);
         },
 
         renderHand: function(hand) {
