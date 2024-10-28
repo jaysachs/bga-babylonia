@@ -30,7 +30,6 @@ class Model {
 
     private ?Board $_board = null;
     private ?TurnProgress $_turn_progress = null;
-    //    private ?PlayerInfo $_player_info = null;
     private ?array $_playerData = null;
     private ?Hand $_hand = null;
     private ?Pool $_pool = null;
@@ -107,13 +106,6 @@ class Model {
         }
         return $this->_turn_progress;
     }
-
-    // public function playerInfo(): PlayerInfo {
-    //     if ($this->_player_info == null) {
-    //         $this->_player_info = $this->db->retrievePlayerInfo($this->player_id);
-    //     }
-    //     return $this->_player_info;
-    // }
 
     public function isPlayAllowed(Piece $piece, Hex $hex): bool {
         // first check move limits per turn
@@ -264,8 +256,6 @@ class Model {
         $this->db->upsertPool($this->player_id, $this->pool());
 
         // set sizes on info, persist it?
-        // $info = $this->playerInfo();
-        // $this->db->updatePlayerInfo($this->player_id, $info);
 
         if ($hand->size() == 0 || $this->board()->cityCount() <= 1) {
             return true;

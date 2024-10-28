@@ -229,19 +229,6 @@ class Db {
                      WHERE board_row=$hex->row AND board_col=$hex->col");
     }
 
-    public function updatePlayerInfo(int $player_id, PlayerInfo $info) {
-        $sql = "DELETE FROM handpools WHERE player_id = $player_id";
-        $this->db->DbQuery( $sql );
-        $sql = "DELETE FROM hands WHERE player_id = $player_id";
-        $this->db->DbQuery( $sql );
-
-        $this->insertPlayerInfos([$player_id => $info]);
-        $sql = "UPDATE player
-                SET captured_city_count = $info->captured_city_count
-                WHERE player_id = $player_id";
-        $this->db->DbQuery( $sql );
-    }
-
     public function retrievePlayerInfo(int $player_id): PlayerInfo {
         $sql = "SELECT ziggurat_card
                 FROM ziggurat_cards
@@ -252,35 +239,6 @@ class Db {
                 WHERE player_id = $player_id";
         $player_data = $this->db->getNonEmptyObjectFromDB2( $sql );
         return PlayerInfo::fromDbResults( $player_id, $ziggurat_data, $player_data );
-    }
-
-    public function insertPlayerInfos(array $player_infos): void {
-        // first the pools
-        $sql_values = [];
-        foreach ($player_infos as $player_id => $pi) {
-            foreach ($pi->pool as $piece) {
-                $x = $piece->value;
-                $sql_values[] = "($player_id, '$x')";
-            }
-        }
-        if (count($sql_values) > 0) {
-            $sql = "INSERT INTO handpools (player_id, piece) VALUES "
-                . implode(',', $sql_values);
-            $this->db->DbQuery( $sql );
-        }
-
-        // then the hands
-        $sql = "INSERT INTO hands (player_id, pos, piece) VALUES ";
-        $sql_values = [];
-        foreach ($player_infos as $player_id => $pi) {
-            for ($i = 0; $i < count($pi->hand); ++$i) {
-                $p = $pi->hand[$i];
-                $piece = ($p == null) ? "NULL" : "'$p->value'";
-                $sql_values[] = "($player_id, $i, $piece)";
-            }
-        }
-        $sql .= implode(',', $sql_values);
-        $this->db->DbQuery( $sql );
     }
 
     public function retrieveScore(int $player_id): int {
