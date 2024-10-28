@@ -73,8 +73,7 @@ END;
         if ($numPlayers < 2 || $numPlayers > 4) {
             throw new \InvalidArgumentException(sprintf("invalid number of players: %s", $numPlayers));
         }
-        $empty = [];
-        $board = new Board($empty);
+        $board = new Board();
         $lines = explode("\n", Board::MAP);
         $row = 0;
         $development_locations = [];
@@ -145,16 +144,16 @@ END;
         }
     }
 
-    public static function fromDbResult($dbresults): Board {
-        $hexes = [];
-        $board = new Board($hexes);
-        foreach ($dbresults as &$result) {
-            $board->addHex(Hex::fromDbResult($result));
+    public static function fromHexes(array /* Hex */ &$hexes): Board {
+        $board = new Board();
+        foreach ($hexes as &$hex) {
+            $board->addHex($hex);
         }
         return $board;
     }
 
-    public function __construct(private array &$hexes) {}
+    private function __construct() {}
+    private array $hexes = [];
 
     /* visit should return true if continue exploring */
     public function bfs(int $start_row, int $start_col, \Closure $visit) {

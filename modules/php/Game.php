@@ -300,9 +300,9 @@ class Game extends \Table
 
         $model = new Model($this->db, $this->currentPlayerId());
 
-        $players = [];
+        $player_data = [];
         foreach ($model->allPlayerInfo() as $pid => $pi) {
-            $players[$pid] = [
+            $player_data[$pid] = [
                 "player_id" => $pid,
                 "player_name" => $pi->player_name,
                 "player_number" => $pi->player_number,
@@ -312,12 +312,24 @@ class Game extends \Table
                 "pool_size" => $pi->pool_size
             ];
         }
+        $board_data = [];
+        $model->board()->visitAll(
+            function (&$hex) use (&$board_data) {
+                $board_data[] = [
+                    "row" => $hex->row,
+                    "col" => $hex->col,
+                    "hextype" => $hex->type->value,
+                    "piece" => $hex->piece->value,
+                    "board_player" => $hex->player_id,
+                ];
+            }
+        );
 
         return [
-            'players' => $players,
+            'players' => $player_data,
             'hand' => array_map(function ($p) { return $p->value; },
                                 $model->hand()->pieces()),
-            'board' => $this->db->retrieveBoardData(),
+            'board' => $board_data,
             'ziggurat_cards' => $this->db->retrieveZigguratCards()
         ];
     }

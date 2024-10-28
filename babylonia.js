@@ -118,7 +118,7 @@ function (dojo, declare) {
                     this.jstpl_hex( hex ) );
                 let p = hex.piece;
                 if (p != null) {
-                    let n = (hex.board_player == null || hex.board_player == 0)
+                    let n = (hex.board_player == 0)
                         ? null
                         : gamedatas.players[hex.board_player].player_number;
                     this.renderPlayedPiece(hex.row, hex.col, p, n);

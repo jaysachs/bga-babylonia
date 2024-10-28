@@ -26,20 +26,15 @@ declare(strict_types=1);
 
 namespace Bga\Games\babylonia;
 
-/* a played move */
+/* A played move */
 class Move {
-    function __construct(public int $player_id, public Piece $piece, public int $handpos, public int $row, public int $col, public bool $captured, public int $points) {}
-
-    public static function fromDbResults(array &$dbresults): Move {
-        return new Move(intval($dbresults['player_id']),
-                        Piece::from($dbresults['piece']),
-                        intval($dbresults['handpos']),
-                        intval($dbresults['board_row']),
-                        intval($dbresults['board_col']),
-                        boolval($dbresults['captured']),
-                        intval($dbresults['points']));
-    }
-
+    function __construct(public int $player_id,
+                         public Piece $piece,
+                         public int $handpos,
+                         public int $row,
+                         public int $col,
+                         public bool $captured,
+                         public int $points) {}
 }
 
 ?>

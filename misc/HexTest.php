@@ -73,20 +73,6 @@ final class HexTest extends TestCase
         $hex->playPiece(Piece::PRIEST, 1);
     }
 
-    public function test_fromDbResultSucceeds(): void
-    {
-        $hex = new Hex(HexType::LAND, 4, 6, Piece::PRIEST, 3);
-        $dr = [
-            "row" => 4,
-            "col" => 6,
-            "piece" => "priest",
-            "board_player" => 3,
-            "hextype" => "LAND",
-        ];
-        $unmarshalled = Hex::fromDbResult($dr);
-        $this->assertEquals($hex, $unmarshalled);
-    }
-
     public function test_isLandAndIsWaterSucceed() {
         $hex = Hex::land(4, 5);
         $this->assertTrue($hex->isLand());

@@ -115,13 +115,19 @@ class Db {
     }
 
     public function retrieveBoard(): Board {
-        return Board::fromDbResult($this->retrieveBoardData());
-    }
-
-    public function retrieveBoardData(): array {
-        return $this->db->getObjectListFromDB2(
-            "SELECT board_row row, board_col col, hextype, piece, scored, player_id board_player FROM board ORDER BY col, row"
-        );
+        $hexes = [];
+        $data = $this->db->getObjectListFromDB2(
+                "SELECT board_row row, board_col col, hextype, piece, scored,
+                        player_id board_player
+                 FROM board");
+        foreach ($data as &$hex) {
+            $hexes[] = new Hex(HexType::from($hex['hextype']),
+                               intval($hex['row']),
+                               intval($hex['col']),
+                               Piece::from($hex['piece']),
+                               intval($hex['board_player']));
+        }
+        return Board::fromHexes($hexes);
     }
 
     public function removeTurnProgress(int $player_id): void {
@@ -178,8 +184,14 @@ class Db {
              WHERE player_id = $player_id
              ORDER BY seq_id");
         $moves = [];
-        foreach ($dbresults as &$res) {
-            $moves[] = Move::fromDbResults($res);
+        foreach ($dbresults as &$move) {
+            $moves[] = new Move(intval($move['player_id']),
+                                Piece::from($move['piece']),
+                                intval($move['handpos']),
+                                intval($move['board_row']),
+                                intval($move['board_col']),
+                                boolval($move['captured']),
+                                intval($move['points']));
         }
         return new TurnProgress($moves);
     }
