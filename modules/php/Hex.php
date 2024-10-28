@@ -53,17 +53,17 @@ class Hex {
         return $p;
     }
 
-    public function placeFeature(Piece $feature) {
+    public function placeDevelopment(Piece $development) {
         if ($this->piece != Piece::EMPTY) {
             throw new \LogicException("attempt to place city or field on top of $this");
         }
         if ($this->isWater()) {
             throw new \LogicException("attempt to place city or field on water hex $this");
         }
-        if (!$feature->isCity() && !$feature->isField() && $feature != Piece::ZIGGURAT) {
+        if (!$development->isCity() && !$development->isField() && $development != Piece::ZIGGURAT) {
             throw new \LogicException("attempt to place a non-city or field on $this");
         }
-        $this->piece = $feature;
+        $this->piece = $development;
     }
 
     public function playPiece(Piece $piece, int $player_id): Piece {

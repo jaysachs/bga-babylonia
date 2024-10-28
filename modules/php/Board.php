@@ -77,7 +77,7 @@ END;
         $board = new Board($empty);
         $lines = explode("\n", Board::MAP);
         $row = 0;
-        $cityfields = [];
+        $development_locations = [];
         foreach ($lines as &$s) {
             $col = ($row & 1) ? 1 : 0;
             foreach (preg_split("/\s+/", trim($s)) as $t) {
@@ -87,7 +87,7 @@ END;
                     $board->addHex(Hex::land($row, $col));
                 } else if ($t == "C") {
                     $board->addHex(Hex::land($row, $col));
-                    $cityfields[] = [ $row, $col ];
+                    $development_locations[] = [ $row, $col ];
                 } else if ($t == "!" || $t == "Z") {
                     $board->addHex(Hex::ziggurat($row, $col));
                 } else if ($t == "=" || $t == "W") {
@@ -108,20 +108,21 @@ END;
             $board->removeLandmassAt(2, 0);
         }
 
-        $pool = self::initializePool($numPlayers, $random);
-        $board->placeCitiesAndFields($pool, $cityfields);
-        if (count($pool) != 0) {
+        $available_developments = self::initializePool($numPlayers, $random);
+        $board->placeDevelopments($available_developments, $development_locations);
+        if (count($available_developments) != 0) {
             throw new \LogicException("placed all cities and fields but tiles leftover");
         }
         return $board;
     }
 
-    private function placeCitiesAndFields(array &$pool, array &$cityfields) {
-        foreach ($cityfields as $rc) {
+    private function placeDevelopments(array &$available_developments,
+                                          array &$development_locations) {
+        foreach ($development_locations as $rc) {
             $hex = $this->hexAt($rc[0], $rc[1]);
             if ($hex != null) {
-                $x = array_shift($pool);
-                $hex->placeFeature($x);
+                $x = array_shift($available_developments);
+                $hex->placeDevelopment($x);
             }
         }
     }
@@ -212,44 +213,43 @@ END;
     }
 
     private static function initializePool(int $numPlayers, bool $random) {
-        // set up city pool
-        $pool = array();
+        $available_developments = array();
         for ($i = 0; $i < 2; $i++) {
-            $pool[] = Piece::CITY_P;
-            $pool[] = Piece::CITY_S;
-            $pool[] = Piece::CITY_M;
-            $pool[] = Piece::CITY_SP;
-            $pool[] = Piece::CITY_MS;
-            $pool[] = Piece::CITY_MP;
+            $available_developments[] = Piece::CITY_P;
+            $available_developments[] = Piece::CITY_S;
+            $available_developments[] = Piece::CITY_M;
+            $available_developments[] = Piece::CITY_SP;
+            $available_developments[] = Piece::CITY_MS;
+            $available_developments[] = Piece::CITY_MP;
         }
         for ($i = 0; $i < 3; $i++) {
-            $pool[] = Piece::FIELD_CITIES;
+            $available_developments[] = Piece::FIELD_CITIES;
         }
-        $pool[] = Piece::FIELD_5;
-        $pool[] = Piece::FIELD_6;
-        $pool[] = Piece::FIELD_7;
+        $available_developments[] = Piece::FIELD_5;
+        $available_developments[] = Piece::FIELD_6;
+        $available_developments[] = Piece::FIELD_7;
         if ($numPlayers > 2) {
-            $pool[] = Piece::CITY_SP;
-            $pool[] = Piece::CITY_MS;
-            $pool[] = Piece::CITY_MP;
-            $pool[] = Piece::CITY_MSP;
-            $pool[] = Piece::FIELD_5;
-            $pool[] = Piece::FIELD_6;
-            $pool[] = Piece::FIELD_7;
-            $pool[] = Piece::FIELD_CITIES;
+            $available_developments[] = Piece::CITY_SP;
+            $available_developments[] = Piece::CITY_MS;
+            $available_developments[] = Piece::CITY_MP;
+            $available_developments[] = Piece::CITY_MSP;
+            $available_developments[] = Piece::FIELD_5;
+            $available_developments[] = Piece::FIELD_6;
+            $available_developments[] = Piece::FIELD_7;
+            $available_developments[] = Piece::FIELD_CITIES;
         }
         if ($numPlayers > 3) {
-            $pool[] = Piece::CITY_P;
-            $pool[] = Piece::CITY_S;
-            $pool[] = Piece::CITY_M;
+            $available_developments[] = Piece::CITY_P;
+            $available_developments[] = Piece::CITY_S;
+            $available_developments[] = Piece::CITY_M;
             for ($i = 0; $i < 3; $i++) {
-                $pool[] = Piece::FIELD_CITIES;
+                $available_developments[] = Piece::FIELD_CITIES;
             }
         }
         if ($random) {
-            shuffle($pool);
+            shuffle($available_developments);
         }
-        return $pool;
+        return $available_developments;
     }
 }
 

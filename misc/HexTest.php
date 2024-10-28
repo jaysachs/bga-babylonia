@@ -11,27 +11,27 @@ use Bga\Games\babylonia\ {
 
 final class HexTest extends TestCase
 {
-    public function testPlaceFeatureOnEmptyHexSucceeds(): void
+    public function testPlaceDevelopmentOnEmptyHexSucceeds(): void
     {
         $hex = new Hex(HexType::LAND, 0, 0);
-        $hex->placeFeature(Piece::CITY_P);
+        $hex->placeDevelopment(Piece::CITY_P);
         $this->assertSame(Piece::CITY_P, $hex->piece);
     }
 
-    public function testPlaceFeatureOnNonEmptyHexFails(): void
+    public function testPlaceDevelopmentOnNonEmptyHexFails(): void
     {
         $this->expectException(LogicException::class);
 
         $hex = new Hex(HexType::LAND, 0, 0);
-        $hex->placeFeature(Piece::CITY_P);
-        $hex->placeFeature(Piece::CITY_P);
+        $hex->placeDevelopment(Piece::CITY_P);
+        $hex->placeDevelopment(Piece::CITY_P);
     }
 
-    public function testPlaceFeatureOnWaterFails(): void
+    public function testPlaceDevelopmentOnWaterFails(): void
     {
         $hex = new Hex(HexType::WATER, 0, 0);
         $this->expectException(LogicException::class);
-        $hex->placeFeature(Piece::CITY_P);
+        $hex->placeDevelopment(Piece::CITY_P);
     }
 
     public function testPlayPieceSucceeds(): void
@@ -45,16 +45,16 @@ final class HexTest extends TestCase
     public function testPlayPieceOnFieldSucceeds(): void
     {
         $hex = new Hex(HexType::LAND, 0, 0);
-        $hex->placeFeature(Piece::FIELD_5);
+        $hex->placeDevelopment(Piece::FIELD_5);
         $hex->playPiece(Piece::FARMER, 1);
         $this->assertSame(Piece::FARMER, $hex->piece);
         $this->assertSame(1, $hex->player_id);
     }
 
-    public function testPlayPieceOnNonFieldFeatureFails(): void
+    public function testPlayPieceOnNonFieldDevelopmentFails(): void
     {
         $hex = new Hex(HexType::LAND, 0, 0);
-        $hex->placeFeature(Piece::CITY_S);
+        $hex->placeDevelopment(Piece::CITY_S);
         $this->expectException(LogicException::class);
         $hex->playPiece(Piece::FARMER, 1);
     }
@@ -100,7 +100,7 @@ final class HexTest extends TestCase
     public function test_toStringSucceeds() {
         $hex = Hex::land(4, 5);
         $this->assertSame("LAND 4:5 empty(0)", "$hex");
-        $hex->placeFeature(Piece::FIELD_5);
+        $hex->placeDevelopment(Piece::FIELD_5);
         $this->assertSame("LAND 4:5 field_5(0)", "$hex");
 
         $hex = Hex::land(4, 5);
@@ -108,4 +108,3 @@ final class HexTest extends TestCase
         $this->assertSame("LAND 4:5 priest(3)", "$hex");
     }
 }
-
