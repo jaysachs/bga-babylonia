@@ -117,7 +117,7 @@ END;
     }
 
     private function placeDevelopments(array &$available_developments,
-                                          array &$development_locations) {
+                                       array &$development_locations) {
         foreach ($development_locations as $rc) {
             $hex = $this->hexAt($rc[0], $rc[1]);
             if ($hex != null) {
