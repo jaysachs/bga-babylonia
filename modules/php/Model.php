@@ -267,13 +267,7 @@ class Model {
         // $info = $this->playerInfo();
         // $this->db->updatePlayerInfo($this->player_id, $info);
 
-        $city_count = 0;
-        $this->board()->visitAll(function (&$hex) use (&$city_count): void {
-            if ($hex->piece->isCity()) {
-                $city_count++;
-            }
-        });
-        if ($hand->size() == 0 || $city_count <= 1) {
+        if ($hand->size() == 0 || $board->cityCount() <= 1) {
             return true;
         }
 

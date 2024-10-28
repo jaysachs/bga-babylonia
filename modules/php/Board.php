@@ -127,6 +127,16 @@ END;
         }
     }
 
+    public function cityCount(): int {
+        $city_count = 0;
+        $this->visitAll(function (&$hex) use (&$city_count): void {
+            if ($hex->piece->isCity()) {
+                $city_count++;
+            }
+        });
+        return $city_count;
+    }
+
     public function visitAll(\Closure $visit) {
         foreach ($this->hexes as &$hexrow) {
             foreach ($hexrow as &$hex) {
