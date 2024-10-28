@@ -26,50 +26,21 @@ declare(strict_types=1);
 
 namespace Bga\Games\babylonia;
 
-// TODO: consider factoring out a "Hand" class.
+// Ziggurat tiles could continue to live here, maybe?
 class PlayerInfo {
     public int $captured_city_count = 0;
-    public array $hand = array(); /* PieceType */
-    public array $pool = array(); /* PieceType */
     public array $ziggurat_cards = array(); /* ZigguratCard */
     public int $score = 0;
     public int $id = 0;
 
     public static function newPlayerInfo($pid) {
         $p = new PlayerInfo();
-        for ($i = 0; $i < 5; $i++) {
-            $p->hand[] = Piece::EMPTY;
-        }
-        $p->hand[] = null;
-        $p->hand[] = null;
-
-        $p->id = $pid;
-        $pool = &$p->pool;
-        for ($i = 0; $i < 6; $i++) {
-            $pool[] = Piece::PRIEST;
-            $pool[] = Piece::MERCHANT;
-            $pool[] = Piece::SERVANT;
-            $pool[] = Piece::FARMER;
-            $pool[] = Piece::FARMER;
-        }
-        shuffle($pool);
-        $p->refillHand();
         return $p;
     }
 
-    public static function fromDbResults(int $player_id, array $handdata, array $pooldata, array $ziggurat_data, array $player_data): PlayerInfo {
+    public static function fromDbResults(int $player_id, array $ziggurat_data, array $player_data): PlayerInfo {
         $p = new PlayerInfo();
-        for ($i = 0; $i < 7; $i++) {
-            $p->hand[] = null;
-        }
-        foreach ($handdata as $hp) {
-            $x = $hp["piece"];
-            $p->hand[$hp["pos"]] = ($x == null) ? null : Piece::from($hp["piece"]);
-        }
         $p->id = $player_id;
-        foreach ($pooldata as $pp) {
-            $p->pool[] = Piece::from($pp["piece"]);
-        }
         foreach ($ziggurat_data as $zd) {
             $p->ziggurat_cards[] = ZigguratCard::from($zd);
         }
@@ -78,49 +49,8 @@ class PlayerInfo {
         return $p;
     }
 
-    public function handSize(): int {
-        $result = 0;
-        foreach ($this->hand as $p) {
-            if ($p != null & $p != Piece::EMPTY) {
-                $result++;
-            }
-        }
-        return $result;
-    }
-
-    public function poolSize(): int {
-        return count($this->pool);
-    }
-
-    public function handContains(Piece $piece): bool {
-        foreach ($this->hand as $p) {
-            if ($piece == $p) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /* returns false if pool is empty */
-    public function refillHand() : bool {
-        $maxHandSize = $this->maxHandSize();
-        for ($i = 0; $i < $maxHandSize; $i++) {
-            if ($this->hand[$i] == Piece::EMPTY) {
-                if (count($this->pool) == 0) {
-                    return false;
-                }
-                $this->hand[$i] = array_pop($this->pool);
-            }
-        }
-        return true;
-    }
-
     public function hasZigguratCard(ZigguratCard $type): bool {
         return in_array($type, $this->ziggurat_cards);
-    }
-
-    public function maxHandSize() : int {
-        return $this->hasZigguratCard(ZigguratCard::SEVEN_TOKENS) ? 7 : 5;
     }
 }
 

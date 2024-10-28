@@ -54,6 +54,10 @@ class Pool {
         return $this->pieces;
     }
 
+    public function isEmpty(): bool {
+        return $this->size() == 0;
+    }
+
     public function size(): int {
         return count($this->pieces);
     }

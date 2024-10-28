@@ -38,13 +38,15 @@ ALTER TABLE `player` ADD `captured_city_count` INT UNSIGNED NOT NULL DEFAULT '0'
 
 CREATE TABLE IF NOT EXISTS `handpools` (
   `player_id` int(10) unsigned NOT NULL,
-  `piece` varchar(8) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8  AUTO_INCREMENT=1 ;
+  `seq_id` int(3) unsigned NOT NULL,
+  `piece` varchar(8) NOT NULL,
+  PRIMARY KEY (`player_id`, `seq_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ;
 
 CREATE TABLE IF NOT EXISTS `hands` (
   `player_id` int(10) unsigned NOT NULL,
   `pos` int(2) unsigned NOT NULL,
-  `piece` varchar(8) DEFAULT NULL,
+  `piece` varchar(8) NOT NULL,
   PRIMARY KEY (`player_id`, `pos`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 

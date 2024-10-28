@@ -53,6 +53,67 @@ class Db {
         $this->db->DbQuery( $sql );
     }
 
+    public function upsertPool(int $player_id, Pool $pool): void {
+        $sql = "DELETE FROM handpools WHERE player_id = $player_id";
+        $this->db->DbQuery( $sql );
+
+        $sql_values = [];
+        foreach ($pool->dataDump() as $i => $p) {
+            if ($p != null) {
+                $x = $p->value;
+                $sql_values[] = "($player_id, $i, '$x')";
+            }
+        }
+        if (count($sql_values) > 0) {
+            $sql = "INSERT INTO handpools (player_id, seq_id, piece) VALUES "
+                . implode(',', $sql_values);
+            $this->db->DbQuery( $sql );
+        }
+    }
+
+    // TODO: this is inefficient, improve it.
+    public function upsertHand(int $player_id, Hand $hand): void {
+        $sql = "DELETE FROM hands WHERE player_id = $player_id";
+        $this->db->DbQuery( $sql );
+        // then the hands
+        $sql_values = [];
+        foreach ($hand->dataDump() as $i => $p) {
+            $sql_values[] = "($player_id, $i, '$p->value')";
+        }
+        if (count($sql_values) > 0) {
+            $sql = "INSERT INTO hands (player_id, pos, piece) VALUES "
+                . implode(',', $sql_values);
+            $this->db->DbQuery( $sql );
+        }
+    }
+
+    public function retrievePool(int $player_id): Pool {
+        $sql = "SELECT piece
+                FROM handpools
+                WHERE player_id = $player_id";
+        $pooldata = $this->db->getObjectListFromDB2( $sql );
+
+        $data = $this->db->getCollectionFromDB(
+            "SELECT seq_id, piece
+             FROM handpools
+             WHERE player_id = $player_id",
+            true
+        );
+        return new Pool(
+            array_map(function ($p): Piece { return Piece::from($p); }, $data)
+        );
+    }
+
+    public function retrieveHand(int $player_id): Hand {
+        $data = $this->db->getObjectListFromDB2(
+            "SELECT piece from hands WHERE player_id = $player_id ORDER BY pos",
+            true
+        );
+        return new Hand(
+            array_map(function ($p): Piece { return Piece::from($p); }, $data)
+        );
+    }
+
     public function retrieveHandPiece(int $player_id, int $handpos): ?Piece {
         $v = $this->db->getUniqueValueFromDB(
             "SELECT piece from hands WHERE player_id = $player_id AND pos=$handpos"
@@ -62,10 +123,10 @@ class Db {
 
     public function retrievePlayersData(): array {
         return $this->db->getCollectionFromDb(
-            "SELECT P.player_id, P.player_score score, P.captured_city_count captured_city_count, P.player_no player_number, P.player_name player_name, H.hand_size, Q.pool_size
+            "SELECT P.player_id id, P.player_id, P.player_score score, P.captured_city_count captured_city_count, P.player_no player_number, P.player_name player_name, H.hand_size, Q.pool_size
              FROM
                (SELECT player_id, COUNT(*) hand_size
-                FROM hands WHERE piece IS NOT NULL AND piece <> 'empty'
+                FROM hands WHERE piece <> 'empty'
                 GROUP BY player_id) H
              JOIN player P
              ON P.player_id = H.player_id

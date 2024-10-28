@@ -30,8 +30,10 @@ class Model {
 
     private ?Board $_board = null;
     private ?TurnProgress $_turn_progress = null;
-    private ?PlayerInfo $_player_info = null;
+    //    private ?PlayerInfo $_player_info = null;
     private ?array $_playerData = null;
+    private ?Hand $_hand = null;
+    private ?Pool $_pool = null;
 
     public function __construct(private Db $db, private int $player_id) { }
 
@@ -39,12 +41,15 @@ class Model {
         $this->_board = Board::forPlayerCount(count($player_ids));
         $this->db->insertBoard($this->_board);
 
-        $pis = [];
         foreach ($player_ids as $player_id) {
-            $pis[$player_id] = PlayerInfo::newPlayerInfo($player_id);
+            $hand = Hand::new();
+            $pool = Pool::new();
+            $this->refill($hand, $pool);
+            $this->db->upsertHand($player_id, $hand);
+            $this->db->upsertPool($player_id, $pool);
         }
-        $this->db->insertPlayerInfos($pis);
 
+        // TODO: consider a class to hold the available ziggurat cards?
         $ziggurats = [
             ZigguratCard::PLUS_10,
             ZigguratCard::EXTRA_TURN,
@@ -75,6 +80,20 @@ class Model {
         return array_keys($this->allPlayersData());
     }
 
+    public function hand(): Hand {
+        if ($this->_hand == null) {
+            $this->_hand = $this->db->retrieveHand($this->player_id);
+        }
+        return $this->_hand;
+    }
+
+    public function pool(): Pool {
+        if ($this->_pool == null) {
+            $this->_pool = $this->db->retrievePool($this->player_id);
+        }
+        return $this->_pool;
+    }
+
     public function board(): Board {
         if ($this->_board == null) {
             $this->_board = $this->db->retrieveBoard();
@@ -89,17 +108,12 @@ class Model {
         return $this->_turn_progress;
     }
 
-    public function playerInfoForPlayer(int $player_id): PlayerInfo {
-        // TODO: cache? do better than this?
-        return $this->db->retrievePlayerInfo($player_id);
-    }
-
-    public function playerInfo(): PlayerInfo {
-        if ($this->_player_info == null) {
-            $this->_player_info = $this->db->retrievePlayerInfo($this->player_id);
-        }
-        return $this->_player_info;
-    }
+    // public function playerInfo(): PlayerInfo {
+    //     if ($this->_player_info == null) {
+    //         $this->_player_info = $this->db->retrievePlayerInfo($this->player_id);
+    //     }
+    //     return $this->_player_info;
+    // }
 
     public function isPlayAllowed(Piece $piece, Hex $hex): bool {
         // first check move limits per turn
@@ -141,10 +155,10 @@ class Model {
      */
     public function getAllowedMoves(): array {
         $result = [];
-        $hand = $this->playerInfo()->hand;
+        $hand = $this->hand();
         $this->board()->visitAll(function (&$hex) use (&$result, &$hand) :void {
             foreach (Piece::playerPieces() as $piece) {
-                if (in_array($piece, $hand)) {
+                if ($hand->contains($piece)) {
                     if ($this->isPlayAllowed($piece, $hex)) {
                         if (!isset($result[$piece->value])) {
                             $result[$piece->value] = [];
@@ -232,32 +246,44 @@ class Model {
         return result;
     }
 
+    private function refill(Hand $hand, Pool $pool): void {
+        while ($hand->size() < $hand->maxSize() && !$pool->isEmpty()) {
+            $hand->replenish($pool->take());
+        }
+    }
+
+    private function refillHand(): void {
+        $this->refill($this->hand(), $this->pool());
+    }
+
     /* return true if game should end */
     public function finishTurn(): array {
-        $info = $this->playerInfo();
-        if (!$info->refillHand()) {
-            return [
-                "gameOver" => true
-            ];
-        }
+        $hand = $this->hand();
+        $this->refillHand();
+        $this->db->updateHand($hand);
+        $this->db->updatePool($this->pool());
 
-        $this->db->updatePlayerInfo($this->player_id, $info);
+        // set sizes on info, persist it?
+        // $info = $this->playerInfo();
+        // $this->db->updatePlayerInfo($this->player_id, $info);
 
-        $hand = [];
-        foreach ($info->hand as $piece) {
-            $hand[] = ["piece" => ($piece == null) ? null : $piece->value];
+        $city_count = 0;
+        $this->board()->visitAll(function (&$hex) use (&$city_count): void {
+            if ($hex->piece->isCity()) {
+                $city_count++;
+            }
+        });
+        if ($hand->size() == 0 || $city_count <= 1) {
+            return true;
         }
 
         $this->db->removeTurnProgress($this->player_id);
-        return [
-            "gameOver" => false,
-            "hand" => $hand
-        ];
+        return false;
     }
 
     public function scoreCity(Hex $hex): ScoredCity {
         $scores = $this->computeCityScores($hex);
-        $player_data = &$this->AllPlayersData();
+        $player_data = &$this->allPlayersData();
 
         // Increase captured_city_count for capturing player, if any
         if ($scores->captured_by > 0) {

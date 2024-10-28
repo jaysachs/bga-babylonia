@@ -85,8 +85,8 @@ class Game extends \Table
             "points" => $points,
             "score" => $this->db->retrieveScore( $player_id ),
             "i18n" => ['piece'],
-            "hand_size" => $model->playerInfo()->handSize(),
-            "pool_size" => $model->playerInfo()->poolSize(),
+            "hand_size" => $model->hand()->size(),
+            "pool_size" => $model->pool()->size(),
         ]);
 
         $this->gamestate->nextState("playPieces");
@@ -182,7 +182,7 @@ class Game extends \Table
 
             // Then notify of the scoring details
             foreach (array_keys($pd) as $pid) {
-                $pi = $model->playerInfoForPlayer($pid);
+                $pi = $this->db->retrievePlayerInfo($pid);
                 $this->notifyAllPlayers(
                     "cityScoredPlayer",
                     clienttranslate('${player_name} scored ${points}'), [
@@ -211,8 +211,7 @@ class Game extends \Table
         $this->doScoring($model);
 
         $player_name = $this->getActivePlayerName();
-        $result = $model->finishTurn();
-        if ($result["gameOver"]) {
+        if ($model->finishTurn()) {
             $this->notifyAllPlayers("gameEnded", clienttranslate('${player_name} unable to refill their hand'), [
                 "player_id" => $player_id,
                 "player_name" => $player_name,
@@ -220,21 +219,25 @@ class Game extends \Table
             $this->gamestate->nextState("endGame");
             return;
         }
-        $pi = $model->playerInfo();
+
+        $this->notifyAllPlayers("turnFinished", "{$player_name} finished their turn", [
+            "player_id" => $player_id,
+            "player_number" => $this->getPlayerNoById($player_id),
+            "hand_size" => $model->hand()->size(),
+            "pool_size" => $model->pool()->size(),
+        ]);
 
         // TODO: this shouldn't return the whole hand, just the refilled parts
         // Capture the delta and return *that*. Then it can be animated on
         // the client.
-        $this->notifyAllPlayers("turnFinished", "{$player_name} finished their turn", [
-            "player_id" => $player_id,
-            "player_number" => $this->getPlayerNoById($player_id),
-            "hand_size" => $pi->handSize(),
-            "pool_size" => $pi->poolSize(),
-        ]);
+        $xhand = [];
+        foreach ($model->hand()->dataDump() as $piece) {
+            $xhand[] = ["piece" => $piece->value];
+        }
 
         $this->notifyPlayer($player_id, "handRefilled", "{You} refilled your hand", [
             "player_id" => $player_id,
-            "hand" => $result["hand"],
+            "hand" => $xhand,
         ]);
 
         $this->giveExtraTime($player_id);
