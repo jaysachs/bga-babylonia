@@ -82,7 +82,7 @@ class Game extends \Table
             "row" => $row,
             "col" => $col,
             "points" => $points,
-            "score" => $this->db->retrieveScore( $player_id ),
+            "score" => $this->db->retrievePlayerInfo( $player_id )->score,
             "i18n" => ['piece'],
             "hand_size" => $model->hand()->size(),
             "pool_size" => $model->pool()->size(),
