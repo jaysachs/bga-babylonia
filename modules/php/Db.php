@@ -160,10 +160,10 @@ class Db {
         $this->db->DbQuery( $sql );
     }
 
-    public function updatePlayers(array $player_data): void {
-        foreach ($player_data as $player_id => $pd) {
-            $score = $pd["score"];
-            $captured_city_count = $pd["captured_city_count"];
+    public function updatePlayers(array $player_infos): void {
+        foreach ($player_infos as $player_id => $pi) {
+            $score = $pi->score;
+            $captured_city_count = $pi->captured_city_count;
             $this->db->DbQuery(
                 "UPDATE player q
                  SET q.player_score = $score, q.captured_city_count=$captured_city_count
@@ -222,23 +222,36 @@ class Db {
                      WHERE board_row=$hex->row AND board_col=$hex->col");
     }
 
+    public function retrieveAllPlayerInfo(): array /* int => PlayerInfo */ {
+        // TODO: retrieve zig cards? or remove from PlayerInfo?
+        $sql = "SELECT player_id id, player_name, player_no, captured_city_count, player_score
+                FROM player";
+        $result = [];
+        $data = $this->db->getCollectionFromDB( $sql );
+        foreach ($data as $pid => $pd) {
+            $result[$pid] = $this->playerInfoFromData($pid, $pd);
+        }
+        return $result;
+    }
+
+    private function playerInfoFromData(int $player_id, array $pd): PlayerInfo {
+        return new PlayerInfo($player_id,
+                              $pd["player_name"],
+                              intval($pd["player_no"]),
+                              intval($pd["player_score"]),
+                              intval($pd["captured_city_count"]));
+    }
+
     public function retrievePlayerInfo(int $player_id): PlayerInfo {
-        $sql = "SELECT ziggurat_card
-                FROM ziggurat_cards
-                WHERE player_id = $player_id";
-        $ziggurat_data = $this->db->getObjectListFromDB2( $sql );
-        $sql = "SELECT captured_city_count, player_score score
+        // $sql = "SELECT ziggurat_card
+        //         FROM ziggurat_cards
+        //         WHERE player_id = $player_id";
+        // $ziggurat_data = $this->db->getObjectListFromDB2( $sql );
+        $sql = "SELECT player_id id, player_name, player_no, captured_city_count, player_score
                 FROM player
                 WHERE player_id = $player_id";
         $player_data = $this->db->getNonEmptyObjectFromDB2( $sql );
-
-        return new PlayerInfo(
-            $player_id,
-            intval($player_data["score"]),
-            intval($player_data["captured_city_count"]),
-            array_map(function ($zc) { return ZiggratCard::from($zc); },
-                      $ziggurat_data)
-        );
+        return $this->playerInfoFromData($player_id, $player_data);
     }
 
     public function retrieveScore(int $player_id): int {

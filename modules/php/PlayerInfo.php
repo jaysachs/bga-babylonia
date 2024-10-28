@@ -26,22 +26,13 @@ declare(strict_types=1);
 
 namespace Bga\Games\babylonia;
 
-// TODO: Ziggurat tiles maybe don't need to be here?
-// Maybe have an encapsulating class for the collection?
 class PlayerInfo {
 
     public function __construct(public int $player_id,
+                                public string $player_name,
+                                public int $player_no,
                                 public int $score,
-                                public int $captured_city_count,
-                                public array /* ZigguratCard */ $ziggurat_cards) {
-    }
-
-    public static function newPlayerInfo($pid) {
-        return new PlayerInfo($pid, 0, 0, []);
-    }
-
-    public function hasZigguratCard(ZigguratCard $type): bool {
-        return in_array($type, $this->ziggurat_cards);
+                                public int $captured_city_count) {
     }
 }
 

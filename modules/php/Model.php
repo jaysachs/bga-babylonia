@@ -30,7 +30,7 @@ class Model {
 
     private ?Board $_board = null;
     private ?TurnProgress $_turn_progress = null;
-    private ?array $_playerData = null;
+    private ?array /* PlayerInfo */ $_allPlayerInfo = null;
     private ?Hand $_hand = null;
     private ?Pool $_pool = null;
 
@@ -68,15 +68,15 @@ class Model {
         $this->db->insertZigguratCards($ziggurats);
     }
 
-    public function &allPlayersData(): array {
-        if ($this->_playerData == null) {
-            $this->_playerData = $this->db->retrievePlayersData();
+    public function &allPlayerInfo(): array /* PlayerInfo */ {
+        if ($this->_allPlayerInfo == null) {
+            $this->_allPlayerInfo = $this->db->retrieveAllPlayerInfo();
         }
-        return $this->_playerData;
+        return $this->_allPlayerInfo;
     }
 
     private function allPlayerIds(): array {
-        return array_keys($this->allPlayersData());
+        return array_keys($this->allPlayerInfo());
     }
 
     public function hand(): Hand {
@@ -219,8 +219,8 @@ class Model {
 
     private function totalCapturedCities(): int {
         $result = 0;
-        foreach ($this->allPlayersData() as $pid => $pd) {
-            $result += $pd["captured_city_count"];
+        foreach ($this->allPlayersInfo() as $pid => $pi) {
+            $result += $pi->captured_city_count;
         }
         return $result;
     }
@@ -264,24 +264,24 @@ class Model {
 
     public function scoreCity(Hex $hex): ScoredCity {
         $scores = $this->computeCityScores($hex);
-        $player_data = &$this->allPlayersData();
+        $player_infos = &$this->allPlayerInfo();
 
         // Increase captured_city_count for capturing player, if any
         if ($scores->captured_by > 0) {
-            $player_data[$scores->captured_by]["captured_city_count"]++;
+            $player_infos[$scores->captured_by]->captured_city_count++;
         }
 
         // Now each player gets 1 point for city they've captured.
-        foreach ($player_data as $pid => $pd) {
+        foreach ($player_infos as $pid => $pi) {
             // TODO: this is weird, just tacking on data
             // TODO: incorporate ziggurat card
             $scores->captured_city_points[$pid] =
-                $pd["captured_city_count"];
+                $pi->captured_city_count;
         }
 
         // Give players points for connected pieces
-        foreach ($player_data as $pid => $unused) {
-            $player_data[$pid]["score"] += $scores->pointsForPlayer($pid);
+        foreach ($player_infos as $pid => $unused) {
+            $player_infos[$pid]->score += $scores->pointsForPlayer($pid);
         }
 
         // Mark the hex captured
@@ -291,7 +291,7 @@ class Model {
         $_unused = $captured_hex->captureCity();
 
         $this->db->updateHex($captured_hex);
-        $this->db->updatePlayers($player_data);
+        $this->db->updatePlayers($player_infos);
 
         // TODO: update global captured city count in db globals
         return $scores;

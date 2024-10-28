@@ -10,32 +10,30 @@ use Bga\Games\babylonia\ {
       Board,
         ScoredCity,
         Piece,
+        PlayerInfo,
         Db,
 };
 
 class TestDb extends Db {
     private ?Board $board = null;
-    private array $players_data = [
-        1 => ["score"=> 0, "captured_city_count"=> 0],
-        2 => ["score"=> 0, "captured_city_count"=> 0],
-        3 => ["score"=> 0, "captured_city_count"=> 0]
-    ];
+    private array $player_infos = [];
+
     public function __construct() {
         Db::__construct(null);
+        for ($i = 1; $i <= 3; $i++) {
+            $this->player_infos[$i] = new PlayerInfo($i, "", 0, 0, 0);
+        }
     }
-    public function &retrievePlayersData(): array {
-        return $this->players_data;
-    }
+
     public function insertBoard(Board $b): void { $this->board = $b; }
     public function insertPlayerInfos(array $pis): void { }
     public function insertZigguratCards(array $zs): void { }
     public function retrieveBoard(): Board { return $this->board; }
-
+    public function retrieveAllPlayerInfo(): array {
+        return $this->player_infos;
+    }
     public function updateHex(Hex $hex): void { }
-    public function updatePlayers(array $pd): void {
-        foreach ($pd as $pid => $d) {
-            $this->players_data[$pid] = $d;
-        }
+    public function updatePlayers(array /* PlayerInfo */ $pis): void {
     }
 }
 
@@ -74,11 +72,11 @@ final class ModelTest extends TestCase
 
         $this->assertEquals(
             [
-                1 => ["score"=> 0, "captured_city_count"=> 0],
-                2 => ["score"=> 2, "captured_city_count"=> 0],
-                3 => ["score"=> 7, "captured_city_count"=> 1]
+                1 => new PlayerInfo(1, "", 0, 0, 0),
+                2 => new PlayerInfo(2, "", 0, 2, 0),
+                3 => new PlayerInfo(3, "", 0, 7, 1),
             ],
-            $db->retrievePlayersData()
+            $db->retrieveAllPlayerInfo()
         );
 
         $sc = $model->scoreCity($board->hexAt(3, 3));
@@ -95,22 +93,22 @@ final class ModelTest extends TestCase
 
         $this->assertEquals(
             [
-                1 => ["score"=> 2, "captured_city_count"=> 0],
-                2 => ["score"=> 2, "captured_city_count"=> 0],
-                3 => ["score"=> 11, "captured_city_count"=> 2]
+                1 => new PlayerInfo(1, "", 0, 2, 0),
+                2 => new PlayerInfo(2, "", 0, 2, 0),
+                3 => new PlayerInfo(3, "", 0, 11, 2),
             ],
-            $db->retrievePlayersData()
+            $db->retrieveAllPlayerInfo()
         );
 
     }
-    
+
     public function testCitiesRequiringScoring(): void
     {
         $board = Board::forPlayerCount(2, false);
         $db = new TestDb();
         $db->insertBoard($board);
         $model = new Model($db, 0);
-        
+
         $this->assertEquals([], $model->citiesRequiringScoring());
 
         $board->hexAt(4, 0)->playPiece(Piece::PRIEST, 1);
@@ -121,14 +119,14 @@ final class ModelTest extends TestCase
         $board->hexAt(8, 0)->playPiece(Piece::PRIEST, 3);
         $this->assertEquals([$board->hexAt(6, 0)], $model->citiesRequiringScoring());
     }
-    
+
     public function testZigguratsRequiringScoring(): void
     {
         $board = Board::forPlayerCount(2);
         $db = new TestDb();
         $db->insertBoard($board);
         $model = new Model($db, 0);
-        
+
         $this->assertEquals([], $model->zigguratsRequiringScoring());
 
         $board->hexAt(2, 0)->playPiece(Piece::PRIEST, 1);
@@ -144,4 +142,3 @@ final class ModelTest extends TestCase
         $this->assertEquals([], $model->zigguratsRequiringScoring());
     }
 }
-
