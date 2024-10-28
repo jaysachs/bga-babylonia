@@ -273,15 +273,14 @@ class Model {
 
         // Now each player gets 1 point for city they've captured.
         foreach ($player_infos as $pid => $pi) {
-            // TODO: this is weird, just tacking on data
             // TODO: incorporate ziggurat card
             $scores->captured_city_points[$pid] =
                 $pi->captured_city_count;
         }
 
         // Give players points for connected pieces
-        foreach ($player_infos as $pid => $unused) {
-            $player_infos[$pid]->score += $scores->pointsForPlayer($pid);
+        foreach ($player_infos as $pid => $pi) {
+            $pi->score += $scores->pointsForPlayer($pid);
         }
 
         // Mark the hex captured
