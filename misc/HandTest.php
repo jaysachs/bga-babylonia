@@ -41,4 +41,51 @@ final class HandTest extends TestCase
         $this->assertEquals(true, $hand->isEmpty());
         $this->assertEquals(count($x), $hand->maxSize());
     }
+
+    public function testHandSizeLimit(): void
+    {
+        $hand = Hand::new();
+        $this->assertEquals(0, $hand->size());
+        $this->assertEquals(5, $hand->maxSize());
+        $x = [
+            Piece::PRIEST,
+            Piece::SERVANT,
+            Piece::PRIEST,
+            Piece::MERCHANT,
+            Piece::FARMER
+        ];
+        foreach ($x as $p) {
+            $hand->replenish($p);
+        }
+        $this->expectException(LogicException::class);
+        $hand->replenish(Piece::PRIEST);
+    }
+
+    public function testHandExtend(): void
+    {
+        $hand = Hand::new();
+        $this->assertEquals(0, $hand->size());
+        $this->assertEquals(5, $hand->maxSize());
+        $x = [
+            Piece::PRIEST,
+            Piece::SERVANT,
+            Piece::PRIEST,
+            Piece::MERCHANT,
+            Piece::FARMER
+        ];
+        foreach ($x as $p) {
+            $hand->replenish($p);
+        }
+        $hand->play(1);
+        $hand->play(3);
+        $hand->extend(7);
+        $this->assertEquals(7, $hand->maxSize());
+        $this->assertEquals(3, $hand->size());
+        $hand->replenish(Piece::PRIEST);
+        $hand->replenish(Piece::FARMER);
+        $hand->replenish(Piece::MERCHANT);
+        $hand->replenish(Piece::FARMER);
+        $this->assertEquals(7, $hand->maxSize());
+        $this->assertEquals(7, $hand->size());
+    }
 }

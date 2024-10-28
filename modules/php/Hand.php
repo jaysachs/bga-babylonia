@@ -42,12 +42,13 @@ class Hand {
         return new Hand($pieces);
     }
 
-    public function grow(int $newsize) {
+    public function extend(int $newsize) {
         if ($newsize <= count($this->pieces)) {
-            throw \InvalidArgumentException("Can't shrink hand from " + $this->size() + " to " + $newsize);
+            throw \InvalidArgumentException("Can't shrink hand from " . $this->size() . " to " . $newsize);
         }
-        for ($i = count($pieces); $i < $newsize; $i++) {
-            $pieces[] = Piece::EMPTY;
+        error_log("extending from " . count($this->pieces) . " to " . $newsize);
+        for ($i = count($this->pieces); $i < $newsize; $i++) {
+            $this->pieces[] = Piece::EMPTY;
         }
     }
 
