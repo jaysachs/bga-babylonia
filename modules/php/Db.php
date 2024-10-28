@@ -114,13 +114,6 @@ class Db {
         );
     }
 
-    public function retrieveHandPiece(int $player_id, int $handpos): ?Piece {
-        $v = $this->db->getUniqueValueFromDB(
-            "SELECT piece from hands WHERE player_id = $player_id AND pos=$handpos"
-        );
-        return $v == null ? null : Piece::from($v);
-    }
-
     public function retrievePlayersData(): array {
         return $this->db->getCollectionFromDb(
             "SELECT P.player_id id, P.player_id, P.player_score score, P.captured_city_count captured_city_count, P.player_no player_number, P.player_name player_name, H.hand_size, Q.pool_size

@@ -166,10 +166,7 @@ class Model {
     public function playPiece(int $handpos, int $row, int $col): array {
         // also retrieve ziggurat tiles held
 
-        $piece = $this->db->retrieveHandPiece($this->player_id, $handpos);
-        if ($piece == null) {
-            throw new \InvalidArgumentException("No piece in hand at $handpos");
-        }
+        $piece = $this->hand()->play($handpos);
         $hex = $this->board()->hexAt($row, $col);
         if ($hex == null) {
             throw new \LogicException("Hex at $row $col was null");
