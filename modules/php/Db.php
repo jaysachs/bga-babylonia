@@ -39,6 +39,22 @@ class Db {
         return $e == null ? 'NULL' : "'$e->value'";
     }
 
+    public function retrieveBoard(): Board {
+        $hexes = [];
+        $data = $this->db->getObjectListFromDB2(
+                "SELECT board_row row, board_col col, hextype, piece, scored,
+                        player_id board_player
+                 FROM board");
+        foreach ($data as &$hex) {
+            $hexes[] = new Hex(HexType::from($hex['hextype']),
+                               intval($hex['row']),
+                               intval($hex['col']),
+                               Piece::from($hex['piece']),
+                               intval($hex['board_player']));
+        }
+        return Board::fromHexes($hexes);
+    }
+
     public function insertBoard(Board $board): void {
         $sql = "INSERT INTO board (board_row, board_col, hextype, piece, scored, player_id) VALUES ";
         $sql_values = [];
@@ -51,6 +67,13 @@ class Db {
         });
         $sql .= implode(',', $sql_values);
         $this->db->DbQuery( $sql );
+    }
+
+    public function updateHex(Hex $hex): void {
+        $piece = $hex->piece->value;
+        $this->db->DbQuery("UPDATE board
+                     SET piece='$piece', player_id=$hex->player_id
+                     WHERE board_row=$hex->row AND board_col=$hex->col");
     }
 
     public function upsertPool(int $player_id, Pool $pool): void {
@@ -66,22 +89,6 @@ class Db {
         }
         if (count($sql_values) > 0) {
             $sql = "INSERT INTO handpools (player_id, seq_id, piece) VALUES "
-                . implode(',', $sql_values);
-            $this->db->DbQuery( $sql );
-        }
-    }
-
-    // TODO: this is inefficient, improve it.
-    public function upsertHand(int $player_id, Hand $hand): void {
-        $sql = "DELETE FROM hands WHERE player_id = $player_id";
-        $this->db->DbQuery( $sql );
-        // then the hands
-        $sql_values = [];
-        foreach ($hand->pieces() as $i => $p) {
-            $sql_values[] = "($player_id, $i, '$p->value')";
-        }
-        if (count($sql_values) > 0) {
-            $sql = "INSERT INTO hands (player_id, pos, piece) VALUES "
                 . implode(',', $sql_values);
             $this->db->DbQuery( $sql );
         }
@@ -104,6 +111,22 @@ class Db {
         );
     }
 
+    // TODO: this is inefficient, improve it.
+    public function upsertHand(int $player_id, Hand $hand): void {
+        $sql = "DELETE FROM hands WHERE player_id = $player_id";
+        $this->db->DbQuery( $sql );
+        // then the hands
+        $sql_values = [];
+        foreach ($hand->pieces() as $i => $p) {
+            $sql_values[] = "($player_id, $i, '$p->value')";
+        }
+        if (count($sql_values) > 0) {
+            $sql = "INSERT INTO hands (player_id, pos, piece) VALUES "
+                . implode(',', $sql_values);
+            $this->db->DbQuery( $sql );
+        }
+    }
+
     public function retrieveHand(int $player_id): Hand {
         $data = $this->db->getObjectListFromDB2(
             "SELECT piece from hands WHERE player_id = $player_id ORDER BY pos",
@@ -112,27 +135,6 @@ class Db {
         return new Hand(
             array_map(function ($p): Piece { return Piece::from($p); }, $data)
         );
-    }
-
-    public function retrieveBoard(): Board {
-        $hexes = [];
-        $data = $this->db->getObjectListFromDB2(
-                "SELECT board_row row, board_col col, hextype, piece, scored,
-                        player_id board_player
-                 FROM board");
-        foreach ($data as &$hex) {
-            $hexes[] = new Hex(HexType::from($hex['hextype']),
-                               intval($hex['row']),
-                               intval($hex['col']),
-                               Piece::from($hex['piece']),
-                               intval($hex['board_player']));
-        }
-        return Board::fromHexes($hexes);
-    }
-
-    public function removeTurnProgress(int $player_id): void {
-        $sql = "DELETE FROM turn_progress WHERE player_id=$player_id";
-        $this->db->DbQuery( $sql );
     }
 
     public function updatePlayers(array $player_infos): void {
@@ -147,6 +149,16 @@ class Db {
         }
     }
 
+    public function removeTurnProgress(int $player_id): void {
+        $sql = "DELETE FROM turn_progress WHERE player_id=$player_id";
+        $this->db->DbQuery( $sql );
+    }
+
+    // TODO: this logic maybe doesn't belong here at the data layer.
+    // Instead, move it to the model?
+    // Right now, this updates the score but the model doesn't get
+    // updated, so it can't be used in Game::actPlayPiece to return the score
+    // which is a bit of a smell.
     public function insertMove(Move $move) {
         $c = $this->boolValue($move->captured);
         $piece = $move->piece->value;
@@ -196,13 +208,6 @@ class Db {
         return new TurnProgress($moves);
     }
 
-    public function updateHex(Hex $hex): void {
-        $piece = $hex->piece->value;
-        $this->db->DbQuery("UPDATE board
-                     SET piece='$piece', player_id=$hex->player_id
-                     WHERE board_row=$hex->row AND board_col=$hex->col");
-    }
-
     public function retrieveAllPlayerInfo(): array /* int => PlayerInfo */ {
         // TODO: retrieve zig cards? or remove from PlayerInfo?
         $result = [];
@@ -214,11 +219,10 @@ class Db {
     }
 
     public function retrievePlayerInfo(int $player_id): PlayerInfo {
-        $sql = Db::SQL_PLAYER_INFO . "WHERE player_id = $player_id";
+        $sql = Db::SQL_PLAYER_INFO . " WHERE P.player_id = $player_id";
         $player_data = $this->db->getNonEmptyObjectFromDB2( $sql );
         return $this->playerInfoFromData($player_id, $player_data);
     }
-
 
     const SQL_PLAYER_INFO =
         "SELECT P.player_id id, P.player_id, P.player_score score,
@@ -248,13 +252,6 @@ class Db {
                               intval($pd["captured_city_count"]),
                               intval($pd["hand_size"]),
                               intval($pd["pool_size"]));
-    }
-
-    public function retrieveScore(int $player_id): int {
-        $v = $this->db->getUniqueValueFromDB(
-            "SELECT player_score from player WHERE player_id = $player_id "
-        );
-        return $v == null ? null : intval($v);
     }
 
     public function insertZigguratCards(array $ziggurats): void {
