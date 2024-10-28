@@ -267,7 +267,7 @@ class Model {
         // $info = $this->playerInfo();
         // $this->db->updatePlayerInfo($this->player_id, $info);
 
-        if ($hand->size() == 0 || $board->cityCount() <= 1) {
+        if ($hand->size() == 0 || $this->board()->cityCount() <= 1) {
             return true;
         }
 

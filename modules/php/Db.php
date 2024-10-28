@@ -124,13 +124,13 @@ class Db {
     public function retrievePlayersData(): array {
         return $this->db->getCollectionFromDb(
             "SELECT P.player_id id, P.player_id, P.player_score score, P.captured_city_count captured_city_count, P.player_no player_number, P.player_name player_name, H.hand_size, Q.pool_size
-             FROM
+             FROM player P
+             LEFT JOIN
                (SELECT player_id, COUNT(*) hand_size
                 FROM hands WHERE piece <> 'empty'
                 GROUP BY player_id) H
-             JOIN player P
              ON P.player_id = H.player_id
-             JOIN
+             LEFT JOIN
                (SELECT player_id, COUNT(*) pool_size
                 FROM handpools
                 GROUP BY player_id) Q
@@ -243,15 +243,6 @@ class Db {
     }
 
     public function retrievePlayerInfo(int $player_id): PlayerInfo {
-        $sql = "SELECT pos, piece
-                FROM hands
-                WHERE player_id = $player_id
-                ORDER BY pos";
-        $handdata = $this->db->getObjectListFromDB2( $sql );
-        $sql = "SELECT piece
-                FROM handpools
-                WHERE player_id = $player_id";
-        $pooldata = $this->db->getObjectListFromDB2( $sql );
         $sql = "SELECT ziggurat_card
                 FROM ziggurat_cards
                 WHERE player_id = $player_id";
@@ -260,7 +251,7 @@ class Db {
                 FROM player
                 WHERE player_id = $player_id";
         $player_data = $this->db->getNonEmptyObjectFromDB2( $sql );
-        return PlayerInfo::fromDbResults( $player_id, $handdata, $pooldata, $ziggurat_data, $player_data );
+        return PlayerInfo::fromDbResults( $player_id, $ziggurat_data, $player_data );
     }
 
     public function insertPlayerInfos(array $player_infos): void {
