@@ -114,31 +114,6 @@ class Db {
         );
     }
 
-    public function retrievePlayersData(): array {
-        return $this->db->getCollectionFromDb(
-            "SELECT P.player_id id, P.player_id, P.player_score score, P.captured_city_count captured_city_count, P.player_no player_number, P.player_name player_name, H.hand_size, Q.pool_size
-             FROM player P
-             LEFT JOIN
-               (SELECT player_id, COUNT(*) hand_size
-                FROM hands WHERE piece <> 'empty'
-                GROUP BY player_id) H
-             ON P.player_id = H.player_id
-             LEFT JOIN
-               (SELECT player_id, COUNT(*) pool_size
-                FROM handpools
-                GROUP BY player_id) Q
-             ON P.player_id = Q.player_id;"
-            // "SELECT P.player_id player_id,
-            //         P.player_score score,
-            //         P.player_color color,
-            //         COUNT(H.piece) hand_size,
-            //         GROUP_CONCAT(z.ziggurat_card SEPARATOR ',') cards
-            //  FROM player P
-            //  INNER JOIN hands H ON P.player_id = H.player_id
-            //  INNER JOIN ziggurat_cards Z ON P.player_id = Z.player_id"
-        );
-    }
-
     public function retrieveBoard(): Board {
         return Board::fromDbResult($this->retrieveBoardData());
     }
@@ -218,34 +193,49 @@ class Db {
 
     public function retrieveAllPlayerInfo(): array /* int => PlayerInfo */ {
         // TODO: retrieve zig cards? or remove from PlayerInfo?
-        $sql = "SELECT player_id id, player_name, player_no, captured_city_count, player_score
-                FROM player";
         $result = [];
-        $data = $this->db->getCollectionFromDB( $sql );
+        $data = $this->db->getCollectionFromDB( Db::SQL_PLAYER_INFO );
         foreach ($data as $pid => $pd) {
             $result[$pid] = $this->playerInfoFromData($pid, $pd);
         }
         return $result;
     }
 
+    public function retrievePlayerInfo(int $player_id): PlayerInfo {
+        $sql = Db::SQL_PLAYER_INFO . "WHERE player_id = $player_id";
+        $player_data = $this->db->getNonEmptyObjectFromDB2( $sql );
+        return $this->playerInfoFromData($player_id, $player_data);
+    }
+
+
+    const SQL_PLAYER_INFO =
+        "SELECT P.player_id id, P.player_id, P.player_score score,
+                P.captured_city_count captured_city_count, P.player_no player_number,
+                P.player_name player_name, H.hand_size, Q.pool_size
+         FROM player P
+         LEFT JOIN
+           (SELECT player_id, COUNT(*) hand_size
+            FROM hands WHERE piece <> 'empty'
+            GROUP BY player_id) H
+         ON P.player_id = H.player_id
+         LEFT JOIN
+           (SELECT player_id, COUNT(*) pool_size
+            FROM handpools
+            GROUP BY player_id) Q
+         ON P.player_id = Q.player_id";
+    //         GROUP_CONCAT(z.ziggurat_card SEPARATOR ',') cards
+    //         ...
+    //  INNER JOIN ziggurat_cards Z ON P.player_id = Z.player_id"
+
+
     private function playerInfoFromData(int $player_id, array $pd): PlayerInfo {
         return new PlayerInfo($player_id,
                               $pd["player_name"],
-                              intval($pd["player_no"]),
-                              intval($pd["player_score"]),
-                              intval($pd["captured_city_count"]));
-    }
-
-    public function retrievePlayerInfo(int $player_id): PlayerInfo {
-        // $sql = "SELECT ziggurat_card
-        //         FROM ziggurat_cards
-        //         WHERE player_id = $player_id";
-        // $ziggurat_data = $this->db->getObjectListFromDB2( $sql );
-        $sql = "SELECT player_id id, player_name, player_no, captured_city_count, player_score
-                FROM player
-                WHERE player_id = $player_id";
-        $player_data = $this->db->getNonEmptyObjectFromDB2( $sql );
-        return $this->playerInfoFromData($player_id, $player_data);
+                              intval($pd["player_number"]),
+                              intval($pd["score"]),
+                              intval($pd["captured_city_count"]),
+                              intval($pd["hand_size"]),
+                              intval($pd["pool_size"]));
     }
 
     public function retrieveScore(int $player_id): int {

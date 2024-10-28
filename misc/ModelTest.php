@@ -21,7 +21,7 @@ class TestDb extends Db {
     public function __construct() {
         Db::__construct(null);
         for ($i = 1; $i <= 3; $i++) {
-            $this->player_infos[$i] = new PlayerInfo($i, "", 0, 0, 0);
+            $this->player_infos[$i] = new PlayerInfo($i, "", 0, 0, 0, 5, 25);
         }
     }
 
@@ -72,9 +72,9 @@ final class ModelTest extends TestCase
 
         $this->assertEquals(
             [
-                1 => new PlayerInfo(1, "", 0, 0, 0),
-                2 => new PlayerInfo(2, "", 0, 2, 0),
-                3 => new PlayerInfo(3, "", 0, 7, 1),
+                1 => new PlayerInfo(1, "", 0, 0, 0, 5, 25),
+                2 => new PlayerInfo(2, "", 0, 2, 0, 5, 25),
+                3 => new PlayerInfo(3, "", 0, 7, 1, 5, 25),
             ],
             $db->retrieveAllPlayerInfo()
         );
@@ -93,9 +93,9 @@ final class ModelTest extends TestCase
 
         $this->assertEquals(
             [
-                1 => new PlayerInfo(1, "", 0, 2, 0),
-                2 => new PlayerInfo(2, "", 0, 2, 0),
-                3 => new PlayerInfo(3, "", 0, 11, 2),
+                1 => new PlayerInfo(1, "", 0, 2, 0, 5, 25),
+                2 => new PlayerInfo(2, "", 0, 2, 0, 5, 25),
+                3 => new PlayerInfo(3, "", 0, 11, 2, 5, 25),
             ],
             $db->retrieveAllPlayerInfo()
         );

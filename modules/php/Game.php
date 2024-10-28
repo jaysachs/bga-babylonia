@@ -61,9 +61,8 @@ class Game extends \Table
 
     public function actPlayPiece(int $handpos, int $row, int $col): void
     {
-        $player_id = intval($this->getActivePlayerId());
+        $player_id = $this->activePlayerId();
         $model = new Model($this->db, $player_id);
-
         $result = $model->playPiece($handpos, $row, $col);
         $points = $result["points"];
         $piece = $result["piece"];
@@ -94,7 +93,7 @@ class Game extends \Table
 
     public function actDonePlayPieces(): void
     {
-        $player_id = intval($this->getActivePlayerId());
+        $player_id = $this->activePlayerId();
         $model = new Model($this->db, $player_id);
         if (count($model->turnProgress()->moves) < 2) {
             throw new \BgaUserException("Attempt to end turn but less than 2 pieces played");
@@ -120,7 +119,7 @@ class Game extends \Table
      */
     public function argPlayPieces(): array
     {
-        $model = new Model($this->db, intval($this->getActivePlayerId()));
+        $model = new Model($this->db, $this->activePlayerId());
         // [ ["farmer" => [hex1, hex2, ...] ];
         $allowed_moves = $model->getAllowedMoves();
 
@@ -203,7 +202,7 @@ class Game extends \Table
      * Called when state finishTurn is entered.
      */
     public function stFinishTurn(): void {
-        $player_id = intval($this->getActivePlayerId());
+        $player_id = $this->activePlayerId();
         $model = new Model($this->db, $player_id);
 
         // TODO: this doesn't belong here
@@ -277,6 +276,14 @@ class Game extends \Table
 //       }
     }
 
+    private function currentPlayerId(): int {
+        return intval($this->getCurrentPlayerId());
+    }
+
+    private function activePlayerId(): int {
+        return intval($this->getActivePlayerId());
+    }
+
     /*
      * Gather all information about current game situation (visible by
      * the current player).
@@ -290,12 +297,24 @@ class Game extends \Table
     protected function getAllDatas()
     {
         // WARNING: We must only return information visible by the current player.
-        $current_player_id = intval($this->getCurrentPlayerId());
 
-        $model = new Model($this->db, $current_player_id);
+        $model = new Model($this->db, $this->currentPlayerId());
+
+        $players = [];
+        foreach ($model->allPlayerInfo() as $pid => $pi) {
+            $players[$pid] = [
+                "player_id" => $pid,
+                "player_name" => $pi->player_name,
+                "player_number" => $pi->player_number,
+                "score" => $pi->score,
+                "captured_city_count" => $pi->captured_city_count,
+                "hand_size" => $pi->hand_size,
+                "pool_size" => $pi->pool_size
+            ];
+        }
 
         return [
-            'players' => $this->db->retrievePlayersData(),
+            'players' => $players,
             'hand' => array_map(function ($p) { return $p->value; },
                                 $model->hand()->pieces()),
             'board' => $this->db->retrieveBoardData(),

@@ -30,9 +30,11 @@ class PlayerInfo {
 
     public function __construct(public int $player_id,
                                 public string $player_name,
-                                public int $player_no,
+                                public int $player_number,
                                 public int $score,
-                                public int $captured_city_count) {
+                                public int $captured_city_count,
+                                public int $hand_size,
+                                public int $pool_size) {
     }
 }
 
