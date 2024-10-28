@@ -26,27 +26,18 @@ declare(strict_types=1);
 
 namespace Bga\Games\babylonia;
 
-// Ziggurat tiles could continue to live here, maybe?
+// TODO: Ziggurat tiles maybe don't need to be here?
+// Maybe have an encapsulating class for the collection?
 class PlayerInfo {
-    public int $captured_city_count = 0;
-    public array $ziggurat_cards = array(); /* ZigguratCard */
-    public int $score = 0;
-    public int $id = 0;
 
-    public static function newPlayerInfo($pid) {
-        $p = new PlayerInfo();
-        return $p;
+    public function __construct(public int $player_id,
+                                public int $score,
+                                public int $captured_city_count,
+                                public array /* ZigguratCard */ $ziggurat_cards) {
     }
 
-    public static function fromDbResults(int $player_id, array $ziggurat_data, array $player_data): PlayerInfo {
-        $p = new PlayerInfo();
-        $p->id = $player_id;
-        foreach ($ziggurat_data as $zd) {
-            $p->ziggurat_cards[] = ZigguratCard::from($zd);
-        }
-        $p->captured_city_count = intval($player_data['captured_city_count']);
-        $p->score = intval($player_data['score']);
-        return $p;
+    public static function newPlayerInfo($pid) {
+        return new PlayerInfo($pid, 0, 0, []);
     }
 
     public function hasZigguratCard(ZigguratCard $type): bool {

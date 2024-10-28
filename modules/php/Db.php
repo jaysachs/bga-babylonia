@@ -231,7 +231,14 @@ class Db {
                 FROM player
                 WHERE player_id = $player_id";
         $player_data = $this->db->getNonEmptyObjectFromDB2( $sql );
-        return PlayerInfo::fromDbResults( $player_id, $ziggurat_data, $player_data );
+
+        return new PlayerInfo(
+            $player_id,
+            intval($player_data["score"]),
+            intval($player_data["captured_city_count"]),
+            array_map(function ($zc) { return ZiggratCard::from($zc); },
+                      $ziggurat_data)
+        );
     }
 
     public function retrieveScore(int $player_id): int {
