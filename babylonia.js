@@ -388,6 +388,7 @@ function (dojo, declare) {
         },
 
         handClass: function(piece) {
+            console.log("handClass(" + piece + ")");
             if (piece == null) {
                 return "unavailable";
             }
@@ -422,9 +423,9 @@ function (dojo, declare) {
 
         renderHand: function(hand) {
             console.log("renderHand: " + hand);
-
+            console.log(hand);
             for (i = 0; i < hand.length; ++i) {
-                this.handDiv(i).className = this.handClass(hand[i].piece);
+                this.handDiv(i).className = this.handClass(hand[i]);
             }
             console.log("renderHand done");
         },

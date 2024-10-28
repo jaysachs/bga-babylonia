@@ -227,17 +227,15 @@ class Game extends \Table
             "pool_size" => $model->pool()->size(),
         ]);
 
-        // TODO: this shouldn't return the whole hand, just the refilled parts
-        // Capture the delta and return *that*. Then it can be animated on
+        // TODO: this doesn't have to return the whole hand,
+        // just the refilled parts.
+        // Could capture the delta and return *that*. Then it can be animated on
         // the client.
-        $xhand = [];
-        foreach ($model->hand()->dataDump() as $piece) {
-            $xhand[] = ["piece" => $piece->value];
-        }
 
         $this->notifyPlayer($player_id, "handRefilled", "{You} refilled your hand", [
             "player_id" => $player_id,
-            "hand" => $xhand,
+            'hand' => array_map(function ($p) { return $p->value; },
+                                $model->hand()->pieces()),
         ]);
 
         $this->giveExtraTime($player_id);
@@ -295,10 +293,12 @@ class Game extends \Table
         // WARNING: We must only return information visible by the current player.
         $current_player_id = intval($this->getCurrentPlayerId());
 
-        // TODO: include zig cards info as well.
+        $model = new Model($this->db, $current_player_id);
+
         return [
             'players' => $this->db->retrievePlayersData(),
-            'hand' => $this->db->retrieveHandData($current_player_id),
+            'hand' => array_map(function ($p) { return $p->value; },
+                                $model->hand()->pieces()),
             'board' => $this->db->retrieveBoardData(),
             'ziggurat_cards' => $this->db->retrieveZigguratCards()
         ];

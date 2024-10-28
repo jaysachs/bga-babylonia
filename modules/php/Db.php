@@ -58,7 +58,7 @@ class Db {
         $this->db->DbQuery( $sql );
 
         $sql_values = [];
-        foreach ($pool->dataDump() as $i => $p) {
+        foreach ($pool->pieces() as $i => $p) {
             if ($p != null) {
                 $x = $p->value;
                 $sql_values[] = "($player_id, $i, '$x')";
@@ -77,7 +77,7 @@ class Db {
         $this->db->DbQuery( $sql );
         // then the hands
         $sql_values = [];
-        foreach ($hand->dataDump() as $i => $p) {
+        foreach ($hand->pieces() as $i => $p) {
             $sql_values[] = "($player_id, $i, '$p->value')";
         }
         if (count($sql_values) > 0) {
@@ -136,12 +136,6 @@ class Db {
             //  FROM player P
             //  INNER JOIN hands H ON P.player_id = H.player_id
             //  INNER JOIN ziggurat_cards Z ON P.player_id = Z.player_id"
-        );
-    }
-
-    public function retrieveHandData(int $player_id): array {
-        return $this->db->getObjectListFromDB2(
-            "SELECT piece from hands WHERE player_id = $player_id ORDER BY pos"
         );
     }
 

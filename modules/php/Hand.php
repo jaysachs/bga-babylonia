@@ -52,8 +52,7 @@ class Hand {
         }
     }
 
-    // TODO: only if needed.
-    public function dataDump(): array /* int => Piece */ {
+    public function pieces(): array /* int => Piece */ {
         return $this->pieces;
     }
 
