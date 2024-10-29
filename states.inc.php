@@ -112,7 +112,7 @@ $machinestates = [
         ],
         "updateGameProgression" => true,
         "transitions" => [
-            "hexSelected" => STATE_END_OF_TURN_SCORING,
+            "citySelected" => STATE_END_OF_TURN_SCORING,
             "zigguratSelected" => STATE_PLAYER_SELECT_ZIGGURAT_CARD,
         ]
     ],

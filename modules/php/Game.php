@@ -257,7 +257,8 @@ class Game extends \Table
             "row" => $row,
             "col" => $col,
         ]);
-        $this->gamestate->nextState("hexSelected");
+        // TODO: need to go to "zigguratSelected" if ziggurat chosen.
+        $this->gamestate->nextState("citySelected");
     }
 
     public function stEndOfTurnScoring(): void {
