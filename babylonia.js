@@ -104,9 +104,7 @@ function (dojo, declare) {
             this.playerNumber = gamedatas.players[this.player_id].player_number;
 
             console.log("Setting the the game board");
-            // Set up the board
             let board = $('board');
-
             // console.log( gamedatas.board );
 
             for( let h = 0; h < gamedatas.board.length; ++h) {
@@ -188,16 +186,14 @@ function (dojo, declare) {
                 return;
             }
             console.log("selected hex " + hex.row + "," + hex.col);
-
-            this.bgaPerformAction("actSelectHexToScore", {
+            let rc = {
                 row: hex.row,
                 col: hex.col
-            }).then(() =>  {
-                // What to do after the server call if it succeeded
-                // (most of the time, nothing, as the game will react
-                // to notifs / change of state instead)
+            };
+            this.bgaPerformAction("actSelectHexToScore", rc ).then(() =>  {
+                this.markHexUnplayable(rc);
             });
-                },
+        },
 
         selectPieceToPlay: function(event) {
             // first find selected hand piece, if any.
@@ -225,9 +221,10 @@ function (dojo, declare) {
                 row: hex.row,
                 col: hex.col
             }).then(() =>  {
-                // What to do after the server call if it succeeded
-                // (most of the time, nothing, as the game will react
-                // to notifs / change of state instead)
+                this.markHexUnplayable({
+                    row: hex.row,
+                    col: hex.col
+                });
             });
         },
 
@@ -235,13 +232,13 @@ function (dojo, declare) {
 
         pieceClasses: [ "priest", "servant", "farmer", "merchant" ],
 
-        removeAllHighlightedHexes: function() {
+        markAllHexesUnplayable: function() {
             $("board").querySelectorAll('.playable')
                 .forEach(div => div.className = '');
         },
 
         pieceForHandDivClassList: function(cl) {
-            console.log("pieceFor: " + cl);
+            // console.log("pieceFor: " + cl);
             for (var i = 0; i < this.pieceClasses.length; ++i) {
                 if (cl.contains(this.handClass(this.pieceClasses[i]))) {
                     return this.pieceClasses[i];
@@ -265,22 +262,22 @@ function (dojo, declare) {
         },
 
         markHexPlayable: function (rc) {
-            this.hexDiv(rc.row, rc.col).firstElementChild.firstElementChild.className = 'playable';
+            this.hexDiv(rc.row, rc.col).firstElementChild.firstElementChild.classList.add('playable');
         },
 
         markHexUnplayable: function (rc2) {
-            this.hexDiv(rc2.row, rc2.col).firstElementChild.firstElementChild.className = '';
+            this.hexDiv(rc2.row, rc2.col).firstElementChild.firstElementChild.classList.remove('playable');
         },
 
-        highlightScoreableHexes: function(hexes) {
+        markScoreableHexesPlayable: function(hexes) {
             hexes.forEach(rc => this.markHexPlayable(rc));
         },
 
-        addPlayableFor: function(cl) {
+        markHexesPlayableForPiece: function(cl) {
             this.allowedMovesFor(cl).forEach(rc => this.markHexPlayable(rc));
         },
 
-        removePlayableFor: function(cl) {
+        markHexesUnplayableForPiece: function(cl) {
             this.allowedMovesFor(cl).forEach(rc => this.markHexUnplayable(rc));
         },
 
@@ -299,13 +296,13 @@ function (dojo, declare) {
                     if (!c.contains("selected")) {
                         hc.querySelectorAll('.selected').forEach(div => {
                             if (div.classList.contains('selected')) {
-                                this.removePlayableFor(div.classList);
+                                this.markHexesUnplayableForPiece(div.classList);
                             }
                             div.classList.remove('selected');
                         });
-                        this.addPlayableFor(c);
+                        this.markHexesPlayableForPiece(c);
                     } else {
-                        this.removePlayableFor(c);
+                        this.markHexesUnplayableForPiece(c);
                     }
                     c.toggle("selected");
                 }
@@ -321,36 +318,24 @@ function (dojo, declare) {
         // onEnteringState: this method is called each time we are entering into a new game state.
         //                  You can use this method to perform some user interface changes at this moment.
         //
-        onEnteringState: function( stateName, args )
+        onEnteringState: function( stateName, stateInfo )
         {
-            console.log( 'Entering state: '+stateName, args );
+            console.log( 'Entering state: '+stateName + " " +  this.isCurrentPlayerActive(), stateInfo );
             this.stateName = stateName;
+            let args = stateInfo.args;
             switch( stateName )
             {
                 case 'endOfTurnScoring':
-                console.log("remove all highlights");
-                this.removeAllHighlightedHexes();
+                // this.markAllHexesUnplayable();
                 break;
+
                 case 'selectHexToScore':
-                console.log("now highlighting");
-                console.log(args);
-                console.log(args.hexes);
-                console.log("abc");
-                this.highlightScoreableHexes(args.hexes);
+                // this.markAllHexesUnplayable();
+                // TODO: also get the right onclick handler!!
+                this.markScoreableHexesPlayable(args.hexes);
                 break;
 
-            /* Example:
-
-            case 'myGameState':
-
-                // Show some HTML block at this game state
-                dojo.style( 'my_html_block_id', 'display', 'block' );
-
-                break;
-           */
-
-
-            case 'dummmy':
+                case 'dummmy':
                 break;
             }
         },
@@ -361,11 +346,9 @@ function (dojo, declare) {
         onLeavingState: function( stateName )
         {
             console.log( 'Leaving state: '+stateName );
-            this.removeAllHighlightedHexes();
             this.stateName = "";
             switch( stateName )
             {
-
             /* Example:
 
             case 'myGameState':
@@ -393,6 +376,10 @@ function (dojo, declare) {
             {
                 switch( stateName )
                 {
+                    case 'endOfTurnScoring':
+                    this.markAllHexesUnplayable();
+                    break;
+
                     // If we want to get fancy, can even roll own HTML for buttons:
                     // this.addActionButton(
                     //  'gear_button',
@@ -407,13 +394,8 @@ function (dojo, declare) {
                     //         row: 0,
                     //         col: 0
                     //     });
-                    // console.log("remove all highligts");
-                    this.removeAllHighlightedHexes();
-                    console.log("now highlighting");
-                    console.log(args.hexes);
-                    // TODO: get the right onclick handler!!
-                    this.highlightScoreableHexes(args.hexes);
                     break;
+
                     case 'playPieces':
                     if (args.canEndTurn) {
                         if (args.allowedMoves.length == 0) {
@@ -424,8 +406,7 @@ function (dojo, declare) {
                         this.addActionButton(
                             'end-btn',
                             'End turn',
-                            () => this.bgaPerformAction("actDonePlayPieces").then(() => this.removeAllHighlightedHexes())
-                    );
+                            () => this.bgaPerformAction("actDonePlayPieces"));
                     } else {
                         this.updateStatusBar('You must play a piece');
                     }
@@ -433,7 +414,7 @@ function (dojo, declare) {
                     // save allowedMoves so selection can highlight hexes
                     // and enforce placement rules.
                     this.allowedMoves = args.allowedMoves;
-                    this.removeAllHighlightedHexes();
+                    this.markAllHexesUnplayable();
 
                     this.addActionButton(
                         'undo-btn',
@@ -555,7 +536,7 @@ function (dojo, declare) {
         },
 
         notif_cityScored: function( notif ) {
-            console.log( notif );
+            console.log( 'notif_cityScored', notif );
             this.renderPlayedPiece( notif.args.row, notif.args.col, 'empty', null );
             if ( notif.args.captured_by != 0 ) {
                 // TODO: update player and global city scored count
@@ -563,15 +544,14 @@ function (dojo, declare) {
         },
 
         notif_turnFinished: function( notif ) {
-            console.log( "turnFinished" );
-            console.log( notif );
+            console.log( 'notif_turnFinished', notif );
 
             this.updateHandCount( notif.args );
             this.updatePoolCount( notif.args );
         },
 
         notif_cityScoredPlayer: function( notif ) {
-            console.log( notif );
+            console.log( 'notif_cityScoredPlayer', notif );
 
             // TODO: animate hexes contributing to scoring
 
@@ -580,8 +560,7 @@ function (dojo, declare) {
         },
 
         notif_piecePlayed: function( notif ) {
-            console.log( 'notif_piecePlayed' );
-            console.log( notif );
+            console.log( 'notif_piecePlayed', notif );
             this.renderPlayedPiece( notif.args.row, notif.args.col, notif.args.piece, notif.args.player_number );
             if (notif.args.player_number == this.playerNumber) {
                 this.handDiv(notif.args.handpos).className = this.handClass("empty");
@@ -592,8 +571,7 @@ function (dojo, declare) {
         },
 
         notif_handRefilled: function( notif ) {
-            console.log( 'notif_handRefilled' );
-            console.log( notif );
+            console.log( 'notif_handRefilled', notif );
             this.renderHand( notif.args.hand, notif.args.player_number );
         },
     });
