@@ -69,11 +69,11 @@ class Game extends \Table
 
         $msg = "";
         if ($points > 0) {
-            $msg = clienttranslate('${player_name} plays ${piece} to ${row} ${col} scoring ${points} points');
+            $msg = '${player_name} plays ${piece} to ${row} ${col} scoring ${points} points';
         } else {
-            $msg = clienttranslate('${player_name} plays ${piece} to ${row} ${col}');
+            $msg = '${player_name} plays ${piece} to ${row} ${col}';
         }
-        $this->notifyAllPlayers("piecePlayed", $msg, [
+        $this->notifyAllPlayers("piecePlayed", clienttranslate($msg), [
             "player_id" => $player_id,
             "player_number" => $this->getPlayerNoById($player_id),
             "player_name" => $this->getActivePlayerName(),
@@ -155,58 +155,85 @@ class Game extends \Table
         return 0;
     }
 
-    private function doScoring(Model $model): void {
-
+    private function scoreCity(Model $model, Hex $cityhex): void {
         $player_infos = $model->allPlayerInfo();
+        $city = $cityhex->piece->value;
+        $scored_city = $model->scoreCity($cityhex);
+        $captured_by = "noone";
+        if ($scored_city->captured_by > 0) {
+            $captured_by = $player_infos[$scored_city->captured_by]->player_name;
+            $msg = '${city} ${row},${col} scored, captured by ${captured_by}';
+        } else {
+            $msg = '${city} ${row},${col} scored, uncaptured';
+        }
 
-        foreach ($model->citiesRequiringScoring() as $cityhex) {
-            $city = $cityhex->piece->value;
-            $scored_city = $model->scoreCity($cityhex);
-            $captured_by = "noone";
-            if ($scored_city->captured_by > 0) {
-                $captured_by = $player_infos[$scored_city->captured_by]->player_name;
-            }
-
-            // First notify that the city was captured
-            $this->notifyAllPlayers(
-                "cityScored",
-                clienttranslate('${city} ${row},${col} scored, captured by ${captured_by}'
-                ), [
+        // First notify that the city was captured
+        $this->notifyAllPlayers(
+            "cityScored",
+            clienttranslate($msg), [
                 "city" => $city,
                 "row" => $cityhex->row,
                 "col" => $cityhex->col,
                 "captured_by" => $captured_by
+            ]
+        );
+
+        // Then notify of the scoring details
+        foreach ($player_infos as $pid => $pi) {
+            $this->notifyAllPlayers(
+                "cityScoredPlayer",
+                clienttranslate('${player_name} scored ${points}'), [
+                    // TODO: make more efficient, by only passing the delta?
+                    "captured_city_count" => $pi->captured_city_count,
+                    "scored_hexes" => $scored_city->hexesScoringForPlayer($pid),
+                    "points" => $scored_city->pointsForPlayer($pid),
+                    "score" => $pi->score,
+                    "player_id" => $pid,
+                    "player_name" => $pi->player_name,
                 ]
             );
-
-            // Then notify of the scoring details
-            foreach ($player_infos as $pid => $pi) {
-                $this->notifyAllPlayers(
-                    "cityScoredPlayer",
-                    clienttranslate('${player_name} scored ${points}'), [
-                        // TODO: make more efficient, by only passing the delta?
-                        "captured_city_count" => $pi->captured_city_count,
-                        "scored_hexes" => $scored_city->hexesScoringForPlayer($pid),
-                        "points" => $scored_city->pointsForPlayer($pid),
-                        "score" => $pi->score,
-                        "player_id" => $pid,
-                        "player_name" => $pi->player_name,
-                    ]
-                );
-            }
         }
-
     }
 
-    /**
-     * Called when state finishTurn is entered.
-     */
-    public function stFinishTurn(): void {
+    // TODO: just a placeholder to see that the state machine works.
+    public function stChooseHexToScore(): void {
         $player_id = $this->activePlayerId();
         $model = new Model($this->db, $player_id);
 
-        // TODO: this doesn't belong here
-        $this->doScoring($model);
+        $hexes = $model->citiesRequiringScoring();
+        $player_name = $this->getActivePlayerName();
+        $hex = $hexes[array_rand($hexes)];
+        $this->notifyAllPlayers("scoringSelection", clienttranslate('${player_name} chose hex ${row},${col} to score'), [
+            "player_id" => $player_id,
+            "player_name" => $player_name,
+            "row" => $hex->row,
+            "col" => $hex->col,
+        ]);
+        $this->gamestate->nextState("cityChosen");
+    }
+
+    public function stEndOfTurnScoring(): void {
+        // TODO: implement this for real
+        $model = new Model($this->db, $this->activePlayerId());
+        $hexes = $model->citiesRequiringScoring();
+        if (count($hexes) > 1) {
+            foreach ($hexes as $hex) {
+                $this->scoreCity($model, $hex);
+            }
+            // $this->gamestate->nextState("chooseHex");
+            // return;
+        }
+        else if (count($hexes) == 1) {
+            // TODO: notify that auto-choice was made?
+            $this->scoreCity($model, $hexes[0]);
+        }
+
+        $this->gamestate->nextState("done");
+    }
+
+    public function stFinishTurn(): void {
+        $player_id = $this->activePlayerId();
+        $model = new Model($this->db, $player_id);
 
         $player_name = $this->getActivePlayerName();
         if ($model->finishTurn()) {
@@ -218,8 +245,9 @@ class Game extends \Table
             return;
         }
 
-        $this->notifyAllPlayers("turnFinished", "{$player_name} finished their turn", [
+        $this->notifyAllPlayers("turnFinished", clienttranslate('${player_name} finished their turn'), [
             "player_id" => $player_id,
+            "player_name" => $this->getActivePlayerName(),
             "player_number" => $this->getPlayerNoById($player_id),
             "hand_size" => $model->hand()->size(),
             "pool_size" => $model->pool()->size(),
@@ -230,7 +258,7 @@ class Game extends \Table
         // Could capture the delta and return *that*. Then it can be animated on
         // the client.
 
-        $this->notifyPlayer($player_id, "handRefilled", "{You} refilled your hand", [
+        $this->notifyPlayer($player_id, "handRefilled", clienttranslate("You refilled your hand"), [
             "player_id" => $player_id,
             'hand' => array_map(function ($p) { return $p->value; },
                                 $model->hand()->pieces()),

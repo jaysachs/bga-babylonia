@@ -50,9 +50,10 @@
 //    !! It is not a good idea to modify this file when a game is running !!
 
 if ( !defined('STATE_END_GAME')) { // guard since this included multiple times
-    define("STATE_PLAYER_PLAY_PIECES", 3);
-
-    define("STATE_END_OF_TURN_SCORING", 5);
+    define("STATE_PLAYER_PLAY_PIECES", 2);
+    define("STATE_END_OF_TURN_SCORING", 3);
+    define("STATE_PLAYER_CHOOSE_SCORING", 4);
+    define("STATE_PLAYER_CHOOSE_ZIGGURAT_CARD", 5);
     define("STATE_FINISH_TURN", 6);
     //    define("STATE_PLAYER_GAME_END", 98);
     define("STATE_END_GAME", 99);
@@ -77,32 +78,59 @@ $machinestates = [
         "type" => "activeplayer",
         "args" => "argPlayPieces",
         "possibleactions" => [
-            // these actions are called from the front with bgaPerformAction, and matched to the function on the game.php file
             "actPlayPiece",
             "actDonePlayPieces",
             "actUndo",
         ],
         "transitions" => [
             "playPieces" => STATE_PLAYER_PLAY_PIECES,
-            "done" => STATE_FINISH_TURN,
+            "done" => STATE_END_OF_TURN_SCORING,
         ]
     ],
 
     STATE_END_OF_TURN_SCORING => [
         "name" => "endOfTurnScoring",
+        "type" => "game",
+        "description" => '',
+        "action" => "stEndOfTurnScoring",
+        "updateGameProgression" => true,
+        "transitions" => [
+            "chooseHex" => STATE_PLAYER_CHOOSE_SCORING,
+            "done" => STATE_FINISH_TURN,
+        ],
+    ],
+
+    STATE_PLAYER_CHOOSE_SCORING => [
+        "name" => "chooseWhatToScore",
         "description" => clienttranslate('${actplayer} must choose what to score'),
         "descriptionmyturn" => clienttranslate('${you} must choose what to score'),
-        "type" => "activeplayer",
-        // "action" => "stEndOfTurnScoring",
+
+        // TODO: temporary change to "game" state to test the state transitions.
+        // "type" => "activeplayer",
+        "type" => "game",
+        "action" => "stChooseHexToScore",
+
         "possibleactions" => [
-            // these actions are called from the front with bgaPerformAction, and matched to the function on the game.php file
-            "actChooseTileToScore",
-            "actFinishTurn",
+            "actChooseHexToScore",
         ],
         "updateGameProgression" => true,
         "transitions" => [
-            "moreTilesToScore" => STATE_END_OF_TURN_SCORING,
-            "finishTurn" => STATE_FINISH_TURN,
+            "cityChosen" => STATE_END_OF_TURN_SCORING,
+            "zigguratChosen" => STATE_PLAYER_CHOOSE_ZIGGURAT_CARD,
+        ]
+    ],
+
+    STATE_PLAYER_CHOOSE_ZIGGURAT_CARD => [
+        "name" => "chooseZigguratCard",
+        "description" => clienttranslate('${actplayer} must choose a ziggurat card'),
+        "descriptionmyturn" => clienttranslate('${you} must choose a ziggurat card'),
+        "type" => "activeplayer",
+        "possibleactions" => [
+            "actChooseZigguratCard",
+        ],
+        "updateGameProgression" => true,
+        "transitions" => [
+            "cardChosen" => STATE_END_OF_TURN_SCORING,
         ]
     ],
 
