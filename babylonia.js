@@ -149,7 +149,57 @@ function (dojo, declare) {
             console.log("onHexSelection:" + event.target.id);
             event.preventDefault();
             event.stopPropagation();
+            switch (this.stateName) {
+            case "playPieces":
+                this.selectPieceToPlay(event);
+                break;
+            case "selectHexToScore":
+                this.selectHexToScore(event);
+                break;
+            }
+        },
 
+        // Returns the hex (row,col) clicked on, or null if not a playable hex
+        selectedHex: function(target) {
+            let e = target;
+            while (e.parentElement != null && e.parentElement.id != "board") {
+                e = e.parentElement;
+            }
+            if (e.parentElement == null) {
+                console.log("didn't click on a hex");
+                return null;
+            }
+            // now check if it's allowed
+            let ae = e.firstElementChild.firstElementChild;
+            if (!ae.classList.contains('playable')) {
+                console.log('not playable');
+                return null;
+            }
+            let id = e.id.split("_");
+            return {
+                row: id[1],
+                col: id[2],
+            };
+        },
+
+        selectHexToScore: function(event) {
+            let hex = this.selectedHex(event.target);
+            if (hex == null) {
+                return;
+            }
+            console.log("selected hex " + hex.row + "," + hex.col);
+
+            this.bgaPerformAction("actSelectHexToScore", {
+                row: hex.row,
+                col: hex.col
+            }).then(() =>  {
+                // What to do after the server call if it succeeded
+                // (most of the time, nothing, as the game will react
+                // to notifs / change of state instead)
+            });
+                },
+
+        selectPieceToPlay: function(event) {
             // first find selected hand piece, if any.
             var s = dojo.query( '#hand .selected' );
             if (s.length == 0) {
@@ -163,33 +213,21 @@ function (dojo, declare) {
             let foo = s[0].id.split("_");
             let piece = foo[0];
             let pos = foo[1];
-            let e = event.target;
-            while (e.parentElement != null && e.parentElement.id != "board") {
-                e = e.parentElement;
-            }
-            if (e.parentElement == null) {
-                console.log("didn't click on a hex");
-                return;
-            }
-            // now check if it's allowed
-            let ae = e.firstElementChild.firstElementChild;
-            if (!ae.classList.contains('playable')) {
-                console.log('not playable');
-                return;
-            }
 
-            let id = e.id.split("_");
-            let row = id[1];
-            let col = id[2];
-            console.log("selected hex " + row + "," + col);
+            let hex = this.selectedHex(event.target);
+            if (hex == null) {
+                return;
+            }
+            console.log("selected hex " + hex.row + "," + hex.col);
 
             this.bgaPerformAction("actPlayPiece", {
                 handpos: pos,
-                row: row,
-                col: col
+                row: hex.row,
+                col: hex.col
             }).then(() =>  {
                 // What to do after the server call if it succeeded
-                // (most of the time, nothing, as the game will react to notifs / change of state instead)
+                // (most of the time, nothing, as the game will react
+                // to notifs / change of state instead)
             });
         },
 
@@ -197,7 +235,7 @@ function (dojo, declare) {
 
         pieceClasses: [ "priest", "servant", "farmer", "merchant" ],
 
-        removeAllAllowedMoves: function() {
+        removeAllHighlightedHexes: function() {
             $("board").querySelectorAll('.playable')
                 .forEach(div => div.className = '');
         },
@@ -226,16 +264,24 @@ function (dojo, declare) {
             return m;
         },
 
+        markHexPlayable: function (rc) {
+            this.hexDiv(rc.row, rc.col).firstElementChild.firstElementChild.className = 'playable';
+        },
+
+        markHexUnplayable: function (rc2) {
+            this.hexDiv(rc2.row, rc2.col).firstElementChild.firstElementChild.className = '';
+        },
+
+        highlightScoreableHexes: function(hexes) {
+            hexes.forEach(rc => this.markHexPlayable(rc));
+        },
+
         addPlayableFor: function(cl) {
-            this.allowedMovesFor(cl).forEach(rc => {
-                this.hexDiv(rc.row, rc.col).firstElementChild.firstElementChild.className = 'playable';
-            });
+            this.allowedMovesFor(cl).forEach(rc => this.markHexPlayable(rc));
         },
 
         removePlayableFor: function(cl) {
-            this.allowedMovesFor(cl).forEach(rc => {
-                this.hexDiv(rc.row, rc.col).firstElementChild.firstElementChild.className = '';
-            });
+            this.allowedMovesFor(cl).forEach(rc => this.markHexUnplayable(rc));
         },
 
         onPieceSelection: function(event) {
@@ -267,6 +313,8 @@ function (dojo, declare) {
             return false;
         },
 
+        stateName: "",
+
         ///////////////////////////////////////////////////
         //// Game & client states
 
@@ -276,9 +324,20 @@ function (dojo, declare) {
         onEnteringState: function( stateName, args )
         {
             console.log( 'Entering state: '+stateName, args );
-
+            this.stateName = stateName;
             switch( stateName )
             {
+                case 'endOfTurnScoring':
+                console.log("remove all highlights");
+                this.removeAllHighlightedHexes();
+                break;
+                case 'selectHexToScore':
+                console.log("now highlighting");
+                console.log(args);
+                console.log(args.hexes);
+                console.log("abc");
+                this.highlightScoreableHexes(args.hexes);
+                break;
 
             /* Example:
 
@@ -302,7 +361,8 @@ function (dojo, declare) {
         onLeavingState: function( stateName )
         {
             console.log( 'Leaving state: '+stateName );
-
+            this.removeAllHighlightedHexes();
+            this.stateName = "";
             switch( stateName )
             {
 
@@ -328,6 +388,7 @@ function (dojo, declare) {
         onUpdateActionButtons: function( stateName, args )
         {
             console.log( 'onUpdateActionButtons: '+stateName, args );
+            console.log( "current player active: " + this.isCurrentPlayerActive() );
             if( this.isCurrentPlayerActive() )
             {
                 switch( stateName )
@@ -337,11 +398,21 @@ function (dojo, declare) {
                     //  'gear_button',
                     //  '<div id="gear_token" class="skills_and_techniques gear_token"></div>',
                     //  'onSelectAssetType', null, false, 'blue');
-                    case 'chooseHexToScore':
-                    this.addActionButton(
-                        'rnd-btn',
-                        'Choose one for me',
-                        () => this.bgaPerformAction("actChooseHexToScore"));
+
+                    case 'selectHexToScore':
+                    // this.addActionButton(
+                    //     'rnd-btn',
+                    //     'Choose randomly',
+                    //     () => this.bgaPerformAction("actChooseHexToScore") {
+                    //         row: 0,
+                    //         col: 0
+                    //     });
+                    // console.log("remove all highligts");
+                    this.removeAllHighlightedHexes();
+                    console.log("now highlighting");
+                    console.log(args.hexes);
+                    // TODO: get the right onclick handler!!
+                    this.highlightScoreableHexes(args.hexes);
                     break;
                     case 'playPieces':
                     if (args.canEndTurn) {
@@ -353,7 +424,7 @@ function (dojo, declare) {
                         this.addActionButton(
                             'end-btn',
                             'End turn',
-                            () => this.bgaPerformAction("actDonePlayPieces").then(() => this.removeAllAllowedMoves())
+                            () => this.bgaPerformAction("actDonePlayPieces").then(() => this.removeAllHighlightedHexes())
                     );
                     } else {
                         this.updateStatusBar('You must play a piece');
@@ -362,7 +433,7 @@ function (dojo, declare) {
                     // save allowedMoves so selection can highlight hexes
                     // and enforce placement rules.
                     this.allowedMoves = args.allowedMoves;
-                    this.removeAllAllowedMoves();
+                    this.removeAllHighlightedHexes();
 
                     this.addActionButton(
                         'undo-btn',

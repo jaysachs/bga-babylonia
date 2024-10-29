@@ -52,8 +52,8 @@
 if ( !defined('STATE_END_GAME')) { // guard since this included multiple times
     define("STATE_PLAYER_PLAY_PIECES", 2);
     define("STATE_END_OF_TURN_SCORING", 3);
-    define("STATE_PLAYER_CHOOSE_SCORING", 4);
-    define("STATE_PLAYER_CHOOSE_ZIGGURAT_CARD", 5);
+    define("STATE_PLAYER_SELECT_SCORING_HEX", 4);
+    define("STATE_PLAYER_SELECT_ZIGGURAT_CARD", 5);
     define("STATE_FINISH_TURN", 6);
     //    define("STATE_PLAYER_GAME_END", 98);
     define("STATE_END_GAME", 99);
@@ -93,39 +93,41 @@ $machinestates = [
         "type" => "game",
         "description" => '',
         "action" => "stEndOfTurnScoring",
+        "args" => "argSelectHexToScore",
         "updateGameProgression" => true,
         "transitions" => [
-            "chooseHex" => STATE_PLAYER_CHOOSE_SCORING,
+            "selectHex" => STATE_PLAYER_SELECT_SCORING_HEX,
             "done" => STATE_FINISH_TURN,
         ],
     ],
 
-    STATE_PLAYER_CHOOSE_SCORING => [
-        "name" => "chooseHexToScore",
-        "description" => clienttranslate('${actplayer} must choose what to score'),
-        "descriptionmyturn" => clienttranslate('${you} must choose what to score'),
+    STATE_PLAYER_SELECT_SCORING_HEX => [
+        "name" => "selectHexToScore",
+        "description" => clienttranslate('${actplayer} must select a hex to score'),
+        "descriptionmyturn" => clienttranslate('${you} must select a hex to score'),
         "type" => "activeplayer",
+        "args" => "argSelectHexToScore",
         "possibleactions" => [
-            "actChooseHexToScore",
+            "actSelectHexToScore",
         ],
         "updateGameProgression" => true,
         "transitions" => [
-            "cityChosen" => STATE_END_OF_TURN_SCORING,
-            "zigguratChosen" => STATE_PLAYER_CHOOSE_ZIGGURAT_CARD,
+            "hexSelected" => STATE_END_OF_TURN_SCORING,
+            "zigguratSelected" => STATE_PLAYER_SELECT_ZIGGURAT_CARD,
         ]
     ],
 
-    STATE_PLAYER_CHOOSE_ZIGGURAT_CARD => [
-        "name" => "chooseZigguratCard",
-        "description" => clienttranslate('${actplayer} must choose a ziggurat card'),
-        "descriptionmyturn" => clienttranslate('${you} must choose a ziggurat card'),
+    STATE_PLAYER_SELECT_ZIGGURAT_CARD => [
+        "name" => "selectZigguratCard",
+        "description" => clienttranslate('${actplayer} must select a ziggurat card'),
+        "descriptionmyturn" => clienttranslate('${you} must select a ziggurat card'),
         "type" => "activeplayer",
         "possibleactions" => [
-            "actChooseZigguratCard",
+            "actSelectZigguratCard",
         ],
         "updateGameProgression" => true,
         "transitions" => [
-            "cardChosen" => STATE_END_OF_TURN_SCORING,
+            "cardSelected" => STATE_END_OF_TURN_SCORING,
         ]
     ],
 

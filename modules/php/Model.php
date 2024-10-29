@@ -262,7 +262,31 @@ class Model {
         return false;
     }
 
+    public function scoreZiggurat(Hex $hex): ScoredZiggurat {
+        // TODO: really implement this, checking for a winner,
+        //  and executing a state change
+        $hex = $this->board()->hexAt($hex->row, $hex->col);
+        if (!$hex->piece->isZiggurat()) {
+            throw new \InvalidArgumentException("Attempt to score non-ziggurat {$hex} as a ziggurat");
+        }
+        if ($hex->scored) {
+            throw new \InvalidArgumentException("Attempt to score and already scored ziggurat {$hex}");
+        }
+        if (!$this->hexRequiresScoring($hex)) {
+            throw new \InvalidArgumentException("{$hex} is not ready to be scored");
+        }
+        $hex->scored = true;
+        $this->db->updateHex($hex);
+        return new ScoredZiggurat(0);
+    }
+
     public function scoreCity(Hex $hex): ScoredCity {
+        if (!$hex->piece->isCity()) {
+            throw new \InvalidArgumentException("Attempt to score non-city {$hex} as a city");
+        }
+        if (!$this->hexRequiresScoring($hex)) {
+            throw new \InvalidArgumentException("{$hex} is not a city to be scored");
+        }
         $scores = $this->computeCityScores($hex);
         $player_infos = &$this->allPlayerInfo();
 
@@ -329,9 +353,6 @@ class Model {
 
     // TODO: Also needs to return who captured it.
     private function computeCityScores(Hex $hex): ScoredCity {
-        if (!$this->cityRequiresScoring($hex)) {
-            throw new \InvalidArgumentException("$hex is not a city to be scored");
-        }
         $result = new ScoredCity($hex->piece, $this->allPlayerIds());
         $result->captured_by = $this->computeTileWinner($hex);
 
@@ -369,47 +390,26 @@ class Model {
         return $result;
     }
 
-    private function cityRequiresScoring(Hex $hex): bool {
-        if (!$hex->piece->isCity()) {
-            return false;
+    public function hexRequiresScoring(Hex $hex): bool {
+        if (($hex->piece->isZiggurat() && !$hex->scored)
+            || $hex->piece->isCity()) {
+            $missing = $this->board()->neighbors(
+                $hex,
+                function (&$nh): bool {
+                    return $nh->piece == Piece::EMPTY
+                        && $nh->type == HexType::LAND;
+                }
+            );
+            return (count($missing) == 0);
         }
-        $missing = $this->board()->neighbors(
-            $hex,
-            function (&$nh): bool {
-                return $nh->piece == Piece::EMPTY
-                    && $nh->type == HexType::LAND;
-            }
-        );
-        return (count($missing) == 0);
+        return false;
     }
 
-    public function citiesRequiringScoring(): array /* Hex */ {
+    public function hexesRequiringScoring(): array /* Hex */ {
         $result = [];
         $this->board()->visitAll(
             function (&$hex) use (&$result) {
-                if ($this->cityRequiresScoring($hex)) {
-                    $result[] = $hex;
-                }
-            }
-        );
-        return $result;
-    }
-
-    public function zigguratsRequiringScoring(): array /* Hex */ {
-        $result = [];
-        $this->board()->visitAll(
-            function (&$hex) use (&$result) {
-                if (!$hex->piece->isZiggurat() || $hex->scored) {
-                    return;
-                }
-                $missing = $this->board()->neighbors(
-                    $hex,
-                    function (&$nh): bool {
-                        return $nh->piece == Piece::EMPTY
-                            && $nh->type == HexType::LAND;
-                    }
-                );
-                if (count($missing) == 0) {
+                if ($this->hexRequiresScoring($hex)) {
                     $result[] = $hex;
                 }
             }

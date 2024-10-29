@@ -50,7 +50,8 @@ class Db {
                                intval($hex['row']),
                                intval($hex['col']),
                                Piece::from($hex['piece']),
-                               intval($hex['board_player']));
+                               intval($hex['board_player']),
+                               boolval($hex['scored']));
         }
         return Board::fromHexes($hexes);
     }
@@ -71,8 +72,9 @@ class Db {
 
     public function updateHex(Hex $hex): void {
         $piece = $hex->piece->value;
+        $scored = $this->boolValue($hex->scored);
         $this->db->DbQuery("UPDATE board
-                     SET piece='$piece', player_id=$hex->player_id
+                     SET piece='$piece', player_id=$hex->player_id, scored=$scored
                      WHERE board_row=$hex->row AND board_col=$hex->col");
     }
 

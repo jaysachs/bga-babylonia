@@ -155,16 +155,45 @@ class Game extends \Table
         return 0;
     }
 
+    private function scoreHex(Model $model, Hex $hex): void {
+        if ($hex->piece->isCity()) {
+            $this->scoreCity($model, $hex);
+        } else if ($hex->piece->isZiggurat()) {
+            $this->scoreZiggurat($model, $hex);
+        }
+    }
+
+    private function scoreZiggurat(Model $model, Hex $zighex): void {
+        $scored_zig = $model->scoreZiggurat($zighex);
+        $msg = '';
+        $winner = $scored_zig->winning_player_id;
+        if ($winner == 0) {
+            $msg = 'Ziggurat at (${row},${col}) scored, no winner';
+        } else {
+            $msg = 'Ziggurat at (${row},${col}) scored, ${winner} chose ${ziggurat_card}';
+        }
+        $this->notifyAllPlayers(
+            "zigguratScored",
+            clienttranslate($msg), [
+                // "ziggurat_card" => $scored_zig->ziggurat_card->value,
+                "row" => $zighex->row,
+                "col" => $zighex->col,
+                "winner" => $winner
+            ]
+        );
+    }
+
     private function scoreCity(Model $model, Hex $cityhex): void {
+        $scored_city = $model->scoreCity($cityhex);
+
         $player_infos = $model->allPlayerInfo();
         $city = $cityhex->piece->value;
-        $scored_city = $model->scoreCity($cityhex);
         $captured_by = "noone";
         if ($scored_city->captured_by > 0) {
             $captured_by = $player_infos[$scored_city->captured_by]->player_name;
-            $msg = '${city} ${row},${col} scored, captured by ${captured_by}';
+            $msg = '${city} at (${row},${col}) scored, captured by ${captured_by}';
         } else {
-            $msg = '${city} ${row},${col} scored, uncaptured';
+            $msg = '${city} at (${row},${col}) scored, uncaptured';
         }
 
         // First notify that the city was captured
@@ -180,58 +209,73 @@ class Game extends \Table
 
         // Then notify of the scoring details
         foreach ($player_infos as $pid => $pi) {
-            $this->notifyAllPlayers(
-                "cityScoredPlayer",
-                clienttranslate('${player_name} scored ${points}'), [
-                    // TODO: make more efficient, by only passing the delta?
-                    "captured_city_count" => $pi->captured_city_count,
-                    "scored_hexes" => $scored_city->hexesScoringForPlayer($pid),
-                    "points" => $scored_city->pointsForPlayer($pid),
-                    "score" => $pi->score,
-                    "player_id" => $pid,
-                    "player_name" => $pi->player_name,
-                ]
-            );
+            $points = $scored_city->pointsForPlayer($pid);
+            if ($points > 0) {
+                $this->notifyAllPlayers(
+                    "cityScoredPlayer",
+                    clienttranslate('${player_name} scored ${points}'), [
+                        // TODO: make more efficient, by only passing the delta?
+                        "captured_city_count" => $pi->captured_city_count,
+                        "scored_hexes" => $scored_city->hexesScoringForPlayer($pid),
+                        "points" => $points,
+                        "score" => $pi->score,
+                        "player_id" => $pid,
+                        "player_name" => $pi->player_name,
+                    ]
+                );
+            }
         }
     }
 
-    public function argChooseHexToScore(): array {
-        return [];
-    }
-
-    public function actChooseHexToScore(): void {
+    public function argSelectHexToScore(): array {
         $player_id = $this->activePlayerId();
         $model = new Model($this->db, $player_id);
+        $hexes = $model->hexesRequiringScoring();
 
-        $hexes = $model->citiesRequiringScoring();
+        return [
+            "hexes" => array_map(
+                function ($hex) {
+                    return ["row" => $hex->row, "col" => $hex->col ];
+                },
+                $hexes
+            ),
+        ];
+    }
+
+    public function actSelectHexToScore(int $row, int $col): void {
+        $player_id = $this->activePlayerId();
+        $model = new Model($this->db, $player_id);
+        $hex = $model->board()->hexAt($row, $col);
+        if ($hex == null) {
+            throw new \InvalidArgumentException("Hex at ${row},${col} can't be scored");
+        }
         $player_name = $this->getActivePlayerName();
-        $hex = $hexes[array_rand($hexes)];
-        $this->scoreCity($model, $hex);
+        $this->scoreHex($model, $hex);
         $this->notifyAllPlayers("scoringSelection", clienttranslate('${player_name} chose hex ${row},${col} to score'), [
             "player_id" => $player_id,
             "player_name" => $player_name,
-            "row" => $hex->row,
-            "col" => $hex->col,
+            "row" => $row,
+            "col" => $col,
         ]);
-        $this->gamestate->nextState("cityChosen");
+        $this->gamestate->nextState("hexSelected");
     }
 
     public function stEndOfTurnScoring(): void {
-        // TODO: implement this for real
         $model = new Model($this->db, $this->activePlayerId());
-        $hexes = $model->citiesRequiringScoring();
-        if (count($hexes) > 1) {
+        $hexes = $model->hexesRequiringScoring();
+        // TODO: make auto-choice when there is 1 a preference or game option.
+        if (count($hexes) > 0 /* 1 */) {
             $this->notifyAllPlayers("scoringHexChoice",
-                                    clienttranslate('${player_name} must choose a hex to score'), [
+                                    clienttranslate('${player_name} must select a hex to score'), [
                                         "player_name" => $this->getActivePlayerName(),
                                     ]);
-            $this->gamestate->nextState("chooseHex");
+            $this->gamestate->nextState("selectHex");
             return;
         }
 
         if (count($hexes) == 1) {
             // TODO: notify that auto-choice was made?
-            $this->scoreCity($model, $hexes[0]);
+            $this->scoreHex($model, $hexes[0]);
         }
 
         $this->gamestate->nextState("done");

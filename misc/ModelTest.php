@@ -109,15 +109,15 @@ final class ModelTest extends TestCase
         $db->insertBoard($board);
         $model = new Model($db, 0);
 
-        $this->assertEquals([], $model->citiesRequiringScoring());
+        $this->assertEquals([], $model->hexesRequiringScoring());
 
         $board->hexAt(4, 0)->playPiece(Piece::PRIEST, 1);
         $board->hexAt(5, 1)->playPiece(Piece::FARMER, 2);
         $board->hexAt(7, 1)->playPiece(Piece::PRIEST, 3);
-        $this->assertEquals([], $model->citiesRequiringScoring());
+        $this->assertEquals([], $model->hexesRequiringScoring());
 
         $board->hexAt(8, 0)->playPiece(Piece::PRIEST, 3);
-        $this->assertEquals([$board->hexAt(6, 0)], $model->citiesRequiringScoring());
+        $this->assertEquals([$board->hexAt(6, 0)], $model->hexesRequiringScoring());
     }
 
     public function testZigguratsRequiringScoring(): void
@@ -127,18 +127,18 @@ final class ModelTest extends TestCase
         $db->insertBoard($board);
         $model = new Model($db, 0);
 
-        $this->assertEquals([], $model->zigguratsRequiringScoring());
+        $this->assertEquals([], $model->hexesRequiringScoring());
 
         $board->hexAt(2, 0)->playPiece(Piece::PRIEST, 1);
         $board->hexAt(4, 0)->playPiece(Piece::FARMER, 2);
         $board->hexAt(1, 1)->playPiece(Piece::PRIEST, 3);
-        $this->assertEquals([], $model->zigguratsRequiringScoring());
+        $this->assertEquals([], $model->hexesRequiringScoring());
 
         $board->hexAt(5, 1)->playPiece(Piece::PRIEST, 3);
         $this->assertEquals([$board->hexAt(3, 1)],
-                            $model->zigguratsRequiringScoring());
+                            $model->hexesRequiringScoring());
 
         $board->hexAt(3, 1)->scored = true;
-        $this->assertEquals([], $model->zigguratsRequiringScoring());
+        $this->assertEquals([], $model->hexesRequiringScoring());
     }
 }
