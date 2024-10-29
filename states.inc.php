@@ -101,15 +101,10 @@ $machinestates = [
     ],
 
     STATE_PLAYER_CHOOSE_SCORING => [
-        "name" => "chooseWhatToScore",
+        "name" => "chooseHexToScore",
         "description" => clienttranslate('${actplayer} must choose what to score'),
         "descriptionmyturn" => clienttranslate('${you} must choose what to score'),
-
-        // TODO: temporary change to "game" state to test the state transitions.
-        // "type" => "activeplayer",
-        "type" => "game",
-        "action" => "stChooseHexToScore",
-
+        "type" => "activeplayer",
         "possibleactions" => [
             "actChooseHexToScore",
         ],

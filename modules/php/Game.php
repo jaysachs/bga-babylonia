@@ -195,14 +195,18 @@ class Game extends \Table
         }
     }
 
-    // TODO: just a placeholder to see that the state machine works.
-    public function stChooseHexToScore(): void {
+    public function argChooseHexToScore(): array {
+        return [];
+    }
+
+    public function actChooseHexToScore(): void {
         $player_id = $this->activePlayerId();
         $model = new Model($this->db, $player_id);
 
         $hexes = $model->citiesRequiringScoring();
         $player_name = $this->getActivePlayerName();
         $hex = $hexes[array_rand($hexes)];
+        $this->scoreCity($model, $hex);
         $this->notifyAllPlayers("scoringSelection", clienttranslate('${player_name} chose hex ${row},${col} to score'), [
             "player_id" => $player_id,
             "player_name" => $player_name,
@@ -217,13 +221,15 @@ class Game extends \Table
         $model = new Model($this->db, $this->activePlayerId());
         $hexes = $model->citiesRequiringScoring();
         if (count($hexes) > 1) {
-            foreach ($hexes as $hex) {
-                $this->scoreCity($model, $hex);
-            }
-            // $this->gamestate->nextState("chooseHex");
-            // return;
+            $this->notifyAllPlayers("scoringHexChoice",
+                                    clienttranslate('${player_name} must choose a hex to score'), [
+                                        "player_name" => $this->getActivePlayerName(),
+                                    ]);
+            $this->gamestate->nextState("chooseHex");
+            return;
         }
-        else if (count($hexes) == 1) {
+
+        if (count($hexes) == 1) {
             // TODO: notify that auto-choice was made?
             $this->scoreCity($model, $hexes[0]);
         }

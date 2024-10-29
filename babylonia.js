@@ -74,7 +74,6 @@ function (dojo, declare) {
         setupPlayerBoard: function( player ) {
             let player_id = player.player_id;
             console.log("Setting up board for player " + player_id);
-            console.log( player );
             let player_board_div = this.getPlayerPanelElement(player_id);
             dojo.place( this.jstpl_player_board( player_id, player ),
                         player_board_div );
@@ -99,7 +98,6 @@ function (dojo, declare) {
             // Setting up player boards
             console.log("Setting up player boards");
             for( var player_id in gamedatas.players ) {
-                console.log(player_id);
                 this.setupPlayerBoard( gamedatas.players[player_id] );
             }
 
@@ -138,7 +136,6 @@ function (dojo, declare) {
             }
 
             // Set up the player's hand
-            console.log( 'rendering hand' );
             this.renderHand(gamedatas.hand);
             //   and owned ziggurat cards
 
@@ -221,7 +218,7 @@ function (dojo, declare) {
                 console.log("no playable piece found");
                 return [];
             }
-            console.log("hexes playable for " + p + "=" + this.allowedMoves[p]);
+            // console.log("hexes playable for " + p + "=" + this.allowedMoves[p]);
             let m = this.allowedMoves[p];
             if (m == null) {
                 m = [];
@@ -340,7 +337,12 @@ function (dojo, declare) {
                     //  'gear_button',
                     //  '<div id="gear_token" class="skills_and_techniques gear_token"></div>',
                     //  'onSelectAssetType', null, false, 'blue');
-
+                    case 'chooseHexToScore':
+                    this.addActionButton(
+                        'rnd-btn',
+                        'Choose one for me',
+                        () => this.bgaPerformAction("actChooseHexToScore"));
+                    break;
                     case 'playPieces':
                     if (args.canEndTurn) {
                         if (args.allowedMoves.length == 0) {
@@ -388,7 +390,6 @@ function (dojo, declare) {
         },
 
         handClass: function(piece) {
-            console.log("handClass(" + piece + ")");
             if (piece == null) {
                 return "unavailable";
             }
@@ -422,12 +423,9 @@ function (dojo, declare) {
         },
 
         renderHand: function(hand) {
-            console.log("renderHand: " + hand);
-            console.log(hand);
             for (i = 0; i < hand.length; ++i) {
                 this.handDiv(i).className = this.handClass(hand[i]);
             }
-            console.log("renderHand done");
         },
 
         renderPlayedPiece: function (row, col, piece, playerNumber) {
