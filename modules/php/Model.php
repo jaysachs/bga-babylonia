@@ -33,6 +33,7 @@ class Model {
     private ?array /* PlayerInfo */ $_allPlayerInfo = null;
     private ?Hand $_hand = null;
     private ?Pool $_pool = null;
+    private ?array /* ZigguratCards */ $_ziggurat_cards = null;
 
     public function __construct(private Db $db, private int $player_id) { }
 
@@ -47,25 +48,11 @@ class Model {
             $this->db->upsertHand($player_id, $hand);
             $this->db->upsertPool($player_id, $pool);
         }
-
-        // TODO: consider a class to hold the available ziggurat cards?
-        $ziggurats = [
-            ZigguratCard::PLUS_10,
-            ZigguratCard::EXTRA_TURN,
-            ZigguratCard::SEVEN_TOKENS,
-            ZigguratCard::THREE_NOBLES,
-            ZigguratCard::NOBLE_WITH_3_FARMERS,
-            ZigguratCard::NOBLES_IN_FIELDS,
-            ZigguratCard::EXTRA_CITY_POINTS ];
-        if ($use_advanced_ziggurats) {
-            $ziggurats[] = ZigguratCard::FREE_CENTRAL_LAND_CONNECTS;
-            $ziggurats[] = ZigguratCard::FREE_RIVER_CONNECTS;
-            shuffle($ziggurats);
-            array_pop($ziggurats);
-            array_pop($ziggurats);
-            // TODO: persist these somewhere :-)
-        }
-        $this->db->insertZigguratCards($ziggurats);
+        $this->_ziggurat_cards = array_map(
+            function ($z) { return new ZigguratCard($z); },
+            ZigguratCardType::sevenTypes($use_advanced_ziggurats)
+        );
+        $this->db->insertZigguratCards($this->_ziggurat_cards);
     }
 
     public function &allPlayerInfo(): array /* PlayerInfo */ {

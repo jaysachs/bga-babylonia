@@ -256,12 +256,14 @@ class Db {
                               intval($pd["pool_size"]));
     }
 
-    public function insertZigguratCards(array $ziggurats): void {
-        $sql = "INSERT INTO ziggurat_cards (ziggurat_card, player_id) VALUES ";
+    public function insertZigguratCards(array $ziggurat_cards): void {
+        $sql = "INSERT INTO ziggurat_cards (ziggurat_card, used, player_id) VALUES ";
 
         $sql_values = [];
-        foreach ($ziggurats as $zc) {
-            $sql_values[] = "('$zc->value', 0)";
+        foreach ($ziggurat_cards as $zc) {
+            $used = $this->boolValue($zc->used);
+            $type = $zc->type->value;
+            $sql_values[] = "('$type', $used, $zc->owning_player_id)";
         }
         $sql .= implode(',', $sql_values);
         $this->db->DbQuery( $sql );
