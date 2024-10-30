@@ -69,9 +69,9 @@ class Game extends \Table
 
         $msg = "";
         if ($points > 0) {
-            $msg = '${player_name} plays ${piece} to ${row} ${col} scoring ${points} points';
+            $msg = '${player_name} plays ${piece} to (${row},${col}) scoring ${points} points';
         } else {
-            $msg = '${player_name} plays ${piece} to ${row} ${col}';
+            $msg = '${player_name} plays ${piece} to (${row},${col})';
         }
         $this->notifyAllPlayers("piecePlayed", clienttranslate($msg), [
             "player_id" => $player_id,
@@ -167,18 +167,20 @@ class Game extends \Table
         $scored_zig = $model->scoreZiggurat($zighex);
         $msg = '';
         $winner = $scored_zig->winning_player_id;
+
+        $winner_name = '';
         if ($winner == 0) {
             $msg = 'Ziggurat at (${row},${col}) scored, no winner';
         } else {
-            $msg = 'Ziggurat at (${row},${col}) scored, ${winner} chose ${ziggurat_card}';
+            $winner_name = $model->allPlayerInfo()[$winner]->player_name;
+            $msg = 'Ziggurat at (${row},${col}) scored, winner is ${winner_name}';
         }
         $this->notifyAllPlayers(
             "zigguratScored",
             clienttranslate($msg), [
-                // "ziggurat_card" => $scored_zig->ziggurat_card->value,
                 "row" => $zighex->row,
                 "col" => $zighex->col,
-                "winner" => $winner
+                "winner_name" => $winner_name
             ]
         );
     }
@@ -247,11 +249,11 @@ class Game extends \Table
         $model = new Model($this->db, $player_id);
         $hex = $model->board()->hexAt($row, $col);
         if ($hex == null) {
-            throw new \InvalidArgumentException("Hex at ${row},${col} can't be scored");
+            throw new \InvalidArgumentException("Hex at (${row},${col}) can't be scored");
         }
         $player_name = $this->getActivePlayerName();
         $this->scoreHex($model, $hex);
-        $this->notifyAllPlayers("scoringSelection", clienttranslate('${player_name} chose hex ${row},${col} to score'), [
+        $this->notifyAllPlayers("scoringSelection", clienttranslate('${player_name} chose hex (${row},${col}) to score'), [
             "player_id" => $player_id,
             "player_name" => $player_name,
             "row" => $row,

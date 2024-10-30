@@ -48,7 +48,7 @@ class Model {
             $this->db->upsertHand($player_id, $hand);
             $this->db->upsertPool($player_id, $pool);
         }
-        $this->_components = new Components($use_advanced_ziggurats);
+        $this->_components = Components::forNewGame($use_advanced_ziggurats);
         $this->db->insertComponents($this->_components);
     }
 
@@ -253,10 +253,10 @@ class Model {
         return false;
     }
 
-    public function scoreZiggurat(Hex $hex): ScoredZiggurat {
+    public function scoreZiggurat(Hex $hexrc): ScoredZiggurat {
         // TODO: really implement this, checking for a winner,
         //  and executing a state change
-        $hex = $this->board()->hexAt($hex->row, $hex->col);
+        $hex = $this->board()->hexAt($hexrc->row, $hexrc->col);
         if (!$hex->piece->isZiggurat()) {
             throw new \InvalidArgumentException("Attempt to score non-ziggurat {$hex} as a ziggurat");
         }
@@ -268,7 +268,8 @@ class Model {
         }
         $hex->scored = true;
         $this->db->updateHex($hex);
-        return new ScoredZiggurat(0);
+
+        return new ScoredZiggurat($this->computeTileWinner($hex));
     }
 
     public function scoreCity(Hex $hex): ScoredCity {
@@ -342,7 +343,6 @@ class Model {
         return $captured_by;
     }
 
-    // TODO: Also needs to return who captured it.
     private function computeCityScores(Hex $hex): ScoredCity {
         $result = new ScoredCity($hex->piece, $this->allPlayerIds());
         $result->captured_by = $this->computeTileWinner($hex);
