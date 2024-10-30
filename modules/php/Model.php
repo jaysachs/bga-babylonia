@@ -407,6 +407,11 @@ class Model {
         );
         return $result;
     }
+
+    public function canEndTurn(): bool {
+        return count($this->turnProgress()->moves) >= 2
+            || count($this->getAllowedMoves()) == 0;
+    }
 }
 
 ?>

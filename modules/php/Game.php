@@ -99,7 +99,7 @@ class Game extends \Table
     {
         $player_id = $this->activePlayerId();
         $model = new Model($this->db, $player_id);
-        if (count($model->turnProgress()->moves) < 2) {
+        if (!$model->canEndTurn()) {
             throw new \BgaUserException("Attempt to end turn but less than 2 pieces played");
         }
 
@@ -141,7 +141,7 @@ class Game extends \Table
         }
         return [
             "allowedMoves" => $am,
-            "canEndTurn" => count($model->turnProgress()->moves) >= 2,
+            "canEndTurn" => $model->canEndTurn(),
         ];
     }
 
