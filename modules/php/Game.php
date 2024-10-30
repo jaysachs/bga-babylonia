@@ -73,20 +73,24 @@ class Game extends \Table
         } else {
             $msg = '${player_name} plays ${piece} to (${row},${col})';
         }
-        $this->notifyAllPlayers("piecePlayed", clienttranslate($msg), [
-            "player_id" => $player_id,
-            "player_number" => $this->getPlayerNoById($player_id),
-            "player_name" => $this->getActivePlayerName(),
-            "piece" => $piece,
-            "handpos" => $handpos,
-            "row" => $row,
-            "col" => $col,
-            "points" => $points,
-            "score" => $this->db->retrievePlayerInfo( $player_id )->score,
-            "i18n" => ['piece'],
-            "hand_size" => $model->hand()->size(),
-            "pool_size" => $model->pool()->size(),
-        ]);
+        $this->notifyAllPlayers(
+            "piecePlayed",
+            clienttranslate($msg),
+            [
+                "player_id" => $player_id,
+                "player_number" => $this->getPlayerNoById($player_id),
+                "player_name" => $this->getActivePlayerName(),
+                "piece" => $piece,
+                "handpos" => $handpos,
+                "row" => $row,
+                "col" => $col,
+                "points" => $points,
+                "score" => $this->db->retrievePlayerInfo( $player_id )->score,
+                "i18n" => ['piece'],
+                "hand_size" => $model->hand()->size(),
+                "pool_size" => $model->pool()->size(),
+            ]
+        );
 
         $this->gamestate->nextState("playPieces");
     }
@@ -99,10 +103,14 @@ class Game extends \Table
             throw new \BgaUserException("Attempt to end turn but less than 2 pieces played");
         }
 
-        $this->notifyAllPlayers("donePlayed", clienttranslate('${player_name} finishes playing pieces'), [
-            "player_id" => $player_id,
-            "player_name" => $this->getActivePlayerName(),
-        ]);
+        $this->notifyAllPlayers(
+            "donePlayed",
+            clienttranslate('${player_name} finishes playing pieces'),
+            [
+                "player_id" => $player_id,
+                "player_name" => $this->getActivePlayerName(),
+            ]
+        );
 
         // TODO: if scoring needed, go to scoring
         $this->gamestate->nextState("done");
@@ -252,13 +260,17 @@ class Game extends \Table
             throw new \InvalidArgumentException("Hex at (${row},${col}) can't be scored");
         }
         $player_name = $this->getActivePlayerName();
+        $this->notifyAllPlayers(
+            "scoringSelection",
+            clienttranslate('${player_name} chose hex (${row},${col}) to score'),
+            [
+                "player_id" => $player_id,
+                "player_name" => $player_name,
+                "row" => $row,
+                "col" => $col,
+            ]
+        );
         $this->scoreHex($model, $hex);
-        $this->notifyAllPlayers("scoringSelection", clienttranslate('${player_name} chose hex (${row},${col}) to score'), [
-            "player_id" => $player_id,
-            "player_name" => $player_name,
-            "row" => $row,
-            "col" => $col,
-        ]);
         // TODO: need to go to "zigguratSelected" if ziggurat chosen.
         $this->gamestate->nextState("citySelected");
     }
@@ -268,10 +280,13 @@ class Game extends \Table
         $hexes = $model->hexesRequiringScoring();
         // TODO: make auto-choice when there is 1 a preference or game option.
         if (count($hexes) > 0 /* 1 */) {
-            $this->notifyAllPlayers("scoringHexChoice",
-                                    clienttranslate('${player_name} must select a hex to score'), [
-                                        "player_name" => $this->getActivePlayerName(),
-                                    ]);
+            $this->notifyAllPlayers(
+                "scoringHexChoice",
+                clienttranslate('${player_name} must select a hex to score'),
+                [
+                    "player_name" => $this->getActivePlayerName(),
+                ]
+            );
             $this->gamestate->nextState("selectHex");
             return;
         }
@@ -290,32 +305,45 @@ class Game extends \Table
 
         $player_name = $this->getActivePlayerName();
         if ($model->finishTurn()) {
-            $this->notifyAllPlayers("gameEnded", clienttranslate('${player_name} unable to refill their hand'), [
-                "player_id" => $player_id,
-                "player_name" => $player_name,
-            ]);
+            $this->notifyAllPlayers(
+                "gameEnded",
+                clienttranslate('${player_name} unable to refill their hand'),
+                [
+                    "player_id" => $player_id,
+                    "player_name" => $player_name,
+                ]
+            );
             $this->gamestate->nextState("endGame");
             return;
         }
 
-        $this->notifyAllPlayers("turnFinished", clienttranslate('${player_name} finished their turn'), [
-            "player_id" => $player_id,
-            "player_name" => $this->getActivePlayerName(),
-            "player_number" => $this->getPlayerNoById($player_id),
-            "hand_size" => $model->hand()->size(),
-            "pool_size" => $model->pool()->size(),
-        ]);
+        $this->notifyAllPlayers(
+            "turnFinished",
+            clienttranslate('${player_name} finished their turn'),
+            [
+                "player_id" => $player_id,
+                "player_name" => $this->getActivePlayerName(),
+                "player_number" => $this->getPlayerNoById($player_id),
+                "hand_size" => $model->hand()->size(),
+                "pool_size" => $model->pool()->size(),
+            ]
+        );
 
         // TODO: this doesn't have to return the whole hand,
         // just the refilled parts.
         // Could capture the delta and return *that*. Then it can be animated on
         // the client.
 
-        $this->notifyPlayer($player_id, "handRefilled", clienttranslate("You refilled your hand"), [
-            "player_id" => $player_id,
-            'hand' => array_map(function ($p) { return $p->value; },
-                                $model->hand()->pieces()),
-        ]);
+        $this->notifyPlayer(
+            $player_id,
+            "handRefilled",
+            clienttranslate("You refilled your hand"),
+            [
+                "player_id" => $player_id,
+                'hand' => array_map(function ($p) { return $p->value; },
+                                    $model->hand()->pieces()),
+            ]
+        );
 
         $this->giveExtraTime($player_id);
 
