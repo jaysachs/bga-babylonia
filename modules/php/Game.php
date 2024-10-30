@@ -409,7 +409,14 @@ class Game extends \Table
             'hand' => array_map(function ($p) { return $p->value; },
                                 $model->hand()->pieces()),
             'board' => $board_data,
-            'ziggurat_cards' => $this->db->retrieveZigguratCards()
+            'ziggurat_cards' =>
+                array_map(
+                    function ($z) { return [
+                        "ziggurat_card" => $z->type->value,
+                        "owning_player_id" => $z->owning_player_id,
+                        "used" => $z->used,
+                    ]; },
+                    $model->components()->allZigguratCards()),
         ];
     }
 

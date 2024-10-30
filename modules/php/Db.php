@@ -256,11 +256,11 @@ class Db {
                               intval($pd["pool_size"]));
     }
 
-    public function insertZigguratCards(array $ziggurat_cards): void {
+    public function insertComponents(Components $components): void {
         $sql = "INSERT INTO ziggurat_cards (ziggurat_card, used, player_id) VALUES ";
 
         $sql_values = [];
-        foreach ($ziggurat_cards as $zc) {
+        foreach ($components->allZigguratCards() as &$zc) {
             $used = $this->boolValue($zc->used);
             $type = $zc->type->value;
             $sql_values[] = "('$type', $used, $zc->owning_player_id)";
@@ -269,11 +269,16 @@ class Db {
         $this->db->DbQuery( $sql );
     }
 
-    public function retrieveZigguratCards(): array {
-        return $this->db->getObjectListFromDB2(
-            "SELECT ziggurat_card, player_id
-             FROM ziggurat_cards"
-        );
+    public function retrieveComponents(): Components {
+        return new Components(array_map(
+            function ($d) {
+                return new ZigguratCard(ZigguratCardType::from($d["type"]),
+                                        intval($d["player_id"]),
+                                        boolval($d["used"]));
+            },
+            $this->db->getObjectListFromDB2(
+                "SELECT ziggurat_card type, player_id, used FROM ziggurat_cards")
+        ));
     }
 }
 

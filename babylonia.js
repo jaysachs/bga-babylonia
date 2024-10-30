@@ -125,8 +125,7 @@ function (dojo, declare) {
             // Set up the available ziggurat tiles
             for( let z = 0; z < gamedatas.ziggurat_cards.length; z++) {
                 let div = $(`zig${z+1}`);
-                if ( gamedatas.ziggurat_cards[z].player_id == null
-                     || gamedatas.ziggurat_cards[z].player_id == 0 ) {
+                if ( gamedatas.ziggurat_cards[z].owning_player_id == 0 ) {
                     div.classList = gamedatas.ziggurat_cards[z].ziggurat_card;
                 } else {
                     div.className = "";

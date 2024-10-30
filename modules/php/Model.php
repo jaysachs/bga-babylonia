@@ -33,7 +33,7 @@ class Model {
     private ?array /* PlayerInfo */ $_allPlayerInfo = null;
     private ?Hand $_hand = null;
     private ?Pool $_pool = null;
-    private ?array /* ZigguratCards */ $_ziggurat_cards = null;
+    private ?Components $_components = null;
 
     public function __construct(private Db $db, private int $player_id) { }
 
@@ -48,11 +48,15 @@ class Model {
             $this->db->upsertHand($player_id, $hand);
             $this->db->upsertPool($player_id, $pool);
         }
-        $this->_ziggurat_cards = array_map(
-            function ($z) { return new ZigguratCard($z); },
-            ZigguratCardType::sevenTypes($use_advanced_ziggurats)
-        );
-        $this->db->insertZigguratCards($this->_ziggurat_cards);
+        $this->_components = new Components($use_advanced_ziggurats);
+        $this->db->insertComponents($this->_components);
+    }
+
+    public function components(): Components {
+        if ($this->_components == null) {
+            $this->_components = $this->db->retrieveComponents();
+        }
+        return $this->_components;
     }
 
     public function &allPlayerInfo(): array /* PlayerInfo */ {
