@@ -186,10 +186,10 @@ class Game extends \Table
     }
 
     private function scoreCity(Model $model, Hex $cityhex): void {
-        $scored_city = $model->scoreCity($cityhex);
-
-        $player_infos = $model->allPlayerInfo();
+        // grab this, as it will change underneath when the model scores it.
         $city = $cityhex->piece->value;
+        $scored_city = $model->scoreCity($cityhex);
+        $player_infos = $model->allPlayerInfo();
         $captured_by = "noone";
         if ($scored_city->captured_by > 0) {
             $captured_by = $player_infos[$scored_city->captured_by]->player_name;
