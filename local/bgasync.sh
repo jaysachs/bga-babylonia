@@ -7,7 +7,7 @@ DEST=${GAME}
 
 
 DRY_RUN=
-#DRY_RUN=--dry-run
+DRY_RUN=--dry-run
 
 LAST_SYNC=.last_sync
 HOST=sftp://${USER}:@1.studio.boardgamearena.com:2022
@@ -24,7 +24,7 @@ function lftp_via_sync() {
     fi
     declare -a files
     readarray -t files < \
-              <(find -E -X . -newer ${LAST_SYNC} -not -regex ^./'${EXCLUDES}' -type f)
+              <(find -E -X . -newer ${LAST_SYNC} -not -regex ^./"${EXCLUDES}" -type f)
     echo mput -O "${DEST}" -d "${files[@]}" | ${COPY} && ${TOUCH}
 }
 
