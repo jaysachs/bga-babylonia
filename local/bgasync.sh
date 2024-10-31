@@ -7,7 +7,7 @@ DEST=${GAME}
 
 
 DRY_RUN=
-DRY_RUN=--dry-run
+#DRY_RUN=--dry-run
 
 LAST_SYNC=.last_sync
 HOST=sftp://${USER}:@1.studio.boardgamearena.com:2022
