@@ -1,29 +1,38 @@
-#!/bin/bash
+#!/usr/local/bin/bash
 
 GAME=babylonia
 USER=vagabond
-
-LAST_SYNC=.last_sync
-HOST=sftp://${USER}:@1.studio.boardgamearena.com:2022
 SRC="$HOME/projects/bga/babylonia"
 DEST=${GAME}
 
-REPEAT="repeat -d 1m -c 60"
-REPEAT=
-EXCLUDES=
 
-function lftp_via_newer() {
-    (
-        echo "mput -O ${DEST} -d";
-        find -X * -newer ${LAST_SYNC} -not -path local/\* -not -path .\* -not -path \*\#\* -not -path LICENSE_BGA -not -path _ide_helper.php -type f
-    ) | xargs echo | lftp "${HOST}" && touch "${LAST_SYNC}"
+DRY_RUN=
+#DRY_RUN=--dry-run
+
+LAST_SYNC=.last_sync
+HOST=sftp://${USER}:@1.studio.boardgamearena.com:2022
+
+EXCLUDES='(((local/|\.|.*#).*)|LICENSE_BGA|_ide_helper.php)'
+
+function lftp_via_sync() {
+    COPY="lftp ${HOST}"
+    TOUCH="touch ${LAST_SYNC}"
+    if [ "${DRY_RUN}" == --dry-run ];
+    then
+        COPY=cat
+        TOUCH=true
+    fi
+    declare -a files
+    readarray -t files < \
+              <(find -E -X . -newer ${LAST_SYNC} -not -regex ^./'${EXCLUDES}' -type f)
+    echo mput -O "${DEST}" -d "${files[@]}" | ${COPY} && ${TOUCH}
 }
 
 function lftp_mirror() {
     REPEAT=$1
     lftp "${HOST}" <<EOF
-cd "${DEST}"
-${REPEAT} mirror -R -vvv -X .git/* -X .* -X .phpunit.cache/* -X local/* -X*#* -X LICENSE_BGA -X _ide_helper.php
+cd ${DEST}
+${REPEAT} mirror ${DRY_RUN} -R -vvv -x ^'${EXCLUDES}'
 EOF
 }
 
