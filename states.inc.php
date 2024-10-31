@@ -55,6 +55,8 @@ if ( !defined('STATE_END_GAME')) { // guard since this included multiple times
     define("STATE_PLAYER_SELECT_SCORING_HEX", 4);
     define("STATE_PLAYER_SELECT_ZIGGURAT_CARD", 5);
     define("STATE_FINISH_TURN", 6);
+    define("STATE_ZIGGURAT_SCORING", 7);
+    define("STATE_START_TURN", 8);
     //    define("STATE_PLAYER_GAME_END", 98);
     define("STATE_END_GAME", 99);
 }
@@ -113,8 +115,20 @@ $machinestates = [
         "updateGameProgression" => true,
         "transitions" => [
             "citySelected" => STATE_END_OF_TURN_SCORING,
-            "zigguratSelected" => STATE_PLAYER_SELECT_ZIGGURAT_CARD,
+            "zigguratSelected" => STATE_ZIGGURAT_SCORING,
         ]
+    ],
+
+    STATE_ZIGGURAT_SCORING => [
+        "name" => "zigguratScoring",
+        "type" => "game",
+        "description" => '',
+        "action" => "stZigguratScoring",
+        "args" => "argZigguratScoring",
+        "updateGameProgression" => true,
+        "transitions" => [
+            "next" => STATE_PLAYER_SELECT_ZIGGURAT_CARD,
+        ],
     ],
 
     STATE_PLAYER_SELECT_ZIGGURAT_CARD => [
@@ -122,6 +136,7 @@ $machinestates = [
         "description" => clienttranslate('${actplayer} must select a ziggurat card'),
         "descriptionmyturn" => clienttranslate('${you} must select a ziggurat card'),
         "type" => "activeplayer",
+        "args" => "argSelectZigguratCard",
         "possibleactions" => [
             "actSelectZigguratCard",
         ],

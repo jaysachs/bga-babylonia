@@ -412,6 +412,20 @@ class Model {
         return count($this->turnProgress()->moves) >= 2
             || count($this->getAllowedMoves()) == 0;
     }
+
+    public function selectZigguratCard(ZigguratCardType $card_type): ZigguratCard {
+        foreach ($this->components()->allZigguratCards() as &$card) {
+            if ($card->type == $card_type) {
+                if ($card->owning_player_id != 0) {
+                    throw new \InvalidArgumentException("ziggurat card $card_type->value already chosen");
+                }
+                $card->owning_player_id = $this->player_id;
+                $this->db->updateZigguratCard($card);
+                return $card;
+            }
+        }
+        throw new \InvalidArgumentException("ziggurat card $card_type->value not available");
+    }
 }
 
 ?>

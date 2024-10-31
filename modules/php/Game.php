@@ -33,7 +33,8 @@ class Game extends \Table
     //  means another player needs to choose a tile; this global holds
     //  the ID of the "primary" player, i.e. who should become active
     //  once the ziggurat tile is selected.
-    private const GLOBAL_PRIMARY_PLAYER_ID = 'primary_player_id';
+    private const GLOBAL_PLAYER_ON_TURN = 'player_on_turn';
+    private const GLOBAL_PLAYER_NEXT_ACTIVE = 'player_next_active';
 
     private Db $db;
     /**
@@ -51,7 +52,8 @@ class Game extends \Table
         parent::__construct();
 
         $this->initGameStateLabels([
-            Game::GLOBAL_PRIMARY_PLAYER_ID => 10,
+            Game::GLOBAL_PLAYER_ON_TURN => 10,
+            Game::GLOBAL_PLAYER_NEXT_ACTIVE => 11,
             Option::ADVANCED_ZIGGURAT_TILES->value => 100
         ]);
 
@@ -85,7 +87,7 @@ class Game extends \Table
                 "row" => $row,
                 "col" => $col,
                 "points" => $points,
-                "score" => $this->db->retrievePlayerInfo( $player_id )->score,
+                "score" => $this->db->retrievePlayerInfo($player_id)->score,
                 "i18n" => ['piece'],
                 "hand_size" => $model->hand()->size(),
                 "pool_size" => $model->pool()->size(),
@@ -163,15 +165,17 @@ class Game extends \Table
         return 0;
     }
 
-    private function scoreHex(Model $model, Hex $hex): void {
+    private function scoreHex(Model $model, Hex $hex): int {
         if ($hex->piece->isCity()) {
             $this->scoreCity($model, $hex);
+            return 0;
         } else if ($hex->piece->isZiggurat()) {
-            $this->scoreZiggurat($model, $hex);
+            return $this->scoreZiggurat($model, $hex);
         }
+        return 0;
     }
 
-    private function scoreZiggurat(Model $model, Hex $zighex): void {
+    private function scoreZiggurat(Model $model, Hex $zighex): int {
         $scored_zig = $model->scoreZiggurat($zighex);
         $msg = '';
         $winner = $scored_zig->winning_player_id;
@@ -191,6 +195,7 @@ class Game extends \Table
                 "winner_name" => $winner_name
             ]
         );
+        return $winner;
     }
 
     private function scoreCity(Model $model, Hex $cityhex): void {
@@ -237,6 +242,50 @@ class Game extends \Table
         }
     }
 
+
+    public function argZigguratScoring(): array {
+        return [];
+    }
+
+    public function stZigguratScoring(): void {
+        $player_id = $this->activePlayerId();
+        $this->gamestate->changeActivePlayer(
+            $this->getGameStateValue(Game::GLOBAL_PLAYER_NEXT_ACTIVE));
+        $this->gamestate->nextState("next");
+    }
+
+    public function argSelectZigguratCard(): array {
+        $player_id = $this->activePlayerId();
+        $model = new Model($this->db, $player_id);
+        $zcards = $model->components()->availableZigguratCards();
+        return [
+            "available_cards" => array_map(
+                function ($z) {
+                    return $z->type->value;
+                },
+                $model->components()->availableZigguratCards()
+            ),
+        ];
+    }
+
+    public function actSelectZigguratCard(string $card_type) {
+        $player_id = $this->activePlayerId();
+        $model = new Model($this->db, $player_id);
+        $card = $model->selectZigguratCard(ZigguratCardType::from($card_type));
+
+        $player_name = $this->getActivePlayerName();
+        $this->notifyAllPlayers(
+            "zigguratCardSelection",
+            clienttranslate('${player_name} chose ziggurat card ${card}'),
+            [
+                "player_id" => $player_id,
+                "player_name" => $player_name,
+                "card" => $card->type->value,
+                "card_description" => "short description of card"
+            ]
+        );
+    }
+
     public function argSelectHexToScore(): array {
         $player_id = $this->activePlayerId();
         $model = new Model($this->db, $player_id);
@@ -257,7 +306,7 @@ class Game extends \Table
         $model = new Model($this->db, $player_id);
         $hex = $model->board()->hexAt($row, $col);
         if ($hex == null) {
-            throw new \InvalidArgumentException("Hex at (${row},${col}) can't be scored");
+            throw new \InvalidArgumentException("Hex at ({$row},{$col}) can't be scored");
         }
         $player_name = $this->getActivePlayerName();
         $this->notifyAllPlayers(
@@ -270,14 +319,34 @@ class Game extends \Table
                 "col" => $col,
             ]
         );
-        $this->scoreHex($model, $hex);
-        // TODO: need to go to "zigguratSelected" if ziggurat chosen.
-        $this->gamestate->nextState("citySelected");
+        $piece = $hex->piece;
+        $next_player = $this->scoreHex($model, $hex);
+
+        $this->setGameStateValue(Game::GLOBAL_PLAYER_NEXT_ACTIVE, $next_player);
+
+        if ($piece->isCity()) {
+            $this->gamestate->nextState("citySelected");
+        } else {
+            $this->gamestate->nextState("zigguratSelected");
+        }
     }
 
     public function stEndOfTurnScoring(): void {
-        $model = new Model($this->db, $this->activePlayerId());
+        $player_id = $this->activePlayerId();
+        $player_on_turn =
+            $this->getGameStateValue(Game::GLOBAL_PLAYER_ON_TURN, $player_id);
+        if ($player_id != $player_on_turn) {
+            $this->giveExtraTime($player_id);
+            $this->gamestate->changeActivePlayer($player_on_turn);
+            $player_id = $player_on_turn;
+        }
+        $model = new Model($this->db, $player_id);
         $hexes = $model->hexesRequiringScoring();
+
+        // Initialize these to safe and correct values.
+        $this->setGameStateValue(Game::GLOBAL_PLAYER_ON_TURN, $player_id);
+        $this->setGameStateValue(Game::GLOBAL_PLAYER_NEXT_ACTIVE, 0);
+
         // TODO: make auto-choice when there is 1 a preference or game option.
         if (count($hexes) > 0 /* 1 */) {
             $this->notifyAllPlayers(
@@ -291,16 +360,27 @@ class Game extends \Table
             return;
         }
 
-        if (count($hexes) == 1) {
-            // TODO: notify that auto-choice was made?
-            $this->scoreHex($model, $hexes[0]);
-        }
-
+        $this->notifyAllPlayers(
+            "scoringHexChoice",
+            clienttranslate('${player_name} must select a hex to score'),
+            [
+                "player_name" => $this->getActivePlayerName(),
+            ]
+        );
         $this->gamestate->nextState("done");
     }
 
     public function stFinishTurn(): void {
         $player_id = $this->activePlayerId();
+        $player_on_turn = $this->getGameStateValue(Game::GLOBAL_PLAYER_ON_TURN);
+        if ($player_on_turn != 0) {
+            if ($player_on_turn != $player_id) {
+                $this->giveExtraTime($player_id);
+                $this->gamestate->changeActivePlayer($player_on_turn);
+                $player_id = $player_on_turn;
+            }
+        }
+
         $model = new Model($this->db, $player_id);
 
         $player_name = $this->getActivePlayerName();
@@ -349,7 +429,10 @@ class Game extends \Table
 
         $this->activeNextPlayer();
 
-        $this->gamestate->nextState("nextPlayer");
+        $this->setGameStateValue(Game::GLOBAL_PLAYER_ON_TURN,
+                                 $this->activePlayerId());
+        $this->setGameStateValue(Game::GLOBAL_PLAYER_NEXT_ACTIVE, 0);
+         $this->gamestate->nextState("nextPlayer");
     }
 
     /**
@@ -500,7 +583,8 @@ class Game extends \Table
         // Init global values with their initial values.
 
         // Dummy content.
-        $this->setGameStateInitialValue(Game::GLOBAL_PRIMARY_PLAYER_ID, 0);
+        $this->setGameStateInitialValue(Game::GLOBAL_PLAYER_ON_TURN, 0);
+        $this->setGameStateInitialValue(Game::GLOBAL_PLAYER_NEXT_ACTIVE, 0);
 
         // Init game statistics.
         //

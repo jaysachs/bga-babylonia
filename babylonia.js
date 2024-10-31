@@ -55,7 +55,8 @@ function (dojo, declare) {
             <div class="b_hand">hand:<span id="handcount_${player_id}">0</span></div>
             <div class="b_pool">pool:<span id="poolcount_${player_id}">0</span></div>
             <div class="b_citycount">cities:<span id="citycount_${player_id}">0</span></div>
-            </div>`
+            <div id="b_ziggurats"><!-- <img src=""></img> --></div>
+          </div>`
         },
         hand_counters: [],
         pool_counters: [],
@@ -393,6 +394,19 @@ function (dojo, declare) {
                     //         row: 0,
                     //         col: 0
                     //     });
+                    break;
+
+                    case 'selectZigguratCard':
+                    this.updateStatusBar('You must select a ziggurat card');
+                    console.log(args.available_cards);
+                    args.available_cards.forEach(z =>
+                        this.addActionButton(
+                            z + '-btn',
+                            'Choose ziggurat card ' + z,
+                            () => this.bgaPerformAction('actSelectZigguratCard', {
+                                card_type: z
+                            })));
+                    // TODO: highlight available ones & select by clicking on them.
                     break;
 
                     case 'playPieces':
