@@ -127,7 +127,8 @@ $machinestates = [
         "args" => "argZigguratScoring",
         "updateGameProgression" => true,
         "transitions" => [
-            "next" => STATE_PLAYER_SELECT_ZIGGURAT_CARD,
+            "selectZiggurat" => STATE_PLAYER_SELECT_ZIGGURAT_CARD,
+            "next" => STATE_END_OF_TURN_SCORING,
         ],
     ],
 
