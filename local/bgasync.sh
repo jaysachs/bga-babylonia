@@ -1,13 +1,17 @@
 #!/bin/bash
 
+GAME=babylonia
+USER=vagabond
+
 LAST_SYNC=.last_sync
-HOST=sftp://vagabond:@1.studio.boardgamearena.com:2022
+HOST=sftp://${USER}:@1.studio.boardgamearena.com:2022
 SRC="$HOME/projects/bga/babylonia"
-DEST=babylonia
+DEST=${GAME}
 
 REPEAT="repeat -d 1m -c 60"
 REPEAT=
 EXCLUDES=
+
 function lftp_via_newer() {
     (
         echo "mput -O ${DEST} -d";
@@ -15,24 +19,33 @@ function lftp_via_newer() {
     ) | xargs echo | lftp "${HOST}" && touch "${LAST_SYNC}"
 }
 
-function lftp_via_mirror() {
+function lftp_mirror() {
+    REPEAT=$1
     lftp "${HOST}" <<EOF
 cd "${DEST}"
 ${REPEAT} mirror -R -vvv -X .git/* -X .* -X .phpunit.cache/* -X local/* -X*#* -X LICENSE_BGA -X _ide_helper.php
 EOF
 }
 
+function lftp_via_periodic_mirror() {
+    lftp_mirror "repeat -d 1m -c 60"
+}
 
-MODE=newer
+function lftp_via_mirror() {
+    lftp_mirror ""
+}
+
+
+MODE=-sync
 if [[ "$#" > 1 ]];
 then
-    echo "Arguments must be 'newer' or 'mirror'"
+    echo "usage: $0 [ -mirror | -sync ]"
     exit 1
 fi
 if [[ "$#" > 0 ]];
 then
     case "$1" in
-        newer|mirror)
+        -mirror|-sync)
             MODE="$1"
             ;;
         *)
@@ -46,10 +59,10 @@ fi
 cd "${SRC}"
 
 case "$MODE" in
-    mirror)
+    -mirror)
         lftp_via_mirror
         ;;
-    newer)
-        lftp_via_newer
+    -sync)
+        lftp_via_sync
         ;;
 esac
