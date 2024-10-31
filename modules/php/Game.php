@@ -168,7 +168,7 @@ class Game extends \Table
     private function scoreHex(Model $model, Hex $hex): int {
         if ($hex->piece->isCity()) {
             $this->scoreCity($model, $hex);
-            return 0;
+            return $this->activePlayerId();
         } else if ($hex->piece->isZiggurat()) {
             return $this->scoreZiggurat($model, $hex);
         }
@@ -284,6 +284,7 @@ class Game extends \Table
                 "card_description" => "short description of card"
             ]
         );
+        $this->gamestate->nextState("cardSelected");
     }
 
     public function argSelectHexToScore(): array {
