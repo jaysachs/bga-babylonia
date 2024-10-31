@@ -43,13 +43,20 @@ class Components {
     }
 
     public function availableZigguratCards(): array /* ZigguratCard */ {
-        return array_filter($this->ziggurat_cards,
-                            function ($z) { return $z->owning_player_id == 0; });
+        return array_values(
+            array_filter($this->ziggurat_cards,
+                         function ($z) { return $z->owning_player_id == 0; }
+            )
+        );
     }
 
     public function zigguratCardsOwnedBy(int $player_id): array /* ZigguratCard */ {
-        return array_filter($this->ziggurat_cards,
-                            function ($z) { return $z->owning_player_id == $player_id; });
+        return array_values(
+            array_filter(
+                $this->ziggurat_cards,
+                function ($z) { return $z->owning_player_id == $player_id; }
+            )
+        );
     }
 }
 ?>
