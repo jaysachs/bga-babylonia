@@ -34,7 +34,7 @@ class Game extends \Table
     //  the ID of the "primary" player, i.e. who should become active
     //  once the ziggurat tile is selected.
     private const GLOBAL_PLAYER_ON_TURN = 'player_on_turn';
-    private const GLOBAL_PLAYER_NEXT_ACTIVE = 'player_next_active';
+    private const GLOBAL_NEXT_PLAYER_ACTIVE = 'next_player_active';
 
     private Db $db;
     /**
@@ -53,7 +53,7 @@ class Game extends \Table
 
         $this->initGameStateLabels([
             Game::GLOBAL_PLAYER_ON_TURN => 10,
-            Game::GLOBAL_PLAYER_NEXT_ACTIVE => 11,
+            Game::GLOBAL_NEXT_PLAYER_ACTIVE => 11,
             Option::ADVANCED_ZIGGURAT_TILES->value => 100
         ]);
 
@@ -486,11 +486,11 @@ class Game extends \Table
     }
 
     private function nextActivePlayer(): int {
-        return intval($this->getGameStateValue(Game::GLOBAL_PLAYER_NEXT_ACTIVE));
+        return intval($this->getGameStateValue(Game::GLOBAL_NEXT_PLAYER_ACTIVE));
     }
 
     private function setNextActivePlayer(int $player_id) {
-        $this->setGameStateValue(Game::GLOBAL_PLAYER_NEXT_ACTIVE, $player_id);
+        $this->setGameStateValue(Game::GLOBAL_NEXT_PLAYER_ACTIVE, $player_id);
     }
 
 
@@ -618,7 +618,7 @@ class Game extends \Table
 
         $this->setGameStateInitialValue(Game::GLOBAL_PLAYER_ON_TURN,
                                         $this->activePlayerId());
-        $this->setGameStateInitialValue(Game::GLOBAL_PLAYER_NEXT_ACTIVE, 0);
+        $this->setGameStateInitialValue(Game::GLOBAL_NEXT_PLAYER_ACTIVE, 0);
 
     }
 
