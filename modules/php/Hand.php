@@ -56,7 +56,7 @@ class Hand {
         return $this->pieces;
     }
 
-    public function maxSize(): int {
+    public function limit(): int {
         return count($this->pieces);
     }
 

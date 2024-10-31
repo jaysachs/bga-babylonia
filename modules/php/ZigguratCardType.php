@@ -30,7 +30,7 @@ namespace Bga\Games\babylonia;
 enum ZigguratCardType : string {
     case PLUS_10 = 'zcard1';
     case EXTRA_TURN = 'zcard2';
-    case SEVEN_TOKENS = 'zcard3';
+    case HAND_SIZE_SEVEN = 'zcard3';
     case THREE_NOBLES = 'zcard4';
     case NOBLE_WITH_3_FARMERS = 'zcard5';
     case NOBLES_IN_FIELDS = 'zcard6';
@@ -42,7 +42,7 @@ enum ZigguratCardType : string {
         $ziggurats = [
             ZigguratCardType::PLUS_10,
             ZigguratCardType::EXTRA_TURN,
-            ZigguratCardType::SEVEN_TOKENS,
+            ZigguratCardType::HAND_SIZE_SEVEN,
             ZigguratCardType::THREE_NOBLES,
             ZigguratCardType::NOBLE_WITH_3_FARMERS,
             ZigguratCardType::NOBLES_IN_FIELDS,

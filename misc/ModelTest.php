@@ -8,6 +8,7 @@ use Bga\Games\babylonia\ {
     HexType,
       Model,
       Board,
+        Components,
         ScoredCity,
         Piece,
         PlayerInfo,
@@ -17,12 +18,14 @@ use Bga\Games\babylonia\ {
 class TestDb extends Db {
     private ?Board $board = null;
     private array $player_infos = [];
+    private Components $components;
 
     public function __construct() {
         Db::__construct(null);
         for ($i = 1; $i <= 3; $i++) {
             $this->player_infos[$i] = new PlayerInfo($i, "", 0, 0, 0, 5, 25);
         }
+        $this->components = Components::forNewGame(false);
     }
 
     public function insertBoard(Board $b): void { $this->board = $b; }
@@ -34,6 +37,9 @@ class TestDb extends Db {
     }
     public function updateHex(Hex $hex): void { }
     public function updatePlayers(array /* PlayerInfo */ $pis): void {
+    }
+    public function retrieveComponents(): Components {
+        return $this->components;
     }
 }
 

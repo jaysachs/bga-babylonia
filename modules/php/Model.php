@@ -101,17 +101,31 @@ class Model {
     public function isPlayAllowed(Piece $piece, Hex $hex): bool {
         // first check move limits per turn
         if (count($this->turnProgress()->moves) >= 2) {
+            // extra moves can not go in water
             if ($hex->isWater()) {
                 return false;
             }
+            $non_land_farmer_played =
+                !$this->turnProgress()->allMovesFarmersOnLand($this->board());
             if ($piece->isFarmer()) {
-                if (!$this->turnProgress()->allMovesFarmersOnLand($this->board())) {
+                if ($non_land_farmer_played) {
                     return false;
                 }
                 // fall through
             } else {
-                // Now check if player has zig tiles to permit another move
-                return false;
+                if ($non_land_farmer_played
+                    || count($this->turnProgress()->moves) < 3
+                    || !$this->components()->hasZigguratCard($this->player_id,
+                                                             ZigguratCardType::NOBLE_WITH_THREE_FARMERS)) {
+                    return false;
+                }
+                $played = $this->turnProgress();
+                if (count($played) != 2
+                    || in_array($piece, $played)
+                    || !$this->components()->hasZigguratCard($this->player_id,
+                                                             ZigguratCardType::THREE_NOBES)) {
+                    return false;
+                }
             }
         }
         // now check if piece is allowed
@@ -125,8 +139,10 @@ class Model {
                     return $h->player_id == $this->player_id
                         && $h->piece->isNoble();
                 };
-                $n = count($this->board()->neighbors($hex, $is_noble)) > 0;
-                return $n;
+                return count($this->board()->neighbors($hex, $is_noble)) > 0;
+            } else if ($this->components()->hasZigguratCard(
+                $this->player_id, ZigguratCardType::NOBLES_IN_FIELDS)) {
+                return true;
             }
         }
         return false;
@@ -227,7 +243,11 @@ class Model {
     }
 
     private function refill(Hand $hand, Pool $pool): void {
-        while ($hand->size() < $hand->maxSize() && !$pool->isEmpty()) {
+        $max_size =
+            $this->components()->hasZigguratCard(ZigguratCardType::HAND_SIZE_SEVEN)
+            ? 7
+            : 5;
+        while ($hand->size() < $max_size && !$pool->isEmpty()) {
             $hand->replenish($pool->take());
         }
     }
@@ -290,8 +310,12 @@ class Model {
         // Now each player gets 1 point for city they've captured.
         foreach ($player_infos as $pid => $pi) {
             // TODO: incorporate ziggurat card
-            $scores->captured_city_points[$pid] =
-                $pi->captured_city_count;
+            $points = $pi->captured_city_count;
+            if ($this->components()->hasZigguratCard($pid, ZigguratCardType::EXTRA_CITY_POINTS)) {
+                $points += intval(floor($points / 2));
+            }
+            $scores->captured_city_points[$pid] = $points;
+
         }
 
         // Give players points for connected pieces

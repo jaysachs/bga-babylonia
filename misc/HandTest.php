@@ -15,7 +15,7 @@ final class HandTest extends TestCase
     {
         $hand = Hand::new();
         $this->assertEquals(0, $hand->size());
-        $this->assertEquals(5, $hand->maxSize());
+        $this->assertEquals(5, $hand->limit());
         $x = [
             Piece::PRIEST,
             Piece::SERVANT,
@@ -27,7 +27,7 @@ final class HandTest extends TestCase
             $hand->replenish($p);
         }
         $this->assertEquals(5, $hand->size());
-        $this->assertEquals(5, $hand->maxSize());
+        $this->assertEquals(5, $hand->limit());
         foreach ($x as $p) {
             $this->assertTrue($hand->contains($p));
         }
@@ -39,14 +39,14 @@ final class HandTest extends TestCase
             $this->assertEquals(count($x) - $i - 1, $hand->size());
         }
         $this->assertEquals(true, $hand->isEmpty());
-        $this->assertEquals(count($x), $hand->maxSize());
+        $this->assertEquals(count($x), $hand->limit());
     }
 
     public function testHandSizeLimit(): void
     {
         $hand = Hand::new();
         $this->assertEquals(0, $hand->size());
-        $this->assertEquals(5, $hand->maxSize());
+        $this->assertEquals(5, $hand->limit());
         $x = [
             Piece::PRIEST,
             Piece::SERVANT,
@@ -65,7 +65,7 @@ final class HandTest extends TestCase
     {
         $hand = Hand::new();
         $this->assertEquals(0, $hand->size());
-        $this->assertEquals(5, $hand->maxSize());
+        $this->assertEquals(5, $hand->limit());
         $x = [
             Piece::PRIEST,
             Piece::SERVANT,
@@ -79,13 +79,13 @@ final class HandTest extends TestCase
         $hand->play(1);
         $hand->play(3);
         $hand->extend(7);
-        $this->assertEquals(7, $hand->maxSize());
+        $this->assertEquals(7, $hand->limit());
         $this->assertEquals(3, $hand->size());
         $hand->replenish(Piece::PRIEST);
         $hand->replenish(Piece::FARMER);
         $hand->replenish(Piece::MERCHANT);
         $hand->replenish(Piece::FARMER);
-        $this->assertEquals(7, $hand->maxSize());
+        $this->assertEquals(7, $hand->limit());
         $this->assertEquals(7, $hand->size());
     }
 }

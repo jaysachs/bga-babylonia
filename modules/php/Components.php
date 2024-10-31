@@ -50,6 +50,15 @@ class Components {
         );
     }
 
+    public function hasZigguratCard(int $player_id, ZigguratCardType $type): bool {
+        foreach ($this->ziggurat_cards as $card) {
+            if ($card->owning_player_id == $player_id) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public function zigguratCardsOwnedBy(int $player_id): array /* ZigguratCard */ {
         return array_values(
             array_filter(
