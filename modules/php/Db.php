@@ -257,7 +257,7 @@ class Db {
     }
 
     public function insertComponents(Components $components): void {
-        $sql = "INSERT INTO ziggurat_cards (ziggurat_card, used, player_id) VALUES ";
+        $sql = "INSERT INTO ziggurat_cards (card_type, used, player_id) VALUES ";
 
         $sql_values = [];
         foreach ($components->allZigguratCards() as &$zc) {
@@ -272,13 +272,22 @@ class Db {
     public function retrieveComponents(): Components {
         return new Components(array_map(
             function ($d) {
-                return new ZigguratCard(ZigguratCardType::from($d["type"]),
+                return new ZigguratCard(ZigguratCardType::from($d["card_type"]),
                                         intval($d["player_id"]),
                                         boolval($d["used"]));
             },
             $this->db->getObjectListFromDB2(
-                "SELECT ziggurat_card type, player_id, used FROM ziggurat_cards")
+                "SELECT card_type, player_id, used FROM ziggurat_cards")
         ));
+    }
+
+    public function updateZigguratCard(ZigguratCard $card) {
+        $player_id = $card->owning_player_id;
+        $used = $this->boolValue($card->used);
+        $type = $card->type->value;
+        $this->db->DbQuery("UPDATE ziggurat_cards
+                            SET player_id = $player_id, used = $used
+                            WHERE card_type = '$type'");
     }
 }
 
