@@ -75,19 +75,20 @@ class Game extends \Table
         } else {
             $msg = '${player_name} plays ${piece} to (${row},${col})';
         }
+        $player_info = $model->allPlayerInfo()[$player_id];
         $this->notifyAllPlayers(
             "piecePlayed",
             clienttranslate($msg),
             [
                 "player_id" => $player_id,
-                "player_number" => $this->getPlayerNoById($player_id),
+                "player_number" => $player_info->player_number,
                 "player_name" => $this->getActivePlayerName(),
                 "piece" => $piece,
                 "handpos" => $handpos,
                 "row" => $row,
                 "col" => $col,
                 "points" => $points,
-                "score" => $this->db->retrievePlayerInfo($player_id)->score,
+                "score" => $player_info->score,
                 "i18n" => ['piece'],
                 "hand_size" => $model->hand()->size(),
                 "pool_size" => $model->pool()->size(),
