@@ -434,28 +434,20 @@ class Model {
     }
 
     public function selectZigguratCard(ZigguratCardType $card_type): ZigguratCardSelection {
-        foreach ($this->components()->allZigguratCards() as &$card) {
-            if ($card->type == $card_type) {
-                if ($card->owning_player_id != 0) {
-                    throw new \InvalidArgumentException("ziggurat card $card_type->value already chosen");
-                }
-                $card->owning_player_id = $this->player_id;
-                $points = 0;
-                if ($card_type == ZigguratCardType::PLUS_10) {
-                    $card->used = true;
-                    $points = 10;
-                    $pi = $this->allPlayerInfo()[$this->player_id];
-                    $pi->score += $points;
-                    $this->db->updatePlayer($pi);
-                } else if ($card_type == ZigguratCardType::HAND_SIZE_7) {
-                    $this->hand()->extend(7);
-                    $this->db->upsertHand($this->player_id, $this->hand());
-                }
-                $this->db->updateZigguratCard($card);
-                return new ZigguratCardSelection($card, $points);
-            }
+        $card = $this->components()->takeCard($this->player_id, $card_type);
+        $points = 0;
+        if ($card_type == ZigguratCardType::PLUS_10) {
+            $card->used = true;
+            $points = 10;
+            $pi = $this->allPlayerInfo()[$this->player_id];
+            $pi->score += $points;
+            $this->db->updatePlayer($pi);
+        } else if ($card_type == ZigguratCardType::HAND_SIZE_7) {
+            $this->hand()->extend(7);
+            $this->db->upsertHand($this->player_id, $this->hand());
         }
-        throw new \InvalidArgumentException("ziggurat card $card_type->value not available");
+        $this->db->updateZigguratCard($card);
+        return new ZigguratCardSelection($card, $points);
     }
 
     public function useExtraTurnCard(): void {

@@ -52,30 +52,42 @@ class Components {
     }
 
     public function availableZigguratCards(): array /* ZigguratCard */ {
-        return array_values(
-            array_filter($this->ziggurat_cards,
-                         function ($z) { return $z->owning_player_id == 0; }
-            )
-        );
+        return $this->zigguratCardsOwnedBy(0);
     }
 
     public function hasUnusedZigguratCard(int $player_id, ZigguratCardType $type): bool {
-        foreach ($this->ziggurat_cards as $card) {
-            if ($card->owning_player_id == $player_id
-                && $card->type == $type) {
-                return !$card->used;
-            }
+        $card = $this->getOwnedCard($player_id, $type);
+        if ($card == null) {
+            return false;
         }
-        return false;
+        return !$card->used;
     }
 
     public function zigguratCardsOwnedBy(int $player_id): array /* ZigguratCard */ {
         return array_values(
             array_filter(
                 $this->ziggurat_cards,
-                function ($z) { return $z->owning_player_id == $player_id; }
+                function ($z) use($player_id) {
+                    return $z->owning_player_id == $player_id;
+                }
             )
         );
+    }
+
+    public function takeCard(int $player_id, ZigguratCardType $type): ?ZigguratCard {
+        foreach ($this->allZigguratCards() as &$card) {
+            if ($card->type == $type) {
+                if ($card->owning_player_id != 0) {
+                    throw new \InvalidArgumentException("Ziggurat card $type is already taken (by $card->owning_player_id).");
+                }
+                if ($card->used) {
+                    throw new \InvalidArgumentException("Ziggurat card $type is already used.");
+                }
+                $card->owning_player_id = $player_id;
+                return $card;
+            }
+        }
+        return null;
     }
 }
 ?>
