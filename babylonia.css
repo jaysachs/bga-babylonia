@@ -354,3 +354,18 @@ div.b_ziggurats > div {
     background-size: 1000% 100%;
     background-image: url(img/ziggurats.png);
 }
+
+a.action-button:has(> div.ziggurat) {
+    padding: 0;
+    border-style: none;
+}
+
+a.action-button > div.ziggurat {
+    border-radius: 5px;
+    border: 0;
+    border-style: none;
+    height: 6em;
+    width: 4em;
+    background-size: 1000% 100%;
+    background-image: url(img/ziggurats.png);
+}

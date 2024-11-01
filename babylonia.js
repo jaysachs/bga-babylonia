@@ -403,8 +403,9 @@ function (dojo, declare) {
         //                        HTML links in the status bar).
         //
         onUpdateActionButtons: function( stateName, args ) {
-            console.log( 'onUpdateActionButtons: '+stateName, args );
-            console.log( "current player active: " + this.isCurrentPlayerActive() );
+            console.log( 'onUpdateActionButtons: '+stateName,
+                         this.isCurrentPlayerActive(),
+                         args );
             if( this.isCurrentPlayerActive() ) {
                 switch( stateName ) {
                     case 'chooseExtraTurn':
@@ -436,10 +437,13 @@ function (dojo, declare) {
                         args.available_cards.forEach(z =>
                             this.addActionButton(
                                 z + '-btn',
-                                'Choose ziggurat card ' + z,
+                                `<div class="shadow ziggurat bgaimagebutton ${z}"></div>`,
                                 () => this.bgaPerformAction('actSelectZigguratCard', {
                                     card_type: z
-                                })));
+                                }),
+                                null,
+                                false,
+                                "gray"));
                         // TODO: highlight available ones & select by clicking on them.
                         break;
 
