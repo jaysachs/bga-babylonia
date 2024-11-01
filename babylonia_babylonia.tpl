@@ -39,14 +39,7 @@ var jstpl_some_game_item='<div class="my_game_item" id="my_game_item_${MY_ITEM_I
 
     <div id="main">
       <div style="width: 1024px; display: flex; flex-direction:row; flex-wrap: nowrap; justify-content:center;">
-        <div class="hand blue" id="hand">
-          <div id="hand_0" class=""></div>
-          <div id="hand_1" class=""></div>
-          <div id="hand_2" class=""></div>
-          <div id="hand_3" class=""></div>
-          <div id="hand_4" class=""></div>
-	  <div id="hand_5" class="unavailable"></div>
-	  <div id="hand_6" class="unavailable"></div>
+        <div class="hand" id="hand">
 	</div>
       </div>
       <!-- needed since the board is absolutely positions / sized. for now. -->

@@ -502,7 +502,23 @@ function (dojo, declare) {
         },
 
         handDiv: function (i) {
-            return $(`hand_${i}`);
+            let id = `hand_${i}`;
+            let div = $(id);
+            if (div != null) {
+                return div;
+            }
+            // dynamically extend hand as needed.
+            hand = $(`hand`);
+            for (j = 0; j <= i; ++j) {
+                let d = $(`hand_${j}`);
+                if (d == null) {
+                    hand.insertAdjacentHTML(
+                        'beforeend',
+                        `<div id="hand_${j}"></div>`
+                    );
+                }
+            }
+            return $(id);
         },
 
         handClass: function(piece) {
