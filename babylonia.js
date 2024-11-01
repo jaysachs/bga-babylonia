@@ -16,13 +16,16 @@
  */
 
 var thegamedatas = null;
+let jstpl_bbl_piece = '<span class="log-element ${value}"></span>';
+
 
 define([
     "dojo","dojo/_base/declare",
+    "dojo/aspect",
     "ebg/core/gamegui",
     "ebg/counter"
 ],
-function (dojo, declare) {
+       function (dojo, declare, aspect) {
     return declare("bgagame.babylonia", ebg.core.gamegui, {
         constructor: function(){
             console.log('babylonia constructor');
@@ -33,6 +36,13 @@ function (dojo, declare) {
 
             dojo.connect( $('hand'), 'onclick', this, 'onPieceSelection' );
             dojo.connect( $('board'), 'onclick', this, 'onHexSelection' );
+
+            let transformFunction = dojo.hitch(this, "getTokenDiv");          //Needed as the this object in aspect.before will not refer to the game object in which the formatting function resides
+            aspect.before(dojo.string, "substitute", function(template, map, transform) {
+                if (undefined === transform) {    //Check for a transform function presence, just in case
+                    return [template, map, transformFunction];
+                }
+            });
         },
 
         playerNumber: -1,
@@ -648,11 +658,20 @@ function (dojo, declare) {
             this.updateCapturedCityCount(notif.args);
         },
 
+        getTokenDiv: function(value, key) {
+            switch (key) {
+                case 'bbl_piece':
+                    return this.format_block('jstpl_bbl_piece', { value: value+"_1" });
+                default:
+                    return value;
+            }
+        },
+
         notif_piecePlayed: function( notif ) {
             console.log( 'notif_piecePlayed', notif );
             this.renderPlayedPiece( notif.args.row,
                                     notif.args.col,
-                                    notif.args.piece,
+                                    notif.args.bbl_piece,
                                     notif.args.player_number );
             if (notif.args.player_number == this.playerNumber) {
                 this.handDiv(notif.args.handpos).className = this.handClass("empty");
