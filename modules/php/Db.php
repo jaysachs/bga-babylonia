@@ -139,15 +139,19 @@ class Db {
         );
     }
 
+    public function updatePlayer(PlayerInfo $player_info): void {
+        $score = $pi->score;
+        $captured_city_count = $pi->captured_city_count;
+        $this->db->DbQuery(
+            "UPDATE player q
+             SET q.player_score = $score, q.captured_city_count=$captured_city_count
+             WHERE q.player_id = $player_info->player_id"
+        );
+    }
+
     public function updatePlayers(array $player_infos): void {
         foreach ($player_infos as $player_id => $pi) {
-            $score = $pi->score;
-            $captured_city_count = $pi->captured_city_count;
-            $this->db->DbQuery(
-                "UPDATE player q
-                 SET q.player_score = $score, q.captured_city_count=$captured_city_count
-                 WHERE q.player_id = $player_id"
-            );
+            $this->updatePlayer($pi);
         }
     }
 
