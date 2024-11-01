@@ -354,8 +354,10 @@ function (dojo, declare) {
             console.log( 'Entering state: '+stateName,
                          this.isCurrentPlayerActive(),
                          stateInfo );
-            this.stateName = stateName;
-            let args = stateInfo.args;
+
+            // All important things are done in onUpdateActionButtons.
+            // this.stateName = stateName;
+            // let args = stateInfo.args;
             switch( stateName ) {
                 case 'endOfTurnScoring':
                     // this.markAllHexesUnplayable();
@@ -363,8 +365,6 @@ function (dojo, declare) {
 
                 case 'selectHexToScore':
                     // this.markAllHexesUnplayable();
-                    // TODO: also get the right onclick handler!!
-                    this.markScoreableHexesPlayable(args.hexes);
                     break;
 
                 case 'dummmy':
@@ -427,13 +427,7 @@ function (dojo, declare) {
                         break;
 
                     case 'selectHexToScore':
-                        // this.addActionButton(
-                        //     'rnd-btn',
-                        //     'Choose randomly',
-                        //     () => this.bgaPerformAction("actChooseHexToScore") {
-                        //         row: 0,
-                        //         col: 0
-                        //     });
+                        this.markScoreableHexesPlayable(args.hexes);
                         break;
 
                     case 'selectZigguratCard':
