@@ -35,19 +35,6 @@ function (dojo, declare) {
             dojo.connect( $('board'), 'onclick', this, 'onHexSelection' );
         },
 
-        /*
-            setup:
-
-            This method must set up the game user interface according to current game situation specified
-            in parameters.
-
-            The method is called each time the game interface is displayed to a player, ie:
-            _ when the game starts
-            _ when a player refreshes the game page (F5)
-
-            "gamedatas" argument contains all datas retrieved by your "getAllDatas" PHP method.
-        */
-
         playerNumber: -1,
 
         jstpl_player_board: function( player_id, player ) {
@@ -73,7 +60,9 @@ function (dojo, declare) {
             let left = 38 + (col * 55);
             board.insertAdjacentHTML(
                 'beforeend',
-                `<div id="hex_${row}_${col}" style="top:${top}px; left:${left}px;"><div><div></div></div></div>`);
+                `<div id="hex_${row}_${col}" style="top:${top}px; left:${left}px;">
+                 <div><div></div></div></div>`
+            );
         },
 
         setupPlayerBoard: function( player ) {
@@ -96,8 +85,21 @@ function (dojo, declare) {
             this.updateCapturedCityCount(player, false);
         },
 
-        setup: function( gamedatas )
-        {
+        /*
+            setup:
+
+            This method must set up the game user interface according
+            to current game situation specified in parameters.
+
+            The method is called each time the game interface is
+            displayed to a player, ie:
+            _ when the game starts
+            _ when a player refreshes the game page (F5)
+
+            "gamedatas" argument contains all datas retrieved by your
+            "getAllDatas" PHP method.
+        */
+        setup: function( gamedatas ) {
             console.log( "Starting game setup" );
             thegamedatas = gamedatas;
             // Setting up player boards
@@ -153,12 +155,12 @@ function (dojo, declare) {
             event.preventDefault();
             event.stopPropagation();
             switch (this.stateName) {
-            case "playPieces":
-                this.selectPieceToPlay(event);
-                break;
-            case "selectHexToScore":
-                this.selectHexToScore(event);
-                break;
+                case 'playPieces':
+                    this.selectPieceToPlay(event);
+                    break;
+                case 'selectHexToScore':
+                    this.selectHexToScore(event);
+                    break;
             }
         },
 
@@ -288,11 +290,13 @@ function (dojo, declare) {
         },
 
         markHexPlayable: function (rc) {
-            this.hexDiv(rc.row, rc.col).firstElementChild.firstElementChild.classList.add('playable');
+            this.hexDiv(rc.row, rc.col).firstElementChild.firstElementChild
+                .classList.add('playable');
         },
 
         markHexUnplayable: function (rc2) {
-            this.hexDiv(rc2.row, rc2.col).firstElementChild.firstElementChild.classList.remove('playable');
+            this.hexDiv(rc2.row, rc2.col).firstElementChild.firstElementChild
+                .classList.remove('playable');
         },
 
         markScoreableHexesPlayable: function(hexes) {
@@ -341,67 +345,68 @@ function (dojo, declare) {
         ///////////////////////////////////////////////////
         //// Game & client states
 
-        // onEnteringState: this method is called each time we are entering into a new game state.
-        //                  You can use this method to perform some user interface changes at this moment.
+        // onEnteringState: this method is called each time we are
+        //                  entering into a new game state.  You can
+        //                  use this method to perform some user
+        //                  interface changes at this moment.
         //
-        onEnteringState: function( stateName, stateInfo )
-        {
-            console.log( 'Entering state: '+stateName + " " +  this.isCurrentPlayerActive(), stateInfo );
+        onEnteringState: function( stateName, stateInfo ) {
+            console.log( 'Entering state: '+stateName,
+                         this.isCurrentPlayerActive(),
+                         stateInfo );
             this.stateName = stateName;
             let args = stateInfo.args;
-            switch( stateName )
-            {
+            switch( stateName ) {
                 case 'endOfTurnScoring':
-                // this.markAllHexesUnplayable();
-                break;
+                    // this.markAllHexesUnplayable();
+                    break;
 
                 case 'selectHexToScore':
-                // this.markAllHexesUnplayable();
-                // TODO: also get the right onclick handler!!
-                this.markScoreableHexesPlayable(args.hexes);
-                break;
+                    // this.markAllHexesUnplayable();
+                    // TODO: also get the right onclick handler!!
+                    this.markScoreableHexesPlayable(args.hexes);
+                    break;
 
                 case 'dummmy':
-                break;
+                    break;
             }
         },
 
-        // onLeavingState: this method is called each time we are leaving a game state.
-        //                 You can use this method to perform some user interface changes at this moment.
+        // onLeavingState: this method is called each time we are
+        //                 leaving a game state.  You can use this
+        //                 method to perform some user interface
+        //                 changes at this moment.
         //
-        onLeavingState: function( stateName )
-        {
+        onLeavingState: function( stateName ) {
             console.log( 'Leaving state: '+stateName );
             this.stateName = "";
-            switch( stateName )
-            {
-            /* Example:
+            switch( stateName ) {
+                    /* Example:
 
-            case 'myGameState':
+                       case 'myGameState':
 
-                // Hide the HTML block we are displaying only during this game state
-                dojo.style( 'my_html_block_id', 'display', 'none' );
+                       // Hide the HTML block we are displaying only
+                       // during this game state
+                       dojo.style( 'my_html_block_id', 'display', 'none' );
 
-                break;
-           */
+                       break;
+                    */
 
-
-            case 'dummmy':
-                break;
+                case 'dummmy':
+                    break;
             }
         },
 
-        // onUpdateActionButtons: in this method you can manage "action buttons" that are displayed in the
-        //                        action status bar (ie: the HTML links in the status bar).
+        // onUpdateActionButtons: in this method you can manage
+        //                        "action buttons" that are displayed
+        //                        in the action status bar (ie: the
+        //                        HTML links in the status bar).
         //
-        onUpdateActionButtons: function( stateName, args )
-        {
+        onUpdateActionButtons: function( stateName, args ) {
             console.log( 'onUpdateActionButtons: '+stateName, args );
             console.log( "current player active: " + this.isCurrentPlayerActive() );
-            if( this.isCurrentPlayerActive() )
-            {
-                switch( stateName )
-                {
+            if( this.isCurrentPlayerActive() ) {
+                switch( stateName ) {
                     case 'chooseExtraTurn':
                         this.addActionButton(
                             'extra-turn-btn',
@@ -415,66 +420,60 @@ function (dojo, declare) {
                             () => this.bgaPerformAction('actChooseExtraTurn', {
                                 take_extra_turn: false
                             }));
-                    break;
+                        break;
 
                     case 'endOfTurnScoring':
-                    this.markAllHexesUnplayable();
-                    break;
-
-                    // If we want to get fancy, can even roll own HTML for buttons:
-                    // this.addActionButton(
-                    //  'gear_button',
-                    //  '<div id="gear_token" class="skills_and_techniques gear_token"></div>',
-                    //  'onSelectAssetType', null, false, 'blue');
+                        this.markAllHexesUnplayable();
+                        break;
 
                     case 'selectHexToScore':
-                    // this.addActionButton(
-                    //     'rnd-btn',
-                    //     'Choose randomly',
-                    //     () => this.bgaPerformAction("actChooseHexToScore") {
-                    //         row: 0,
-                    //         col: 0
-                    //     });
-                    break;
+                        // this.addActionButton(
+                        //     'rnd-btn',
+                        //     'Choose randomly',
+                        //     () => this.bgaPerformAction("actChooseHexToScore") {
+                        //         row: 0,
+                        //         col: 0
+                        //     });
+                        break;
 
                     case 'selectZigguratCard':
-                    this.updateStatusBar('You must select a ziggurat card');
-                    console.log(args.available_cards);
-                    args.available_cards.forEach(z =>
-                        this.addActionButton(
-                            z + '-btn',
-                            'Choose ziggurat card ' + z,
-                            () => this.bgaPerformAction('actSelectZigguratCard', {
-                                card_type: z
-                            })));
-                    // TODO: highlight available ones & select by clicking on them.
-                    break;
+                        this.updateStatusBar('You must select a ziggurat card');
+                        console.log(args.available_cards);
+                        args.available_cards.forEach(z =>
+                            this.addActionButton(
+                                z + '-btn',
+                                'Choose ziggurat card ' + z,
+                                () => this.bgaPerformAction('actSelectZigguratCard', {
+                                    card_type: z
+                                })));
+                        // TODO: highlight available ones & select by clicking on them.
+                        break;
 
                     case 'playPieces':
-                    if (args.canEndTurn) {
-                        if (args.allowedMoves.length == 0) {
-                            this.updateStatusBar('You must end your turn');
+                        if (args.canEndTurn) {
+                            if (args.allowedMoves.length == 0) {
+                                this.updateStatusBar('You must end your turn');
+                            } else {
+                                this.updateStatusBar('You may play a piece or end your turn');
+                            }
+                            this.addActionButton(
+                                'end-btn',
+                                'End turn',
+                                () => this.bgaPerformAction("actDonePlayPieces"));
                         } else {
-                            this.updateStatusBar('You may play a piece or end your turn');
+                            this.updateStatusBar('You must play a piece');
                         }
+
+                        // save allowedMoves so selection can highlight hexes
+                        // and enforce placement rules.
+                        this.allowedMoves = args.allowedMoves;
+                        this.markAllHexesUnplayable();
+
                         this.addActionButton(
-                            'end-btn',
-                            'End turn',
-                            () => this.bgaPerformAction("actDonePlayPieces"));
-                    } else {
-                        this.updateStatusBar('You must play a piece');
-                    }
-
-                    // save allowedMoves so selection can highlight hexes
-                    // and enforce placement rules.
-                    this.allowedMoves = args.allowedMoves;
-                    this.markAllHexesUnplayable();
-
-                    this.addActionButton(
-                        'undo-btn',
-                        'Undo',
-                        () => window.alert('undo not supported'));
-                    break;
+                            'undo-btn',
+                            'Undo',
+                            () => window.alert('undo not supported'));
+                        break;
                 }
             }
         },
@@ -560,14 +559,15 @@ function (dojo, declare) {
         /*
             setupNotifications:
 
-            In this method, you associate each of your game notifications with your local method to handle it.
+            In this method, you associate each of your game
+            notifications with your local method to handle it.
 
-            Note: game notification names correspond to "notifyAllPlayers" and "notifyPlayer" calls in
-                  your babylonia.game.php file.
+            Note: game notification names correspond to
+            "notifyAllPlayers" and "notifyPlayer" calls in your
+            babylonia.game.php file.
 
         */
-        setupNotifications: function()
-        {
+        setupNotifications: function() {
             console.log( 'notifications subscriptions setup' );
 
             dojo.subscribe( 'piecePlayed', this, 'notif_piecePlayed' );
@@ -581,9 +581,10 @@ function (dojo, declare) {
             // Example 1: standard notification handling
             // dojo.subscribe( 'cardPlayed', this, "notif_cardPlayed" );
 
-            // Example 2: standard notification handling + tell the user interface to wait
-            //            during 3 seconds after calling the method in order to let the players
-            //            see what is happening in the game.
+            // Example 2: standard notification handling + tell the
+            //            user interface to wait during 3 seconds
+            //            after calling the method in order to let the
+            //            players see what is happening in the game.
             // dojo.subscribe( 'cardPlayed', this, "notif_cardPlayed" );
             // this.notifqueue.setSynchronous( 'cardPlayed', 3000 );
             //
@@ -622,7 +623,10 @@ function (dojo, declare) {
 
         notif_piecePlayed: function( notif ) {
             console.log( 'notif_piecePlayed', notif );
-            this.renderPlayedPiece( notif.args.row, notif.args.col, notif.args.piece, notif.args.player_number );
+            this.renderPlayedPiece( notif.args.row,
+                                    notif.args.col,
+                                    notif.args.piece,
+                                    notif.args.player_number );
             if (notif.args.player_number == this.playerNumber) {
                 this.handDiv(notif.args.handpos).className = this.handClass("empty");
             }
