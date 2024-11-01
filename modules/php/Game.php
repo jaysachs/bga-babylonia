@@ -450,7 +450,8 @@ class Game extends \Table
 
     public function actChooseExtraTurn(bool $take_extra_turn) {
         if ($take_extra_turn) {
-            $model = new Model($this->ps, $this->activePlayerId());
+            $player_id = $this->activePlayerId();
+            $model = new Model($this->ps, $player_id);
             $model->useExtraTurnCard();
             $this->notifyAllPlayers(
                 "extraTurnUsed",
