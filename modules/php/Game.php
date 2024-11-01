@@ -285,6 +285,7 @@ class Game extends \Table
                 "player_id" => $player_id,
                 "player_name" => $player_name,
                 "card" => $selection->card->type->value,
+                "cardused" => $selection->card->used,
                 "points" => $selection->points,
                 "score" => $model->allPlayerInfo()[$player_id]->score,
                 "card_description" => "short description of card"
@@ -451,6 +452,14 @@ class Game extends \Table
         if ($take_extra_turn) {
             $model = new Model($this->db, $this->activePlayerId());
             $model->useExtraTurnCard();
+            $this->notifyAllPlayers(
+                "extraTurnUsed",
+                clienttranslate('${player_name} is taking an extra turn'),
+                [
+                    "player_id" => $player_id,
+                    "player_name" => $this->getActivePlayerName(),
+                ]
+            );
             $this->gamestate->nextState("extraTurn");
         } else {
             $this->gamestate->nextState("nextPlayer");
@@ -564,7 +573,7 @@ class Game extends \Table
             'ziggurat_cards' =>
                 array_map(
                     function ($z) { return [
-                        "ziggurat_card" => $z->type->value,
+                        "type" => $z->type->value,
                         "owning_player_id" => $z->owning_player_id,
                         "used" => $z->used,
                     ]; },

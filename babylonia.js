@@ -57,9 +57,7 @@ function (dojo, declare) {
               <div class="b_pool">pool:<span id="poolcount_${player_id}">0</span></div>
               <div class="b_citycount">cities:<span id="citycount_${player_id}">0</span></div>
             </div>
-            <div class="b_ziggurats">
-        <div class="zc_3nobles"></div>
-        <div class="zc_3farmers"></div>
+            <div id="b_ziggurats_${player_id}" class="b_ziggurats">
             <!-- <div></div> -->
             </div>
           </div>`
@@ -128,19 +126,20 @@ function (dojo, declare) {
                 }
             }
 
+            // Set up the player's hand
+            this.renderHand(gamedatas.hand);
+
             console.log("Setting up available ziggurat cards");
             // Set up the available ziggurat tiles
             for( let z = 0; z < gamedatas.ziggurat_cards.length; z++) {
                 let div = $(`zig${z+1}`);
-                if ( gamedatas.ziggurat_cards[z].owning_player_id == 0 ) {
-                    div.classList = gamedatas.ziggurat_cards[z].ziggurat_card;
-                } else {
-                    div.className = "";
+                let card = gamedatas.ziggurat_cards[z];
+                div.classList.add(card.type);
+                if ( card.owning_player_id != 0 ) {
+                    this.setZigguratCardOwned(card.owning_player_id, card.type);
                 }
             }
 
-            // Set up the player's hand
-            this.renderHand(gamedatas.hand);
             //   and owned ziggurat cards
 
             console.log( "setting up notifications" );
@@ -265,6 +264,27 @@ function (dojo, declare) {
                 m = [];
             }
             return m;
+        },
+
+        setZigguratCardOwned: function (player_id, card) {
+            let zpaneldiv = $( `b_ziggurats_${player_id}` );
+            // add a div under div id b_ziggurats_{player_id}
+            // with the card as class.
+            // TODO: only if there isn't one already
+            zpaneldiv.insertAdjacentHTML(
+                `beforeend`,
+                `<div class="${card}"></div>` );
+
+            // also mark the available zig card spot as "no class"
+            var s = dojo.query( `#available_ziggurats .${card}` );
+            if (s.length == 0) {
+                console.log("Couldn't find available card " + card);
+                return;
+            }
+            if (s.length > 1) {
+                console.log("More than one of the same available zig card?");
+            }
+            s[0].classList.remove(card);
         },
 
         markHexPlayable: function (rc) {
@@ -571,7 +591,8 @@ function (dojo, declare) {
 
         notif_zigguratCardSelection: function( notif ) {
             console.log( 'notif_zigguratCardSelection', notif );
-
+            // TODO: also hand marking cards as "used"?
+            this.setZigguratCardOwned(notif.args.player_id, notif.args.card);
             this.scoreCtrl[notif.args.player_id].toValue(notif.args.score);
         },
 
