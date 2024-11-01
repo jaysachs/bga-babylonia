@@ -397,6 +397,23 @@ function (dojo, declare) {
             }
         },
 
+        addImageActionButton: function(id, div, handler, bcolor, tooltip) {
+	    if (typeof bcolor == "undefined") {
+		bcolor = "gray";
+	    }
+	    // this will actually make a transparent button id color = gray
+	    this.addActionButton(id, div, handler, null, false, bcolor);
+	    // remove border, for images it better without
+	    dojo.style(id, "border", "none");
+	    // but add shadow style (box-shadow, see css)
+	    dojo.addClass(id, "shadow bgaimagebutton");
+	    // you can also add additional styles, such as background
+	    if (tooltip) {
+		dojo.attr(id, "title", tooltip);
+	    }
+	    return $(id);
+        },
+
         // onUpdateActionButtons: in this method you can manage
         //                        "action buttons" that are displayed
         //                        in the action status bar (ie: the
@@ -435,16 +452,12 @@ function (dojo, declare) {
                         this.updateStatusBar('You must select a ziggurat card');
                         console.log(args.available_cards);
                         args.available_cards.forEach(z =>
-                            this.addActionButton(
+                            this.addImageActionButton(
                                 z + '-btn',
-                                `<div class="shadow ziggurat bgaimagebutton ${z}"></div>`,
+                                `<div class="ziggurat ${z}"></div>`,
                                 () => this.bgaPerformAction('actSelectZigguratCard', {
                                     card_type: z
-                                }),
-                                null,
-                                false,
-                                "gray"));
-                        // TODO: highlight available ones & select by clicking on them.
+                                })));
                         break;
 
                     case 'playPieces':
