@@ -4,8 +4,8 @@ declare(strict_types=1);
 use PHPUnit\Framework\TestCase;
 
 use Bga\Games\babylonia\ {
-    Hex,
-    HexType,
+        Hex,
+        HexType,
         Piece,
 };
 

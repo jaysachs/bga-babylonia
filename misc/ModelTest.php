@@ -4,15 +4,15 @@ declare(strict_types=1);
 use PHPUnit\Framework\TestCase;
 
 use Bga\Games\babylonia\ {
-    Hex,
-    HexType,
-      Model,
-      Board,
+        Board,
         Components,
-        ScoredCity,
+        Hex,
+        HexType,
+        Model,
+        PersistentStore,
         Piece,
         PlayerInfo,
-        PersistentStore,
+        ScoredCity,
 };
 
 class TestStore extends PersistentStore {
