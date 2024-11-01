@@ -381,24 +381,35 @@ class Model {
                 $n->row,
                 $n->col,
                 function (&$h) use (&$result, &$hex, &$n, &$seen) {
-                    if ($h->piece->isPlayerPiece()) {
-                        if ($h->player_id == $n->player_id) {
-                            if ($hex->piece->scores($h->piece)) {
-                                if (in_array($h, $seen)) {
-                                    // nothing
-                                } else {
-                                    $result->addScoredHex($h);
-                                }
+                    if ($this->inNetwork($h, $n->player_id)) {
+                        if ($hex->piece->scores($h->piece)) {
+                            if (in_array($h, $seen)) {
+                                // nothing
+                            } else {
+                                $result->addScoredHex($h);
                             }
-                            $seen[] = $h;
-                            return true;
                         }
+                        $seen[] = $h;
+                        return true;
                     }
                     return false;
                 }
             );
         }
         return $result;
+    }
+
+    private function inNetwork(Hex $h, int $player_id): bool {
+        return
+            // Either it's one of the player's pieces
+            ($h->piece->isPlayerPiece() && $h->player_id == $player_id)
+            // Or it's an empty land hex in the center area and the player has
+            //   the appropriate bonus tile
+            // TODO: how to express "in central land"?
+            // Or it's an empty water tile and the player has the river bonus tile
+            || ($h->piece->isEmpty() && $h->isWater()
+                && $this->components()->hasUnusedZigguratCard($player_id,
+                                                              ZigguratCardType::FREE_RIVER_CONNECTS));
     }
 
     public function hexRequiresScoring(Hex $hex): bool {
