@@ -116,10 +116,10 @@ class Model {
                 if ($non_land_farmer_played
                     || count($this->turnProgress()->moves) < 3
                     || !$this->components()->hasZigguratCard($this->player_id,
-                                                             ZigguratCardType::NOBLE_WITH_THREE_FARMERS)) {
+                                                             ZigguratCardType::NOBLE_WITH_3_FARMERS)) {
                     return false;
                 }
-                $played = $this->turnProgress();
+                $played = $this->turnProgress()->uniquePiecesPlayed();
                 if (count($played) != 2
                     || in_array($piece, $played)
                     || !$this->components()->hasZigguratCard($this->player_id,
@@ -244,7 +244,8 @@ class Model {
 
     private function refill(Hand $hand, Pool $pool): void {
         $max_size =
-            $this->components()->hasZigguratCard(ZigguratCardType::HAND_SIZE_SEVEN)
+            $this->components()->hasZigguratCard($this->player_id,
+                                                 ZigguratCardType::HAND_SIZE_SEVEN)
             ? 7
             : 5;
         while ($hand->size() < $max_size && !$pool->isEmpty()) {
@@ -437,15 +438,23 @@ class Model {
             || count($this->getAllowedMoves()) == 0;
     }
 
-    public function selectZigguratCard(ZigguratCardType $card_type): ZigguratCard {
+    public function selectZigguratCard(ZigguratCardType $card_type): ZigguratCardSelection {
         foreach ($this->components()->allZigguratCards() as &$card) {
             if ($card->type == $card_type) {
                 if ($card->owning_player_id != 0) {
                     throw new \InvalidArgumentException("ziggurat card $card_type->value already chosen");
                 }
                 $card->owning_player_id = $this->player_id;
+                $points = 0;
+                if ($card_type == ZigguratCardType::PLUS_10) {
+                    $card->used = true;
+                    $points = 10;
+                    $pi = $this->allPlayerInfo()[$this->player_id];
+                    $pi->score += $points;
+                    $this->db->updatePlayerInfo($pi);
+                }
                 $this->db->updateZigguratCard($card);
-                return $card;
+                return new ZigguratCardSelection($card, $points);
             }
         }
         throw new \InvalidArgumentException("ziggurat card $card_type->value not available");

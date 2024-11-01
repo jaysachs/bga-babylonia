@@ -534,7 +534,7 @@ function (dojo, declare) {
             dojo.subscribe( 'cityScored', this, 'notif_cityScored' );
             dojo.subscribe( 'cityScoredPlayer', this, 'notif_cityScoredPlayer' );
             dojo.subscribe( 'turnFinished', this, 'notif_turnFinished' );
-
+            dojo.subscribe( 'zigguratCardSelection', this, 'notif_zigguratCardSelection');
             // TODO: here, associate your game notifications with local methods
 
             // Example 1: standard notification handling
@@ -546,6 +546,12 @@ function (dojo, declare) {
             // dojo.subscribe( 'cardPlayed', this, "notif_cardPlayed" );
             // this.notifqueue.setSynchronous( 'cardPlayed', 3000 );
             //
+        },
+
+        notif_zigguratCardSelection: function( notif ) {
+            console.log( 'notif_zigguratCardSelection', notif );
+
+            this.scoreCtrl[notif.args.player_id].toValue(notif.args.score);
         },
 
         notif_cityScored: function( notif ) {

@@ -309,31 +309,31 @@
     border-style: dotted;
 }
 
-div.zcard1 {
+div.zc_10pts {
     background-position: 0% 0%;
 }
-div.zcard2 {
+div.zc_xturn {
     background-position: -100% 0%;
 }
-div.zcard3 {
+div.zc_hand7 {
     background-position: -200% 0%;
 }
-div.zcard4 {
+div.zc_3nobles {
     background-position: -300% 0%;
 }
-div.zcard5 {
+div.zc_3farmers {
     background-position: -400% 0%;
 }
-div.zcard6 {
+div.zc_fields {
     background-position: -500% 0%;
 }
-div.zcard7 {
+div.zc_citypts {
     background-position: -600% 0%;
 }
-div.zcard8 {
+div.zc_land {
     background-position: -700% 0%;
 }
-div.zcard9 {
+div.zc_river {
     background-position: -800% 0%;
 }
 

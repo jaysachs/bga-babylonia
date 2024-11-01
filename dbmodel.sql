@@ -75,7 +75,7 @@ CREATE TABLE IF NOT EXISTS `ziggurat_cards` (
   -- whether the one-shot power was activated
   `used` boolean NOT NULL DEFAULT false,
   -- the card itself
-  `card_type` varchar(6) NOT NULL,
+  `card_type` varchar(12) NOT NULL,
   PRIMARY KEY (`card_type`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 

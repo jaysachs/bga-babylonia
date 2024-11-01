@@ -28,15 +28,15 @@ declare(strict_types=1);
 namespace Bga\Games\babylonia;
 
 enum ZigguratCardType : string {
-    case PLUS_10 = 'zcard1';
-    case EXTRA_TURN = 'zcard2';
-    case HAND_SIZE_SEVEN = 'zcard3';
-    case THREE_NOBLES = 'zcard4';
-    case NOBLE_WITH_3_FARMERS = 'zcard5';
-    case NOBLES_IN_FIELDS = 'zcard6';
-    case EXTRA_CITY_POINTS = 'zcard7';
-    case FREE_CENTRAL_LAND_CONNECTS = 'zcard8';
-    case FREE_RIVER_CONNECTS = 'zcard9';
+    case PLUS_10 = 'zc_10pts';
+    case EXTRA_TURN = 'zc_xturn';
+    case HAND_SIZE_SEVEN = 'zc_hand7';
+    case THREE_NOBLES = 'zc_3nobles';
+    case NOBLE_WITH_3_FARMERS = 'zc_3farmers';
+    case NOBLES_IN_FIELDS = 'zc_fields';
+    case EXTRA_CITY_POINTS = 'zc_citypts';
+    case FREE_CENTRAL_LAND_CONNECTS = 'zc_land';
+    case FREE_RIVER_CONNECTS = 'zc_river';
 
     public static function sevenTypes(bool $use_advanced = false) {
         $ziggurats = [

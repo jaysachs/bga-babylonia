@@ -274,7 +274,7 @@ class Game extends \Table
     public function actSelectZigguratCard(string $card_type) {
         $player_id = $this->activePlayerId();
         $model = new Model($this->db, $player_id);
-        $card = $model->selectZigguratCard(ZigguratCardType::from($card_type));
+        $selection = $model->selectZigguratCard(ZigguratCardType::from($card_type));
 
         $player_name = $this->getActivePlayerName();
         $this->notifyAllPlayers(
@@ -283,7 +283,9 @@ class Game extends \Table
             [
                 "player_id" => $player_id,
                 "player_name" => $player_name,
-                "card" => $card->type->value,
+                "card" => $selection->card->type->value,
+                "points" => $selection->points,
+                "score" => $model->allPlayerInfo()[$player_id]->score,
                 "card_description" => "short description of card"
             ]
         );
