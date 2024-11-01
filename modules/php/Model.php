@@ -451,7 +451,7 @@ class Model {
                     $points = 10;
                     $pi = $this->allPlayerInfo()[$this->player_id];
                     $pi->score += $points;
-                    $this->db->updatePlayerInfo($pi);
+                    $this->db->updatePlayer($pi);
                 }
                 $this->db->updateZigguratCard($card);
                 return new ZigguratCardSelection($card, $points);
