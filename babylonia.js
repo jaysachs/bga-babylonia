@@ -16,16 +16,16 @@
  */
 
 var thegamedatas = null;
-let jstpl_bbl_piece = '<span class="log-element ${value}"></span>';
+let jstpl_log_piece = '<span class="log-element ${piece}"></span>';
+let jstpl_log_city = '<span class="log-element ${city}"></span>';
 
 
 define([
     "dojo","dojo/_base/declare",
-    "dojo/aspect",
     "ebg/core/gamegui",
     "ebg/counter"
 ],
-       function (dojo, declare, aspect) {
+function (dojo, declare) {
     return declare("bgagame.babylonia", ebg.core.gamegui, {
         constructor: function(){
             console.log('babylonia constructor');
@@ -36,13 +36,6 @@ define([
 
             dojo.connect( $('hand'), 'onclick', this, 'onPieceSelection' );
             dojo.connect( $('board'), 'onclick', this, 'onHexSelection' );
-
-            let transformFunction = dojo.hitch(this, "getTokenDiv");          //Needed as the this object in aspect.before will not refer to the game object in which the formatting function resides
-            aspect.before(dojo.string, "substitute", function(template, map, transform) {
-                if (undefined === transform) {    //Check for a transform function presence, just in case
-                    return [template, map, transformFunction];
-                }
-            });
         },
 
         playerNumber: -1,
@@ -658,20 +651,62 @@ define([
             this.updateCapturedCityCount(notif.args);
         },
 
-        getTokenDiv: function(value, key) {
-            switch (key) {
-                case 'bbl_piece':
-                    return this.format_block('jstpl_bbl_piece', { value: value+"_1" });
-                default:
-                    return value;
+        /* @Override */
+        format_string_recursive : function format_string_recursive(log, args) {
+            let saved = [];
+            try {
+                if (log && args && !args.processed) {
+                    args.processed = true;
+
+                    // list of special keys we want to replace with images
+                    var keys = ['piece', 'city'];
+                    for ( var i in keys) {
+                        var key = keys[i];
+                        if (key in args) {
+                            saved[key] = args[key];
+                            args[key] = this.getTokenDiv(key, args);
+                        }
+                    }
+                }
+            } catch (e) {
+//                console.error(log,args,"Exception thrown", e.stack);
             }
+            try {
+                return this.inherited({callee: format_string_recursive}, arguments);
+            } finally {
+                for ( var i in saved ) {
+                    args[i] = saved[i];
+                }
+            }
+        },
+
+        getTokenDiv: function(key, args) {
+            console.log(key);
+            console.log(args);
+            switch (key) {
+                case 'city':
+                    return this.format_block(
+                        'jstpl_log_city',
+                        {
+                            'city': args[key],
+                        });
+                case 'piece':
+                    return this.format_block(
+                        'jstpl_log_piece',
+                        {
+                            'piece': args[key] + "_" + args['player_number']
+                        });
+                default:
+                    break;
+            }
+            return "NOT SURE WHAT HAPPENED";
         },
 
         notif_piecePlayed: function( notif ) {
             console.log( 'notif_piecePlayed', notif );
             this.renderPlayedPiece( notif.args.row,
                                     notif.args.col,
-                                    notif.args.bbl_piece,
+                                    notif.args.piece,
                                     notif.args.player_number );
             if (notif.args.player_number == this.playerNumber) {
                 this.handDiv(notif.args.handpos).className = this.handClass("empty");

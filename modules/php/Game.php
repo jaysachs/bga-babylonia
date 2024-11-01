@@ -71,9 +71,9 @@ class Game extends \Table
 
         $msg = "";
         if ($points > 0) {
-            $msg = '${player_name} plays ${bbl_piece} to (${row},${col}) scoring ${points} points';
+            $msg = '${player_name} plays ${piece} to (${row},${col}) scoring ${points} points';
         } else {
-            $msg = '${player_name} plays ${bbl_piece} to (${row},${col})';
+            $msg = '${player_name} plays ${piece} to (${row},${col})';
         }
         $player_info = $model->allPlayerInfo()[$player_id];
         $this->notifyAllPlayers(
@@ -82,8 +82,11 @@ class Game extends \Table
             [
                 "player_id" => $player_id,
                 "player_number" => $player_info->player_number,
+                "preserve" => [
+                    "player_number",
+                ],
                 "player_name" => $this->getActivePlayerName(),
-                "bbl_piece" => $piece,
+                "piece" => $piece,
                 "handpos" => $handpos,
                 "row" => $row,
                 "col" => $col,

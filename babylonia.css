@@ -379,15 +379,47 @@ a.action-button > div.ziggurat {
 .log-element.merchant_2,
 .log-element.priest_2,
 .log-element.farmer_2,
-.log-element.servant_2
+.log-element.servant_2,
+.log-element.merchant_3,
+.log-element.priest_3,
+.log-element.farmer_3,
+.log-element.servant_3,
+.log-element.merchant_4,
+.log-element.priest_4,
+.log-element.farmer_4,
+.log-element.servant_4
 {
     display: inline-block;
     margin: 0;
     padding: 0;
     background-color: transparent;
     height: 2.1em;
-    width: 1.83em;
+    width: 2.1em;
     background-size: 100% 1300%;
     background-image: url(img/pieces.png);
     background-size: 400% 500%;
+}
+
+.log-element.city_msp,
+.log-element.city_m,
+.log-element.city_back,
+.log-element.city_p,
+.log-element.city_s,
+.log-element.city_mp,
+.log-element.city_ms,
+.log-element.city_sp,
+.log-element.field_5,
+.log-element.field_6,
+.log-element.field_7,
+.log-element.field_X,
+.log-element.ziggurat
+{
+    height: 2.1em;
+    width: 2.4em;
+    display: inline-block;
+    margin: 0;
+    padding: 0;
+    background-color: transparent;
+    background-size: 100% 1300%;
+    background-image: url(img/cities.png);
 }
