@@ -354,9 +354,9 @@ function (dojo, declare) {
             console.log( 'Entering state: '+stateName,
                          this.isCurrentPlayerActive(),
                          stateInfo );
+            this.stateName = stateName;
 
-            // All important things are done in onUpdateActionButtons.
-            // this.stateName = stateName;
+            // All other important things are done in onUpdateActionButtons.
             // let args = stateInfo.args;
             switch( stateName ) {
                 case 'endOfTurnScoring':
