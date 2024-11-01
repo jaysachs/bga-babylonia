@@ -243,12 +243,7 @@ class Model {
     }
 
     private function refill(Hand $hand, Pool $pool): void {
-        $max_size =
-            $this->components()->hasZigguratCard($this->player_id,
-                                                 ZigguratCardType::HAND_SIZE_SEVEN)
-            ? 7
-            : 5;
-        while ($hand->size() < $max_size && !$pool->isEmpty()) {
+        while ($hand->size() < $hand->limit() && !$pool->isEmpty()) {
             $hand->replenish($pool->take());
         }
     }
@@ -452,6 +447,9 @@ class Model {
                     $pi = $this->allPlayerInfo()[$this->player_id];
                     $pi->score += $points;
                     $this->db->updatePlayer($pi);
+                } else if ($card_type == ZigguratCardType::HAND_SIZE_SEVEN) {
+                    $this->hand()->extend(7);
+                    $this->db->upsertHand($this->player_id, $this->hand());
                 }
                 $this->db->updateZigguratCard($card);
                 return new ZigguratCardSelection($card, $points);
