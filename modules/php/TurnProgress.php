@@ -36,9 +36,10 @@ class TurnProgress {
     public function uniquePiecesPlayed(): array /* Piece */ {
         $seen = [];
         foreach ($this->moves as &$move) {
-            $seen[$move->piece] = 1;
+            $seen[$move->piece->value] = 1;
         }
-        return array_keys($seen);
+        return array_map(function ($p) { return Piece::from($p); },
+                         array_keys($seen));
     }
 
     public function allMovesFarmersOnLand(Board $board): bool {
