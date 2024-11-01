@@ -337,10 +337,20 @@ div.zc_river {
     background-position: -800% 0%;
 }
 
-.b_playerboard_ext {
+div.b_handpoolcity {
     display: inline-block;
 }
 
-.b_playerboard_ext > div {
+div.b_handpoolcity > div {
     display: inline-block;
+    background-color: #ccccff;
+}
+
+div.b_ziggurats > div {
+    display: inline-block;
+    border-radius: 5px;
+    height: 4em;
+    width: 2.67em;
+    background-size: 1000% 100%;
+    background-image: url(img/ziggurats.png);
 }

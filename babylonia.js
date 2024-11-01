@@ -52,10 +52,16 @@ function (dojo, declare) {
 
         jstpl_player_board: function( player_id, player ) {
             return `<div class="b_playerboard_ext">
-            <div class="b_hand">hand:<span id="handcount_${player_id}">0</span></div>
-            <div class="b_pool">pool:<span id="poolcount_${player_id}">0</span></div>
-            <div class="b_citycount">cities:<span id="citycount_${player_id}">0</span></div>
-            <div id="b_ziggurats"><!-- <img src=""></img> --></div>
+            <div class="b_handpoolcity">
+              <div class="b_hand">hand:<span id="handcount_${player_id}">0</span></div>
+              <div class="b_pool">pool:<span id="poolcount_${player_id}">0</span></div>
+              <div class="b_citycount">cities:<span id="citycount_${player_id}">0</span></div>
+            </div>
+            <div class="b_ziggurats">
+        <div class="zc_3nobles"></div>
+        <div class="zc_3farmers"></div>
+            <!-- <div></div> -->
+            </div>
           </div>`
         },
         hand_counters: [],

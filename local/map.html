@@ -2,158 +2,172 @@
   <link rel="stylesheet" type="text/css" href="../babylonia.css" />
   <script>
     function cycleThings(e) {
-	let pieces = [
-	    "farmer_1",
-	    "merchant_1",
-	    "servant_1",
-	    "priest_1",
-	    "hidden_1",
-	    "farmer_2",
-	    "merchant_2",
-	    "servant_2",
-	    "priest_2",
-	    "hidden_2",
-	    "farmer_3",
-	    "merchant_3",
-	    "servant_3",
-	    "priest_3",
-	    "hidden_3",
-	    "farmer_4",
-	    "merchant_4",
-	    "servant_4",
-	    "priest_4",
-	    "hidden_4"
-	];
- 	let cities = [
-	    "city_msp",
-	    "city_m",
-	    "city_back",
-	    "city_p",
-	    "city_s",
-	    "city_ms",
-	    "city_sp",
-	    "city_mp",
-	    "field_5",
-	    "field_6",
-	    "field_7",
-	    "field_X",
-	    "ziggurat",
-	];
-	let all = cities.concat(pieces);
-	c = e.classList;
-	for (i = 0; i < all.length; ++i) {
-	    if (c.contains(all[i])) {
-		c.remove(all[i]);
-		if (i < all.length-1) {
-		    c.add(all[i+1]);
-		    return;
-		} else {
-		    c.add(all[0]);
-		}
-		return;
-	    }
-	}
-	c.add(all[0]);
+        let pieces = [
+            "farmer_1",
+            "merchant_1",
+            "servant_1",
+            "priest_1",
+            "hidden_1",
+            "farmer_2",
+            "merchant_2",
+            "servant_2",
+            "priest_2",
+            "hidden_2",
+            "farmer_3",
+            "merchant_3",
+            "servant_3",
+            "priest_3",
+            "hidden_3",
+            "farmer_4",
+            "merchant_4",
+            "servant_4",
+            "priest_4",
+            "hidden_4"
+        ];
+        let cities = [
+            "city_msp",
+            "city_m",
+            "city_back",
+            "city_p",
+            "city_s",
+            "city_ms",
+            "city_sp",
+            "city_mp",
+            "field_5",
+            "field_6",
+            "field_7",
+            "field_X",
+            "ziggurat",
+        ];
+        let all = cities.concat(pieces);
+        c = e.classList;
+        for (i = 0; i < all.length; ++i) {
+            if (c.contains(all[i])) {
+                c.remove(all[i]);
+                if (i < all.length-1) {
+                    c.add(all[i+1]);
+                    return;
+                } else {
+                    c.add(all[0]);
+                }
+                return;
+            }
+        }
+        c.add(all[0]);
     }
 
     function selectHex(event) {
         event.preventDefault();
-	event.stopPropagation();
-	let e = event.target;
-	while (e.parentElement != null && e.parentElement.id != "board") {
-	    e = e.parentElement;
-	}
-	if (e.parentElement != null) {
-	    let x = e.id.split("_");
-	    console.log("selected hex " + x[1] + ", " + x[2]);
-	    // e.classList.toggle("selected");
-	    cycleThings(e.firstElementChild);
-	}
+        event.stopPropagation();
+        let e = event.target;
+        while (e.parentElement != null && e.parentElement.id != "board") {
+            e = e.parentElement;
+        }
+        if (e.parentElement != null) {
+            let x = e.id.split("_");
+            console.log("selected hex " + x[1] + ", " + x[2]);
+            // e.classList.toggle("selected");
+            cycleThings(e.firstElementChild);
+        }
     }
 
     function selectPieceToPlay(event) {
         event.preventDefault();
-	event.stopPropagation();
-	let e = event.target;
-	let hc = e.parentElement;
-	if (hc.id == "hand") {
-	    let c = e.classList;
-	    if (c.length == 0) {
-		return;
-	    }
-	    if (!c.contains("selected")) {
+        event.stopPropagation();
+        let e = event.target;
+        let hc = e.parentElement;
+        if (hc.id == "hand") {
+            let c = e.classList;
+            if (c.length == 0) {
+                return;
+            }
+            if (!c.contains("selected")) {
                 hc.querySelectorAll('.selected').forEach(div => div.classList.remove('selected'));
-	    }
-	    c.toggle("selected");
-	}
+            }
+            c.toggle("selected");
+        }
     }
   </script>
   <body style="background-color: #CCFFCC">
     <div id="main">
       <div style="width: 1024px; display: flex; flex-direction:row; flex-wrap: nowrap; justify-content:center;">
-	<div class="hand" id="hand" onClick="selectPieceToPlay(event)">
+        <div class="hand" id="hand" onClick="selectPieceToPlay(event)">
           <div id="hand_0" class="farmer_1"></div>
           <div id="hand_1"  class="priest_2"></div>
-	  <!-- this one was already played -->
-	  <div id="hand_2"  class=""></div>
-	  <div  id="hand_3" class="farmer_3"></div>
-	  <div  id="hand_4" class="merchant_4"></div>
-	  <div  id="hand_5" class="unavailable"></div>
-	  <div  id="hand_6" class="unavailable"></div>
-	</div>
+          <!-- this one was already played -->
+          <div id="hand_2"  class=""></div>
+          <div  id="hand_3" class="farmer_3"></div>
+          <div  id="hand_4" class="merchant_4"></div>
+          <div  id="hand_5" class="unavailable"></div>
+          <div  id="hand_6" class="unavailable"></div>
+        </div>
       </div>
       <div class="board-spacer"></div>
       <div class="board" id="board" onClick="selectHex(event)">
-	<script>
-	  let b = document.getElementById("board");
-	  for (let c = 0; c < 16; c++) {
-	      let odd = c % 2 == 0;
-	      let rows = odd ? 12 : 11;
-	      for (let r = 0; r < rows; r++) {
-		  let top = r * 63 + (odd ? 6 : 37);
-		  let left = 38 + (c * 55);
-		  var cl="";
-		  if (c % 3 == 0) {
-		      cl = "class='playable'"
-		  }
-		  b.insertAdjacentHTML(
-		      `beforeend`,
-		      `<div id="hex_${r}_${c}" style="top:${top}px; left:${left}px;"><div><div ${cl}></div></div></div>`
-		  );
-	      }
-	  }
+        <script>
+          let b = document.getElementById("board");
+          for (let c = 0; c < 16; c++) {
+              let odd = c % 2 == 0;
+              let rows = odd ? 12 : 11;
+              for (let r = 0; r < rows; r++) {
+                  let top = r * 63 + (odd ? 6 : 37);
+                  let left = 38 + (c * 55);
+                  var cl="";
+                  if (c % 3 == 0) {
+                      cl = "class='playable'"
+                  }
+                  b.insertAdjacentHTML(
+                      `beforeend`,
+                      `<div id="hex_${r}_${c}" style="top:${top}px; left:${left}px;"><div><div ${cl}></div></div></div>`
+                  );
+              }
+          }
 
-	  /*
-	  for (i = 0; i < 7; ++i) {
-	      console.log(i);
-	      let h = document.getElementById("hand_" + i);
-	      let d = h.classList;
+          /*
+          for (i = 0; i < 7; ++i) {
+              console.log(i);
+              let h = document.getElementById("hand_" + i);
+              let d = h.classList;
 
-	      console.log(d);
-	      d.keys().forEach((x,y) => d.remove(x));
-	      console.log(d);
-	      h.className = "";
-	      console.log(h.classList);
-	      }
-	  */
-	  // for (i = 0; i < gamedatas.hand.length; ++i) {
-	  //     let p = gamedatas.hand[i];
-	  //     let c = document.getElementById("hand_" + i).classList;
-	  //     c.add(p);
-	  // }
+              console.log(d);
+              d.keys().forEach((x,y) => d.remove(x));
+              console.log(d);
+              h.className = "";
+              console.log(h.classList);
+              }
+          */
+          // for (i = 0; i < gamedatas.hand.length; ++i) {
+          //     let p = gamedatas.hand[i];
+          //     let c = document.getElementById("hand_" + i).classList;
+          //     c.add(p);
+          // }
 
-	  </script>
+                             </script>
       </div>
       <div id="available_ziggurats">
-	<div class="zcard1"></div>
-	<div class="zcard2"></div>
-	<div class="zcard4"></div>
-	<div class=""></div>
-	<div class="zcard7"></div>
-	<div class="zcard8"></div>
-	<div class="zcard9"></div>
+        <div class="zc_10pts"></div>
+        <div class="zc_xturn"></div>
+        <div class="zc_hand7"></div>
+        <div class=""></div>
+        <div class="zc_3nobles"></div>
+        <div class="zc_3farmers"></div>
+        <div class="zc_citypts"></div>
       </div>
-      
+
+      <div id="playerboard" style="top:10px; left:1040px; position: absolute; border-style: solid;">
+        <div>score:100</div>
+        <div class="b_playerboard_ext">
+          <div class="b_handpoolcity">
+            <div class="b_hand">hand:<span id="handcount_${player_id}">0</span></div>
+            <div class="b_pool">pool:<span id="poolcount_${player_id}">0</span></div>
+            <div class="b_citycount">cities:<span id="citycount_${player_id}">0</span></div>
+          </div>
+          <div class="b_ziggurats">
+            <div class="zc_3nobles"></div>
+            <div class="zc_xturn"></div>
+          </div>
+        </div>
+      </div>
     </div>
     <h1>More Stuff HERE</h1>
     yes, here it is.
