@@ -123,7 +123,7 @@ class Model {
                 if (count($played) != 2
                     || in_array($piece, $played)
                     || !$this->components()->hasZigguratCard($this->player_id,
-                                                             ZigguratCardType::THREE_NOBES)) {
+                                                             ZigguratCardType::NOBES_3_KINDS)) {
                     return false;
                 }
             }
@@ -447,7 +447,7 @@ class Model {
                     $pi = $this->allPlayerInfo()[$this->player_id];
                     $pi->score += $points;
                     $this->db->updatePlayer($pi);
-                } else if ($card_type == ZigguratCardType::HAND_SIZE_SEVEN) {
+                } else if ($card_type == ZigguratCardType::HAND_SIZE_7) {
                     $this->hand()->extend(7);
                     $this->db->upsertHand($this->player_id, $this->hand());
                 }
