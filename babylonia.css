@@ -348,6 +348,7 @@ div.b_handpoolcity > div {
 
 div.b_ziggurats > div {
     display: inline-block;
+    margin: 3px;
     border-radius: 5px;
     height: 4em;
     width: 2.67em;
