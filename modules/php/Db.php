@@ -140,11 +140,10 @@ class Db {
     }
 
     public function updatePlayer(PlayerInfo $player_info): void {
-        $score = $pi->score;
-        $captured_city_count = $pi->captured_city_count;
         $this->db->DbQuery(
             "UPDATE player q
-             SET q.player_score = $score, q.captured_city_count=$captured_city_count
+             SET q.player_score = $player_info->score,
+                 q.captured_city_count=$player_info->captured_city_count
              WHERE q.player_id = $player_info->player_id"
         );
     }
