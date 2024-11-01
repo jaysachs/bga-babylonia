@@ -88,7 +88,7 @@ class Hand {
     }
 
     public function replenish(Piece $piece) {
-        if (!$piece->isPlayerPiece() || $piece == Piece::HIDDEN) {
+        if (!$piece->isPlayerPiece() || $piece == Piece::HIDDEN || $piece == Piece::EMPTY) {
             throw new \InvalidArgumentException("Can't add $piece to hand");
         }
         for ($i = 0; $i < count($this->pieces); $i++) {
