@@ -429,13 +429,31 @@ class Game extends \Table
             ]
         );
 
-        $this->giveExtraTime($player_id);
-
-        $this->activeNextPlayer();
-
-        $this->setPlayerOnTurn($this->activePlayerId());
         $this->setNextActivePlayer(0);
+
+        if ($model->components()->hasUnusedZigguratCard($player_id, ZigguratCardtype::EXTRA_TURN)) {
+            $this->gamestate->nextState("extraTurn");
+            return;
+        }
+
+        $this->giveExtraTime($player_id);
         $this->gamestate->nextState("nextPlayer");
+    }
+
+    public function stNextPlayer() {
+        $this->activeNextPlayer();
+        $this->setPlayerOnTurn($this->activePlayerId());
+        $this->gamestate->nextState("done");
+    }
+
+    public function actChooseExtraTurn(bool $take_extra_turn) {
+        if ($take_extra_turn) {
+            $model = new Model($this->db, $this->activePlayerId());
+            $model->useExtraTurnCard();
+            $this->gamestate->nextState("extraTurn");
+        } else {
+            $this->gamestate->nextState("nextPlayer");
+        }
     }
 
     /**

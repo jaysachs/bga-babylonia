@@ -115,14 +115,14 @@ class Model {
             } else {
                 if ($non_land_farmer_played
                     || count($this->turnProgress()->moves) < 3
-                    || !$this->components()->hasZigguratCard($this->player_id,
+                    || !$this->components()->hasUnusedZigguratCard($this->player_id,
                                                              ZigguratCardType::NOBLE_WITH_3_FARMERS)) {
                     return false;
                 }
                 $played = $this->turnProgress()->uniquePiecesPlayed();
                 if (count($played) != 2
                     || in_array($piece, $played)
-                    || !$this->components()->hasZigguratCard($this->player_id,
+                    || !$this->components()->hasUnusedZigguratCard($this->player_id,
                                                              ZigguratCardType::NOBES_3_KINDS)) {
                     return false;
                 }
@@ -140,7 +140,7 @@ class Model {
                         && $h->piece->isNoble();
                 };
                 return count($this->board()->neighbors($hex, $is_noble)) > 0;
-            } else if ($this->components()->hasZigguratCard(
+            } else if ($this->components()->hasUnusedZigguratCard(
                 $this->player_id, ZigguratCardType::NOBLES_IN_FIELDS)) {
                 return true;
             }
@@ -307,7 +307,7 @@ class Model {
         foreach ($player_infos as $pid => $pi) {
             // TODO: incorporate ziggurat card
             $points = $pi->captured_city_count;
-            if ($this->components()->hasZigguratCard($pid, ZigguratCardType::EXTRA_CITY_POINTS)) {
+            if ($this->components()->hasUnusedZigguratCard($pid, ZigguratCardType::EXTRA_CITY_POINTS)) {
                 $points += intval(floor($points / 2));
             }
             $scores->captured_city_points[$pid] = $points;
@@ -456,6 +456,18 @@ class Model {
             }
         }
         throw new \InvalidArgumentException("ziggurat card $card_type->value not available");
+    }
+
+    public function useExtraTurnCard(): void {
+        $card = $this->components()->getOwnedCard($this->player_id, ZigguratCardType::EXTRA_TURN);
+        if ($card == null) {
+            throw new \InvalidArgumentException(ZigguratCardType::EXTRA_TURN->value . " is not owned by $player_id");
+        }
+        if ($card->used) {
+            throw new \InvalidArgumentException(ZigguratCardType::EXTRA_TURN->value . " has already been used");
+        }
+        $card->used = true;
+        $this->db->updateZigguratCard($card);
     }
 }
 

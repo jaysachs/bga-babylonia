@@ -57,6 +57,8 @@ if ( !defined('STATE_END_GAME')) { // guard since this included multiple times
     define("STATE_FINISH_TURN", 6);
     define("STATE_ZIGGURAT_SCORING", 7);
     define("STATE_START_TURN", 8);
+    define("STATE_PLAYER_EXTRA_TURN", 9);
+    define("STATE_NEXT_PLAYER", 10);
     //    define("STATE_PLAYER_GAME_END", 98);
     define("STATE_END_GAME", 99);
 }
@@ -156,9 +158,37 @@ $machinestates = [
         "updateGameProgression" => true,
         "transitions" => [
             "endGame" => 99,
-            "nextPlayer" => STATE_PLAYER_PLAY_PIECES,
+            "nextPlayer" => STATE_NEXT_PLAYER,
+            "extraTurn" => STATE_PLAYER_EXTRA_TURN,
         ]
     ],
+
+    STATE_NEXT_PLAYER => [
+        "name" => "nextPlayer",
+        "description" => '',
+        "type" => "game",
+        "action" => "stNextPlayer",
+        "updateGameProgression" => true,
+        "transitions" => [
+            "done" => STATE_PLAYER_PLAY_PIECES,
+        ]
+    ],
+
+    STATE_PLAYER_EXTRA_TURN => [
+        "name" => "chooseExtraTurn",
+        "description" => clienttranslate('${actplayer} may choose to take another turn'),
+        "descriptionmyturn" => clienttranslate('${you} must choose whether to take another turn'),
+        "type" => "activeplayer",
+        "possibleactions" => [
+            "actChooseExtraTurn",
+        ],
+        "updateGameProgression" => true,
+        "transitions" => [
+            "extraTurn" => STATE_PLAYER_PLAY_PIECES,
+            "nextPlayer" => STATE_NEXT_PLAYER,
+        ]
+    ],
+
     // Final state.
     // Please do not modify (and do not overload action/args methods).
     99 => [

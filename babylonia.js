@@ -376,6 +376,21 @@ function (dojo, declare) {
             {
                 switch( stateName )
                 {
+                    case 'chooseExtraTurn':
+                        this.addActionButton(
+                            'extra-turn-btn',
+                            'Take your one-time extra turn',
+                            () => this.bgaPerformAction('actChooseExtraTurn', {
+                                take_extra_turn: true
+                            }));
+                        this.addActionButton(
+                            'noextra-turn-btn',
+                            'Just finish your turn',
+                            () => this.bgaPerformAction('actChooseExtraTurn', {
+                                take_extra_turn: false
+                            }));
+                    break;
+
                     case 'endOfTurnScoring':
                     this.markAllHexesUnplayable();
                     break;
