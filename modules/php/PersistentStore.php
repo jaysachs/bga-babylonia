@@ -26,9 +26,9 @@ declare(strict_types=1);
 
 namespace Bga\Games\babylonia;
 
-class Db {
+class PersistentStore {
     public function __construct(private mixed $db) {
-        Logging::debug("Db initialized");
+        Logging::debug("PersistentStore initialized");
     }
 
     private function boolValue(bool $b): string {
@@ -216,7 +216,7 @@ class Db {
     public function retrieveAllPlayerInfo(): array /* int => PlayerInfo */ {
         // TODO: retrieve zig cards? or remove from PlayerInfo?
         $result = [];
-        $data = $this->db->getCollectionFromDB( Db::SQL_PLAYER_INFO );
+        $data = $this->db->getCollectionFromDB( PersistentStore::SQL_PLAYER_INFO );
         foreach ($data as $pid => $pd) {
             $result[$pid] = $this->playerInfoFromData($pid, $pd);
         }
@@ -224,7 +224,7 @@ class Db {
     }
 
     public function retrievePlayerInfo(int $player_id): PlayerInfo {
-        $sql = Db::SQL_PLAYER_INFO . " WHERE P.player_id = $player_id";
+        $sql = PersistentStore::SQL_PLAYER_INFO . " WHERE P.player_id = $player_id";
         $player_data = $this->db->getNonEmptyObjectFromDB2( $sql );
         return $this->playerInfoFromData($player_id, $player_data);
     }

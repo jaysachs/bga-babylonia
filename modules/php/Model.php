@@ -35,33 +35,33 @@ class Model {
     private ?Pool $_pool = null;
     private ?Components $_components = null;
 
-    public function __construct(private Db $db, private int $player_id) { }
+    public function __construct(private PersistentStore $ps, private int $player_id) { }
 
     public function createNewGame(array $player_ids, bool $use_advanced_ziggurats): void {
         $this->_board = Board::forPlayerCount(count($player_ids));
-        $this->db->insertBoard($this->_board);
+        $this->ps->insertBoard($this->_board);
 
         foreach ($player_ids as $player_id) {
             $hand = Hand::new();
             $pool = Pool::new();
             $this->refill($hand, $pool);
-            $this->db->upsertHand($player_id, $hand);
-            $this->db->upsertPool($player_id, $pool);
+            $this->ps->upsertHand($player_id, $hand);
+            $this->ps->upsertPool($player_id, $pool);
         }
         $this->_components = Components::forNewGame($use_advanced_ziggurats);
-        $this->db->insertComponents($this->_components);
+        $this->ps->insertComponents($this->_components);
     }
 
     public function components(): Components {
         if ($this->_components == null) {
-            $this->_components = $this->db->retrieveComponents();
+            $this->_components = $this->ps->retrieveComponents();
         }
         return $this->_components;
     }
 
     public function &allPlayerInfo(): array /* PlayerInfo */ {
         if ($this->_allPlayerInfo == null) {
-            $this->_allPlayerInfo = $this->db->retrieveAllPlayerInfo();
+            $this->_allPlayerInfo = $this->ps->retrieveAllPlayerInfo();
         }
         return $this->_allPlayerInfo;
     }
@@ -72,28 +72,28 @@ class Model {
 
     public function hand(): Hand {
         if ($this->_hand == null) {
-            $this->_hand = $this->db->retrieveHand($this->player_id);
+            $this->_hand = $this->ps->retrieveHand($this->player_id);
         }
         return $this->_hand;
     }
 
     public function pool(): Pool {
         if ($this->_pool == null) {
-            $this->_pool = $this->db->retrievePool($this->player_id);
+            $this->_pool = $this->ps->retrievePool($this->player_id);
         }
         return $this->_pool;
     }
 
     public function board(): Board {
         if ($this->_board == null) {
-            $this->_board = $this->db->retrieveBoard();
+            $this->_board = $this->ps->retrieveBoard();
         }
         return $this->_board;
     }
 
     public function turnProgress(): TurnProgress {
         if ($this->_turn_progress == null) {
-            $this->_turn_progress = $this->db->retrieveTurnProgress($this->player_id);
+            $this->_turn_progress = $this->ps->retrieveTurnProgress($this->player_id);
         }
         return $this->_turn_progress;
     }
@@ -216,7 +216,7 @@ class Model {
         $this->turnProgress()->addMove($move);
 
         // update the database
-        $this->db->insertMove($move);
+        $this->ps->insertMove($move);
 
         return [
             "points" => $points,
@@ -256,8 +256,8 @@ class Model {
     public function finishTurn(): bool {
         $hand = $this->hand();
         $this->refillHand();
-        $this->db->upsertHand($this->player_id, $hand);
-        $this->db->upsertPool($this->player_id, $this->pool());
+        $this->ps->upsertHand($this->player_id, $hand);
+        $this->ps->upsertPool($this->player_id, $this->pool());
 
         // set sizes on info, persist it?
 
@@ -265,7 +265,7 @@ class Model {
             return true;
         }
 
-        $this->db->removeTurnProgress($this->player_id);
+        $this->ps->removeTurnProgress($this->player_id);
         return false;
     }
 
@@ -283,7 +283,7 @@ class Model {
             throw new \InvalidArgumentException("{$hex} is not ready to be scored");
         }
         $hex->scored = true;
-        $this->db->updateHex($hex);
+        $this->ps->updateHex($hex);
 
         return new ScoredZiggurat($this->computeTileWinner($hex));
     }
@@ -325,10 +325,9 @@ class Model {
         $captured_hex = $this->board()->hexAt($hex->row, $hex->col);
         $_unused = $captured_hex->captureCity();
 
-        $this->db->updateHex($captured_hex);
-        $this->db->updatePlayers($player_infos);
+        $this->ps->updateHex($captured_hex);
+        $this->ps->updatePlayers($player_infos);
 
-        // TODO: update global captured city count in db globals
         return $scores;
     }
 
@@ -452,12 +451,12 @@ class Model {
             $points = 10;
             $pi = $this->allPlayerInfo()[$this->player_id];
             $pi->score += $points;
-            $this->db->updatePlayer($pi);
+            $this->ps->updatePlayer($pi);
         } else if ($card_type == ZigguratCardType::HAND_SIZE_7) {
             $this->hand()->extend(7);
-            $this->db->upsertHand($this->player_id, $this->hand());
+            $this->ps->upsertHand($this->player_id, $this->hand());
         }
-        $this->db->updateZigguratCard($card);
+        $this->ps->updateZigguratCard($card);
         return new ZigguratCardSelection($card, $points);
     }
 
@@ -470,7 +469,7 @@ class Model {
             throw new \InvalidArgumentException(ZigguratCardType::EXTRA_TURN->value . " has already been used");
         }
         $card->used = true;
-        $this->db->updateZigguratCard($card);
+        $this->ps->updateZigguratCard($card);
     }
 }
 

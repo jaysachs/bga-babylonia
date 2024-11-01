@@ -12,16 +12,16 @@ use Bga\Games\babylonia\ {
         ScoredCity,
         Piece,
         PlayerInfo,
-        Db,
+        PersistentStore,
 };
 
-class TestDb extends Db {
+class TestStore extends PersistentStore {
     private ?Board $board = null;
     private array $player_infos = [];
     private Components $components;
 
     public function __construct() {
-        Db::__construct(null);
+        PersistentStore::__construct(null);
         for ($i = 1; $i <= 3; $i++) {
             $this->player_infos[$i] = new PlayerInfo($i, "", 0, 0, 0, 5, 25);
         }
@@ -48,9 +48,9 @@ final class ModelTest extends TestCase
     public function testCityScoring(): void
     {
         $board = Board::forPlayerCount(2, false);
-        $db = new TestDb();
-        $db->insertBoard($board);
-        $model = new Model($db, 0);
+        $ps = new TestStore();
+        $ps->insertBoard($board);
+        $model = new Model($ps, 0);
 
         $board->hexAt(4, 0)->playPiece(Piece::PRIEST, 1);
 
@@ -82,7 +82,7 @@ final class ModelTest extends TestCase
                 2 => new PlayerInfo(2, "", 0, 2, 0, 5, 25),
                 3 => new PlayerInfo(3, "", 0, 7, 1, 5, 25),
             ],
-            $db->retrieveAllPlayerInfo()
+            $ps->retrieveAllPlayerInfo()
         );
 
         $sc = $model->scoreCity($board->hexAt(3, 3));
@@ -103,7 +103,7 @@ final class ModelTest extends TestCase
                 2 => new PlayerInfo(2, "", 0, 2, 0, 5, 25),
                 3 => new PlayerInfo(3, "", 0, 11, 2, 5, 25),
             ],
-            $db->retrieveAllPlayerInfo()
+            $ps->retrieveAllPlayerInfo()
         );
 
     }
@@ -111,9 +111,9 @@ final class ModelTest extends TestCase
     public function testCitiesRequiringScoring(): void
     {
         $board = Board::forPlayerCount(2, false);
-        $db = new TestDb();
-        $db->insertBoard($board);
-        $model = new Model($db, 0);
+        $ps = new TestStore();
+        $ps->insertBoard($board);
+        $model = new Model($ps, 0);
 
         $this->assertEquals([], $model->hexesRequiringScoring());
 
@@ -129,9 +129,9 @@ final class ModelTest extends TestCase
     public function testZigguratsRequiringScoring(): void
     {
         $board = Board::forPlayerCount(2);
-        $db = new TestDb();
-        $db->insertBoard($board);
-        $model = new Model($db, 0);
+        $ps = new TestStore();
+        $ps->insertBoard($board);
+        $model = new Model($ps, 0);
 
         $this->assertEquals([], $model->hexesRequiringScoring());
 

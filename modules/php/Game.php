@@ -36,7 +36,7 @@ class Game extends \Table
     private const GLOBAL_PLAYER_ON_TURN = 'player_on_turn';
     private const GLOBAL_NEXT_PLAYER_ACTIVE = 'next_player_active';
 
-    private Db $db;
+    private PersistentStore $ps;
     /**
      * Your global variables labels:
      *
@@ -58,13 +58,13 @@ class Game extends \Table
         ]);
 
         Logging::init($this);
-        $this->db = new Db($this);
+        $this->ps = new PersistentStore($this);
     }
 
     public function actPlayPiece(int $handpos, int $row, int $col): void
     {
         $player_id = $this->activePlayerId();
-        $model = new Model($this->db, $player_id);
+        $model = new Model($this->ps, $player_id);
         $result = $model->playPiece($handpos, $row, $col);
         $points = $result["points"];
         $piece = $result["piece"];
@@ -101,7 +101,7 @@ class Game extends \Table
     public function actDonePlayPieces(): void
     {
         $player_id = $this->activePlayerId();
-        $model = new Model($this->db, $player_id);
+        $model = new Model($this->ps, $player_id);
         if (!$model->canEndTurn()) {
             throw new \BgaUserException("Attempt to end turn but less than 2 pieces played");
         }
@@ -130,7 +130,7 @@ class Game extends \Table
      */
     public function argPlayPieces(): array
     {
-        $model = new Model($this->db, $this->activePlayerId());
+        $model = new Model($this->ps, $this->activePlayerId());
         // [ ["farmer" => [hex1, hex2, ...] ];
         $allowed_moves = $model->getAllowedMoves();
 
@@ -260,7 +260,7 @@ class Game extends \Table
 
     public function argSelectZigguratCard(): array {
         $player_id = $this->activePlayerId();
-        $model = new Model($this->db, $player_id);
+        $model = new Model($this->ps, $player_id);
         $zcards = $model->components()->availableZigguratCards();
         return [
             "available_cards" => array_map(
@@ -274,7 +274,7 @@ class Game extends \Table
 
     public function actSelectZigguratCard(string $card_type) {
         $player_id = $this->activePlayerId();
-        $model = new Model($this->db, $player_id);
+        $model = new Model($this->ps, $player_id);
         $selection = $model->selectZigguratCard(ZigguratCardType::from($card_type));
 
         $player_name = $this->getActivePlayerName();
@@ -296,7 +296,7 @@ class Game extends \Table
 
     public function argSelectHexToScore(): array {
         $player_id = $this->activePlayerId();
-        $model = new Model($this->db, $player_id);
+        $model = new Model($this->ps, $player_id);
         $hexes = $model->hexesRequiringScoring();
 
         return [
@@ -311,7 +311,7 @@ class Game extends \Table
 
     public function actSelectHexToScore(int $row, int $col): void {
         $player_id = $this->activePlayerId();
-        $model = new Model($this->db, $player_id);
+        $model = new Model($this->ps, $player_id);
         $hex = $model->board()->hexAt($row, $col);
         if ($hex == null) {
             throw new \InvalidArgumentException("Hex at ({$row},{$col}) can't be scored");
@@ -348,7 +348,7 @@ class Game extends \Table
             $this->gamestate->changeActivePlayer($player_on_turn);
             $player_id = $player_on_turn;
         }
-        $model = new Model($this->db, $player_id);
+        $model = new Model($this->ps, $player_id);
         $hexes = $model->hexesRequiringScoring();
 
         $this->setNextActivePlayer(0);
@@ -387,7 +387,7 @@ class Game extends \Table
             }
         }
 
-        $model = new Model($this->db, $player_id);
+        $model = new Model($this->ps, $player_id);
 
         $player_name = $this->getActivePlayerName();
         if ($model->finishTurn()) {
@@ -450,7 +450,7 @@ class Game extends \Table
 
     public function actChooseExtraTurn(bool $take_extra_turn) {
         if ($take_extra_turn) {
-            $model = new Model($this->db, $this->activePlayerId());
+            $model = new Model($this->ps, $this->activePlayerId());
             $model->useExtraTurnCard();
             $this->notifyAllPlayers(
                 "extraTurnUsed",
@@ -538,7 +538,7 @@ class Game extends \Table
     {
         // WARNING: We must only return information visible by the current player.
 
-        $model = new Model($this->db, $this->currentPlayerId());
+        $model = new Model($this->ps, $this->currentPlayerId());
 
         $player_data = [];
         foreach ($model->allPlayerInfo() as $pid => $pi) {
@@ -638,7 +638,7 @@ class Game extends \Table
         // $this->initStat("table", "table_teststat1", 0);
         // $this->initStat("player", "player_teststat1", 0);
 
-        $model = new Model($this->db, 0);
+        $model = new Model($this->ps, 0);
         $model->createNewGame(
             array_keys($players),
             $this->optionEnabled($options, Option::ADVANCED_ZIGGURAT_TILES));
