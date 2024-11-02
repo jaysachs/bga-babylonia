@@ -453,7 +453,6 @@ function (dojo, declare) {
 
                     case 'selectZigguratCard':
                         this.updateStatusBar('You must select a ziggurat card');
-                        console.log(args.available_cards);
                         args.available_cards.forEach(z =>
                             this.addImageActionButton(
                                 z + '-btn',
@@ -664,7 +663,7 @@ function (dojo, declare) {
                         var key = keys[i];
                         if (key in args) {
                             saved[key] = args[key];
-                            args[key] = this.getTokenDiv(key, args);
+                            args[key] = this.richFormat(key, args);
                         }
                     }
                 }
@@ -680,9 +679,7 @@ function (dojo, declare) {
             }
         },
 
-        getTokenDiv: function(key, args) {
-            console.log(key);
-            console.log(args);
+        richFormat: function(key, args) {
             switch (key) {
                 case 'city':
                     return this.format_block(
