@@ -46,7 +46,10 @@
                <span class="b_pool_label empty_${player_number}"></span>\
                <span id="poolcount_${player_id}" class="b_counter">19</span>\
              </div>\
-             <div class="b_citycount"><span class="b_citycount_label"></span><span id="citycount_${player_id}" class="b_counter">1</span></div>\
+             <div class="b_citycount">\
+               <span class="b_citycount_label"></span>\
+               <span id="citycount_${player_id}" class="b_counter">1</span>\
+             </div>\
            </div>\
            <div id="b_ziggurats_${player_id}" class="b_ziggurats">\
              <span class="b_ziggurat_label"></span>\
