@@ -229,12 +229,10 @@
     display: inline-block;
     width: auto;
     margin: 5px;
-    background-color: transparent;
+    background-image: url(img/stand.png);
+    background-size: 100% 100%;
     text-align: center;
     align-items: center;
-    border: 2px;
-    border-color: black;
-    border-style: inset;
     padding: 4px;
 }
 

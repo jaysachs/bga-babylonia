@@ -11,4 +11,13 @@ do
     CMD+="-append \) "
 done
 
-echo magick -size 100x100 -pointsize 36 -gravity center "${CMD}" +append pieces.png | bash -s
+# echo magick -size 100x100 -pointsize 36 -gravity center "${CMD}" +append pieces.png | bash -s
+
+# now the stand
+
+magick -size 800x100 -gravity center canvas:none -stroke none -background black \
+       -fill \#924018 -draw 'roundrectangle 0,0,799,99 15,15' \
+       -fill black -draw 'rectangle 15,23,784,37' \
+       -fill black -draw 'rectangle 15,63,784,77' \
+       -transparent black \
+       +append stand.png
