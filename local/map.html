@@ -89,7 +89,40 @@
     }
   </script>
   <head>
-  <style>
+    <style>
+
+      html {
+      background-attachment: scroll;
+      background-clip: border-box;
+      background-color: rgba(0, 0, 0, 0);
+      background-image: url("https://studio.boardgamearena.com:8084/data/themereleases/241023-1437/img/layout/back-main_games.jpg");
+      background-origin: padding-box;
+      background-position-x: 0%;
+      background-position-y: 0%;
+      background-repeat: repeat;
+      background-size: auto;
+      color: rgb(0, 0, 0);
+      direction: ltr;
+      display: block;
+      height: 10973px;
+      unicode-bidi: isolate;
+      width: 1292px;
+      -webkit-locale: en;
+      }
+
+
+    .player-board {
+        background-color: #ebd5bd;
+        border-radius: 8px 0 0 8px;
+        box-shadow: 0 3px 8px rgba(0,0,0,.3);
+        padding: 5px 3px;
+
+        top:10px;
+        left:1040px;
+        position: absolute;
+        border-style: solid;
+        width:240px;
+    }
     .player_showcursor {
         display: none;
         margin-bottom: 5px;
@@ -150,7 +183,7 @@
     }
   </style>
 </head>
-  <body style="background-color: #CCFFCC">
+  <body>
     <div id="main">
       <div style="width: 1024px; display: flex; flex-direction:row; flex-wrap: nowrap; justify-content:center;">
         <div class="hand" id="hand" onClick="selectPieceToPlay(event)">
@@ -217,7 +250,7 @@
       </div>
 
       <!-- player board -->
-      <div style="top:10px; left:1040px; position: absolute; border-style: solid; width:240px">
+      <div class="player-board">
 
         <div id="player_board_2405406" class="player_board_content">
           <div class="player_score">
