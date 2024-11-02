@@ -110,6 +110,33 @@
       -webkit-locale: en;
       }
 
+      #logs_wrap {
+          position: absolute;
+          top: 200px;
+          left: 1040px;
+      }
+      .log {
+          word-wrap: break-word;
+          color: red;
+          font-size: 85%;
+          margin-top: 5px;
+          overflow: hidden;
+       }
+      .roundedbox {
+          background-color: #f8f8f8;
+          padding: 5px;
+          position: relative;
+      }
+      .log_replayable {
+          cursor: pointer;
+      }
+      #logs {
+          margin-top: 10px;
+          max-height: 1004px;
+          overflow: hidden;
+          position: relative;
+      }
+
 
     .player-board {
         background-color: #ebd5bd;
@@ -280,7 +307,25 @@
         </div>
       </div>
 
-    </div>
+      <div id="logs_wrap">
+        <div id="logs" style="display: block;">
+          <div class="log " id="log_39" style="height: auto; display: block; color: rgb(0, 0, 0);"><div class="roundedbox">You are connected again.</div></div>
+          <div class="log " id="log_38" style="height: auto; display: block; color: rgb(0, 0, 0);"><div class="roundedbox">You refilled your hand</div></div>
+          <div class="log  log_replayable" id="log_37" style="height: auto; display: block; color: rgb(0, 0, 0);"><div class="roundedbox"><!--PNS--><span class="playername" style="color:#88dddd;">vagabond0</span><!--PNE--> finished their turn</div></div>
+          <div class="log  log_replayable" id="log_36" style="height: auto; display: block; color: rgb(0, 0, 0);"><div class="roundedbox"><!--PNS--><span class="playername" style="color:#88dddd;">vagabond0</span><!--PNE--> must select a hex to score</div></div>
+          <div class="log  log_replayable" id="log_35" style="height: auto; display: block; color: rgb(0, 0, 0);"><div class="roundedbox"><!--PNS--><span class="playername" style="color:#88dddd;">vagabond0</span><!--PNE--> scored 3</div></div>
+          <div class="log  log_replayable" id="log_34" style="height: auto; display: block; color: rgb(0, 0, 0);"><div class="roundedbox"><!--PNS--><span class="playername" style="color:#ffffff;background-color:#bbbbbb;">vagabond1</span><!--PNE--> scored 1</div></div>
+          <div class="log  log_replayable" id="log_33" style="height: auto; display: block; color: rgb(0, 0, 0);"><div class="roundedbox"><span class="log-element city_ms"></span> at (6,0) scored, captured by vagabond0</div></div>
+          <div class="log  log_replayable" id="log_32" style="height: auto; display: block; color: rgb(0, 0, 0);"><div class="roundedbox"><!--PNS--><span class="playername" style="color:#88dddd;">vagabond0</span><!--PNE--> chose hex (6,0) to score</div></div>
+          <div class="log  log_replayable" id="log_31" style="height: auto; display: block; color: rgb(0, 0, 0);"><div class="roundedbox"><!--PNS--><span class="playername" style="color:#88dddd;">vagabond0</span><!--PNE--> must select a hex to score</div></div>
+          <div class="log  log_replayable" id="log_30" style="height: auto; display: block; color: rgb(0, 0, 0);"><div class="roundedbox"><!--PNS--><span class="playername" style="color:#88dddd;">vagabond0</span><!--PNE--> chose ziggurat card zc_citypts</div></div>
+          <div class="log  log_replayable" id="log_29" style="height: auto; display: block; color: rgb(0, 0, 0);"><div class="roundedbox">Ziggurat at (3,1) scored, winner is vagabond0</div></div>
+          <div class="log  log_replayable" id="log_28" style="height: auto; display: block; color: rgb(0, 0, 0);"><div class="roundedbox"><!--PNS--><span class="playername" style="color:#88dddd;">vagabond0</span><!--PNE--> chose hex (3,1) to score</div></div>
+          <div class="log  log_replayable" id="log_27" style="height: auto; display: block; color: rgb(0, 0, 0);"><div class="roundedbox"><!--PNS--><span class="playername" style="color:#88dddd;">vagabond0</span><!--PNE--> must select a hex to score</div></div>
+          <div class="log  log_replayable" id="log_26" style="height: auto; display: block; color: rgb(0, 0, 0);"><div class="roundedbox"><!--PNS--><span class="playername" style="color:#88dddd;">vagabond0</span><!--PNE--> finishes playing pieces</div></div>
+          <div class="log  log_replayable" id="log_25" style="height: auto; display: block; color: rgb(0, 0, 0);"><div class="roundedbox"><!--PNS--><span class="playername" style="color:#88dddd;">vagabond0</span><!--PNE--> plays <span class="log-element farmer_2"></span> to (8,0)</div></div>
+        </div>
+      </div>
     <h1>More Stuff HERE</h1>
     yes, here it is.
   </body>
