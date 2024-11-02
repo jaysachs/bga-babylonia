@@ -232,6 +232,7 @@
 }
 
 .hand {
+    box-shadow: 0 3px 8px rgba(0,0,0,.3);
     display: inline-block;
     width: auto;
     background-image: url(img/stand.png);
