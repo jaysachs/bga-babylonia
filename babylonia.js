@@ -257,8 +257,8 @@ function (dojo, declare) {
         },
 
         setZigguratCardOwned: function (player_id, card) {
-            let zpaneldiv = $( `b_ziggurats_${player_id}` );
-            // add a div under div id b_ziggurats_{player_id}
+            let zpaneldiv = $( `b_zcards_${player_id}` );
+            // add a div under div id b_zcards_{player_id}
             // with the card as class.
             // TODO: only if there isn't one already
             zpaneldiv.insertAdjacentHTML(
@@ -266,7 +266,7 @@ function (dojo, declare) {
                 `<div class="${card}"></div>` );
 
             // also mark the available zig card spot as "no class"
-            var s = dojo.query( `#available_ziggurats .${card}` );
+            var s = dojo.query( `#available_zcards .${card}` );
             if (s.length == 0) {
                 console.log("Couldn't find available card " + card);
                 return;
@@ -441,7 +441,7 @@ function (dojo, declare) {
                         args.available_cards.forEach(z =>
                             this.addImageActionButton(
                                 z + '-btn',
-                                `<div class="ziggurat ${z}"></div>`,
+                                `<div class="zcard ${z}"></div>`,
                                 () => this.bgaPerformAction('actSelectZigguratCard', {
                                     card_type: z
                                 })));

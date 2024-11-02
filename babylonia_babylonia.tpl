@@ -52,8 +52,8 @@
                <span id="citycount_${player_id}" class="b_counter">1</span>\
              </div>\
            </div>\
-           <div id="b_ziggurats_${player_id}" class="b_ziggurats">\
-             <span class="b_ziggurat_label"></span>\
+           <div id="b_zcards_${player_id}" class="b_zcards">\
+             <span class="b_zcard_label"></span>\
            </div>\
          </div>';
 
@@ -72,7 +72,7 @@
       <!-- needed since the board is absolutely positions / sized. for now. -->
       <div class="board-spacer"></div>
       <div class="board" id="board"></div>
-      <div id="available_ziggurats">
+      <div id="available_zcards">
 	<div id="zig1"></div>
 	<div id="zig2"></div>
 	<div id="zig3"></div>

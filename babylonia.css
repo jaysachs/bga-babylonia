@@ -290,24 +290,24 @@
     cursor: pointer;
 }
 
-#available_ziggurats {
+#available_zcards {
     display: flex;
     justify-content: center;
     width: 1024px;
 }
 
-#available_ziggurats > div {
+#available_zcards > div {
     display: inline-block;
     border-radius: 10px;
     height: 135px;
     width: 90px;
     margin: 10px;
     background-size: 1000% 100%;
-    background-image: url(img/ziggurats.png);
+    background-image: url(img/zcards.png);
 }
 
-#available_ziggurats > div:not([class]),
-#available_ziggurats > div[class=''] {
+#available_zcards > div:not([class]),
+#available_zcards > div[class=''] {
     background-position: -900% 0%;
     border-style: dotted;
 }
@@ -395,7 +395,7 @@ div.b_handpoolcity > .b_pool > .b_counter {
     margin-left: 1.7em;
 }
 
-div.b_ziggurats span.b_ziggurat_label {
+div.b_zcards span.b_zcard_label {
     display: inline-block;
     height: 2.1em;
     width: 2.1em;
@@ -404,14 +404,14 @@ div.b_ziggurats span.b_ziggurat_label {
     background-size: 100% 1400%;
 }
 
-div.b_ziggurats > div {
+div.b_zcards > div {
     display: inline-block;
     margin: 3px;
     border-radius: 5px;
     height: 2.4em;
     width: 1.6em;
     background-size: 1000% 100%;
-    background-image: url(img/ziggurats.png);
+    background-image: url(img/zcards.png);
 }
 
 
@@ -419,19 +419,19 @@ div.b_ziggurats > div {
  * image action buttons
  */
 
-a.action-button:has(> div.ziggurat) {
+a.action-button:has(> div.zcard) {
     padding: 0;
     border-style: none;
 }
 
-a.action-button > div.ziggurat {
+a.action-button > div.zcard {
     border-radius: 5px;
     border: 0;
     border-style: none;
     height: 6em;
     width: 4em;
     background-size: 1000% 100%;
-    background-image: url(img/ziggurats.png);
+    background-image: url(img/zcards.png);
 }
 
 /*
@@ -505,5 +505,5 @@ a.action-button > div.ziggurat {
     height: 2.1em;
     width: 1.4em;
     background-size: 1000% 100%;
-    background-image: url(img/ziggurats.png);
+    background-image: url(img/zcards.png);
 }

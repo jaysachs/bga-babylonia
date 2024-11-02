@@ -8,4 +8,4 @@ done
 
 CMD+=" \( canvas:none -stroke none -fill \#867665 -draw 'rectangle 0,0 99,149' \) "
 
-echo magick -size 100x150 -pointsize 24 -gravity center ${CMD} +append ziggurats.png | bash -s
+echo magick -size 100x150 -pointsize 24 -gravity center ${CMD} +append zcards.png | bash -s
