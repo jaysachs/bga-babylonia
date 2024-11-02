@@ -34,16 +34,24 @@
   const jstpl_log_city = '<span class="log-element ${city}"></span>';
 
   const jstpl_player_board_ext =
-    '<div class="b_playerboard_ext">\
-         <div class="b_handpoolcity">\
-         <div class="b_hand">hand:<span id="handcount_${player_id}">0</span></div>\
-         <div class="b_pool">pool:<span id="poolcount_${player_id}">0</span></div>\
-         <div class="b_citycount"><span class="b_citycount_label"></span><span id="citycount_${player_id}">0</span></div>\
-       </div>\
-       <div id="b_ziggurats_${player_id}" class="b_ziggurats">\
-         <span class="b_ziggurat_label"></span>\
-       </div>\
-     </div>';
+        '<div class="b_playerboard_ext">\
+           <div class="b_handpoolcity">\
+             <div class="b_hand">\
+               <span class="b_hand_label empty${player_number}"></span>\
+               <span id="handcount_${player_id}" class="b_counter">5</span>\
+             </div>\
+             <div class="b_pool">\
+               <span class="b_pool_label empty${player_number}"></span>\
+               <span class="b_pool_label empty${player_number}"></span>\
+               <span class="b_pool_label empty${player_number}"></span>\
+               <span id="poolcount_${player_id}" class="b_counter">19</span>\
+             </div>\
+             <div class="b_citycount"><span class="b_citycount_label"></span><span id="citycount_${player_id}" class="b_counter">1</span></div>\
+           </div>\
+           <div id="b_ziggurats_${player_id}" class="b_ziggurats">\
+             <span class="b_ziggurat_label"></span>\
+           </div>\
+         </div>';
 
   const jstpl_hex =
     '<div id="hex_${row}_${col}" style="top:${top}px; left:${left}px;">\

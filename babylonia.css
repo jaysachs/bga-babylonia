@@ -345,11 +345,22 @@ div.zc_river {
  */
 
 div.b_handpoolcity {
-    display: inline-block;
+    margin-top: 10px;
+    display: flex;
+    align-items: center;
 }
 
 div.b_handpoolcity > div {
     display: inline-block;
+    flex: 1;
+}
+
+div.b_handpoolcity .b_counter {
+    vertical-align: middle;
+    display: inline-block;
+    padding-bottom: 1.2em;
+    padding-left: 5px;
+/*    height: 2.1em; */
 }
 
 div.b_handpoolcity .b_citycount_label {
@@ -361,11 +372,33 @@ div.b_handpoolcity .b_citycount_label {
     background-size: 100% 1400%;
 }
 
-div.b_ziggurats span.b_ziggurat_label {
-/*    margin: 3px; */
+div.b_handpoolcity .b_hand_label {
     display: inline-block;
-    height: 2.1em; /* 42px; */
-    width: 2.1em; /* 48px; */
+    height: 2.1em;
+    width: 2.1em;
+    background: url(img/pieces.png); /*  0% -800%; */
+    background-color: transparent;
+    background-size: 400% 500%;
+}
+
+div.b_handpoolcity .b_pool_label {
+    display: inline-block;
+    margin-right: -2.0em;
+    height: 2.1em;
+    width: 2.1em;
+    background: url(img/pieces.png); /*  0% -800%; */
+    background-color: transparent;
+    background-size: 400% 500%;
+}
+
+div.b_handpoolcity > .b_pool > .b_counter {
+    margin-left: 1.7em;
+}
+
+div.b_ziggurats span.b_ziggurat_label {
+    display: inline-block;
+    height: 2.1em;
+    width: 2.1em;
     background: url(img/cities.png) 0% -1300%;
     background-color: transparent;
     background-size: 100% 1400%;
@@ -375,8 +408,8 @@ div.b_ziggurats > div {
     display: inline-block;
     margin: 3px;
     border-radius: 5px;
-    height: 4em;
-    width: 2.67em;
+    height: 2.4em;
+    width: 1.6em;
     background-size: 1000% 100%;
     background-image: url(img/ziggurats.png);
 }

@@ -48,7 +48,7 @@ function (dojo, declare) {
             dojo.place( this.format_block('jstpl_player_board_ext',
                                           {
                                               'player_id': player_id,
-                                              'player': player
+                                              'player_number': player.player_number
                                           } ),
                         player_board_div );
 
