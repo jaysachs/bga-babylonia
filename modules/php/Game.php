@@ -184,12 +184,12 @@ class Game extends \Table
         $winner = $scored_zig->winning_player_id;
         if ($winner == 0) {
             $winner_name = 'noone';
-            $msg = 'Ziggurat at (${row},${col}) scored, no winner';
             $pnk = 'unused';
+            $msg = 'Ziggurat at (${row},${col}) scored, no winner';
         } else {
             $winner_name = $this->getPlayerNameById($winner);
             $pnk = $this->playerNameKey($scored_zig->winning_player_id);
-            $msg = 'Ziggurat at (${row},${col}) scored, winner is ${' . $pnk . '}';
+            $msg = '${city} at (${row},${col}) scored, winner is ${' . $pnk . '}';
         }
         $this->notifyAllPlayers(
             "zigguratScored",
@@ -197,6 +197,7 @@ class Game extends \Table
                 "row" => $zighex->row,
                 "col" => $zighex->col,
                 $pnk => $winner_name,
+                "city" => "ziggurat",
             ]
         );
         return $winner;
@@ -211,17 +212,17 @@ class Game extends \Table
         // grab this, as it will change underneath when the model scores it.
         $city = $cityhex->piece->value;
         $scored_city = $model->scoreCity($cityhex);
-        $player_infos = $model->allPlayerInfo();
-        $captured_by = "noone";
-        $pnk = 'noone';
         if ($scored_city->captured_by > 0) {
             $pnk = $this->playerNameKey($scored_city->captured_by);
             $captured_by = $this->getPlayerNameById($scored_city->captured_by);
             $msg = '${city} at (${row},${col}) scored, captured by ${' . $pnk . '}';
         } else {
+            $pnk = 'noone';
+            $captured_by = "noone";
             $msg = '${city} at (${row},${col}) scored, uncaptured';
         }
 
+        $player_infos = $model->allPlayerInfo();
         // First notify that the city was captured
         $this->notifyAllPlayers(
             "cityScored",
@@ -236,18 +237,20 @@ class Game extends \Table
 
         // Then notify of the scoring details
         foreach ($player_infos as $pid => $pi) {
+            // foreach (array_keys($this->loadPlayersBasicInfos()) as $pid) {
             $points = $scored_city->pointsForPlayer($pid);
             if ($points > 0) {
+                $pnk = $this->playerNameKey($pid);
                 $this->notifyAllPlayers(
                     "cityScoredPlayer",
-                    clienttranslate('${player_name} scored ${points}'), [
+                    clienttranslate('${' . $pnk . '} scored ${points}'), [
                         // TODO: make more efficient, by only passing the delta?
                         "captured_city_count" => $pi->captured_city_count,
                         "scored_hexes" => $scored_city->hexesScoringForPlayer($pid),
                         "points" => $points,
                         "score" => $pi->score,
                         "player_id" => $pid,
-                        "player_name" => $pi->player_name,
+                        $pnk => $this->getPlayerNameById($pid),
                     ]
                 );
             }
