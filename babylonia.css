@@ -312,31 +312,31 @@
     border-style: dotted;
 }
 
-div.zc_10pts {
+.zc_10pts {
     background-position: 0% 0%;
 }
-div.zc_xturn {
+.zc_xturn {
     background-position: -100% 0%;
 }
-div.zc_hand7 {
+.zc_hand7 {
     background-position: -200% 0%;
 }
-div.zc_3nobles {
+.zc_3nobles {
     background-position: -300% 0%;
 }
-div.zc_3farmers {
+.zc_3farmers {
     background-position: -400% 0%;
 }
-div.zc_fields {
+.zc_fields {
     background-position: -500% 0%;
 }
-div.zc_citypts {
+.zc_citypts {
     background-position: -600% 0%;
 }
-div.zc_land {
+.zc_land {
     background-position: -700% 0%;
 }
-div.zc_river {
+.zc_river {
     background-position: -800% 0%;
 }
 
@@ -488,4 +488,22 @@ a.action-button > div.ziggurat {
     background-color: transparent;
     background-size: 100% 1400%;
     background-image: url(img/cities.png);
+}
+
+.log-element.zc_10pts,
+.log-element.zc_xturn,
+.log-element.zc_hand7,
+.log-element.zc_3nobles,
+.log-element.zc_3farmers,
+.log-element.zc_fields,
+.log-element.zc_citypts,
+.log-element.zc_land,
+.log-element.zc_river
+{
+    display: inline-block;
+    border-radius: 5px;
+    height: 2.1em;
+    width: 1.4em;
+    background-size: 1000% 100%;
+    background-image: url(img/ziggurats.png);
 }

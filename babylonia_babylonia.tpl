@@ -32,6 +32,7 @@
 
   const jstpl_log_piece = '<span class="log-element ${piece}"></span>';
   const jstpl_log_city = '<span class="log-element ${city}"></span>';
+  const jstpl_log_zcard = '<span class="log-element ${zcard}"></span>';
 
   const jstpl_player_board_ext =
         '<div class="b_playerboard_ext">\

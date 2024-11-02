@@ -607,7 +607,7 @@ function (dojo, declare) {
         notif_zigguratCardSelection: function( notif ) {
             console.log( 'notif_zigguratCardSelection', notif );
             // TODO: also hand marking cards as "used"?
-            this.setZigguratCardOwned(notif.args.player_id, notif.args.card);
+            this.setZigguratCardOwned(notif.args.player_id, notif.args.zcard);
             this.scoreCtrl[notif.args.player_id].toValue(notif.args.score);
         },
 
@@ -643,7 +643,7 @@ function (dojo, declare) {
                     args.processed = true;
 
                     // list of special keys we want to replace with images
-                    var keys = ['piece', 'city'];
+                    var keys = ['piece', 'city', 'zcard'];
                     for ( var i in keys) {
                         var key = keys[i];
                         if (key in args) {
@@ -666,6 +666,12 @@ function (dojo, declare) {
 
         richFormat: function(key, args) {
             switch (key) {
+                case 'zcard':
+                    return this.format_block(
+                        'jstpl_log_zcard',
+                        {
+                            'zcard': args[key],
+                        });
                 case 'city':
                     return this.format_block(
                         'jstpl_log_city',
