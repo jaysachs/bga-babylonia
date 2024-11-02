@@ -64,7 +64,7 @@
 </script>
 
     <div id="main">
-      <div style="width: 1024px; display: flex; flex-direction:row; flex-wrap: nowrap; justify-content:center;">
+      <div id="hand_container">
         <div class="hand" id="hand">
 	</div>
       </div>

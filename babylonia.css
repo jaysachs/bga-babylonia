@@ -225,15 +225,20 @@
  Styles for the hand and "rack".
 */
 
+#hand_container {
+    width: 1024px;
+    display: flex;
+    justify-content:center;
+}
+
 .hand {
     display: inline-block;
     width: auto;
-    margin: 5px;
     background-image: url(img/stand.png);
     background-size: 100% 100%;
-    text-align: center;
-    align-items: center;
-    padding: 4px;
+    padding-top: 2px;
+    padding-left: 16px;
+    padding-right: 16px;
 }
 
 #hand > div {
@@ -241,13 +246,10 @@
     width: 57px;
     height: 57px;
     background-size: 400% 500%;
-    border-radius: 100%;
-    border-style: solid;
 
     margin: 5px;
     /* shared with .piece */
     background-image: url(img/pieces.png);
-    border-width: 0px;
 }
 
 #hand > div.empty_1,
