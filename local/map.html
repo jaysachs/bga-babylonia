@@ -88,6 +88,68 @@
         }
     }
   </script>
+  <head>
+  <style>
+    .player_showcursor {
+        display: none;
+        margin-bottom: 5px;
+        margin-left: 22px;
+        margin-top: 5px;
+    }
+    .fa {
+        display: inline-block;
+        font: normal normal normal 14px/1 FontAwesome;
+        font-size: inherit;
+        text-rendering: auto;
+    }
+    .fa-star, .fa-star-half-o, .fa-star-o {
+        color: #f9a11a;
+    }
+    .fa-star:before {
+        content: "\f005";
+    }
+    .gamerank_average {
+        background-color: #84b8de;
+    }
+    .gamerank {
+        background-color: #74bed1;
+        border-radius: 3px;
+        display: -moz-inline-box;
+        display: inline-block;
+        height: 20px;
+        padding: 0 5px;
+        position: relative;
+        top: 3px;
+    }
+
+    .gamerank .icon20 {
+        top: 0;
+    }
+    .icon20_rankw {
+        background-position: 0 -2080px;
+    }
+    .icon12, .icon20 {
+        background-image: url(../img/common/icons20.png);
+        display: inline-block;
+    }
+    .icon20 {
+        height: 20px;
+        position: relative;
+        top: 4px;
+        width: 20px;
+    }
+    .timeToThink {
+        font-size: 80%;
+        position: absolute;
+        right: 0;
+        top: 20px;
+    }
+    body {
+        font-family: Roboto,Arial,sans-serif;
+        font-size: 16px;
+    }
+  </style>
+</head>
   <body style="background-color: #CCFFCC">
     <div id="main">
       <div style="width: 1024px; display: flex; flex-direction:row; flex-wrap: nowrap; justify-content:center;">
@@ -154,20 +216,37 @@
         <div class="zc_citypts"></div>
       </div>
 
-      <div id="playerboard" style="top:10px; left:1040px; position: absolute; border-style: solid;">
-        <div>score:100</div>
-        <div class="b_playerboard_ext">
-          <div class="b_handpoolcity">
-            <div class="b_hand">hand:<span id="handcount_${player_id}">0</span></div>
-            <div class="b_pool">pool:<span id="poolcount_${player_id}">0</span></div>
-            <div class="b_citycount">cities:<span id="citycount_${player_id}">0</span></div>
+      <!-- player board -->
+      <div style="top:10px; left:1040px; position: absolute; border-style: solid; width:240px">
+
+        <div id="player_board_2405406" class="player_board_content">
+          <div class="player_score">
+            <span id="player_score_2405406" class="player_score_value">7</span>
+            <i class="fa fa-star" id="icon_point_2405406"></i>
+            <span class="player_elo_wrap">•
+              <div class="gamerank gamerank_average ">
+                <span class="icon20 icon20_rankw "></span>
+                <span class="gamerank_value" id="player_elo_2405406">117</span>
+              </div>
+            </span>
+            <span id="timeToThink_2405406" class="timeToThink" style="color: inherit;">3:00</span>
           </div>
-          <div class="b_ziggurats">
-            <div class="zc_3nobles"></div>
-            <div class="zc_xturn"></div>
+          <div class="player_showcursor" id="player_showcursor_2405406"><input type="checkbox" checked="checked" class="player_hidecursor" id="player_hidecursor_2405406"> Show cursor <i class="fa fa-hand-pointer-o" style="color:#88dddd"></i></div>
+          <div class="player_table_status" id="player_table_status_2405406" style="display: none;"></div>
+          <div class="player-board-game-specific-content"><div class="b_playerboard_ext">         <div class="b_handpoolcity">
+                <div class="b_hand">hand:<span id="handcount_2405406" class="">5</span></div>
+                <div class="b_pool">pool:<span id="poolcount_2405406" class="">19</span></div>
+                <div class="b_citycount"><span class="b_citycount_label"></span><span id="citycount_2405406" class="">1</span></div>
+              </div>
+              <div id="b_ziggurats_2405406" class="b_ziggurats">
+                <span class="b_ziggurat_label"></span>
+                <div class="zc_citypts"></div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
+
     </div>
     <h1>More Stuff HERE</h1>
     yes, here it is.
