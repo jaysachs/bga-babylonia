@@ -376,7 +376,7 @@ div.b_handpoolcity .b_hand_label {
     display: inline-block;
     height: 2.1em;
     width: 2.1em;
-    background: url(img/pieces.png); /*  0% -800%; */
+    background-image: url(img/pieces.png);
     background-color: transparent;
     background-size: 400% 500%;
 }
@@ -386,7 +386,7 @@ div.b_handpoolcity .b_pool_label {
     margin-right: -2.0em;
     height: 2.1em;
     width: 2.1em;
-    background: url(img/pieces.png); /*  0% -800%; */
+    background-image: url(img/pieces.png);
     background-color: transparent;
     background-size: 400% 500%;
 }

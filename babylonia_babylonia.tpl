@@ -37,13 +37,13 @@
         '<div class="b_playerboard_ext">\
            <div class="b_handpoolcity">\
              <div class="b_hand">\
-               <span class="b_hand_label empty${player_number}"></span>\
+               <span class="b_hand_label empty_${player_number}"></span>\
                <span id="handcount_${player_id}" class="b_counter">5</span>\
              </div>\
              <div class="b_pool">\
-               <span class="b_pool_label empty${player_number}"></span>\
-               <span class="b_pool_label empty${player_number}"></span>\
-               <span class="b_pool_label empty${player_number}"></span>\
+               <span class="b_pool_label empty_${player_number}"></span>\
+               <span class="b_pool_label empty_${player_number}"></span>\
+               <span class="b_pool_label empty_${player_number}"></span>\
                <span id="poolcount_${player_id}" class="b_counter">19</span>\
              </div>\
              <div class="b_citycount"><span class="b_citycount_label"></span><span id="citycount_${player_id}" class="b_counter">1</span></div>\
