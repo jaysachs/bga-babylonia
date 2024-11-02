@@ -28,7 +28,7 @@
     height: 768px;
 }
 
-.board {
+#board {
     font-size: 0; /* disable white space between inline block element */
     background: url(img/mapb.jpg) no-repeat center;
     background-size: cover;
@@ -299,7 +299,6 @@
 
 #available_zcards > div {
     display: inline-block;
-    border-radius: 10px;
     height: 135px;
     width: 90px;
     margin: 10px;
@@ -310,7 +309,6 @@
 #available_zcards > div:not([class]),
 #available_zcards > div[class=''] {
     background-position: -900% 0%;
-    border-style: dotted;
 }
 
 .zc_10pts {
@@ -408,7 +406,6 @@ div.b_zcards span.b_zcard_label {
 div.b_zcards > div {
     display: inline-block;
     margin: 3px;
-    border-radius: 5px;
     height: 2.4em;
     width: 1.6em;
     background-size: 1000% 100%;
@@ -426,7 +423,6 @@ a.action-button:has(> div.zcard) {
 }
 
 a.action-button > div.zcard {
-    border-radius: 5px;
     border: 0;
     border-style: none;
     height: 6em;
@@ -502,7 +498,6 @@ a.action-button > div.zcard {
 .log-element.zc_river
 {
     display: inline-block;
-    border-radius: 5px;
     height: 2.1em;
     width: 1.4em;
     background-size: 1000% 100%;
