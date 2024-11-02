@@ -4,8 +4,9 @@ HEX="0,43 24,0 74,0 99,43 74,86 24,86"
 
 # tile back
 CMD="\( canvas:none -stroke none -fill \#D6C6B5 -draw 'polygon ${HEX}' \) "
+
 # cities
-for P in M S P MS MP SP MSP
+for P in M S P MS MP SP MSP ' '
 do
     CMD+=" \( canvas:none -stroke none -fill \#D6C6B5 -draw 'polygon ${HEX}' -fill \#212575 -draw 'roundrectangle 16,22 83,64 5,5' -stroke white -strokewidth 2 -fill white -draw 'text 0,0 \""${P}"\"' \) "
 done

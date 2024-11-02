@@ -38,9 +38,10 @@
          <div class="b_handpoolcity">\
          <div class="b_hand">hand:<span id="handcount_${player_id}">0</span></div>\
          <div class="b_pool">pool:<span id="poolcount_${player_id}">0</span></div>\
-         <div class="b_citycount">cities:<span id="citycount_${player_id}">0</span></div>\
+         <div class="b_citycount"><span class="b_citycount_label"></span><span id="citycount_${player_id}">0</span></div>\
        </div>\
        <div id="b_ziggurats_${player_id}" class="b_ziggurats">\
+         <span class="b_ziggurat_label"></span>\
        </div>\
      </div>';
 

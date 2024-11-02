@@ -84,7 +84,7 @@
 {
     height: var(--hh);
     width: var(--hw);
-    background-size: 100% 1300%;
+    background-size: 100% 1400%;
 }
 
 .city_back  {
@@ -92,9 +92,6 @@
 }
 .city_m    {
     background: url(img/cities.png) 0% -100%;
-}
-.city_msp {
-    background: url(img/cities.png) 0% -700%;
 }
 .city_p    {
     background: url(img/cities.png) 0% -300%;
@@ -111,20 +108,26 @@
 .city_sp   {
     background: url(img/cities.png) 0% -600%;
 }
-.field_5     {
+.city_msp {
+    background: url(img/cities.png) 0% -700%;
+}
+.city_blank {
     background: url(img/cities.png) 0% -800%;
 }
-.field_6     {
+.field_5     {
     background: url(img/cities.png) 0% -900%;
 }
-.field_7     {
+.field_6     {
     background: url(img/cities.png) 0% -1000%;
 }
-.field_X     {
+.field_7     {
     background: url(img/cities.png) 0% -1100%;
 }
-.ziggurat   {
+.field_X     {
     background: url(img/cities.png) 0% -1200%;
+}
+.ziggurat   {
+    background: url(img/cities.png) 0% -1300%;
 }
 
 .board  .farmer_1,
@@ -337,13 +340,35 @@ div.zc_river {
     background-position: -800% 0%;
 }
 
+/*
+ * Player boards
+ */
+
 div.b_handpoolcity {
     display: inline-block;
 }
 
 div.b_handpoolcity > div {
     display: inline-block;
-    background-color: #ccccff;
+}
+
+div.b_handpoolcity .b_citycount_label {
+    display: inline-block;
+    height: 2.1em;
+    width: 2.4em;
+    background: url(img/cities.png) 0% -800%;
+    background-color: transparent;
+    background-size: 100% 1400%;
+}
+
+div.b_ziggurats span.b_ziggurat_label {
+/*    margin: 3px; */
+    display: inline-block;
+    height: 2.1em; /* 42px; */
+    width: 2.1em; /* 48px; */
+    background: url(img/cities.png) 0% -1300%;
+    background-color: transparent;
+    background-size: 100% 1400%;
 }
 
 div.b_ziggurats > div {
@@ -355,6 +380,11 @@ div.b_ziggurats > div {
     background-size: 1000% 100%;
     background-image: url(img/ziggurats.png);
 }
+
+
+/*
+ * image action buttons
+ */
 
 a.action-button:has(> div.ziggurat) {
     padding: 0;
@@ -371,6 +401,10 @@ a.action-button > div.ziggurat {
     background-image: url(img/ziggurats.png);
 }
 
+/*
+ * rendering log messages
+ *   particularly images for pieces
+ */
 
 .log-element.merchant_1,
 .log-element.priest_1,
@@ -395,7 +429,7 @@ a.action-button > div.ziggurat {
     background-color: transparent;
     height: 2.1em;
     width: 2.1em;
-    background-size: 100% 1300%;
+    background-size: 100% 1400%;
     background-image: url(img/pieces.png);
     background-size: 400% 500%;
 }
@@ -420,6 +454,6 @@ a.action-button > div.ziggurat {
     margin: 0;
     padding: 0;
     background-color: transparent;
-    background-size: 100% 1300%;
+    background-size: 100% 1400%;
     background-image: url(img/cities.png);
 }
