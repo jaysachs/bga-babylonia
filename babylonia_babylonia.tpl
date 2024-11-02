@@ -30,11 +30,25 @@
 
 // Javascript HTML templates
 
-/*
-// Example:
-var jstpl_some_game_item='<div class="my_game_item" id="my_game_item_${MY_ITEM_ID}"></div>';
+  const jstpl_log_piece = '<span class="log-element ${piece}"></span>';
+  const jstpl_log_city = '<span class="log-element ${city}"></span>';
 
-*/
+  const jstpl_player_board_ext =
+    '<div class="b_playerboard_ext">\
+         <div class="b_handpoolcity">\
+         <div class="b_hand">hand:<span id="handcount_${player_id}">0</span></div>\
+         <div class="b_pool">pool:<span id="poolcount_${player_id}">0</span></div>\
+         <div class="b_citycount">cities:<span id="citycount_${player_id}">0</span></div>\
+       </div>\
+       <div id="b_ziggurats_${player_id}" class="b_ziggurats">\
+       </div>\
+     </div>';
+
+  const jstpl_hex =
+    '<div id="hex_${row}_${col}" style="top:${top}px; left:${left}px;">\
+       <div><div></div></div>\
+     </div>';
+
 </script>
 
     <div id="main">

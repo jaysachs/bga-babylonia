@@ -16,9 +16,6 @@
  */
 
 var thegamedatas = null;
-let jstpl_log_piece = '<span class="log-element ${piece}"></span>';
-let jstpl_log_city = '<span class="log-element ${city}"></span>';
-
 
 define([
     "dojo","dojo/_base/declare",
@@ -40,39 +37,19 @@ function (dojo, declare) {
 
         playerNumber: -1,
 
-        jstpl_player_board: function( player_id, player ) {
-            return `<div class="b_playerboard_ext">
-            <div class="b_handpoolcity">
-              <div class="b_hand">hand:<span id="handcount_${player_id}">0</span></div>
-              <div class="b_pool">pool:<span id="poolcount_${player_id}">0</span></div>
-              <div class="b_citycount">cities:<span id="citycount_${player_id}">0</span></div>
-            </div>
-            <div id="b_ziggurats_${player_id}" class="b_ziggurats">
-            <!-- <div></div> -->
-            </div>
-          </div>`
-        },
         hand_counters: [],
         pool_counters: [],
         city_counters: [],
-
-        jstpl_hex: function( hex ) {
-            var row = hex.row;
-            var col = hex.col;
-            let top = row * 31.75 + 6; // row / 2 * 63 + 6;
-            let left = 38 + (col * 55);
-            board.insertAdjacentHTML(
-                'beforeend',
-                `<div id="hex_${row}_${col}" style="top:${top}px; left:${left}px;">
-                 <div><div></div></div></div>`
-            );
-        },
 
         setupPlayerBoard: function( player ) {
             let player_id = player.player_id;
             console.log("Setting up board for player " + player_id);
             let player_board_div = this.getPlayerPanelElement(player_id);
-            dojo.place( this.jstpl_player_board( player_id, player ),
+            dojo.place( this.format_block('jstpl_player_board_ext',
+                                          {
+                                              'player_id': player_id,
+                                              'player': player
+                                          } ),
                         player_board_div );
 
             // create counters per player
@@ -119,9 +96,17 @@ function (dojo, declare) {
 
             for( let h = 0; h < gamedatas.board.length; ++h) {
                 let hex = gamedatas.board[h];
-                board.insertAdjacentHTML(
-                    `beforeend`,
-                    this.jstpl_hex( hex ) );
+
+                dojo.place( this.format_block('jstpl_hex',
+                                              {
+                                                  'row': hex.row,
+                                                  'col': hex.col,
+                                                  // or ... row / 2 * 63 + 6;
+                                                  'top': hex.row * 31.75 + 6,
+                                                  'left': 38 + (hex.col * 55)
+                                              } ),
+                            board );
+
                 let p = hex.piece;
                 if (p != null) {
                     let n = (hex.board_player == 0)
