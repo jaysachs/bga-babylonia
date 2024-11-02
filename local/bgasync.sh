@@ -12,6 +12,8 @@ DRY_RUN=
 LAST_SYNC=.last_sync
 HOST=sftp://${USER}:@1.studio.boardgamearena.com:2022
 
+# exclude "local" dir, any dot-dir (like .git), emacs temp files
+# and BGA-controlled files.
 EXCLUDES='(((local/|\.|.*#).*)|LICENSE_BGA|_ide_helper.php)'
 
 function lftp_via_sync() {
