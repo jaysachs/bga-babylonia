@@ -19,8 +19,8 @@
 10. (DONE) Fix game end condition. It's not "hand can't refill" but rather "pool is empty or <=1 cities left on board".
 11. Improved notification message rendering:
 11.1 Get all player names rendered properly in the log
-11.2 Instead of e.g. "city_ms", use the image for it. Similar for fields.
-12. (IN PROGRESS0 Player board images: put zig cards there, use "zig" image in the board. Use a city tile (with the symbols removed so just the blue rectangle) for captured cities. For hand, use the standard "hand" -- or maybe a blank player piece. For pool -- use a "pile" of pieces?
+11.2 (DONE) Instead of e.g. "city_ms", use the image for it. Similar for fields.
+12. (IN PROGRESS) Player board images: put zig cards there, use "zig" image in the board. Use a city tile (with the symbols removed so just the blue rectangle) for captured cities. For hand, use the standard "hand" -- or maybe a blank player piece. For pool -- use a "pile" of pieces?
 13. Consider hex-highlighting (and piece?) via filters or other CSS-wizardry (but careful of iOS performance issues).
 14. Ziggurat cards should maybe have a description in addition to an id. hovercard.
 15. Use image action buttons and client state to handle playing pieces.
