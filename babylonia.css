@@ -163,61 +163,61 @@
     background-position: 0% 0;
 }
 .hidden_2, .empty_2    {
-    background-position: 100% 0;
+    background-position: -100% 0;
 }
 .hidden_3, .empty_3    {
-    background-position: 200% 0;
+    background-position: -200% 0;
 }
 .hidden_4, .empty_4    {
-    background-position: 300% 0;
+    background-position: -300% 0;
 }
 .farmer_1    {
     background-position: 0% -100%;
 }
 .farmer_2   {
-    background-position: 100% -100%;
+    background-position: -100% -100%;
 }
 .farmer_3 {
-    background-position: 200% -100%;
+    background-position: -200% -100%;
 }
 .farmer_4 {
-    background-position: 300% -100%;
+    background-position: -300% -100%;
 }
 .merchant_1 {
     background-position: 0% -200%;
 }
 .merchant_2 {
-    background-position: 100% -200%;
+    background-position: -100% -200%;
 }
 .merchant_3 {
-    background-position: 200% -200%;
+    background-position: -200% -200%;
 }
 .merchant_4 {
-    background-position: 300% -200%;
+    background-position: -300% -200%;
 }
 .servant_1  {
     background-position: 0% -300%;
 }
 .servant_2  {
-    background-position: 100% -300%;
+    background-position: -100% -300%;
 }
 .servant_3  {
-    background-position: 200% -300%;
+    background-position: -200% -300%;
 }
 .servant_4  {
-    background-position: 300% -300%;
+    background-position: -300% -300%;
 }
 .priest_1   {
     background-position: 0% -400%;
 }
 .priest_2   {
-    background-position: 100% -400%;
+    background-position: -100% -400%;
 }
 .priest_3   {
-    background-position: 200% -400%;
+    background-position: -200% -400%;
 }
 .priest_4  {
-    background-position: 300% -400%;
+    background-position: -300% -400%;
 }
 
 
@@ -462,7 +462,6 @@ a.action-button > div.ziggurat {
     background-color: transparent;
     height: 2.1em;
     width: 2.1em;
-    background-size: 100% 1400%;
     background-image: url(img/pieces.png);
     background-size: 400% 500%;
 }
