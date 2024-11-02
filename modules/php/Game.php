@@ -81,7 +81,7 @@ class Game extends \Table
             clienttranslate($msg),
             [
                 "player_id" => $player_id,
-                "player_number" => $player_info->player_number,
+                "player_number" => $this->getPlayerNoById($player_id),
                 "preserve" => [
                     "player_number",
                 ],
@@ -181,25 +181,30 @@ class Game extends \Table
 
     private function scoreZiggurat(Model $model, Hex $zighex): int {
         $scored_zig = $model->scoreZiggurat($zighex);
-        $msg = '';
         $winner = $scored_zig->winning_player_id;
-
-        $winner_name = '';
         if ($winner == 0) {
+            $winner_name = 'noone';
             $msg = 'Ziggurat at (${row},${col}) scored, no winner';
+            $pnk = 'unused';
         } else {
-            $winner_name = $model->allPlayerInfo()[$winner]->player_name;
-            $msg = 'Ziggurat at (${row},${col}) scored, winner is ${winner_name}';
+            $winner_name = $this->getPlayerNameById($winner);
+            $pnk = $this->playerNameKey($scored_zig->winning_player_id);
+            $msg = 'Ziggurat at (${row},${col}) scored, winner is ${' . $pnk . '}';
         }
         $this->notifyAllPlayers(
             "zigguratScored",
             clienttranslate($msg), [
                 "row" => $zighex->row,
                 "col" => $zighex->col,
-                "winner_name" => $winner_name
+                $pnk => $winner_name,
             ]
         );
         return $winner;
+    }
+
+    // returns string key that will render nicely
+    private function playerNameKey(int $player_id): string {
+        return 'player_name' . $this->getPlayerNoById($player_id);
     }
 
     private function scoreCity(Model $model, Hex $cityhex): void {
@@ -208,9 +213,11 @@ class Game extends \Table
         $scored_city = $model->scoreCity($cityhex);
         $player_infos = $model->allPlayerInfo();
         $captured_by = "noone";
+        $pnk = 'noone';
         if ($scored_city->captured_by > 0) {
-            $captured_by = $player_infos[$scored_city->captured_by]->player_name;
-            $msg = '${city} at (${row},${col}) scored, captured by ${captured_by}';
+            $pnk = $this->playerNameKey($scored_city->captured_by);
+            $captured_by = $this->getPlayerNameById($scored_city->captured_by);
+            $msg = '${city} at (${row},${col}) scored, captured by ${' . $pnk . '}';
         } else {
             $msg = '${city} at (${row},${col}) scored, uncaptured';
         }
@@ -222,7 +229,8 @@ class Game extends \Table
                 "city" => $city,
                 "row" => $cityhex->row,
                 "col" => $cityhex->col,
-                "captured_by" => $captured_by
+                $pnk => $captured_by,
+                "captured_by" => $captured_by,
             ]
         );
 
@@ -280,13 +288,12 @@ class Game extends \Table
         $model = new Model($this->ps, $player_id);
         $selection = $model->selectZigguratCard(ZigguratCardType::from($card_type));
 
-        $player_name = $this->getActivePlayerName();
         $this->notifyAllPlayers(
             "zigguratCardSelection",
             clienttranslate('${player_name} chose ziggurat card ${card}'),
             [
                 "player_id" => $player_id,
-                "player_name" => $player_name,
+                "player_name" => $this->getActivePlayerName(),
                 "card" => $selection->card->type->value,
                 "cardused" => $selection->card->used,
                 "points" => $selection->points,
@@ -319,13 +326,12 @@ class Game extends \Table
         if ($hex == null) {
             throw new \InvalidArgumentException("Hex at ({$row},{$col}) can't be scored");
         }
-        $player_name = $this->getActivePlayerName();
         $this->notifyAllPlayers(
             "scoringSelection",
             clienttranslate('${player_name} chose hex (${row},${col}) to score'),
             [
                 "player_id" => $player_id,
-                "player_name" => $player_name,
+                "player_name" => $this->getActivePlayerName(),
                 "row" => $row,
                 "col" => $col,
             ]
@@ -392,14 +398,13 @@ class Game extends \Table
 
         $model = new Model($this->ps, $player_id);
 
-        $player_name = $this->getActivePlayerName();
         if ($model->finishTurn()) {
             $this->notifyAllPlayers(
                 "gameEnded",
                 clienttranslate('${player_name} unable to refill their hand'),
                 [
                     "player_id" => $player_id,
-                    "player_name" => $player_name,
+                    "player_name" => $this->getActivePlayerName(),
                 ]
             );
             $this->gamestate->nextState("endGame");
