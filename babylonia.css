@@ -242,7 +242,7 @@
     width: 57px;
     height: 57px;
     background-size: 400% 500%;
-
+    border-radius: 100%;
     margin: 5px;
     /* shared with .piece */
     background-image: url(img/pieces.png);
