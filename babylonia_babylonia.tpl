@@ -70,7 +70,6 @@
 	</div>
       </div>
       <!-- needed since the board is absolutely positions / sized. for now. -->
-      <div class="board-spacer"></div>
       <div class="board" id="board"></div>
       <div id="available_zcards">
 	<div id="zig1"></div>

@@ -23,23 +23,18 @@
     --w2: calc(var(--hh) - 4px);
 }
 
-.board-spacer {
-    width: 1024px;
-    height: 768px;
-}
-
 #board {
-    font-size: 0; /* disable white space between inline block element */
+    font-size: 0;
     background: url(img/mapb.jpg) no-repeat center;
     background-size: cover;
-    display: block;
     width: 1024px;
     height: 768px;
-    position: absolute;
-    left: 0px;
-    top: 100px;
+    position: relative;
+    margin-top: 10px;
+    margin-bottom: 10px;
 }
 
+/* the outermost hex container */
 .board > div {
     height: calc(var(--hh));
     width: calc(var(--hw));
