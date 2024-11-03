@@ -508,11 +508,11 @@ function (dojo, declare) {
             return $(id);
         },
 
-        handClass: function(piece) {
+        handClass: function(piece, playerNumber = 0) {
             if (piece == null || piece == "empty") {
                 return "unavailable";
             }
-            return piece + "_" + this.playerNumber;
+            return piece + "_" + (playerNumber == 0 ? this.playerNumber : playerNumber);
         },
 
         updateCounter: function(counter, value, animate) {
@@ -712,11 +712,16 @@ function (dojo, declare) {
 
             const handDiv = this.handDiv(notif.args.handpos);
             const hexDiv = this.hexDiv(notif.args.row, notif.args.col);
-            const hc = this.handClass(notif.args.piece);
+            const hc = this.handClass(notif.args.piece, notif.args.player_number);
+            const sourceDivId =
+                  this.playerNumber == notif.args.player_number
+                  ? handDiv.id
+                  : `overall_player_board_${notif.args.player_id}`;
+
             a = this.slideTemporaryObject(
                 `<div class="${hc}"></div>`,
                 'board',
-                handDiv.id,
+                sourceDivId,
                 hexDiv.id,
                 500
             );
@@ -726,7 +731,7 @@ function (dojo, declare) {
                                         notif.args.piece,
                                         notif.args.player_number );
                 if (notif.args.player_number == this.playerNumber) {
-                    this.handDiv(notif.args.handpos).className = this.handClass("empty");
+                    handDvi.className = this.handClass("empty");
                 }
                 this.updateHandCount( notif.args );
                 this.updatePoolCount( notif.args );
