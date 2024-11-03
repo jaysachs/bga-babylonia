@@ -1,7 +1,7 @@
 #!/bin/zsh
 
 CMD=
-for C in F8F8F8 76A89B F9C29A 9A9A9A
+for C in FFFFFF 76A89B F9C29A 9A9A9A
 do
     CMD+=" \( "
     for P in ' ' F M S P

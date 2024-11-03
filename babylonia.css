@@ -255,13 +255,13 @@
 {
     margin: 0px;
     background-image: unset;
-    border-width: 5px;
+    border-width: 2px;
     border-style: dotted;
-    border-color: #FF888A;
+    border-color: black;
 
     /* these two */
     background-color: white;
-    opacity: 0.5;
+    opacity: 0.2;
     /* or just: */
     /* background-color: transparent; */
 }
