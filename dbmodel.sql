@@ -91,5 +91,6 @@ CREATE TABLE IF NOT EXISTS `board` (
   `piece` varchar(8) DEFAULT NULL,
   `scored` boolean DEFAULT FALSE,
   `player_id` int(10) unsigned DEFAULT NULL,
+  `landmass` varchar(8) NOT NULL,
   PRIMARY KEY (`board_row`,`board_col`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

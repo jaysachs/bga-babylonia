@@ -43,7 +43,7 @@ class PersistentStore {
         $hexes = [];
         $data = $this->db->getObjectListFromDB2(
                 "SELECT board_row row, board_col col, hextype, piece, scored,
-                        player_id board_player
+                        player_id board_player, landmass
                  FROM board");
         foreach ($data as &$hex) {
             $hexes[] = new Hex(HexType::from($hex['hextype']),
@@ -51,20 +51,22 @@ class PersistentStore {
                                intval($hex['col']),
                                Piece::from($hex['piece']),
                                intval($hex['board_player']),
-                               boolval($hex['scored']));
+                               boolval($hex['scored']),
+                               Landmass::from($hex['landmass']));
         }
         return Board::fromHexes($hexes);
     }
 
     public function insertBoard(Board $board): void {
-        $sql = "INSERT INTO board (board_row, board_col, hextype, piece, scored, player_id) VALUES ";
+        $sql = "INSERT INTO board (board_row, board_col, hextype, piece, scored, player_id, landmass) VALUES ";
         $sql_values = [];
         $board->visitAll(function ($hex) use (&$sql_values) {
             $piece = $this->enumValue($hex->piece);
             $player_id = $hex->player_id;
             $scored = $this->boolValue($hex->scored);
             $t = $hex->type->value;
-            $sql_values[] = "($hex->row, $hex->col, '$t', $piece, $scored, $hex->player_id)";
+            $lm = $hex->landmass->value;
+            $sql_values[] = "($hex->row, $hex->col, '$t', $piece, $scored, $hex->player_id, '$lm')";
         });
         $sql .= implode(',', $sql_values);
         $this->db->DbQuery( $sql );
