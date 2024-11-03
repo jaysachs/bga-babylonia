@@ -618,7 +618,7 @@ function (dojo, declare) {
 
             if ( notif.args.captured_by != 0 ) {
                 a = this.slideTemporaryObject(
-                    '<div class="city_back"></div>',
+                    '<div class="city_blank"></div>',
                     'board',
                     hexDiv.id,
                     `citycount_${notif.args.captured_by}`,
@@ -626,7 +626,7 @@ function (dojo, declare) {
                 );
             } else {
                 a = this.slideTemporaryObject(
-                    '<div class="city_back"></div>',
+                    '<div class="city_blank"></div>',
                     'board',
                     hexDiv.id,
                     // TODO: find a location for "off the board"
