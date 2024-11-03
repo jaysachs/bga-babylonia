@@ -140,9 +140,9 @@ class Model {
             return true;
         }
 
-        $played = $this->turnProgress()->uniquePiecesPlayed();
-        if (count($played) == 2
-            && !in_array($piece, $played)
+        $nobles_played = $this->turnProgress()->uniqueNoblesPlayed();
+        if (count($nobles_played) == 2
+            && !in_array($piece, $nobles_played)
             && $this->components()->hasUnusedZigguratCard(
                 $this->player_id,
                 ZigguratCardType::NOBLES_3_KINDS)) {

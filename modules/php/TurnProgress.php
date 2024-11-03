@@ -33,10 +33,12 @@ class TurnProgress {
         $this->moves[] = $move;
     }
 
-    public function uniquePiecesPlayed(): array /* Piece */ {
+    public function uniqueNoblesPlayed(): array /* Piece */ {
         $seen = [];
         foreach ($this->moves as &$move) {
-            $seen[$move->piece->value] = 1;
+            if ($move->piece->isNoble()) {
+                $seen[$move->piece->value] = 1;
+            }
         }
         return array_map(function ($p) { return Piece::from($p); },
                          array_keys($seen));
