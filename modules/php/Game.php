@@ -30,9 +30,9 @@ require_once(APP_GAMEMODULE_PATH . "module/table/table.game.php");
 class Game extends \Table
 {
     // Used during scoring ziggurats in case the scoring of a ziggurat
-    //  means another player needs to choose a tile; this global holds
+    //  means another player needs to choose a card; this global holds
     //  the ID of the "primary" player, i.e. who should become active
-    //  once the ziggurat tile is selected.
+    //  once the ziggurat card is selected.
     private const GLOBAL_PLAYER_ON_TURN = 'player_on_turn';
     private const GLOBAL_NEXT_PLAYER_ACTIVE = 'next_player_active';
 
@@ -54,7 +54,7 @@ class Game extends \Table
         $this->initGameStateLabels([
             Game::GLOBAL_PLAYER_ON_TURN => 10,
             Game::GLOBAL_NEXT_PLAYER_ACTIVE => 11,
-            Option::ADVANCED_ZIGGURAT_TILES->value => 100
+            Option::ADVANCED_ZIGGURAT_CARDS->value => 100
         ]);
 
         Logging::init($this);
@@ -653,7 +653,7 @@ class Game extends \Table
         $model = new Model($this->ps, 0);
         $model->createNewGame(
             array_keys($players),
-            $this->optionEnabled($options, Option::ADVANCED_ZIGGURAT_TILES));
+            $this->optionEnabled($options, Option::ADVANCED_ZIGGURAT_CARDS));
 
         // Activate first player once everything has been initialized and ready.
         $this->activeNextPlayer();

@@ -27,7 +27,7 @@ declare(strict_types=1);
 namespace Bga\Games\babylonia;
 
 enum Option: string {
-    case ADVANCED_ZIGGURAT_TILES = 'advanced_ziggurat_tiles';
+    case ADVANCED_ZIGGURAT_CARDS = 'advanced_ziggurat_cards';
 }
 
 ?>

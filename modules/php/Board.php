@@ -114,7 +114,7 @@ END;
         $available_developments = self::initializePool($numPlayers, $random);
         $board->placeDevelopments($available_developments, $development_locations);
         if (count($available_developments) != 0) {
-            throw new \LogicException("placed all cities and fields but tiles leftover");
+            throw new \LogicException("placed all cities and fields but developments leftover");
         }
         return $board;
     }

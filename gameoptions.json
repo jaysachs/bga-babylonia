@@ -1,6 +1,6 @@
 {
     "100": {
-	"name": "Advanced ziggurat tiles",
+	"name": "Advanced ziggurat cards",
 	"values": {
 	    "0": { "name": "Off" },
 	    "1": { "name": "On", "nobeginner": true }

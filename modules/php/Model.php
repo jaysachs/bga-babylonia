@@ -176,7 +176,7 @@ class Model {
     }
 
     public function playPiece(int $handpos, int $row, int $col): array {
-        // also retrieve ziggurat tiles held
+        // also retrieve ziggurat cards held
 
         $piece = $this->hand()->play($handpos);
         $hex = $this->board()->hexAt($row, $col);
@@ -290,7 +290,7 @@ class Model {
         $hex->scored = true;
         $this->ps->updateHex($hex);
 
-        return new ScoredZiggurat($this->computeTileWinner($hex));
+        return new ScoredZiggurat($this->computeHexWinner($hex));
     }
 
     public function scoreCity(Hex $hex): ScoredCity {
@@ -346,8 +346,8 @@ class Model {
         return $result;
     }
 
-    private function computeTileWinner(Hex $hex): int {
-        // first compute who will win the city tile, if anyone.
+    private function computeHexWinner(Hex $hex): int {
+        // first compute who will win the city / ziggurat, if anyone.
         $neighbors = $this->board()->neighbors(
             $hex,
             function (&$h): bool { return $h->piece->isPlayerPiece(); }
@@ -371,7 +371,7 @@ class Model {
 
     private function computeCityScores(Hex $hex): ScoredCity {
         $result = new ScoredCity($hex->piece, $this->allPlayerIds());
-        $result->captured_by = $this->computeTileWinner($hex);
+        $result->captured_by = $this->computeHexWinner($hex);
 
         $seen = [];
         $neighbors = $this->board()->neighbors(
@@ -410,12 +410,12 @@ class Model {
             // Either it's one of the player's pieces
             ($h->piece->isPlayerPiece() && $h->player_id == $player_id)
             // Or it's an empty land hex in the center area and the player has
-            //   the appropriate bonus tile
+            //   the appropriate bonus card
             || ($h->landmass == Landmass::CENTER && $h->piece->isEmpty()
                 && $this->components()->hasUnusedZigguratCard(
                     $player_id,
                     ZigguratCardType::FREE_CENTER_LAND_CONNECTS))
-            // Or it's an empty water tile and the player has the river bonus tile
+            // Or it's an empty water hex and the player has the river bonus card
             || ($h->piece->isEmpty() && $h->isWater()
                 && $this->components()->hasUnusedZigguratCard(
                     $player_id,
