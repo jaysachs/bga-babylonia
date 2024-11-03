@@ -125,26 +125,26 @@
     background: url(img/cities.png) 0% -1300%;
 }
 
-.board  .farmer_1,
-.board  .merchant_1,
-.board  .servant_1,
-.board  .priest_1,
-.board  .hidden_1,
-.board  .farmer_2,
-.board  .merchant_2,
-.board  .servant_2,
-.board  .priest_2,
-.board  .hidden_2,
-.board  .farmer_3,
-.board  .merchant_3,
-.board  .servant_3,
-.board  .priest_3,
-.board  .hidden_3,
-.board  .farmer_4,
-.board  .merchant_4,
-.board  .servant_4,
-.board  .priest_4,
-.board  .hidden_4
+  .farmer_1,
+  .merchant_1,
+  .servant_1,
+  .priest_1,
+  .hidden_1,
+  .farmer_2,
+  .merchant_2,
+  .servant_2,
+  .priest_2,
+  .hidden_2,
+  .farmer_3,
+  .merchant_3,
+  .servant_3,
+  .priest_3,
+  .hidden_3,
+  .farmer_4,
+  .merchant_4,
+  .servant_4,
+  .priest_4,
+  .hidden_4
 {
     width: calc(var(--hh) - 4px);
     height: calc(var(--hh) - 4px);
@@ -227,6 +227,7 @@
 }
 
 .hand {
+    position: relative;
     box-shadow: 0 3px 8px rgba(0,0,0,.3);
     display: inline-block;
     width: auto;
@@ -237,7 +238,8 @@
     padding-right: 16px;
 }
 
-#hand > div {
+.hand > div {
+    position: relative;
     display: inline-block;
     width: 57px;
     height: 57px;
@@ -248,25 +250,14 @@
     background-image: url(img/pieces.png);
 }
 
-#hand > div.empty_1,
-#hand > div.empty_2,
-#hand > div.empty_3,
-#hand > div.empty_4
-{
-    margin: 0px;
-    background-image: unset;
+#hand > div.unavailable {
+    /* consider distinguishing just-played hand spots with: */
+    /*
     border-width: 2px;
     border-style: dotted;
     border-color: black;
+   */
 
-    /* these two */
-    background-color: white;
-    opacity: 0.2;
-    /* or just: */
-    /* background-color: transparent; */
-}
-
-#hand > div.unavailable {
     background-image: unset;
     background-color: white;
     opacity: 0.5;
@@ -287,6 +278,7 @@
 }
 
 #available_zcards {
+    position: relative;
     display: flex;
     justify-content: center;
     width: 1024px;

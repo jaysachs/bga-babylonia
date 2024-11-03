@@ -509,7 +509,7 @@ function (dojo, declare) {
         },
 
         handClass: function(piece) {
-            if (piece == null) {
+            if (piece == null || piece == "empty") {
                 return "unavailable";
             }
             return piece + "_" + this.playerNumber;
@@ -692,21 +692,55 @@ function (dojo, declare) {
 
         notif_piecePlayed: function( notif ) {
             console.log( 'notif_piecePlayed', notif );
-            this.renderPlayedPiece( notif.args.row,
-                                    notif.args.col,
-                                    notif.args.piece,
-                                    notif.args.player_number );
-            if (notif.args.player_number == this.playerNumber) {
-                this.handDiv(notif.args.handpos).className = this.handClass("empty");
-            }
-            this.updateHandCount( notif.args );
-            this.updatePoolCount( notif.args );
-            this.scoreCtrl[notif.args.player_id].toValue(notif.args.score);
+
+            const handDiv = this.handDiv(notif.args.handpos);
+            const hexDiv = this.hexDiv(notif.args.row, notif.args.col);
+            const hc = this.handClass(notif.args.piece);
+            a = this.slideTemporaryObject(
+                `<div class="${hc}"></div>`,
+                'board',
+                handDiv.id,
+                hexDiv.id,
+                500
+            );
+            dojo.connect(a, 'onEnd', () => {
+                this.renderPlayedPiece( notif.args.row,
+                                        notif.args.col,
+                                        notif.args.piece,
+                                        notif.args.player_number );
+                if (notif.args.player_number == this.playerNumber) {
+                    this.handDiv(notif.args.handpos).className = this.handClass("empty");
+                }
+                this.updateHandCount( notif.args );
+                this.updatePoolCount( notif.args );
+                this.scoreCtrl[notif.args.player_id].toValue(notif.args.score);
+            });
         },
 
         notif_handRefilled: function( notif ) {
             console.log( 'notif_handRefilled', notif );
-            this.renderHand( notif.args.hand, notif.args.player_number );
+
+            delay = 0;
+            for (i = 0; i < notif.args.hand.length; i++) {
+                const div = this.handDiv(i);
+                if (notif.args.hand[i] != "empty"
+                    && div.className == "unavailable") {
+                    const hc = this.handClass(notif.args.hand[i]);
+                    a = this.slideTemporaryObject(
+                        `<div class="${hc}"></div>`,
+                        'hand',
+                        `overall_player_board_${this.player_id}`,
+                        div.id,
+                        500,
+                        delay
+                    );
+                    dojo.connect(a, 'onEnd', () => {
+                        div.className = hc;
+                    });
+
+                    delay += 500;
+                }
+            }
         },
     });
 });
