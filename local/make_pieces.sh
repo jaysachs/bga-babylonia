@@ -1,7 +1,7 @@
 #!/bin/zsh
 
 CMD=
-for C in FFFFFF 88DDDD DD00DD EED8AE
+for C in F8F8F8 76A89B F9C29A 9A9A9A
 do
     CMD+=" \( "
     for P in ' ' F M S P
@@ -11,13 +11,13 @@ do
     CMD+="-append \) "
 done
 
-# echo magick -size 100x100 -pointsize 36 -gravity center "${CMD}" +append pieces.png | bash -s
+echo magick -size 100x100 -pointsize 36 -gravity center "${CMD}" +append img/pieces.png | bash -s
 
 # now the stand
 
 magick -size 800x100 -gravity center canvas:none -stroke none -background black \
        -fill \#924018 -draw 'roundrectangle 0,0,799,99 15,15' \
-       -fill black -draw 'rectangle 15,23,784,37' \
-       -fill black -draw 'rectangle 15,63,784,77' \
+       -fill black -draw 'rectangle 15,25,784,35' \
+       -fill black -draw 'rectangle 15,65,784,75' \
        -transparent black \
-       +append stand.png
+       +append img/stand.png
