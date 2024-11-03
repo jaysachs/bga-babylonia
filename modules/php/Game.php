@@ -378,13 +378,6 @@ class Game extends \Table
             return;
         }
 
-        $this->notifyAllPlayers(
-            "scoringHexChoice",
-            clienttranslate('${player_name} must select a hex to score'),
-            [
-                "player_name" => $this->getActivePlayerName(),
-            ]
-        );
         $this->gamestate->nextState("done");
     }
 
