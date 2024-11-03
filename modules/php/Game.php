@@ -212,15 +212,16 @@ class Game extends \Table
         // grab this, as it will change underneath when the model scores it.
         $city = $cityhex->piece->value;
         $scored_city = $model->scoreCity($cityhex);
-        if ($scored_city->captured_by > 0) {
-            $pnk = $this->playerNameKey($scored_city->captured_by);
-            $captured_by = $this->getPlayerNameById($scored_city->captured_by);
+        $captured_by = $scored_city->captured_by;
+        if ($captured_by > 0) {
+            $pnk = $this->playerNameKey($captured_by);
             $msg = '${city} at (${row},${col}) scored, captured by ${' . $pnk . '}';
         } else {
             $pnk = 'noone';
-            $captured_by = "noone";
             $msg = '${city} at (${row},${col}) scored, uncaptured';
         }
+        $capturer_name =
+            $captured_by > 0 ? $this->getPlayerNameById($captured_by) : "noone";
 
         $player_infos = $model->allPlayerInfo();
         // First notify that the city was captured
@@ -230,7 +231,7 @@ class Game extends \Table
                 "city" => $city,
                 "row" => $cityhex->row,
                 "col" => $cityhex->col,
-                $pnk => $captured_by,
+                $pnk => $capturer_name,
                 "captured_by" => $captured_by,
             ]
         );

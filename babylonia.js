@@ -614,8 +614,25 @@ function (dojo, declare) {
         notif_cityScored: function( notif ) {
             console.log( 'notif_cityScored', notif );
             this.renderPlayedPiece( notif.args.row, notif.args.col, 'empty', null );
+            const hexDiv = this.hexDiv(notif.args.row, notif.args.col);
+
             if ( notif.args.captured_by != 0 ) {
-                // TODO: update player and global city scored count
+                a = this.slideTemporaryObject(
+                    '<div class="city_back"></div>',
+                    'board',
+                    hexDiv.id,
+                    `citycount_${notif.args.captured_by}`,
+                    500
+                );
+            } else {
+                a = this.slideTemporaryObject(
+                    '<div class="city_back"></div>',
+                    'board',
+                    hexDiv.id,
+                    // TODO: find a location for "off the board"
+                    'available_zcards',
+                    500
+                );
             }
         },
 
