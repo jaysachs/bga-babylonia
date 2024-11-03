@@ -10,3 +10,4 @@
 15. ?? Use image action buttons handle playing pieces.
 16. Use client state to handle playing pieces.
 19. Audit all notifications; are they all required? any missing? incomplete?
+20. Animations of refills, piece playing, tile selection, ...
