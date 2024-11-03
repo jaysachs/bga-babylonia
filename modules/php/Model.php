@@ -135,8 +135,9 @@ class Model {
         }
         if (!$non_land_farmer_played
             && count($this->turnProgress()->moves) >= 3
-            && $this->components()->hasUnusedZigguratCard($this->player_id,
-                                                          ZigguratCardType::NOBLE_WITH_3_FARMERS)) {
+            && $this->components()->hasUnusedZigguratCard(
+                $this->player_id,
+                ZigguratCardType::NOBLE_WITH_3_FARMERS)) {
             return true;
         }
 
@@ -311,7 +312,9 @@ class Model {
         foreach ($player_infos as $pid => $pi) {
             // TODO: incorporate ziggurat card
             $points = $pi->captured_city_count;
-            if ($this->components()->hasUnusedZigguratCard($pid, ZigguratCardType::EXTRA_CITY_POINTS)) {
+            if ($this->components()->hasUnusedZigguratCard(
+                $pid,
+                ZigguratCardType::EXTRA_CITY_POINTS)) {
                 $points += intval(floor($points / 2));
             }
             $scores->captured_city_points[$pid] = $points;
@@ -408,11 +411,15 @@ class Model {
             ($h->piece->isPlayerPiece() && $h->player_id == $player_id)
             // Or it's an empty land hex in the center area and the player has
             //   the appropriate bonus tile
-            // TODO: how to express "in central land"?
+            || ($h->landmass == Landmass::CENTER && $h->piece->isEmpty()
+                && $this->components()->hasUnusedZigguratCard(
+                    $player_id,
+                    ZigguratCardType::FREE_CENTER_LAND_CONNECTS))
             // Or it's an empty water tile and the player has the river bonus tile
             || ($h->piece->isEmpty() && $h->isWater()
-                && $this->components()->hasUnusedZigguratCard($player_id,
-                                                              ZigguratCardType::FREE_RIVER_CONNECTS));
+                && $this->components()->hasUnusedZigguratCard(
+                    $player_id,
+                    ZigguratCardType::FREE_RIVER_CONNECTS));
     }
 
     public function hexRequiresScoring(Hex $hex): bool {

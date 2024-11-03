@@ -35,7 +35,7 @@ enum ZigguratCardType : string {
     case NOBLE_WITH_3_FARMERS = 'zc_3farmers';
     case NOBLES_IN_FIELDS = 'zc_fields';
     case EXTRA_CITY_POINTS = 'zc_citypts';
-    case FREE_CENTRAL_LAND_CONNECTS = 'zc_land';
+    case FREE_CENTER_LAND_CONNECTS = 'zc_land';
     case FREE_RIVER_CONNECTS = 'zc_river';
 
     public static function sevenTypes(bool $use_advanced = false) {
@@ -48,7 +48,7 @@ enum ZigguratCardType : string {
             ZigguratCardType::NOBLES_IN_FIELDS,
             ZigguratCardType::EXTRA_CITY_POINTS ];
         if ($use_advanced) {
-            $ziggurats[] = ZigguratCardType::FREE_CENTRAL_LAND_CONNECTS;
+            $ziggurats[] = ZigguratCardType::FREE_CENTER_LAND_CONNECTS;
             $ziggurats[] = ZigguratCardType::FREE_RIVER_CONNECTS;
             shuffle($ziggurats);
             array_pop($ziggurats);

@@ -99,12 +99,16 @@ END;
             $row++;
         }
 
+        $board->markLandmass(Landmass::WEST, 18, 16);
+        $board->markLandmass(Landmass::EAST, 2, 0);
+        $board->markLandmass(Landmass::CENTER, 11, 7);
+
         switch ($numPlayers) {
         case 2:
-            $board->removeLandmassAt(18, 16);
+            $board->removeLandmass(Landmass::WEST);
             break;
         case 3:
-            $board->removeLandmassAt(2, 0);
+            $board->removeLandmassAt(Landmass::EAST);
         }
 
         $available_developments = self::initializePool($numPlayers, $random);
@@ -173,19 +177,28 @@ END;
         }
     }
 
-    private function removeLandmassAt(int $start_row, int $start_col) {
+    private function markLandmass(Landmass $landmass, int $start_row, int $start_col) {
         $this->bfs(
             $start_row,
             $start_col,
-            function(&$hex) {
+            function(&$hex) use ($landmass) {
                 if ($hex->isLand()) {
-                  $hexrow = &$this->hexes[$hex->row];
-                  unset($hexrow[$hex->col]);
-                  return true;
+                    $hex->landmass = $landmass;
+                    return true;
                 }
                 return false;
             }
         );
+    }
+
+    private function removeLandmass(Landmass $landmass) {
+        foreach ($this->hexes as &$hexrow) {
+            foreach ($hexrow as &$hex) {
+                if ($hex->landmass == $landmass) {
+                    unset($hexrow[$hex->col]);
+                }
+            }
+        }
     }
 
     public function adjacentZiggurats(int $player_id): int {
