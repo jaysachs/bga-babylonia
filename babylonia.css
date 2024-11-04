@@ -306,6 +306,10 @@
     background-image: url(img/zcards.png);
 }
 
+#available_zcards.selecting > div[class^="zc_"] {
+    cursor: pointer;
+}
+
 #available_zcards > div:not([class]),
 #available_zcards > div[class=''] {
     background-image: unset;

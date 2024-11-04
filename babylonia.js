@@ -33,6 +33,7 @@ function (dojo, declare) {
 
             dojo.connect( $('hand'), 'onclick', this, 'onPieceSelection' );
             dojo.connect( $('board'), 'onclick', this, 'onHexSelection' );
+            dojo.connect( $('available_zcards'), 'onclick', this, 'onZcardSelected');
         },
 
         playerNumber: -1,
@@ -280,8 +281,32 @@ function (dojo, declare) {
             this.allowedMovesFor(cl).forEach(rc => this.markHexUnplayable(rc));
         },
 
-        setMainTitle: function(text) {
-            $('pagemaintitletext').innerHTML = text;
+        onZcardSelected: function (event) {
+            event.preventDefault();
+            event.stopPropagation();
+            if(! this.isCurrentPlayerActive() ) {
+                 return false;
+            }
+            if (this.stateName != 'selectZigguratCard') {
+                return false;
+            }
+            let e = event.target;
+            let zdiv = e.parentElement;
+            if (zdiv.id != "available_zcards") {
+                return false;
+            }
+            let cl = e.classList;
+            for (var i = 0; i < cl.length; ++i) {
+                let c = cl[i];
+                if (c.startsWith('zc_')) {
+                    this.bgaPerformAction('actSelectZigguratCard',
+                                          { card_type: c });
+                    let div = $( 'available_zcards' );
+                    div.classList.remove('selecting');
+                    return false;
+                }
+            }
+            return false;
         },
 
         onPieceSelection: function(event) {
@@ -498,14 +523,10 @@ function (dojo, declare) {
                         break;
 
                     case 'selectZigguratCard':
+                        let div = $( 'available_zcards' );
+                        div.scrollIntoView( false );
+                        div.classList.add('selecting');
                         this.updateStatusBar('You must select a ziggurat card');
-                        args.available_cards.forEach(z =>
-                            this.addImageActionButton(
-                                z + '-btn',
-                                `<div class="zcard ${z}"></div>`,
-                                () => this.bgaPerformAction('actSelectZigguratCard', {
-                                    card_type: z
-                                })));
                         break;
 
                     case 'playPieces':
