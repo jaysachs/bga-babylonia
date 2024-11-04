@@ -731,7 +731,7 @@ function (dojo, declare) {
                                         notif.args.piece,
                                         notif.args.player_number );
                 if (notif.args.player_number == this.playerNumber) {
-                    handDvi.className = this.handClass("empty");
+                    handDiv.className = this.handClass("empty");
                 }
                 this.updateHandCount( notif.args );
                 this.updatePoolCount( notif.args );
