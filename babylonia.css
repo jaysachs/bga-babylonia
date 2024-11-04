@@ -57,6 +57,12 @@
     object-fit: cover;
     width: 100%;
     height: 100%;
+    /*
+    background-color: white;
+    opacity: 0.2;
+   */
+    cursor: pointer;
+
 }
 
 .board .city_count,
@@ -266,16 +272,10 @@
 
 #hand > div.selected {
     margin: 0px;
-    border-color: black;
+    border-color: yellow;
     border-style: solid;
     border-width: 5px;
 /*    opacity: 0.8; */
-}
-
-.possibleMove {
-    background-color: white;
-    opacity: 0.2;
-    cursor: pointer;
 }
 
 #available_zcards {
