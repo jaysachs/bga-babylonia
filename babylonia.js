@@ -15,7 +15,7 @@
  *
  */
 
-var thegamedatas = null;
+var thegame = null;
 
 define([
     "dojo","dojo/_base/declare",
@@ -36,7 +36,7 @@ function (dojo, declare) {
         },
 
         playerNumber: -1,
-
+        thegamedatas: null,
         hand_counters: [],
         pool_counters: [],
         city_counters: [],
@@ -81,7 +81,8 @@ function (dojo, declare) {
         */
         setup: function( gamedatas ) {
             console.log( "Starting game setup" );
-            thegamedatas = gamedatas;
+            thegame = this;
+            this.thegamedatas = gamedatas;
             // Setting up player boards
             console.log("Setting up player boards");
             for( var player_id in gamedatas.players ) {
