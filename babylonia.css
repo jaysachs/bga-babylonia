@@ -302,6 +302,9 @@
     border-width: 1px;
 }
 
+.zc_used {
+    background-position: -900% 0%;
+}
 .zc_10pts {
     background-position: 0% 0%;
 }

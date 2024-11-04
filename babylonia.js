@@ -125,11 +125,10 @@ function (dojo, declare) {
             for( let z = 0; z < gamedatas.ziggurat_cards.length; z++) {
                 card = gamedatas.ziggurat_cards[z];
                 this.card_tooltips[card.type] = card.tooltip;
-                this.addZigguratCardDiv( `zig${z}`, 'available_zcards', card.type);
+                this.addZigguratCardDiv( `zig${z}`, 'available_zcards', card.type, card.used);
                 if ( card.owning_player_id != 0 ) {
-                    this.setZigguratCardOwned(card.owning_player_id, card.type);
+                    this.setZigguratCardOwned(card.owning_player_id, card.type, card.used);
                 }
-                // div.title = card.tooltip;
             }
 
             console.log( "setting up notifications" );
@@ -585,18 +584,20 @@ function (dojo, declare) {
             //
         },
 
-        addZigguratCardDiv: function(id, parentElem, card) {
-            dojo.place( `<div id="${id}" class="${card}"</div>`,
-                        parentElem );
+        addZigguratCardDiv: function(id, parentElem, card, used = false) {
+            cls = used ? 'zc_used' : card;
+            div = dojo.place( `<div id="${id}" class="${cls}"</div>`,
+                              parentElem );
             this.addTooltip( id, this.card_tooltips[card], '' );
+            div.title = this.card_tooltips[card];
         },
 
-        setZigguratCardOwned: function (player_id, card) {
+        setZigguratCardOwned: function (player_id, card, used) {
             // add a div under div id b_zcards_{player_id}
             // with the card as class.
             // TODO: only if there isn't one already
             newid = `ozig_${card}`;
-            this.addZigguratCardDiv( newid, `b_zcards_${player_id}`, card );
+            this.addZigguratCardDiv( newid, `b_zcards_${player_id}`, card, used );
 
             // now mark the available zig card spot as "no class"
             var s = dojo.query( `#available_zcards .${card}` );
