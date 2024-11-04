@@ -62,7 +62,6 @@
     opacity: 0.2;
    */
     cursor: pointer;
-
 }
 
 .board .city_count,
@@ -267,7 +266,20 @@
 
     background-image: unset;
     background-color: white;
-    opacity: 0.5;
+    opacity: 0.1;
+}
+
+#hand > div.playable {
+    cursor: pointer;
+    border-color: #ffFFdd;
+    border-style: solid;
+    border-width: 1px;
+}
+
+#hand > div.unplayable {
+    cursor: not-allowed;
+    background-color: white;
+    opacity: 0.6;
 }
 
 #hand > div.selected {

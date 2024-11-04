@@ -144,8 +144,8 @@ function (dojo, declare) {
             event.preventDefault();
             event.stopPropagation();
             switch (this.stateName) {
-                case 'playPieces':
-                    this.selectPieceToPlay(event);
+                case 'client_pickHexToPlay':
+                    this.playSelectedPiece(event);
                     break;
                 case 'selectHexToScore':
                     this.selectHexToScore(event);
@@ -191,7 +191,7 @@ function (dojo, declare) {
             });
         },
 
-        selectPieceToPlay: function(event) {
+        playSelectedPiece: function(event) {
             // first find selected hand piece, if any.
             var s = dojo.query( '#hand .selected' );
             if (s.length == 0) {
@@ -222,6 +222,7 @@ function (dojo, declare) {
                     col: hex.col
                 });
             });
+            this.unselectAllHandPieces();
         },
 
         allowedMoves: [],
@@ -250,7 +251,7 @@ function (dojo, declare) {
                 return [];
             }
             // console.log("hexes playable for " + p + "=" + this.allowedMoves[p]);
-            let m = this.allowedMoves[p];
+            let m = this.stateArgs.allowedMoves[p];
             if (m == null) {
                 m = [];
             }
@@ -279,36 +280,116 @@ function (dojo, declare) {
             this.allowedMovesFor(cl).forEach(rc => this.markHexUnplayable(rc));
         },
 
+        setMainTitle: function(text) {
+            $('pagemaintitletext').innerHTML = text;
+        },
+
         onPieceSelection: function(event) {
             console.log("onPieceSelection");
             event.preventDefault();
             event.stopPropagation();
             if(! this.isCurrentPlayerActive() ) {
+                 return false;
+            }
+            if (this.stateName != 'client_selectPieceOrEndTurn'
+                && this.stateName != 'client_mustSelectPiece') {
                 return false;
             }
             let e = event.target;
             let hc = e.parentElement;
-            if (hc.id == "hand") {
-                let c = e.classList;
-                if (this.allowedMovesFor(c).length > 0) {
-                    if (!c.contains("selected")) {
-                        hc.querySelectorAll('.selected').forEach(div => {
-                            if (div.classList.contains('selected')) {
-                                this.markHexesUnplayableForPiece(div.classList);
-                            }
-                            div.classList.remove('selected');
-                        });
-                        this.markHexesPlayableForPiece(c);
-                    } else {
-                        this.markHexesUnplayableForPiece(c);
-                    }
-                    c.toggle("selected");
+            if (hc.id != "hand") {
+                return false;
+            }
+            var playable = false;
+            let c = e.classList;
+            if (this.allowedMovesFor(c).length > 0) {
+                if (!c.contains("selected")) {
+                    this.unselectAllHandPieces();
+                    this.markHexesPlayableForPiece(c);
+                    playable = true;
+                } else {
+                    this.markHexesUnplayableForPiece(c);
                 }
+                c.toggle("selected");
+            }
+            if (playable) {
+                this.setClientState("client_pickHexToPlay", {
+                    descriptionmyturn : _("${you} must select a hex to play to"),
+                });
+                this.addActionButton(
+                    'cancel-btn',
+                    'Cancel',
+                    () => {
+                        this.unselectAllHandPieces();
+                        this.setStatusBarForPlayState();
+                    });
+            } else {
+                this.setStatusBarForPlayState();
             }
             return false;
         },
 
+        unselectAllHandPieces: function() {
+            handDiv = $( 'hand' );
+            for (const div of handDiv.children) {
+                cl = div.classList;
+                if (cl.contains('selected')) {
+                    this.markHexesUnplayableForPiece(cl);
+                }
+                cl.remove('selected');
+                cl.remove('playable');
+                cl.remove('unplayable');
+            }
+        },
+
+        setPlayablePieces: function() {
+            handDiv = $( 'hand' );
+            for (const div of handDiv.children) {
+                cl = div.classList;
+                if (! cl.contains('unavailable')) {
+                    if (this.allowedMovesFor(cl).length > 0) {
+                        cl.add('playable');
+                        cl.remove('unplayable');
+                    } else {
+                        cl.remove('playable');
+                        cl.add('unplayable');
+                    }
+                }
+            }
+        },
+
+        setStatusBarForPlayState: function() {
+            if( !this.isCurrentPlayerActive() ) {
+                return;
+            }
+            if (this.stateArgs.canEndTurn) {
+                if (this.stateArgs.allowedMoves.length == 0) {
+                    this.setClientState("client_noPlaysLeft", {
+                        descriptionmyturn : _("${you} must end your turn"),
+                    });
+                } else {
+                    this.setClientState("client_selectPieceOrEndTurn", {
+                        descriptionmyturn : _("${you} may select a piece to play or end your turn"),
+                    });
+                    this.setPlayablePieces();
+                }
+                this.addActionButton(
+                    'end-btn',
+                    'End turn',
+                    () => {
+                        this.unselectAllHandPieces();
+                        this.bgaPerformAction("actDonePlayPieces");
+                    });
+            } else {
+                this.setClientState("client_mustSelectPiece", {
+                    descriptionmyturn : _("${you} must select a piece to play"),
+                });
+                this.setPlayablePieces();
+            }
+        },
+
         stateName: "",
+        stateArgs: [],
 
         ///////////////////////////////////////////////////
         //// Game & client states
@@ -322,8 +403,6 @@ function (dojo, declare) {
             console.log( 'Entering state: '+stateName,
                          this.isCurrentPlayerActive(),
                          stateInfo );
-            this.stateName = stateName;
-
             // All other important things are done in onUpdateActionButtons.
             // let args = stateInfo.args;
             switch( stateName ) {
@@ -391,6 +470,8 @@ function (dojo, declare) {
             console.log( 'onUpdateActionButtons: '+stateName,
                          this.isCurrentPlayerActive(),
                          args );
+            this.stateName = stateName;
+            this.stateArgs = args;
             if( this.isCurrentPlayerActive() ) {
                 switch( stateName ) {
                     case 'chooseExtraTurn':
@@ -428,29 +509,13 @@ function (dojo, declare) {
                         break;
 
                     case 'playPieces':
-                        if (args.canEndTurn) {
-                            if (args.allowedMoves.length == 0) {
-                                this.updateStatusBar('You must end your turn');
-                            } else {
-                                this.updateStatusBar('You may play a piece or end your turn');
-                            }
-                            this.addActionButton(
-                                'end-btn',
-                                'End turn',
-                                () => this.bgaPerformAction("actDonePlayPieces"));
-                        } else {
-                            this.updateStatusBar('You must play a piece');
-                        }
-
-                        // save allowedMoves so selection can highlight hexes
-                        // and enforce placement rules.
-                        this.allowedMoves = args.allowedMoves;
+                        this.setStatusBarForPlayState();
                         this.markAllHexesUnplayable();
 
-                        this.addActionButton(
-                            'undo-btn',
-                            'Undo',
-                            () => window.alert('undo not supported'));
+                        // this.addActionButton(
+                        //     'undo-btn',
+                        //     'Undo',
+                        //     () => window.alert('undo not supported'));
                         break;
                 }
             }
@@ -721,7 +786,6 @@ function (dojo, declare) {
 
         notif_piecePlayed: function( notif ) {
             console.log( 'notif_piecePlayed', notif );
-
             const handDiv = this.handDiv(notif.args.handpos);
             const hexDiv = this.hexDiv(notif.args.row, notif.args.col);
             const hc = this.handClass(notif.args.piece, notif.args.player_number);
@@ -753,7 +817,6 @@ function (dojo, declare) {
 
         notif_handRefilled: function( notif ) {
             console.log( 'notif_handRefilled', notif );
-
             delay = 0;
             for (i = 0; i < notif.args.hand.length; i++) {
                 const div = this.handDiv(i);
