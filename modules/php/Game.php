@@ -582,6 +582,7 @@ class Game extends \Table
                         "type" => $z->type->value,
                         "owning_player_id" => $z->owning_player_id,
                         "used" => $z->used,
+                        "tooltip" => clienttranslate($z->type->tooltip()),
                     ]; },
                     $model->components()->allZigguratCards()),
         ];

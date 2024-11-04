@@ -72,13 +72,6 @@
       <!-- needed since the board is absolutely positions / sized. for now. -->
       <div class="board" id="board"></div>
       <div id="available_zcards">
-	<div id="zig1"></div>
-	<div id="zig2"></div>
-	<div id="zig3"></div>
-	<div id="zig4"></div>
-	<div id="zig5"></div>
-	<div id="zig6"></div>
-	<div id="zig7"></div>
       </div>
     </div>
 

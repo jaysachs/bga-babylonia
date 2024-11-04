@@ -57,6 +57,31 @@ enum ZigguratCardType : string {
         return $ziggurats;
 
     }
+
+    public function tooltip(): string {
+        return match ($this) {
+            ZigguratCardType::PLUS_10 =>
+            "Receive 10 points immediately. Next, turn the card face down: you can not use it any longer.",
+            ZigguratCardType::EXTRA_TURN =>
+            "Play an additional turn at the end of one of your turns (that is, after refilling your Stand). Next, turn the card face down: you can not use it any longer.",
+            ZigguratCardType::HAND_SIZE_7 =>
+            "From now on you can have 7 Clan Tokens on your Stand instead of 5.",
+            ZigguratCardType::NOBLES_3_KINDS =>
+            "From now on you can play exactly 3 different Nobles face up instead of any 2 Clan Tokens.",
+            ZigguratCardType::NOBLE_WITH_3_FARMERS =>
+            "From now on you can also play a Noble face up when you play 3 or more Farmers.",
+            ZigguratCardType::NOBLES_IN_FIELDS =>
+            "From now on you can place the Nobles in the Crop Fields, even without having one of your Clan Tokens next to those Crop Fields.",
+            ZigguratCardType::EXTRA_CITY_POINTS =>
+            "From now on, when the Cities are scored, you will receive 1 additional point for every two Cities that you have in front of you.",
+            ZigguratCardType::FREE_CENTER_LAND_CONNECTS =>
+            "From now on
+all the free land hexagons of the central area between the 2 rivers serve to connect your Clan Tokens.",
+            ZigguratCardType::FREE_RIVER_CONNECTS =>
+            "From now on all the free river hexagons serve to connect your Clan Tokens.",
+            default => ""
+        };
+    }
 };
 
 ?>
