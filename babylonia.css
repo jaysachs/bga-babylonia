@@ -59,10 +59,6 @@
     height: 100%;
 }
 
-.board > div.selected {
-    background-color: rgba(22, 255, 22, 0.1);
-}
-
 .board .city_count,
 .board .city_msp,
 .board .city_m,
