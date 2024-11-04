@@ -296,7 +296,10 @@
 
 #available_zcards > div:not([class]),
 #available_zcards > div[class=''] {
-    background-position: -900% 0%;
+    background-image: unset;
+    border-style: dotted;
+    border-color: #444444;
+    border-width: 1px;
 }
 
 .zc_10pts {
