@@ -616,7 +616,10 @@ function (dojo, declare) {
         notif_zigguratCardSelection: function( notif ) {
             console.log( 'notif_zigguratCardSelection', notif );
             // TODO: also hand marking cards as "used"?
-            this.setZigguratCardOwned(notif.args.player_id, notif.args.zcard);
+            this.setZigguratCardOwned(notif.args.player_id,
+                                      notif.args.zcard,
+                                      // 10pts card used on acquisition
+                                      notif.args.zcard == 'zc_10pts');
             this.scoreCtrl[notif.args.player_id].toValue(notif.args.score);
         },
 
