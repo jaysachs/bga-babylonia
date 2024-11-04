@@ -564,24 +564,15 @@ function (dojo, declare) {
         setupNotifications: function() {
             console.log( 'notifications subscriptions setup' );
 
+            // Can add "wait time" in ms via
+            //   this.notifqueue.setSynchronous( 'cardPlayed', 3000 );
             dojo.subscribe( 'piecePlayed', this, 'notif_piecePlayed' );
             dojo.subscribe( 'handRefilled', this, 'notif_handRefilled' );
             dojo.subscribe( 'cityScored', this, 'notif_cityScored' );
             dojo.subscribe( 'cityScoredPlayer', this, 'notif_cityScoredPlayer' );
             dojo.subscribe( 'turnFinished', this, 'notif_turnFinished' );
             dojo.subscribe( 'zigguratCardSelection', this, 'notif_zigguratCardSelection');
-            // TODO: here, associate your game notifications with local methods
-
-            // Example 1: standard notification handling
-            // dojo.subscribe( 'cardPlayed', this, "notif_cardPlayed" );
-
-            // Example 2: standard notification handling + tell the
-            //            user interface to wait during 3 seconds
-            //            after calling the method in order to let the
-            //            players see what is happening in the game.
-            // dojo.subscribe( 'cardPlayed', this, "notif_cardPlayed" );
-            // this.notifqueue.setSynchronous( 'cardPlayed', 3000 );
-            //
+            dojo.subscribe( 'extraTurnUsed', this, 'notif_extraTurnUsed');
         },
 
         addZigguratCardDiv: function(id, parentElem, card, used = false) {
@@ -610,6 +601,16 @@ function (dojo, declare) {
             }
             s[0].classList.remove(card);
             this.removeTooltip(s[0].id);
+        },
+
+        notif_extraTurnUsed: function ( notif ) {
+            console.log( 'notif_extraTurnUsed', notif );
+            carddiv = $( 'ozig_zc_xturn' );
+            if ( carddiv == undefined ) {
+                console.log( "Couldn't find owned extra turn card." );
+            } else {
+                carddiv.className = 'zc_used';
+            }
         },
 
         notif_zigguratCardSelection: function( notif ) {
