@@ -460,11 +460,21 @@ class Game extends \Table
             clienttranslate('${player_name} undid their move'),
             [
                 "player_name" => $this->getActivePlayerName(),
+                "player_id" => $this->activePlayerId(),
                 "row" => $move->row,
                 "col" => $move->col,
                 "piece" => $move->piece->value,
                 "captured" => $move->captured,
                 "points" => $move->points,
+            ]
+        );
+        $this->notifyPlayer(
+            $this->activePlayerId(),
+            "undoPieceReturned",
+            clienttranslate('You returned ${piece} to your hand'),
+            [
+                "handpos" => $move->handpos,
+                "piece" => $move->original_piece->value,
             ]
         );
         $this->gamestate->nextState("playPieces");

@@ -654,14 +654,17 @@ function (dojo, declare) {
 
             // Can add "wait time" in ms via
             //   this.notifqueue.setSynchronous( 'cardPlayed', 3000 );
-            dojo.subscribe( 'piecePlayed', this, 'notif_piecePlayed' );
-            dojo.subscribe( 'handRefilled', this, 'notif_handRefilled' );
-            dojo.subscribe( 'cityScored', this, 'notif_cityScored' );
-            dojo.subscribe( 'cityScoredPlayer', this, 'notif_cityScoredPlayer' );
-            dojo.subscribe( 'turnFinished', this, 'notif_turnFinished' );
-            dojo.subscribe( 'zigguratCardSelection', this, 'notif_zigguratCardSelection');
-            dojo.subscribe( 'extraTurnUsed', this, 'notif_extraTurnUsed');
-            dojo.subscribe( 'undoMove', this, 'notif_undoMove');
+            [
+                'piecePlayed',
+                'handRefilled',
+                'cityScored',
+                'cityScoredPlayer',
+                'turnFinished',
+                'zigguratCardSelection',
+                'extraTurnUsed',
+                'undoMove',
+                'undoPieceReturned',
+            ].forEach(n => dojo.subscribe(n, this, `notif_${n}`));
         },
 
         addZigguratCardDiv: function(id, parentElem, card, used = false) {
@@ -808,6 +811,29 @@ function (dojo, declare) {
             return "NOT SURE WHAT HAPPENED";
         },
 
+        notif_undoMove: function( notif ) {
+            console.log( 'notif_undoMove', notif );
+
+            const handDiv = this.handDiv(notif.args.handpos);
+            const hexDiv = this.hexDiv(notif.args.row, notif.args.col);
+            if (notif.args.captured != 'empty') {
+                this.renderPlayedPiece( notif.args.row,
+                                        notif.args.col,
+                                        notif.args.captured,
+                                        0 );
+            }
+            this.hand_counters[notif.args.player_id].incValue(1);
+            this.scoreCtrl[notif.args.player_id].incValue(-notif.args.points);
+            // TODO: animate all this
+        },
+
+        notif_undoPieceReturned: function( notif ) {
+            console.log( 'notif_undoPieceReturned', notif );
+
+            const handDiv = this.handDiv(notif.args.handpos);
+            handDiv.className = this.handClass(notif.args.piece);
+        },
+
         notif_piecePlayed: function( notif ) {
             console.log( 'notif_piecePlayed', notif );
             const handDiv = this.handDiv(notif.args.handpos);
@@ -862,10 +888,6 @@ function (dojo, declare) {
                     delay += 500;
                 }
             }
-        },
-
-        notif_undoMove: function( notif ) {
-            console.log( 'notif_undoMove', notif );
         },
     });
 });
