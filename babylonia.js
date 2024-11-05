@@ -37,7 +37,6 @@ function (dojo, declare) {
         },
 
         selectedHandPos: null,
-        allowedMoves: [],
         pieceClasses: [ "priest", "servant", "farmer", "merchant" ],
         card_tooltips: {},
         stateName: "",
@@ -252,7 +251,6 @@ function (dojo, declare) {
                 console.log("no playable piece found");
                 return [];
             }
-            // console.log("hexes playable for " + p + "=" + this.allowedMoves[p]);
             let m = this.stateArgs.allowedMoves[p];
             if (m == null) {
                 m = [];
