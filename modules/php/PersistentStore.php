@@ -161,17 +161,51 @@ class PersistentStore {
         $this->db->DbQuery( $sql );
     }
 
+    public function undoMove(Move $move) {
+        $this->db->DbQuery( "DELETE FROM turn_progress
+                             WHERE player_id = $move->player_id
+                             AND seq_id = $move->seq_id" );
+
+        // update board state
+        $captured = Piece::EMPTY->value;
+        if ($move->captured > '') {
+            $captured = $move->captured;
+        }
+        $this->db->DbQuery("UPDATE board
+                     SET piece='$captured', player_id=0
+                     WHERE board_row=$move->row AND board_col=$move->col");
+
+        // update player scores
+        if ($move->points > 0) {
+            $this->db->DbQuery(
+                "UPDATE player q
+                 SET q.player_score = (
+                     SELECT p.sc - $move->points
+                     FROM (SELECT player_score sc
+                           FROM player
+                           WHERE player_id = $move->player_id) p)
+                     WHERE q.player_id = $move->player_id" );
+        }
+        // update hands
+        $opiece = $move->original_piece->value;
+        $this->db->DbQuery(
+            "UPDATE hands
+             SET piece = '$opiece'
+             WHERE player_id=$move->player_id AND pos=$move->handpos");
+    }
+
     // TODO: this logic maybe doesn't belong here at the data layer.
     // Instead, move it to the model?
     // Right now, this updates the score but the model doesn't get
     // updated, so it can't be used in Game::actPlayPiece to return the score
     // which is a bit of a smell.
     public function insertMove(Move $move) {
-        $c = $this->boolValue($move->captured);
+        $c = $move->captured;
         $piece = $move->piece->value;
+        $opiece = $move->original_piece->value;
         $this->db->DbQuery( "INSERT INTO turn_progress
-                      (player_id, seq_id, piece, handpos, board_row, board_col, captured, points)
-                      VALUES($move->player_id, NULL, '$piece', $move->handpos, $move->row, $move->col, $c, $move->points)");
+                      (player_id, seq_id, original_piece, piece, handpos, board_row, board_col, captured, points)
+                      VALUES($move->player_id, NULL, '$opiece', '$piece', $move->handpos, $move->row, $move->col, '$c', $move->points)");
         // update board state
         $this->db->DbQuery("UPDATE board
                      SET piece='$piece', player_id=$move->player_id
@@ -198,19 +232,21 @@ class PersistentStore {
 
     public function retrieveTurnProgress(int $player_id): TurnProgress {
         $dbresults = $this->db->getCollectionFromDb(
-            "SELECT seq_id, player_id, handpos, piece, board_row, board_col, captured, points
+            "SELECT seq_id, player_id, handpos, piece, original_piece, board_row, board_col, captured, points
              FROM turn_progress
              WHERE player_id = $player_id
              ORDER BY seq_id");
         $moves = [];
         foreach ($dbresults as &$move) {
             $moves[] = new Move(intval($move['player_id']),
+                                Piece::from($move['original_piece']),
                                 Piece::from($move['piece']),
                                 intval($move['handpos']),
                                 intval($move['board_row']),
                                 intval($move['board_col']),
                                 boolval($move['captured']),
-                                intval($move['points']));
+                                intval($move['points']),
+                                intval($move['seq_id']));
         }
         return new TurnProgress($moves);
     }

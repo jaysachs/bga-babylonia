@@ -55,7 +55,8 @@ CREATE TABLE IF NOT EXISTS `hands` (
 CREATE TABLE IF NOT EXISTS `turn_progress` (
   `player_id` int(10) unsigned NOT NULL,
   `seq_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `piece` varchar(8) DEFAULT NULL,
+  `original_piece` varchar(8) NOT NULL,
+  `piece` varchar(8) NOT NULL,
   -- position in hand
   `handpos` int(2) NOT NULL,
   -- where it was placed

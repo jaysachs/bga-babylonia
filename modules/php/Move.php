@@ -30,11 +30,24 @@ namespace Bga\Games\babylonia;
 class Move {
     function __construct(public int $player_id,
                          public Piece $piece,
+                         public Piece $original_piece,
                          public int $handpos,
                          public int $row,
                          public int $col,
                          public bool $captured,
-                         public int $points) {}
+                         public int $points,
+                         public int $seq_id = 0) {}
+
+    public function __toString(): string {
+        return sprintf("id:%d/%d piece:%s opiece:%s pos:$d %d:%d cap:%s points:%d ",
+                       $this->player_id, $this->seq_id,
+                       $this->piece->value, $this->original_piece->value,
+                       $this->handpos,
+                       $this->row, $this->col,
+                       $this->captured, $this->piece->value);
+    }
+
+
 }
 
 ?>

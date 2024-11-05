@@ -65,9 +65,9 @@ class Game extends \Table
     {
         $player_id = $this->activePlayerId();
         $model = new Model($this->ps, $player_id);
-        $result = $model->playPiece($handpos, $row, $col);
-        $points = $result["points"];
-        $piece = $result["piece"];
+        $move = $model->playPiece($handpos, $row, $col);
+        $points = $move->points;
+        $piece = $move->piece;
 
         $msg = "";
         if ($points > 0) {
@@ -92,7 +92,6 @@ class Game extends \Table
                 "col" => $col,
                 "points" => $points,
                 "score" => $player_info->score,
-                //                "i18n" => ['piece'],
                 "hand_size" => $model->hand()->size(),
                 "pool_size" => $model->pool()->size(),
             ]
@@ -118,7 +117,6 @@ class Game extends \Table
             ]
         );
 
-        // TODO: if scoring needed, go to scoring
         $this->gamestate->nextState("done");
     }
 
@@ -148,6 +146,7 @@ class Game extends \Table
         return [
             "allowedMoves" => $am,
             "canEndTurn" => $model->canEndTurn(),
+            "canUndo" => $model->turnProgress()->canUndo(),
         ];
     }
 
@@ -451,6 +450,24 @@ class Game extends \Table
         $this->activeNextPlayer();
         $this->setPlayerOnTurn($this->activePlayerId());
         $this->gamestate->nextState("done");
+    }
+
+    public function actUndoPlay() {
+        $model = new Model($this->ps, $this->activePlayerId());
+        $move = $model->undo();
+        $this->notifyAllPlayers(
+            "undoMove",
+            clienttranslate('${player_name} undid their move'),
+            [
+                "player_name" => $this->getActivePlayerName(),
+                "row" => $move->row,
+                "col" => $move->col,
+                "piece" => $move->piece->value,
+                "captured" => $move->captured,
+                "points" => $move->points,
+            ]
+        );
+        $this->gamestate->nextState("playPieces");
     }
 
     public function actChooseExtraTurn(bool $take_extra_turn) {

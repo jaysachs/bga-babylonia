@@ -33,6 +33,17 @@ class TurnProgress {
         $this->moves[] = $move;
     }
 
+    public function canUndo(): bool {
+        return count($this->moves) > 0;
+    }
+
+    public function undoLastMove(): Move {
+        if (! $this->canUndo() ) {
+            throw new \LogicException("No moves to undo!");
+        }
+        return array_pop($this->moves);
+    }
+
     public function uniqueNoblesPlayed(): array /* Piece */ {
         $seen = [];
         foreach ($this->moves as &$move) {

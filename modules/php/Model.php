@@ -175,7 +175,7 @@ class Model {
         return $result;
     }
 
-    public function playPiece(int $handpos, int $row, int $col): array {
+    public function playPiece(int $handpos, int $row, int $col): Move {
         // also retrieve ziggurat cards held
 
         $piece = $this->hand()->play($handpos);
@@ -188,15 +188,16 @@ class Model {
             throw new \InvalidArgumentException("Illegal to play $pv to $row, $col by $this->player_id");
         }
 
+        $originalPiece = $piece;
         if ($hex->isWater()) {
             $piece = Piece::HIDDEN;
         }
-        $original = $hex->playPiece($piece, $this->player_id);
+        $hexPiece = $hex->playPiece($piece, $this->player_id);
 
         $fs = 0;
         $zs = 0;
         // score field
-        switch ($original) {
+        switch ($hexPiece) {
         case Piece::FIELD_5:
             $fs = 5; break;
         case Piece::FIELD_6:
@@ -217,16 +218,13 @@ class Model {
 
         $points = $fs + $zs;
 
-        $move = new Move($this->player_id, $piece, $handpos, $row, $col, false, $points);
+        $move = new Move($this->player_id, $originalPiece, $piece, $handpos, $row, $col, false, $points);
         $this->turnProgress()->addMove($move);
 
         // update the database
         $this->ps->insertMove($move);
 
-        return [
-            "points" => $points,
-            "piece" => $piece
-        ];
+        return $move;
     }
 
     private function totalCapturedCities(): int {
@@ -481,6 +479,17 @@ class Model {
         }
         $card->used = true;
         $this->ps->updateZigguratCard($card);
+    }
+
+    public function undo() {
+        $tp = $this->turnProgress();
+        $move = $tp->undoLastMove();
+        if ($move->player_id != $this->player_id) {
+            throw new \InvalidArgumentException(
+                "Move $move is not for player $this->player_id");
+        }
+        $this->ps->undoMove($move);
+        return $move;
     }
 }
 

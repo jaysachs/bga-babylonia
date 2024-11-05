@@ -84,7 +84,7 @@ $machinestates = [
         "possibleactions" => [
             "actPlayPiece",
             "actDonePlayPieces",
-            "actUndo",
+            "actUndoPlay",
         ],
         "transitions" => [
             "playPieces" => STATE_PLAYER_PLAY_PIECES,

@@ -411,6 +411,13 @@ function (dojo, declare) {
                 });
                 this.setPlayablePieces();
             }
+            if (this.stateArgs.canUndo) {
+                this.addActionButton(
+                    'undo-btn',
+                    'Undo',
+                    () => this.bgaPerformAction('actUndoPlay')
+                );
+            }
         },
 
         stateName: "",
@@ -532,11 +539,6 @@ function (dojo, declare) {
                     case 'playPieces':
                         this.setStatusBarForPlayState();
                         this.markAllHexesUnplayable();
-
-                        // this.addActionButton(
-                        //     'undo-btn',
-                        //     'Undo',
-                        //     () => window.alert('undo not supported'));
                         break;
                 }
             }
@@ -659,6 +661,7 @@ function (dojo, declare) {
             dojo.subscribe( 'turnFinished', this, 'notif_turnFinished' );
             dojo.subscribe( 'zigguratCardSelection', this, 'notif_zigguratCardSelection');
             dojo.subscribe( 'extraTurnUsed', this, 'notif_extraTurnUsed');
+            dojo.subscribe( 'undoMove', this, 'notif_undoMove');
         },
 
         addZigguratCardDiv: function(id, parentElem, card, used = false) {
@@ -859,6 +862,10 @@ function (dojo, declare) {
                     delay += 500;
                 }
             }
+        },
+
+        notif_undoMove: function( notif ) {
+            console.log( 'notif_undoMove', notif );
         },
     });
 });
