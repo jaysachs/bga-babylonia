@@ -93,7 +93,6 @@ class Game extends \Table
                 "points" => $points,
                 "score" => $player_info->score,
                 "hand_size" => $model->hand()->size(),
-                "pool_size" => $model->pool()->size(),
             ]
         );
 
@@ -407,18 +406,6 @@ class Game extends \Table
             return;
         }
 
-        $this->notifyAllPlayers(
-            "turnFinished",
-            clienttranslate('${player_name} finished their turn'),
-            [
-                "player_id" => $player_id,
-                "player_name" => $this->getActivePlayerName(),
-                "player_number" => $this->getPlayerNoById($player_id),
-                "hand_size" => $model->hand()->size(),
-                "pool_size" => $model->pool()->size(),
-            ]
-        );
-
         // TODO: this doesn't have to return the whole hand,
         // just the refilled parts.
         // Could capture the delta and return *that*. Then it can be animated on
@@ -432,6 +419,18 @@ class Game extends \Table
                 "player_id" => $player_id,
                 'hand' => array_map(function ($p) { return $p->value; },
                                     $model->hand()->pieces()),
+            ]
+        );
+
+        $this->notifyAllPlayers(
+            "turnFinished",
+            clienttranslate('${player_name} finished their turn'),
+            [
+                "player_id" => $player_id,
+                "player_name" => $this->getActivePlayerName(),
+                "player_number" => $this->getPlayerNoById($player_id),
+                "hand_size" => $model->hand()->size(),
+                "pool_size" => $model->pool()->size(),
             ]
         );
 
