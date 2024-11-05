@@ -837,7 +837,10 @@ function (dojo, declare) {
             );
             dojo.connect(a, 'onEnd', () => {
                 if (isActive) {
-                    handDiv.className = this.handClass(notif.args.original_piece);
+                    cl = handDiv.classList;
+                    cl.remove('unavailable');
+                    cl.add('playable');
+                    cl.add(this.handClass(notif.args.original_piece));
                 }
 
                 this.hand_counters[notif.args.player_id].incValue(1);
