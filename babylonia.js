@@ -763,7 +763,7 @@ function (dojo, declare) {
                     args.processed = true;
 
                     // list of special keys we want to replace with images
-                    var keys = ['piece', 'city', 'zcard'];
+                    var keys = ['piece', 'city', 'zcard', 'original_piece'];
                     for ( var i in keys) {
                         var key = keys[i];
                         if (key in args) {
@@ -799,6 +799,7 @@ function (dojo, declare) {
                             'city': args[key],
                         });
                 case 'piece':
+                case 'original_piece':
                     return this.format_block(
                         'jstpl_log_piece',
                         {
@@ -819,8 +820,8 @@ function (dojo, declare) {
             const hexDiv = this.hexDiv(notif.args.row, notif.args.col);
             this.renderPlayedPiece( notif.args.row,
                                     notif.args.col,
-                                    notif.args.captured,
-                                    0 );
+                                    notif.args.captured_piece,
+                                    null );
             const targetDivId =
                   isActive
                   ? handDiv.id

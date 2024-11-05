@@ -460,6 +460,9 @@ class Game extends \Table
             $args = [
                 "player_name" => $this->getActivePlayerName(),
                 "player_number" => $this->getPlayerNoById($this->activePlayerId()),
+                "preserve" => [
+                    "player_number",
+                ],
                 "player_id" => $this->activePlayerId(),
                 "row" => $move->row,
                 "col" => $move->col,
