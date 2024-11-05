@@ -273,6 +273,7 @@
     cursor: pointer;
     border-color: #ffFFdd;
     border-style: solid;
+    margin: 4px;
     border-width: 1px;
 }
 
