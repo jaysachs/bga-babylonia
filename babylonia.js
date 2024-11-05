@@ -204,19 +204,9 @@ function (dojo, declare) {
         },
 
         playSelectedPiece: function(event) {
-            // first find selected hand piece, if any.
-            var s = dojo.query( '#hand .selected' );
-            if (s.length == 0) {
-                console.log("No piece selected.");
-                return;
+            if (this.selectedHandPos == null) {
+                console.log("no piece selected!");
             }
-            if (s.length > 1) {
-                console.log("More than one piece selected?!");
-            }
-            console.log("Selected hand piece div id: " + s[0].id);
-            let foo = s[0].id.split("_");
-            let piece = foo[0];
-            let pos = foo[1];
 
             let hex = this.selectedHex(event.target);
             if (hex == null) {
@@ -225,7 +215,7 @@ function (dojo, declare) {
             console.log("selected hex " + hex.row + "," + hex.col);
 
             this.bgaPerformAction("actPlayPiece", {
-                handpos: pos,
+                handpos: this.selectedHandPos,
                 row: hex.row,
                 col: hex.col
             }).then(() =>  {
@@ -249,7 +239,7 @@ function (dojo, declare) {
         pieceForHandDivClassList: function(cl) {
             // console.log("pieceFor: " + cl);
             for (var i = 0; i < this.pieceClasses.length; ++i) {
-                if (cl.contains(this.handClass(this.pieceClasses[i]))) {
+                if (cl.contains(this.handPieceClass(this.pieceClasses[i]))) {
                     return this.pieceClasses[i];
                 }
             }
@@ -320,6 +310,8 @@ function (dojo, declare) {
             return false;
         },
 
+        selectedHandPos: null,
+
         onPieceSelection: function(event) {
             console.log("onPieceSelection");
             event.preventDefault();
@@ -331,13 +323,12 @@ function (dojo, declare) {
                 && this.stateName != 'client_mustSelectPiece') {
                 return false;
             }
-            let e = event.target;
-            let hc = e.parentElement;
-            if (hc.id != "hand") {
+            let selectedDiv = event.target;
+            if (selectedDiv.parentElement.id != "hand") {
                 return false;
             }
             var playable = false;
-            let c = e.classList;
+            let c = selectedDiv.classList;
             if (this.allowedMovesFor(c).length > 0) {
                 if (!c.contains("selected")) {
                     this.unselectAllHandPieces();
@@ -349,6 +340,7 @@ function (dojo, declare) {
                 c.toggle("selected");
             }
             if (playable) {
+                this.selectedHandPos = selectedDiv.id.split("_")[1];
                 this.setClientState("client_pickHexToPlay", {
                     descriptionmyturn : _("${you} must select a hex to play to"),
                 });
@@ -376,6 +368,7 @@ function (dojo, declare) {
                 cl.remove('playable');
                 cl.remove('unplayable');
             }
+            this.selectedHandPos = null;
         },
 
         setPlayablePieces: function() {
@@ -398,6 +391,7 @@ function (dojo, declare) {
             if( !this.isCurrentPlayerActive() ) {
                 return;
             }
+            this.selectedHandPos = null;
             if (this.stateArgs.canEndTurn) {
                 if (this.stateArgs.allowedMoves.length == 0) {
                     this.setClientState("client_noPlaysLeft", {
@@ -567,7 +561,7 @@ function (dojo, declare) {
             return $(`hex_${row}_${col}`);
         },
 
-        handDiv: function (i) {
+        handPosDiv: function (i) {
             let id = `hand_${i}`;
             let div = $(id);
             if (div != null) {
@@ -587,7 +581,7 @@ function (dojo, declare) {
             return $(id);
         },
 
-        handClass: function(piece, playerNumber = 0) {
+        handPieceClass: function(piece, playerNumber = 0) {
             if (piece == null || piece == "empty") {
                 return "unavailable";
             }
@@ -622,7 +616,7 @@ function (dojo, declare) {
 
         renderHand: function(hand) {
             for (i = 0; i < hand.length; ++i) {
-                this.handDiv(i).className = this.handClass(hand[i]);
+                this.handPosDiv(i).className = this.handPieceClass(hand[i]);
             }
         },
 
@@ -826,12 +820,12 @@ function (dojo, declare) {
             // TODO: factor out the commonality there and with notif_piecePlayed
             const isActive = this.playerNumber == notif.args.player_number;
             const hexDiv = this.hexDiv(notif.args.row, notif.args.col);
-            const hc = this.handClass(notif.args.piece, notif.args.player_number);
+            const hc = this.handPieceClass(notif.args.piece, notif.args.player_number);
             var targetDivId = this.handcount_id(notif.args.player_id);
-            var handDiv = null;
+            var handPosDiv = null;
             if (isActive) {
-                handDiv = this.handDiv(notif.args.handpos);
-                targetDivId = handDiv.id;
+                handPosDiv = this.handPosDiv(notif.args.handpos);
+                targetDivId = handPosDiv.id;
             }
 
             // Put any piece (field) captured in the move back on the board
@@ -848,10 +842,10 @@ function (dojo, declare) {
             );
             dojo.connect(a, 'onEnd', () => {
                 if (isActive) {
-                    cl = handDiv.classList;
+                    cl = handPosDiv.classList;
                     cl.remove('unavailable');
                     cl.add('playable');
-                    cl.add(this.handClass(notif.args.original_piece));
+                    cl.add(this.handPieceClass(notif.args.original_piece));
                 }
 
                 this.hand_counters[notif.args.player_id].incValue(1);
@@ -863,13 +857,13 @@ function (dojo, declare) {
             console.log( 'notif_piecePlayed', notif );
             const isActive = this.playerNumber == notif.args.player_number;
             const hexDiv = this.hexDiv(notif.args.row, notif.args.col);
-            const hc = this.handClass(notif.args.piece, notif.args.player_number);
+            const hc = this.handPieceClass(notif.args.piece, notif.args.player_number);
             var sourceDivId = this.handcount_id(notif.args.player_id);
             if (isActive) {
-                const handDiv = this.handDiv(notif.args.handpos);
-                sourceDivId = handDiv.id;
+                const handPosDiv = this.handPosDiv(notif.args.handpos);
+                sourceDivId = handPosDiv.id;
                 // Active player hand piece "removed" from hand.
-                handDiv.className = this.handClass("empty");
+                handPosDiv.className = this.handPieceClass("empty");
             }
             const a = this.slideTemporaryObject(
                 `<div class="${hc}"></div>`,
@@ -888,14 +882,25 @@ function (dojo, declare) {
             });
         },
 
+        slideDiv: function(className, from, to, parent = 'board', delay = 0, time = 500) {
+            return this.slideTemporaryObject(
+                `<div class="${className}"></div>`,
+                parent,
+                from,
+                to,
+                time,
+                delay
+            );
+        },
+
         notif_handRefilled: function( notif ) {
             console.log( 'notif_handRefilled', notif );
             var delay = 0;
             for (i = 0; i < notif.args.hand.length; i++) {
-                const div = this.handDiv(i);
+                const div = this.handPosDiv(i);
                 if (notif.args.hand[i] != "empty"
                     && div.className == "unavailable") {
-                    const hc = this.handClass(notif.args.hand[i]);
+                    const hc = this.handPieceClass(notif.args.hand[i]);
                     const a = this.slideTemporaryObject(
                         `<div class="${hc}"></div>`,
                         'hand',
