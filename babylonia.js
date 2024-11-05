@@ -55,16 +55,27 @@ function (dojo, declare) {
 
             // create counters per player
             this.hand_counters[player_id]=new ebg.counter();
-            this.hand_counters[player_id].create('handcount_'+player_id);
+            this.hand_counters[player_id].create(this.handcount_id(player_id));
             this.pool_counters[player_id]=new ebg.counter();
-            this.pool_counters[player_id].create('poolcount_'+player_id);
+            this.pool_counters[player_id].create(this.poolcount_id(player_id));
             this.city_counters[player_id]=new ebg.counter();
-            this.city_counters[player_id].create('citycount_'+player_id);
+            this.city_counters[player_id].create(this.citycount_id(player_id));
 
             this.updateHandCount(player, false);
             this.updatePoolCount(player, false);
             this.updateCapturedCityCount(player, false);
         },
+
+        handcount_id: function(player_id) {
+            return 'handcount_' + player_id;
+        },
+        poolcount_id: function(player_id) {
+            return 'poolcount_' + player_id;
+        },
+        citycount_id: function(player_id) {
+            return 'citycount_' + player_id;
+        },
+
 
         /*
             setup:
@@ -723,7 +734,7 @@ function (dojo, declare) {
                     '<div class="city_blank"></div>',
                     'board',
                     hexDiv.id,
-                    `citycount_${notif.args.captured_by}`,
+                    this.citycount_id(notif.args.captured_by),
                     500
                 );
             } else {
@@ -816,7 +827,7 @@ function (dojo, declare) {
             const isActive = this.playerNumber == notif.args.player_number;
             const hexDiv = this.hexDiv(notif.args.row, notif.args.col);
             const hc = this.handClass(notif.args.piece, notif.args.player_number);
-            var targetDivId = `overall_player_board_${notif.args.player_id}`;
+            var targetDivId = this.handcount_id(notif.args.player_id);
             var handDiv = null;
             if (isActive) {
                 handDiv = this.handDiv(notif.args.handpos);
@@ -853,7 +864,7 @@ function (dojo, declare) {
             const isActive = this.playerNumber == notif.args.player_number;
             const hexDiv = this.hexDiv(notif.args.row, notif.args.col);
             const hc = this.handClass(notif.args.piece, notif.args.player_number);
-            var sourceDivId = `overall_player_board_${notif.args.player_id}`;
+            var sourceDivId = this.handcount_id(notif.args.player_id);
             if (isActive) {
                 const handDiv = this.handDiv(notif.args.handpos);
                 sourceDivId = handDiv.id;
@@ -888,7 +899,7 @@ function (dojo, declare) {
                     const a = this.slideTemporaryObject(
                         `<div class="${hc}"></div>`,
                         'hand',
-                        `overall_player_board_${this.player_id}`,
+                        this.handcount_id(this.player_id),
                         div.id,
                         500,
                         delay
