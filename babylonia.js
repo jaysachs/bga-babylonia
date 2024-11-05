@@ -533,7 +533,7 @@ function (dojo, declare) {
                         let div = $( 'available_zcards' );
                         div.scrollIntoView( false );
                         div.classList.add('selecting');
-                        this.updateStatusBar('You must select a ziggurat card');
+                        this.updateStatusBar(_('You must select a ziggurat card'));
                         break;
 
                     case 'playPieces':
@@ -563,7 +563,7 @@ function (dojo, declare) {
                 return div;
             }
             // dynamically extend hand as needed.
-            hand = $(`hand`);
+            const hand = $(`hand`);
             for (j = 0; j <= i; ++j) {
                 let d = $(`hand_${j}`);
                 if (d == null) {
@@ -616,7 +616,6 @@ function (dojo, declare) {
         },
 
         renderPlayedPiece: function (row, col, piece, playerNumber) {
-            // TODO: animate this
             let hex = this.hexDiv(row, col);
             if (playerNumber == null) {
                 hex.firstElementChild.className = piece;
@@ -667,18 +666,18 @@ function (dojo, declare) {
         },
 
         addZigguratCardDiv: function(id, parentElem, card, used = false) {
-            cls = used ? 'zc_used' : card;
-            div = dojo.place( `<div id="${id}" class="${cls}"</div>`,
-                              parentElem );
+            const cls = used ? 'zc_used' : card;
+            const div = dojo.place( `<div id="${id}" class="${cls}"</div>`,
+                                    parentElem );
             this.addTooltip( id, this.card_tooltips[card], '' );
-            div.title = this.card_tooltips[card];
+            // div.title = this.card_tooltips[card];
         },
 
         setZigguratCardOwned: function (player_id, card, used) {
             // add a div under div id b_zcards_{player_id}
             // with the card as class.
             // TODO: only if there isn't one already
-            newid = `ozig_${card}`;
+            const newid = `ozig_${card}`;
             this.addZigguratCardDiv( newid, `b_zcards_${player_id}`, card, used );
 
             // now mark the available zig card spot as "no class"
@@ -696,7 +695,7 @@ function (dojo, declare) {
 
         notif_extraTurnUsed: function ( notif ) {
             console.log( 'notif_extraTurnUsed', notif );
-            carddiv = $( 'ozig_zc_xturn' );
+            const carddiv = $( 'ozig_zc_xturn' );
             if ( carddiv == undefined ) {
                 console.log( "Couldn't find owned extra turn card." );
             } else {
@@ -720,7 +719,7 @@ function (dojo, declare) {
             const hexDiv = this.hexDiv(notif.args.row, notif.args.col);
 
             if ( notif.args.captured_by != 0 ) {
-                a = this.slideTemporaryObject(
+                this.slideTemporaryObject(
                     '<div class="city_blank"></div>',
                     'board',
                     hexDiv.id,
@@ -728,7 +727,7 @@ function (dojo, declare) {
                     500
                 );
             } else {
-                a = this.slideTemporaryObject(
+                this.slideTemporaryObject(
                     '<div class="city_blank"></div>',
                     'board',
                     hexDiv.id,
@@ -815,20 +814,21 @@ function (dojo, declare) {
             console.log( 'notif_undoMove', notif );
             // TODO: factor out the commonality there and with notif_piecePlayed
             const isActive = this.playerNumber == notif.args.player_number;
-
-            const handDiv = this.handDiv(notif.args.handpos);
             const hexDiv = this.hexDiv(notif.args.row, notif.args.col);
+            const hc = this.handClass(notif.args.piece, notif.args.player_number);
+            var targetDivId = `overall_player_board_${notif.args.player_id}`;
+            var handDiv = null;
+            if (isActive) {
+                handDiv = this.handDiv(notif.args.handpos);
+                targetDivId = handDiv.id;
+            }
+
+            // Put any piece (field) captured in the move back on the board
             this.renderPlayedPiece( notif.args.row,
                                     notif.args.col,
                                     notif.args.captured_piece,
                                     null );
-            const targetDivId =
-                  isActive
-                  ? handDiv.id
-                  : `overall_player_board_${notif.args.player_id}`;
-
-            const hc = this.handClass(notif.args.piece, notif.args.player_number);
-            a = this.slideTemporaryObject(
+            const a = this.slideTemporaryObject(
                 `<div class="${hc}"></div>`,
                 'board',
                 hexDiv.id,
@@ -850,18 +850,17 @@ function (dojo, declare) {
 
         notif_piecePlayed: function( notif ) {
             console.log( 'notif_piecePlayed', notif );
-            const handDiv = this.handDiv(notif.args.handpos);
+            const isActive = this.playerNumber == notif.args.player_number;
             const hexDiv = this.hexDiv(notif.args.row, notif.args.col);
             const hc = this.handClass(notif.args.piece, notif.args.player_number);
-            const sourceDivId =
-                  this.playerNumber == notif.args.player_number
-                  ? handDiv.id
-                  : `overall_player_board_${notif.args.player_id}`;
-
-            if (notif.args.player_number == this.playerNumber) {
+            var sourceDivId = `overall_player_board_${notif.args.player_id}`;
+            if (isActive) {
+                const handDiv = this.handDiv(notif.args.handpos);
+                sourceDivId = handDiv.id;
+                // Active player hand piece "removed" from hand.
                 handDiv.className = this.handClass("empty");
             }
-            a = this.slideTemporaryObject(
+            const a = this.slideTemporaryObject(
                 `<div class="${hc}"></div>`,
                 'board',
                 sourceDivId,
@@ -874,20 +873,19 @@ function (dojo, declare) {
                                         notif.args.piece,
                                         notif.args.player_number );
                 this.updateHandCount( notif.args );
-                this.updatePoolCount( notif.args );
                 this.scoreCtrl[notif.args.player_id].toValue(notif.args.score);
             });
         },
 
         notif_handRefilled: function( notif ) {
             console.log( 'notif_handRefilled', notif );
-            delay = 0;
+            var delay = 0;
             for (i = 0; i < notif.args.hand.length; i++) {
                 const div = this.handDiv(i);
                 if (notif.args.hand[i] != "empty"
                     && div.className == "unavailable") {
                     const hc = this.handClass(notif.args.hand[i]);
-                    a = this.slideTemporaryObject(
+                    const a = this.slideTemporaryObject(
                         `<div class="${hc}"></div>`,
                         'hand',
                         `overall_player_board_${this.player_id}`,
