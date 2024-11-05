@@ -67,7 +67,7 @@ class Game extends \Table
         $model = new Model($this->ps, $player_id);
         $move = $model->playPiece($handpos, $row, $col);
         $points = $move->points;
-        $piece = $move->piece;
+        $piece = $move->piece->value;
 
         $msg = "";
         if ($points > 0) {
@@ -455,28 +455,32 @@ class Game extends \Table
     public function actUndoPlay() {
         $model = new Model($this->ps, $this->activePlayerId());
         $move = $model->undo();
-        $this->notifyAllPlayers(
-            "undoMove",
-            clienttranslate('${player_name} undid their move'),
-            [
+
+        foreach ($model->allPlayerIds() as $pid) {
+            $args = [
                 "player_name" => $this->getActivePlayerName(),
+                "player_number" => $this->getPlayerNoById($this->activePlayerId()),
                 "player_id" => $this->activePlayerId(),
                 "row" => $move->row,
                 "col" => $move->col,
                 "piece" => $move->piece->value,
-                "captured" => $move->captured,
+                "captured_piece" => $move->captured_piece->value,
                 "points" => $move->points,
-            ]
-        );
-        $this->notifyPlayer(
-            $this->activePlayerId(),
-            "undoPieceReturned",
-            clienttranslate('You returned ${piece} to your hand'),
-            [
-                "handpos" => $move->handpos,
-                "piece" => $move->original_piece->value,
-            ]
-        );
+            ];
+
+            if ($pid == $this->activePlayerId()) {
+                $args["handpos"] = $move->handpos;
+                $args["original_piece"] = $move->original_piece->value;
+                $msg = 'You undid your move and returned ${original_piece} to your hand.';
+            } else {
+                $msg = '${player_name} undid their move';
+            }
+            $this->notifyPlayer($pid, "undoMove", clienttranslate( $msg ), $args );
+        }
+
+        // final notifyAll required to keep moves and replays in sync
+        $this->notifyAllPlayers('sync', '', []);
+
         $this->gamestate->nextState("playPieces");
     }
 

@@ -66,7 +66,7 @@ class Model {
         return $this->_allPlayerInfo;
     }
 
-    private function allPlayerIds(): array {
+    public function allPlayerIds(): array {
         return array_keys($this->allPlayerInfo());
     }
 
@@ -218,7 +218,7 @@ class Model {
 
         $points = $fs + $zs;
 
-        $move = new Move($this->player_id, $originalPiece, $piece, $handpos, $row, $col, false, $points);
+        $move = new Move($this->player_id, $piece, $originalPiece, $handpos, $row, $col, $hexPiece, $points);
         $this->turnProgress()->addMove($move);
 
         // update the database

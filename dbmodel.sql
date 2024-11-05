@@ -63,7 +63,7 @@ CREATE TABLE IF NOT EXISTS `turn_progress` (
   `board_row` int(10) unsigned NOT NULL,
   `board_col` int(10) unsigned NOT NULL,
   -- what field was "captured" if any
-  `captured` varchar(8) DEFAULT NULL,
+  `captured_piece` varchar(8) DEFAULT NULL,
   -- what was immediately scored (field and/or ziggurat adjacency)
   `points` int(10) unsigned DEFAULT NULL,
   -- no need to record "inversion", as the hextype will tell us

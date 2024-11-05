@@ -663,7 +663,6 @@ function (dojo, declare) {
                 'zigguratCardSelection',
                 'extraTurnUsed',
                 'undoMove',
-                'undoPieceReturned',
             ].forEach(n => dojo.subscribe(n, this, `notif_${n}`));
         },
 
@@ -813,25 +812,36 @@ function (dojo, declare) {
 
         notif_undoMove: function( notif ) {
             console.log( 'notif_undoMove', notif );
+            // TODO: factor out the commonality there and with notif_piecePlayed
+            const isActive = this.playerNumber == notif.args.player_number;
 
             const handDiv = this.handDiv(notif.args.handpos);
             const hexDiv = this.hexDiv(notif.args.row, notif.args.col);
-            if (notif.args.captured != 'empty') {
-                this.renderPlayedPiece( notif.args.row,
-                                        notif.args.col,
-                                        notif.args.captured,
-                                        0 );
-            }
-            this.hand_counters[notif.args.player_id].incValue(1);
-            this.scoreCtrl[notif.args.player_id].incValue(-notif.args.points);
-            // TODO: animate all this
-        },
+            this.renderPlayedPiece( notif.args.row,
+                                    notif.args.col,
+                                    notif.args.captured,
+                                    0 );
+            const targetDivId =
+                  isActive
+                  ? handDiv.id
+                  : `overall_player_board_${notif.args.player_id}`;
 
-        notif_undoPieceReturned: function( notif ) {
-            console.log( 'notif_undoPieceReturned', notif );
+            const hc = this.handClass(notif.args.piece, notif.args.player_number);
+            a = this.slideTemporaryObject(
+                `<div class="${hc}"></div>`,
+                'board',
+                hexDiv.id,
+                targetDivId,
+                500
+            );
+            dojo.connect(a, 'onEnd', () => {
+                if (isActive) {
+                    handDiv.className = this.handClass(notif.args.original_piece);
+                }
 
-            const handDiv = this.handDiv(notif.args.handpos);
-            handDiv.className = this.handClass(notif.args.piece);
+                this.hand_counters[notif.args.player_id].incValue(1);
+                this.scoreCtrl[notif.args.player_id].incValue(-notif.args.points);
+            });
         },
 
         notif_piecePlayed: function( notif ) {

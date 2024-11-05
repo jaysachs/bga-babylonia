@@ -34,7 +34,7 @@ class Move {
                          public int $handpos,
                          public int $row,
                          public int $col,
-                         public bool $captured,
+                         public Piece $captured_piece,
                          public int $points,
                          public int $seq_id = 0) {}
 
@@ -44,7 +44,7 @@ class Move {
                        $this->piece->value, $this->original_piece->value,
                        $this->handpos,
                        $this->row, $this->col,
-                       $this->captured, $this->piece->value);
+                       $this->captured->value, $this->piece->value);
     }
 
 

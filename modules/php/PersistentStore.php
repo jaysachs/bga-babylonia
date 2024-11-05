@@ -167,12 +167,9 @@ class PersistentStore {
                              AND seq_id = $move->seq_id" );
 
         // update board state
-        $captured = Piece::EMPTY->value;
-        if ($move->captured > '') {
-            $captured = $move->captured;
-        }
+        $captured_piece =  $move->captured_piece->value;
         $this->db->DbQuery("UPDATE board
-                     SET piece='$captured', player_id=0
+                     SET piece='$captured_piece', player_id=0
                      WHERE board_row=$move->row AND board_col=$move->col");
 
         // update player scores
@@ -200,12 +197,12 @@ class PersistentStore {
     // updated, so it can't be used in Game::actPlayPiece to return the score
     // which is a bit of a smell.
     public function insertMove(Move $move) {
-        $c = $move->captured;
+        $captured_piece = $move->captured_piece->value;
         $piece = $move->piece->value;
         $opiece = $move->original_piece->value;
         $this->db->DbQuery( "INSERT INTO turn_progress
-                      (player_id, seq_id, original_piece, piece, handpos, board_row, board_col, captured, points)
-                      VALUES($move->player_id, NULL, '$opiece', '$piece', $move->handpos, $move->row, $move->col, '$c', $move->points)");
+                      (player_id, seq_id, original_piece, piece, handpos, board_row, board_col, captured_piece, points)
+                      VALUES($move->player_id, NULL, '$opiece', '$piece', $move->handpos, $move->row, $move->col, '$captured_piece', $move->points)");
         // update board state
         $this->db->DbQuery("UPDATE board
                      SET piece='$piece', player_id=$move->player_id
@@ -232,19 +229,19 @@ class PersistentStore {
 
     public function retrieveTurnProgress(int $player_id): TurnProgress {
         $dbresults = $this->db->getCollectionFromDb(
-            "SELECT seq_id, player_id, handpos, piece, original_piece, board_row, board_col, captured, points
+            "SELECT seq_id, player_id, handpos, piece, original_piece, board_row, board_col, captured_piece, points
              FROM turn_progress
              WHERE player_id = $player_id
              ORDER BY seq_id");
         $moves = [];
         foreach ($dbresults as &$move) {
             $moves[] = new Move(intval($move['player_id']),
-                                Piece::from($move['original_piece']),
                                 Piece::from($move['piece']),
+                                Piece::from($move['original_piece']),
                                 intval($move['handpos']),
                                 intval($move['board_row']),
                                 intval($move['board_col']),
-                                boolval($move['captured']),
+                                Piece::from($move['captured_piece']),
                                 intval($move['points']),
                                 intval($move['seq_id']));
         }
