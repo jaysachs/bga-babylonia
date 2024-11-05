@@ -858,6 +858,9 @@ function (dojo, declare) {
                   ? handDiv.id
                   : `overall_player_board_${notif.args.player_id}`;
 
+            if (notif.args.player_number == this.playerNumber) {
+                handDiv.className = this.handClass("empty");
+            }
             a = this.slideTemporaryObject(
                 `<div class="${hc}"></div>`,
                 'board',
@@ -870,9 +873,6 @@ function (dojo, declare) {
                                         notif.args.col,
                                         notif.args.piece,
                                         notif.args.player_number );
-                if (notif.args.player_number == this.playerNumber) {
-                    handDiv.className = this.handClass("empty");
-                }
                 this.updateHandCount( notif.args );
                 this.updatePoolCount( notif.args );
                 this.scoreCtrl[notif.args.player_id].toValue(notif.args.score);
