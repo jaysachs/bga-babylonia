@@ -16,21 +16,19 @@
 
 /* inspired from https://css-tricks.com/hexagons-and-beyond-flexible-responsive-grid-patterns-sans-media-queries/ */
 
-#main {
-    --hw: 70px;
-    --cfh: calc(var(--hh) - 0px);
-    --hh: 61px;
-    --w2: calc(var(--hh) - 4px);
-    --bw: 1024px;
-    --bh: 768px;
+body {
+    --board-width: 1024px;
+    --board-height: 768px;
+    --hex-width: calc(var(--board-width)/14.53); // 70px;
+    --hex-height: calc(var(--board-height)/12.6); // 61px;
 }
 
 #board {
     font-size: 0;
     background: url(img/mapb.jpg) no-repeat center;
     background-size: cover;
-    width: calc(var(--bw));
-    height: calc(var(--bh));
+    width: calc(var(--board-width));
+    height: calc(var(--board-height));
     position: relative;
     margin-top: 10px;
     margin-bottom: 10px;
@@ -38,8 +36,8 @@
 
 /* the outermost hex container */
 .board > div {
-    height: calc(var(--hh));
-    width: calc(var(--hw));
+    height: calc(var(--hex-height));
+    width: calc(var(--hex-width));
     margin: 0;
     padding: 0;
     background-color: transparent;
@@ -81,8 +79,8 @@
 .board .field_X,
 .board .ziggurat
 {
-    height: var(--hh);
-    width: var(--hw);
+    height: var(--hex-height);
+    width: var(--hex-width);
     background-size: 100% 1400%;
 }
 
@@ -154,8 +152,8 @@
   .priest_4,
   .hidden_4
 {
-    width: calc(var(--hh) - 4px);
-    height: calc(var(--hh) - 4px);
+    width: calc(var(--hex-height) - 4px);
+    height: calc(var(--hex-height) - 4px);
     margin-top: 3px;
     margin-left: 7px;
     background-image: url(img/pieces.png);
@@ -229,7 +227,7 @@
 */
 
 #hand_container {
-    width: calc(var(--bw));
+    width: calc(var(--board-width));
     display: flex;
     justify-content:center;
 }
@@ -249,8 +247,8 @@
 .hand > div {
     position: relative;
     display: inline-block;
-    width: 57px;
-    height: 57px;
+    width: calc(var(--hex-height) - 4px); // 57px
+    height: calc(var(--hex-height) - 4px); // 57px
     background-size: 400% 500%;
     border-radius: 100%;
     margin: 5px;
@@ -297,13 +295,13 @@
     position: relative;
     display: flex;
     justify-content: center;
-    width: calc(var(--bw));
+    width: calc(var(--board-width));
 }
 
 #available_zcards > div {
     display: inline-block;
-    height: 135px;
-    width: 90px;
+    height: calc((var(--hex-height) - 4px) * 2.37); // 135px;
+    width: calc((var(--hex-height) - 4px) * 1.58); // 90px;
     margin: 10px;
     background-size: 1000% 100%;
     background-image: url(img/zcards.png);
