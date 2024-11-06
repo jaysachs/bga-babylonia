@@ -21,14 +21,16 @@
     --cfh: calc(var(--hh) - 0px);
     --hh: 61px;
     --w2: calc(var(--hh) - 4px);
+    --bw: 1024px;
+    --bh: 768px;
 }
 
 #board {
     font-size: 0;
     background: url(img/mapb.jpg) no-repeat center;
     background-size: cover;
-    width: 1024px;
-    height: 768px;
+    width: calc(var(--bw));
+    height: calc(var(--bh));
     position: relative;
     margin-top: 10px;
     margin-bottom: 10px;
@@ -227,7 +229,7 @@
 */
 
 #hand_container {
-    width: 1024px;
+    width: calc(var(--bw));
     display: flex;
     justify-content:center;
 }
@@ -295,7 +297,7 @@
     position: relative;
     display: flex;
     justify-content: center;
-    width: 1024px;
+    width: calc(var(--bw));
 }
 
 #available_zcards > div {
