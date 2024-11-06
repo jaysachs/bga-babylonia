@@ -571,7 +571,7 @@ function (dojo, declare) {
                 if (d == null) {
                     hand.insertAdjacentHTML(
                         'beforeend',
-                        `<div id='hand_${j}'></div>`
+                        `<div id='hand_${j}' class="unavailable"></div>`
                     );
                 }
             }
