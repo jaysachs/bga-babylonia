@@ -19,8 +19,8 @@
 body {
     --board-width: 1024px;
     --board-height: 768px;
-    --hex-width: calc(var(--board-width)/14.53); // 70px;
-    --hex-height: calc(var(--board-height)/12.6); // 61px;
+    --hex-width: calc(var(--board-width)/14.63); // 70px;
+    --hex-height: calc(var(--board-height)/12.59); // 61px;
 }
 
 #board {
