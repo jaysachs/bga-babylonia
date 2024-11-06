@@ -868,7 +868,7 @@ function (dojo, declare) {
                 const div = this.handPosDiv(i);
                 if (notif.args.hand[i] != "empty"
                     && div.className == "unavailable") {
-                    hc = this.handPieceClass(notif.args.hand[i]);
+                    let hc = this.handPieceClass(notif.args.hand[i]);
                     const a = this.slideDiv(
                         hc,
                         this.handcount_id(this.player_id),
