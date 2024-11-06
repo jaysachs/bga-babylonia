@@ -18,12 +18,12 @@
 var thegame = null;
 
 define([
-    "dojo","dojo/_base/declare",
-    "ebg/core/gamegui",
-    "ebg/counter"
+    'dojo','dojo/_base/declare',
+    'ebg/core/gamegui',
+    'ebg/counter'
 ],
 function (dojo, declare) {
-    return declare("bgagame.babylonia", ebg.core.gamegui, {
+    return declare('bgagame.babylonia', ebg.core.gamegui, {
         constructor: function(){
             console.log('babylonia constructor');
 
@@ -37,9 +37,9 @@ function (dojo, declare) {
         },
 
         selectedHandPos: null,
-        pieceClasses: [ "priest", "servant", "farmer", "merchant" ],
+        pieceClasses: [ 'priest', 'servant', 'farmer', 'merchant' ],
         card_tooltips: {},
-        stateName: "",
+        stateName: '',
         stateArgs: [],
         playerNumber: -1,
         thegamedatas: null,
@@ -49,7 +49,7 @@ function (dojo, declare) {
 
         setupPlayerBoard: function( player ) {
             let player_id = player.player_id;
-            console.log("Setting up board for player " + player_id);
+            console.log('Setting up board for player ' + player_id);
             let player_board_div = this.getPlayerPanelElement(player_id);
             dojo.place( this.format_block('jstpl_player_board_ext',
                                           {
@@ -93,22 +93,22 @@ function (dojo, declare) {
             _ when the game starts
             _ when a player refreshes the game page (F5)
 
-            "gamedatas" argument contains all datas retrieved by your
-            "getAllDatas" PHP method.
+            'gamedatas' argument contains all datas retrieved by your
+            'getAllDatas' PHP method.
         */
         setup: function( gamedatas ) {
-            console.log( "Starting game setup" );
+            console.log( 'Starting game setup' );
             thegame = this;
             this.thegamedatas = gamedatas;
             // Setting up player boards
-            console.log("Setting up player boards");
+            console.log('Setting up player boards');
             for( var player_id in gamedatas.players ) {
                 this.setupPlayerBoard( gamedatas.players[player_id] );
             }
 
             this.playerNumber = gamedatas.players[this.player_id].player_number;
 
-            console.log("Setting the the game board");
+            console.log('Setting the the game board');
             let board = $('board');
             // console.log( gamedatas.board );
 
@@ -137,7 +137,7 @@ function (dojo, declare) {
             // Set up the player's hand
             this.renderHand(gamedatas.hand);
 
-            console.log("Setting up available ziggurat cards");
+            console.log('Setting up available ziggurat cards');
             // Set up the ziggurat tiles
             for( let z = 0; z < gamedatas.ziggurat_cards.length; z++) {
                 card = gamedatas.ziggurat_cards[z];
@@ -148,14 +148,14 @@ function (dojo, declare) {
                 }
             }
 
-            console.log( "setting up notifications" );
+            console.log( 'setting up notifications' );
             this.setupNotifications();
 
-            console.log( "Ending game setup" );
+            console.log( 'Ending game setup' );
         },
 
         onHexSelection: function (event) {
-            console.log("onHexSelection:" + event.target.id);
+            console.log('onHexSelection:' + event.target.id);
             event.preventDefault();
             event.stopPropagation();
             switch (this.stateName) {
@@ -171,11 +171,11 @@ function (dojo, declare) {
         // Returns the hex (row,col) clicked on, or null if not a playable hex
         selectedHex: function(target) {
             let e = target;
-            while (e.parentElement != null && e.parentElement.id != "board") {
+            while (e.parentElement != null && e.parentElement.id != 'board') {
                 e = e.parentElement;
             }
             if (e.parentElement == null) {
-                console.log("didn't click on a hex");
+                console.log('no hex');
                 return null;
             }
             // now check if it's allowed
@@ -184,7 +184,7 @@ function (dojo, declare) {
                 console.log('not playable');
                 return null;
             }
-            let id = e.id.split("_");
+            let id = e.id.split('_');
             return {
                 row: id[1],
                 col: id[2],
@@ -196,28 +196,28 @@ function (dojo, declare) {
             if (hex == null) {
                 return;
             }
-            console.log("selected hex " + hex.row + "," + hex.col);
+            console.log('selected hex ' + hex.row + ',' + hex.col);
             let rc = {
                 row: hex.row,
                 col: hex.col
             };
-            this.bgaPerformAction("actSelectHexToScore", rc ).then(() =>  {
+            this.bgaPerformAction('actSelectHexToScore', rc ).then(() =>  {
                 this.markHexUnplayable(rc);
             });
         },
 
         playSelectedPiece: function(event) {
             if (this.selectedHandPos == null) {
-                console.log("no piece selected!");
+                console.log('no piece selected!');
             }
 
             let hex = this.selectedHex(event.target);
             if (hex == null) {
                 return;
             }
-            console.log("selected hex " + hex.row + "," + hex.col);
+            console.log('selected hex ' + hex.row + ',' + hex.col);
 
-            this.bgaPerformAction("actPlayPiece", {
+            this.bgaPerformAction('actPlayPiece', {
                 handpos: this.selectedHandPos,
                 row: hex.row,
                 col: hex.col
@@ -231,12 +231,12 @@ function (dojo, declare) {
         },
 
         markAllHexesUnplayable: function() {
-            $("board").querySelectorAll('.playable')
+            $('board').querySelectorAll('.playable')
                 .forEach(div => div.className = '');
         },
 
         pieceForHandDivClassList: function(cl) {
-            // console.log("pieceFor: " + cl);
+            // console.log('pieceFor: ' + cl);
             for (var i = 0; i < this.pieceClasses.length; ++i) {
                 if (cl.contains(this.handPieceClass(this.pieceClasses[i]))) {
                     return this.pieceClasses[i];
@@ -248,7 +248,7 @@ function (dojo, declare) {
         allowedMovesFor: function(cl) {
             let p = this.pieceForHandDivClassList(cl);
             if (p == null) {
-                console.log("no playable piece found");
+                console.log('no playable piece found');
                 return [];
             }
             let m = this.stateArgs.allowedMoves[p];
@@ -291,7 +291,7 @@ function (dojo, declare) {
             }
             let e = event.target;
             let zdiv = e.parentElement;
-            if (zdiv.id != "available_zcards") {
+            if (zdiv.id != 'available_zcards') {
                 return false;
             }
             let cl = e.classList;
@@ -309,7 +309,7 @@ function (dojo, declare) {
         },
 
         onPieceSelection: function(event) {
-            console.log("onPieceSelection");
+            console.log('onPieceSelection');
             event.preventDefault();
             event.stopPropagation();
             if(! this.isCurrentPlayerActive() ) {
@@ -320,25 +320,25 @@ function (dojo, declare) {
                 return false;
             }
             let selectedDiv = event.target;
-            if (selectedDiv.parentElement.id != "hand") {
+            if (selectedDiv.parentElement.id != 'hand') {
                 return false;
             }
             var playable = false;
             let c = selectedDiv.classList;
             if (this.allowedMovesFor(c).length > 0) {
-                if (!c.contains("selected")) {
+                if (!c.contains('selected')) {
                     this.unselectAllHandPieces();
                     this.markHexesPlayableForPiece(c);
                     playable = true;
                 } else {
                     this.markHexesUnplayableForPiece(c);
                 }
-                c.toggle("selected");
+                c.toggle('selected');
             }
             if (playable) {
-                this.selectedHandPos = selectedDiv.id.split("_")[1];
-                this.setClientState("client_pickHexToPlay", {
-                    descriptionmyturn : _("${you} must select a hex to play to"),
+                this.selectedHandPos = selectedDiv.id.split('_')[1];
+                this.setClientState('client_pickHexToPlay', {
+                    descriptionmyturn : _('${you} must select a hex to play to'),
                 });
                 this.addActionButton(
                     'cancel-btn',
@@ -390,12 +390,12 @@ function (dojo, declare) {
             this.selectedHandPos = null;
             if (this.stateArgs.canEndTurn) {
                 if (this.stateArgs.allowedMoves.length == 0) {
-                    this.setClientState("client_noPlaysLeft", {
-                        descriptionmyturn : _("${you} must end your turn"),
+                    this.setClientState('client_noPlaysLeft', {
+                        descriptionmyturn : _('${you} must end your turn'),
                     });
                 } else {
-                    this.setClientState("client_selectPieceOrEndTurn", {
-                        descriptionmyturn : _("${you} may select a piece to play or end your turn"),
+                    this.setClientState('client_selectPieceOrEndTurn', {
+                        descriptionmyturn : _('${you} may select a piece to play or end your turn'),
                     });
                     this.setPlayablePieces();
                 }
@@ -404,11 +404,11 @@ function (dojo, declare) {
                     'End turn',
                     () => {
                         this.unselectAllHandPieces();
-                        this.bgaPerformAction("actDonePlayPieces");
+                        this.bgaPerformAction('actDonePlayPieces');
                     });
             } else {
-                this.setClientState("client_mustSelectPiece", {
-                    descriptionmyturn : _("${you} must select a piece to play"),
+                this.setClientState('client_mustSelectPiece', {
+                    descriptionmyturn : _('${you} must select a piece to play'),
                 });
                 this.setPlayablePieces();
             }
@@ -456,7 +456,7 @@ function (dojo, declare) {
         //
         onLeavingState: function( stateName ) {
             console.log( 'Leaving state: '+stateName );
-            this.stateName = "";
+            this.stateName = '';
             switch( stateName ) {
                     /* Example:
 
@@ -475,24 +475,24 @@ function (dojo, declare) {
         },
 
         addImageActionButton: function(id, div, handler, bcolor, tooltip) {
-	    if (typeof bcolor == "undefined") {
-		bcolor = "gray";
+	    if (typeof bcolor == 'undefined') {
+		bcolor = 'gray';
 	    }
 	    // this will actually make a transparent button id color = gray
 	    this.addActionButton(id, div, handler, null, false, bcolor);
 	    // remove border, for images it better without
-	    dojo.style(id, "border", "none");
+	    dojo.style(id, 'border', 'none');
 	    // but add shadow style (box-shadow, see css)
-	    dojo.addClass(id, "shadow bgaimagebutton");
+	    dojo.addClass(id, 'shadow bgaimagebutton');
 	    // you can also add additional styles, such as background
 	    if (tooltip) {
-		dojo.attr(id, "title", tooltip);
+		dojo.attr(id, 'title', tooltip);
 	    }
 	    return $(id);
         },
 
         // onUpdateActionButtons: in this method you can manage
-        //                        "action buttons" that are displayed
+        //                        'action buttons' that are displayed
         //                        in the action status bar (ie: the
         //                        HTML links in the status bar).
         //
@@ -571,7 +571,7 @@ function (dojo, declare) {
                 if (d == null) {
                     hand.insertAdjacentHTML(
                         'beforeend',
-                        `<div id="hand_${j}"></div>`
+                        `<div id='hand_${j}'></div>`
                     );
                 }
             }
@@ -579,10 +579,10 @@ function (dojo, declare) {
         },
 
         handPieceClass: function(piece, playerNumber = null) {
-            if (piece == null || piece == "empty") {
-                return "unavailable";
+            if (piece == null || piece == 'empty') {
+                return 'unavailable';
             }
-            return piece + "_" + (playerNumber == null ? this.playerNumber : playerNumber);
+            return piece + '_' + (playerNumber == null ? this.playerNumber : playerNumber);
         },
 
         updateCounter: function(counter, value, animate) {
@@ -622,13 +622,13 @@ function (dojo, declare) {
             if (playerNumber == null) {
                 hex.firstElementChild.className = piece;
             } else {
-                hex.firstElementChild.className = piece + "_" + playerNumber;
+                hex.firstElementChild.className = piece + '_' + playerNumber;
             }
         },
 
         addZigguratCardDiv: function(id, parentElem, card, used = false) {
             const cls = used ? 'zc_used' : card;
-            const div = dojo.place( `<div id="${id}" class="${cls}"</div>`,
+            const div = dojo.place( `<div id='${id}' class='${cls}'</div>`,
                                     parentElem );
             this.addTooltip( id, this.card_tooltips[card], '' );
             // div.title = this.card_tooltips[card];
@@ -641,14 +641,14 @@ function (dojo, declare) {
             const newid = `ozig_${card}`;
             this.addZigguratCardDiv( newid, `b_zcards_${player_id}`, card, used );
 
-            // now mark the available zig card spot as "no class"
+            // now mark the available zig card spot as 'no class'
             var s = dojo.query( `#available_zcards .${card}` );
             if (s.length == 0) {
-                console.log("Couldn't find available card " + card);
+                console.log('Could not find available card ' + card);
                 return;
             }
             if (s.length > 1) {
-                console.log("More than one of the same available zig card?");
+                console.log('More than one of the same available zig card?');
             }
             s[0].classList.remove(card);
             this.removeTooltip(s[0].id);
@@ -662,7 +662,7 @@ function (dojo, declare) {
                            delay = 0,
                            time = 500) {
             let a = this.slideTemporaryObject(
-                `<div class="${className}"></div>`,
+                `<div class='${className}'></div>`,
                 parent,
                 from,
                 to,
@@ -693,7 +693,7 @@ function (dojo, declare) {
                     }
                 }
             } catch (e) {
-//                console.error(log,args,"Exception thrown", e.stack);
+//                console.error(log,args,'Exception thrown', e.stack);
             }
             try {
                 return this.inherited({callee: format_string_recursive}, arguments);
@@ -723,18 +723,18 @@ function (dojo, declare) {
                     return this.format_block(
                         'jstpl_log_piece',
                         {
-                            'piece': args[key] + "_" + args['player_number']
+                            'piece': args[key] + '_' + args['player_number']
                         });
                 default:
                     break;
             }
-            return "NOT SURE WHAT HAPPENED";
+            return 'NOT SURE WHAT HAPPENED';
         },
 
         setupNotifications: function() {
             console.log( 'notifications subscriptions setup' );
 
-            // Can add "wait time" in ms via
+            // Can add 'wait time' in ms via
             //   this.notifqueue.setSynchronous( 'cardPlayed', 3000 );
             [
                 'piecePlayed',
@@ -752,7 +752,7 @@ function (dojo, declare) {
             console.log( 'notif_extraTurnUsed', notif );
             const carddiv = $( 'ozig_zc_xturn' );
             if ( carddiv == undefined ) {
-                console.log( "Couldn't find owned extra turn card." );
+                console.log( 'Could not find owned extra turn card.' );
             } else {
                 carddiv.className = 'zc_used';
             }
@@ -760,7 +760,7 @@ function (dojo, declare) {
 
         notif_zigguratCardSelection: function( notif ) {
             console.log( 'notif_zigguratCardSelection', notif );
-            // TODO: also hand marking cards as "used"?
+            // TODO: also hand marking cards as 'used'?
             this.setZigguratCardOwned(notif.args.player_id,
                                       notif.args.zcard,
                                       // 10pts card used on acquisition
@@ -783,7 +783,7 @@ function (dojo, declare) {
                 this.slideDiv(
                     'city_blank',
                     hexDivId,
-                    // TODO: find a location for "off the board"
+                    // TODO: find a location for 'off the board'
                     'available_zcards'
                 );
             }
@@ -843,8 +843,8 @@ function (dojo, declare) {
             if (isActive) {
                 const handPosDiv = this.handPosDiv(notif.args.handpos);
                 sourceDivId = handPosDiv.id;
-                // Active player hand piece "removed" from hand.
-                handPosDiv.className = this.handPieceClass("empty");
+                // Active player hand piece 'removed' from hand.
+                handPosDiv.className = this.handPieceClass('empty');
             }
             this.slideDiv(
                 this.handPieceClass(notif.args.piece, notif.args.player_number),
@@ -866,8 +866,8 @@ function (dojo, declare) {
             var delay = 0;
             for (i = 0; i < notif.args.hand.length; i++) {
                 const div = this.handPosDiv(i);
-                if (notif.args.hand[i] != "empty"
-                    && div.className == "unavailable") {
+                if (notif.args.hand[i] != 'empty'
+                    && div.className == 'unavailable') {
                     let hc = this.handPieceClass(notif.args.hand[i]);
                     const a = this.slideDiv(
                         hc,
