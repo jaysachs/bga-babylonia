@@ -135,22 +135,22 @@ body {
   .merchant_1,
   .servant_1,
   .priest_1,
-  .hidden_1,
+  .empty_1,
   .farmer_2,
   .merchant_2,
   .servant_2,
   .priest_2,
-  .hidden_2,
+  .empty_2,
   .farmer_3,
   .merchant_3,
   .servant_3,
   .priest_3,
-  .hidden_3,
+  .empty_3,
   .farmer_4,
   .merchant_4,
   .servant_4,
   .priest_4,
-  .hidden_4
+  .empty_4
 {
     width: calc(var(--hex-height) - 4px);
     height: calc(var(--hex-height) - 4px);
@@ -160,16 +160,16 @@ body {
     background-size: 400% 500%;
 }
 
-.hidden_1, .empty_1 {
+.empty_1 {
     background-position: 0% 0;
 }
-.hidden_2, .empty_2    {
+.empty_2    {
     background-position: -100% 0;
 }
-.hidden_3, .empty_3    {
+.empty_3    {
     background-position: -200% 0;
 }
-.hidden_4, .empty_4    {
+.empty_4    {
     background-position: -300% 0;
 }
 .farmer_1    {
