@@ -16,7 +16,6 @@
  */
 
 var thegame = null;
-
 define([
     'dojo','dojo/_base/declare',
     'ebg/core/gamegui',
@@ -35,6 +34,10 @@ function (dojo, declare) {
             dojo.connect( $('board'), 'onclick', this, 'onHexSelection' );
             dojo.connect( $('available_zcards'), 'onclick', this, 'onZcardSelected');
         },
+
+        CSS_PLAYABLE: 'playable',
+        CSS_UNPLAYABLE: 'unplayable',
+        CSS_UNAVAILABLE: 'unavailable',
 
         selectedHandPos: null,
         pieceClasses: [ 'priest', 'servant', 'farmer', 'merchant' ],
@@ -180,7 +183,7 @@ function (dojo, declare) {
             }
             // now check if it's allowed
             let ae = e.firstElementChild.firstElementChild;
-            if (!ae.classList.contains('playable')) {
+            if (!ae.classList.contains(this.CSS_PLAYABLE)) {
                 console.log('not playable');
                 return null;
             }
@@ -231,8 +234,8 @@ function (dojo, declare) {
         },
 
         markAllHexesUnplayable: function() {
-            $('board').querySelectorAll('.playable')
-                .forEach(div => div.className = '');
+            $('board').querySelectorAll('.' + this.CSS_PLAYABLE)
+                .forEach(div => div.classList.remove(this.CSS_PLAYABLE));
         },
 
         pieceForHandDivClassList: function(cl) {
@@ -260,12 +263,12 @@ function (dojo, declare) {
 
         markHexPlayable: function (rc) {
             this.hexDiv(rc.row, rc.col).firstElementChild.firstElementChild
-                .classList.add('playable');
+                .classList.add(this.CSS_PLAYABLE);
         },
 
         markHexUnplayable: function (rc2) {
             this.hexDiv(rc2.row, rc2.col).firstElementChild.firstElementChild
-                .classList.remove('playable');
+                .classList.remove(this.CSS_PLAYABLE);
         },
 
         markScoreableHexesPlayable: function(hexes) {
@@ -361,8 +364,8 @@ function (dojo, declare) {
                     this.markHexesUnplayableForPiece(cl);
                 }
                 cl.remove('selected');
-                cl.remove('playable');
-                cl.remove('unplayable');
+                cl.remove(this.CSS_PLAYABLE);
+                cl.remove(this.CSS_UNPLAYABLE);
             }
             this.selectedHandPos = null;
         },
@@ -371,13 +374,13 @@ function (dojo, declare) {
             handDiv = $( 'hand' );
             for (const div of handDiv.children) {
                 cl = div.classList;
-                if (! cl.contains('unavailable')) {
+                if (! cl.contains(this.CSS_UNAVAILABLE)) {
                     if (this.allowedMovesFor(cl).length > 0) {
-                        cl.add('playable');
-                        cl.remove('unplayable');
+                        cl.add(this.CSS_PLAYABLE);
+                        cl.remove(this.CSS_UNPLAYABLE);
                     } else {
-                        cl.remove('playable');
-                        cl.add('unplayable');
+                        cl.remove(this.CSS_PLAYABLE);
+                        cl.add(this.CSS_UNPLAYABLE);
                     }
                 }
             }
@@ -580,7 +583,7 @@ function (dojo, declare) {
 
         handPieceClass: function(piece, playerNumber = null) {
             if (piece == null || piece == 'empty') {
-                return 'unavailable';
+                return this.CSS_UNAVAILABLE;
             }
             return piece + '_' + (playerNumber == null ? this.playerNumber : playerNumber);
         },
@@ -827,8 +830,8 @@ function (dojo, declare) {
                 () => {
                     if (isActive) {
                         cl = handPosDiv.classList;
-                        cl.remove('unavailable');
-                        cl.add('playable');
+                        cl.remove(this.CSS_UNAVAILABLE);
+                        cl.add(this.CSS_PLAYABLE);
                         cl.add(this.handPieceClass(notif.args.original_piece));
                     }
                     this.hand_counters[notif.args.player_id].incValue(1);
@@ -867,7 +870,7 @@ function (dojo, declare) {
             for (i = 0; i < notif.args.hand.length; i++) {
                 const div = this.handPosDiv(i);
                 if (notif.args.hand[i] != 'empty'
-                    && div.className == 'unavailable') {
+                    && div.classList.contains(this.CSS_UNAVAILABLE)) {
                     let hc = this.handPieceClass(notif.args.hand[i]);
                     const a = this.slideDiv(
                         hc,
