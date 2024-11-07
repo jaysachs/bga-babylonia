@@ -849,7 +849,7 @@ function (dojo, declare) {
                 const handPosDiv = this.handPosDiv(notif.args.handpos);
                 sourceDivId = handPosDiv.id;
                 // Active player hand piece 'removed' from hand.
-                handPosDiv.className = this.handPieceClass('empty');
+                handPosDiv.classList.add(this.CSS_UNAVAILABLE);
             }
             this.slideDiv(
                 this.handPieceClass(notif.args.piece, notif.args.player_number),
