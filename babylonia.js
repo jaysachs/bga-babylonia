@@ -37,7 +37,7 @@ function (dojo, declare) {
 
         CSS_PLAYABLE: 'playable',
         CSS_UNPLAYABLE: 'unplayable',
-        CSS_UNAVAILABLE: 'unavailable',
+        CSS_EMPTY: 'empty',
         ID_AVAILABLE_ZCARDS: 'available_zcards',
         ID_BOARD: 'board',
 
@@ -376,7 +376,7 @@ function (dojo, declare) {
             handDiv = $( 'hand' );
             for (const div of handDiv.children) {
                 cl = div.classList;
-                if (! cl.contains(this.CSS_UNAVAILABLE)) {
+                if (! cl.contains(this.CSS_EMPTY)) {
                     if (this.allowedMovesFor(cl).length > 0) {
                         cl.add(this.CSS_PLAYABLE);
                         cl.remove(this.CSS_UNPLAYABLE);
@@ -572,20 +572,23 @@ function (dojo, declare) {
             // dynamically extend hand as needed.
             const hand = $(`hand`);
             for (j = 0; j <= i; ++j) {
-                let d = $(`hand_${j}`);
+                let id = `hand_${j}`;
+                let d = $(id);
                 if (d == null) {
-                    hand.insertAdjacentHTML(
-                        'beforeend',
-                        `<div id='hand_${j}' class="unavailable"></div>`
-                    );
+                    dojo.create('div',
+                                {
+                                    id: id,
+                                    className: this.CSS_EMPTY,
+                                },
+                                hand);
                 }
             }
             return $(id);
         },
 
         handPieceClass: function(piece, playerNumber = null) {
-            if (piece == null || piece == 'empty') {
-                return this.CSS_UNAVAILABLE;
+            if (piece == null || piece == this.CSS_EMPTY) {
+                return this.CSS_EMPTY;
             }
             return piece + '_' + (playerNumber == null ? this.playerNumber : playerNumber);
         },
@@ -832,7 +835,7 @@ function (dojo, declare) {
                 () => {
                     if (isActive) {
                         cl = handPosDiv.classList;
-                        cl.remove(this.CSS_UNAVAILABLE);
+                        cl.remove(this.CSS_EMPTY);
                         cl.add(this.CSS_PLAYABLE);
                         cl.add(this.handPieceClass(notif.args.original_piece));
                     }
@@ -849,7 +852,7 @@ function (dojo, declare) {
                 const handPosDiv = this.handPosDiv(notif.args.handpos);
                 sourceDivId = handPosDiv.id;
                 // Active player hand piece 'removed' from hand.
-                handPosDiv.classList.add(this.CSS_UNAVAILABLE);
+                handPosDiv.classList.add(this.CSS_EMPTY);
             }
             this.slideDiv(
                 this.handPieceClass(notif.args.piece, notif.args.player_number),
@@ -871,8 +874,8 @@ function (dojo, declare) {
             var delay = 0;
             for (i = 0; i < notif.args.hand.length; i++) {
                 const div = this.handPosDiv(i);
-                if (notif.args.hand[i] != 'empty'
-                    && div.classList.contains(this.CSS_UNAVAILABLE)) {
+                if (notif.args.hand[i] != this.CSS_EMPTY
+                    && div.classList.contains(this.CSS_EMPTY)) {
                     let hc = this.handPieceClass(notif.args.hand[i]);
                     const a = this.slideDiv(
                         hc,
