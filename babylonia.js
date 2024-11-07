@@ -52,6 +52,45 @@ function (dojo, declare) {
         pool_counters: [],
         city_counters: [],
 
+        /*
+            setup:
+
+            This method must set up the game user interface according
+            to current game situation specified in parameters.
+
+            The method is called each time the game interface is
+            displayed to a player, ie:
+            _ when the game starts
+            _ when a player refreshes the game page (F5)
+
+            'gamedatas' argument contains all datas retrieved by your
+            'getAllDatas' PHP method.
+        */
+        setup: function( gamedatas ) {
+            console.log( 'Starting game setup' );
+            thegame = this;
+            this.thegamedatas = gamedatas;
+            this.playerNumber = gamedatas.players[this.player_id].player_number;
+
+            // Setting up player boards
+            console.log('Setting up player boards');
+            for( var player_id in gamedatas.players ) {
+                this.setupPlayerBoard( gamedatas.players[player_id] );
+            }
+
+            this.setupBoard(gamedatas.board, gamedatas.players);
+
+            console.log("Setting up player hand");
+            this.renderHand(gamedatas.hand);
+
+            this.setupAvailableZcards(gamedatas.ziggurat_cards);
+
+            console.log( 'setting up notifications' );
+            this.setupNotifications();
+
+            console.log( 'Game setup done.' );
+        },
+
         setupPlayerBoard: function( player ) {
             let player_id = player.player_id;
             console.log('Setting up board for player ' + player_id);
@@ -76,49 +115,13 @@ function (dojo, declare) {
             this.updateCapturedCityCount(player, false);
         },
 
-        handcount_id: function(player_id) {
-            return 'handcount_' + player_id;
-        },
-        poolcount_id: function(player_id) {
-            return 'poolcount_' + player_id;
-        },
-        citycount_id: function(player_id) {
-            return 'citycount_' + player_id;
-        },
-
-
-        /*
-            setup:
-
-            This method must set up the game user interface according
-            to current game situation specified in parameters.
-
-            The method is called each time the game interface is
-            displayed to a player, ie:
-            _ when the game starts
-            _ when a player refreshes the game page (F5)
-
-            'gamedatas' argument contains all datas retrieved by your
-            'getAllDatas' PHP method.
-        */
-        setup: function( gamedatas ) {
-            console.log( 'Starting game setup' );
-            thegame = this;
-            this.thegamedatas = gamedatas;
-            // Setting up player boards
-            console.log('Setting up player boards');
-            for( var player_id in gamedatas.players ) {
-                this.setupPlayerBoard( gamedatas.players[player_id] );
-            }
-
-            this.playerNumber = gamedatas.players[this.player_id].player_number;
-
+        setupBoard: function( boardData, playersData ) {
             console.log('Setting the the game board');
-            let board = $( this.ID_BOARD );
+            let boardDiv = $( this.ID_BOARD );
             // console.log( gamedatas.board );
 
-            for( let h = 0; h < gamedatas.board.length; ++h) {
-                let hex = gamedatas.board[h];
+            for( let h = 0; h < boardData.length; ++h) {
+                let hex = boardData[h];
 
                 dojo.place( this.format_block('jstpl_hex',
                                               {
@@ -128,35 +131,44 @@ function (dojo, declare) {
                                                   'top': hex.row * 31.75 + 6,
                                                   'left': 38 + (hex.col * 55)
                                               } ),
-                            board );
+                            boardDiv );
 
                 let p = hex.piece;
                 if (p != null) {
                     let n = (hex.board_player == 0)
                         ? null
-                        : gamedatas.players[hex.board_player].player_number;
+                        : playersData[hex.board_player].player_number;
                     this.renderPlayedPiece(hex.row, hex.col, p, n);
                 }
             }
+        },
 
-            // Set up the player's hand
-            this.renderHand(gamedatas.hand);
-
+        setupAvailableZcards: function(zcards) {
             console.log('Setting up available ziggurat cards');
             // Set up the ziggurat tiles
-            for( let z = 0; z < gamedatas.ziggurat_cards.length; z++) {
-                card = gamedatas.ziggurat_cards[z];
+            for( let z = 0; z < zcards.length; z++) {
+                let card = zcards[z];
                 this.card_tooltips[card.type] = card.tooltip;
-                this.addZigguratCardDiv( `zig${z}`, this.ID_AVAILABLE_ZCARDS, card.type, card.used);
+                this.addZigguratCardDiv(`zig${z}`,
+                                        this.ID_AVAILABLE_ZCARDS,
+                                        card.type,
+                                        card.used);
                 if ( card.owning_player_id != 0 ) {
-                    this.setZigguratCardOwned(card.owning_player_id, card.type, card.used);
+                    this.setZigguratCardOwned(card.owning_player_id,
+                                              card.type,
+                                              card.used);
                 }
             }
+        },
 
-            console.log( 'setting up notifications' );
-            this.setupNotifications();
-
-            console.log( 'Ending game setup' );
+        handcount_id: function(player_id) {
+            return 'handcount_' + player_id;
+        },
+        poolcount_id: function(player_id) {
+            return 'poolcount_' + player_id;
+        },
+        citycount_id: function(player_id) {
+            return 'citycount_' + player_id;
         },
 
         onHexSelection: function (event) {
