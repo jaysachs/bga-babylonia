@@ -778,7 +778,7 @@ function (dojo, declare) {
 
         notif_cityScored: function( notif ) {
             console.log( 'notif_cityScored', notif );
-            this.renderPlayedPiece( notif.args.row, notif.args.col, 'empty', null );
+            this.renderPlayedPiece( notif.args.row, notif.args.col, '', null );
             const hexDivId = this.hexDivId(notif.args.row, notif.args.col);
 
             if ( notif.args.captured_by != 0 ) {
