@@ -860,14 +860,18 @@ function (dojo, declare) {
             console.log( 'notif_piecePlayed', notif );
             const isActive = this.playerNumber == notif.args.player_number;
             var sourceDivId = this.handcount_id(notif.args.player_id);
+            let hpc = this.handPieceClass(notif.args.piece,
+                                          notif.args.player_number);
             if (isActive) {
                 const handPosDiv = this.handPosDiv(notif.args.handpos);
                 sourceDivId = handPosDiv.id;
                 // Active player hand piece 'removed' from hand.
-                handPosDiv.classList.add(this.CSS_EMPTY);
+                let cl = handPosDiv.classList;
+                cl.remove(hpc);
+                cl.add(this.CSS_EMPTY);
             }
             this.slideDiv(
-                this.handPieceClass(notif.args.piece, notif.args.player_number),
+                hpc,
                 sourceDivId,
                 this.hexDiv(notif.args.row, notif.args.col).id,
                 () => {
