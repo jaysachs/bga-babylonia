@@ -251,6 +251,7 @@ body {
     height: calc(var(--hex-height) - 4px); // 57px
     background-size: 400% 500%;
     border-radius: 100%;
+    border-style: none;
     margin: 5px;
     /* shared with .piece */
     background-image: url(img/pieces.png);
@@ -271,10 +272,12 @@ body {
 
 #hand > div.playable {
     cursor: pointer;
+    /*
     border-color: #ffFFdd;
     border-style: solid;
     margin: 4px;
     border-width: 1px;
+*/
 }
 
 #hand > div.unplayable {
