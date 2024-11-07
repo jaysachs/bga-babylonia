@@ -32,12 +32,14 @@ function (dojo, declare) {
 
             dojo.connect( $('hand'), 'onclick', this, 'onPieceSelection' );
             dojo.connect( $('board'), 'onclick', this, 'onHexSelection' );
-            dojo.connect( $('available_zcards'), 'onclick', this, 'onZcardSelected');
+            dojo.connect( $(this.ID_AVAILABLE_ZCARDS), 'onclick', this, 'onZcardSelected');
         },
 
         CSS_PLAYABLE: 'playable',
         CSS_UNPLAYABLE: 'unplayable',
         CSS_UNAVAILABLE: 'unavailable',
+        ID_AVAILABLE_ZCARDS: 'available_zcards',
+        ID_BOARD: 'board',
 
         selectedHandPos: null,
         pieceClasses: [ 'priest', 'servant', 'farmer', 'merchant' ],
@@ -112,7 +114,7 @@ function (dojo, declare) {
             this.playerNumber = gamedatas.players[this.player_id].player_number;
 
             console.log('Setting the the game board');
-            let board = $('board');
+            let board = $( this.ID_BOARD );
             // console.log( gamedatas.board );
 
             for( let h = 0; h < gamedatas.board.length; ++h) {
@@ -145,7 +147,7 @@ function (dojo, declare) {
             for( let z = 0; z < gamedatas.ziggurat_cards.length; z++) {
                 card = gamedatas.ziggurat_cards[z];
                 this.card_tooltips[card.type] = card.tooltip;
-                this.addZigguratCardDiv( `zig${z}`, 'available_zcards', card.type, card.used);
+                this.addZigguratCardDiv( `zig${z}`, this.ID_AVAILABLE_ZCARDS, card.type, card.used);
                 if ( card.owning_player_id != 0 ) {
                     this.setZigguratCardOwned(card.owning_player_id, card.type, card.used);
                 }
@@ -158,7 +160,7 @@ function (dojo, declare) {
         },
 
         onHexSelection: function (event) {
-            console.log('onHexSelection:' + event.target.id);
+            // console.log('onHexSelection:' + event.target.id);
             event.preventDefault();
             event.stopPropagation();
             switch (this.stateName) {
@@ -174,17 +176,17 @@ function (dojo, declare) {
         // Returns the hex (row,col) clicked on, or null if not a playable hex
         selectedHex: function(target) {
             let e = target;
-            while (e.parentElement != null && e.parentElement.id != 'board') {
+            while (e.parentElement != null && e.parentElement.id != this.ID_BOARD) {
                 e = e.parentElement;
             }
             if (e.parentElement == null) {
-                console.log('no hex');
+                console.warn('no hex');
                 return null;
             }
             // now check if it's allowed
             let ae = e.firstElementChild.firstElementChild;
             if (!ae.classList.contains(this.CSS_PLAYABLE)) {
-                console.log('not playable');
+                // console.log('not playable');
                 return null;
             }
             let id = e.id.split('_');
@@ -199,7 +201,7 @@ function (dojo, declare) {
             if (hex == null) {
                 return;
             }
-            console.log('selected hex ' + hex.row + ',' + hex.col);
+            // console.log('selected hex ' + hex.row + ',' + hex.col);
             let rc = {
                 row: hex.row,
                 col: hex.col
@@ -211,14 +213,14 @@ function (dojo, declare) {
 
         playSelectedPiece: function(event) {
             if (this.selectedHandPos == null) {
-                console.log('no piece selected!');
+                console.error('no piece selected!');
             }
 
             let hex = this.selectedHex(event.target);
             if (hex == null) {
                 return;
             }
-            console.log('selected hex ' + hex.row + ',' + hex.col);
+            // console.log('selected hex ' + hex.row + ',' + hex.col);
 
             this.bgaPerformAction('actPlayPiece', {
                 handpos: this.selectedHandPos,
@@ -234,7 +236,7 @@ function (dojo, declare) {
         },
 
         markAllHexesUnplayable: function() {
-            $('board').querySelectorAll('.' + this.CSS_PLAYABLE)
+            $(this.ID_BOARD).querySelectorAll('.' + this.CSS_PLAYABLE)
                 .forEach(div => div.classList.remove(this.CSS_PLAYABLE));
         },
 
@@ -251,7 +253,7 @@ function (dojo, declare) {
         allowedMovesFor: function(cl) {
             let p = this.pieceForHandDivClassList(cl);
             if (p == null) {
-                console.log('no playable piece found');
+                console.error('no playable piece found');
                 return [];
             }
             let m = this.stateArgs.allowedMoves[p];
@@ -294,7 +296,7 @@ function (dojo, declare) {
             }
             let e = event.target;
             let zdiv = e.parentElement;
-            if (zdiv.id != 'available_zcards') {
+            if (zdiv.id != this.ID_AVAILABLE_ZCARDS) {
                 return false;
             }
             let cl = e.classList;
@@ -303,7 +305,7 @@ function (dojo, declare) {
                 if (c.startsWith('zc_')) {
                     this.bgaPerformAction('actSelectZigguratCard',
                                           { card_type: c });
-                    let div = $( 'available_zcards' );
+                    let div = $( this.ID_AVAILABLE_ZCARDS );
                     div.classList.remove('selecting');
                     return false;
                 }
@@ -531,7 +533,7 @@ function (dojo, declare) {
                         break;
 
                     case 'selectZigguratCard':
-                        let div = $( 'available_zcards' );
+                        let div = $( this.ID_AVAILABLE_ZCARDS );
                         div.scrollIntoView( false );
                         div.classList.add('selecting');
                         this.updateStatusBar(_('You must select a ziggurat card'));
@@ -647,11 +649,11 @@ function (dojo, declare) {
             // now mark the available zig card spot as 'no class'
             var s = dojo.query( `#available_zcards .${card}` );
             if (s.length == 0) {
-                console.log('Could not find available card ' + card);
+                console.error('Could not find available card ' + card);
                 return;
             }
             if (s.length > 1) {
-                console.log('More than one of the same available zig card?');
+                console.warn('More than one of the same available zig card?');
             }
             s[0].classList.remove(card);
             this.removeTooltip(s[0].id);
@@ -661,7 +663,7 @@ function (dojo, declare) {
                            from,
                            to,
                            onEnd = null,
-                           parent = 'board',
+                           parent = this.ID_BOARD,
                            delay = 0,
                            time = 500) {
             let a = this.slideTemporaryObject(
@@ -755,7 +757,7 @@ function (dojo, declare) {
             console.log( 'notif_extraTurnUsed', notif );
             const carddiv = $( 'ozig_zc_xturn' );
             if ( carddiv == undefined ) {
-                console.log( 'Could not find owned extra turn card.' );
+                console.error( 'Could not find owned extra turn card.' );
             } else {
                 carddiv.className = 'zc_used';
             }
@@ -787,7 +789,7 @@ function (dojo, declare) {
                     'city_blank',
                     hexDivId,
                     // TODO: find a location for 'off the board'
-                    'available_zcards'
+                    this.ID_AVAILABLE_ZCARDS
                 );
             }
         },
