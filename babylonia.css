@@ -256,7 +256,7 @@ body {
     background-image: url(img/pieces.png);
 }
 
-#hand > div.unavailable {
+#hand > div.empty {
     /* consider distinguishing just-played hand spots with: */
     /*
     border-width: 2px;
@@ -363,6 +363,8 @@ div.b_handpoolcity {
 div.b_handpoolcity > div {
     display: inline-block;
     flex: 1;
+    margin-left: 0px;
+    margin-right: 0px;
 }
 
 div.b_handpoolcity .b_counter {
@@ -393,7 +395,8 @@ div.b_handpoolcity .b_hand_label {
 
 div.b_handpoolcity .b_pool_label {
     display: inline-block;
-    margin-right: -2.0em;
+    margin-right: -2em;
+    margin-left: 0;
     height: 2.1em;
     width: 2.1em;
     background-image: url(img/pieces.png);
