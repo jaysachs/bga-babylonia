@@ -52,11 +52,13 @@ body {
 }
 
 
-.board > div > div > div.playable {
+.board > div.playable {
     content: url(img/highlight.png);
     object-fit: cover;
+    /*
     width: 100%;
     height: 100%;
+*/
     /*
     background-color: white;
     opacity: 0.2;
@@ -131,7 +133,7 @@ body {
     background: url(img/cities.png) 0% -1300%;
 }
 
-  .farmer_1,
+  .board > div.farmer_1,
   .merchant_1,
   .servant_1,
   .priest_1,
@@ -151,11 +153,14 @@ body {
   .servant_4,
   .priest_4,
   .hidden_4
-{
+  {
+      clip-path: none;
+      /*
     width: calc(var(--hex-height) - 4px);
     height: calc(var(--hex-height) - 4px);
     margin-top: 3px;
     margin-left: 7px;
+*/
     background-image: url(img/pieces.png);
     background-size: 400% 500%;
 }
@@ -244,15 +249,17 @@ body {
     padding-right: 16px;
 }
 
+
 .hand > div {
     position: relative;
     display: inline-block;
-    width: calc(var(--hex-height) - 4px); // 57px
-    height: calc(var(--hex-height) - 4px); // 57px
+    width: calc(var(--hex-width));
+    height: calc(var(--hex-height));
     background-size: 400% 500%;
     border-radius: 100%;
     border-style: none;
-    margin: 5px;
+    margin-top: 5px;
+    margin-bottom: 5px;
     /* shared with .piece */
     background-image: url(img/pieces.png);
 }
@@ -264,10 +271,15 @@ body {
     border-style: dotted;
     border-color: black;
    */
-
+    height: calc(0.92*var(--hex-height));
+    width: calc(0.92*var(--hex-height));
+    margin-left: calc((var(--hex-width) - var(--hex-height)));
+    margin-right: calc(1.2*(var(--hex-width) - var(--hex-height)));
+    padding: 0px;
+    background-origin: content-box;
     background-image: unset;
     background-color: white;
-    opacity: 0.1;
+    opacity: 0.3;
 }
 
 #hand > div.playable {
@@ -287,10 +299,15 @@ body {
 }
 
 #hand > div.selected {
-    margin: 0px;
+    /*
+    border-radius: 100%;
+    width: calc(var(--hex-height));
+    height: calc(var(--hex-height));
     border-color: yellow;
     border-style: solid;
-    border-width: 5px;
+    border-width: 4px;
+   */
+    content: url(img/piecehl.png);
 /*    opacity: 0.8; */
 }
 
