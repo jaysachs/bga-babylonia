@@ -19,8 +19,10 @@
 body {
     --board-width: 1024px;
     --board-height: 768px;
-    --hex-width: calc(var(--board-width)/14.63); // 70px;
-    --hex-height: calc(var(--board-height)/12.59); // 61px;
+    --hex-ratio: 1.155;
+    --hex-height: calc(var(--board-height)/12.59); /* 61px; */
+    --hex-width2: calc(var(--board-width)/14.63); /* 70px; */
+    --hex-width: calc(var(--hex-height) * var(--hex-ratio)); /* 70px; */
 }
 
 #board {
@@ -351,6 +353,11 @@ body {
  * Player boards
  */
 
+.b_playerboard_ext {
+    --label-height: 2.0em;
+    --label-width: calc(var(--hex-ratio) * var(--label-height));
+}
+
 div.b_handpoolcity {
     margin-top: 10px;
     display: flex;
@@ -362,6 +369,7 @@ div.b_handpoolcity > div {
     flex: 1;
     margin-left: 0px;
     margin-right: 0px;
+    height: calc(var(--label-height));
 }
 
 div.b_handpoolcity .b_counter {
@@ -372,19 +380,10 @@ div.b_handpoolcity .b_counter {
 /*    height: 2.1em; */
 }
 
-div.b_handpoolcity .b_citycount_label {
-    display: inline-block;
-    height: 2.1em;
-    width: 2.4em;
-    background: url(img/cities.png) 0% -800%;
-    background-color: transparent;
-    background-size: 100% 1400%;
-}
-
 div.b_handpoolcity .b_hand_label {
     display: inline-block;
-    height: 2.1em;
-    width: 2.1em;
+    height: calc(var(--label-height));
+    width: calc(var(--label-width));
     background-image: url(img/pieces.png);
     background-color: transparent;
     background-size: 400% 500%;
@@ -392,13 +391,22 @@ div.b_handpoolcity .b_hand_label {
 
 div.b_handpoolcity .b_pool_label {
     display: inline-block;
-    margin-right: -2em;
+    margin-right: -2.2em;
     margin-left: 0;
-    height: 2.1em;
-    width: 2.1em;
+    height: calc(var(--label-height));
+    width: calc(var(--label-width));
     background-image: url(img/pieces.png);
     background-color: transparent;
     background-size: 400% 500%;
+}
+
+div.b_handpoolcity .b_citycount_label {
+    display: inline-block;
+    height: calc(var(--label-height));
+    width: calc(var(--label-width));
+    background: url(img/cities.png) 0% -800%;
+    background-color: transparent;
+    background-size: 100% 1400%;
 }
 
 div.b_handpoolcity > .b_pool > .b_counter {
@@ -407,8 +415,8 @@ div.b_handpoolcity > .b_pool > .b_counter {
 
 div.b_zcards span.b_zcard_label {
     display: inline-block;
-    height: 2.1em;
-    width: 2.1em;
+    height: calc(var(--label-height));
+    width: calc(var(--label-width));
     background: url(img/cities.png) 0% -1300%;
     background-color: transparent;
     background-size: 100% 1400%;
