@@ -196,7 +196,7 @@ function (dojo, declare) {
                 return null;
             }
             // now check if it's allowed
-            let ae = e.firstElementChild.firstElementChild;
+            let ae = e;
             if (!ae.classList.contains(this.CSS_PLAYABLE)) {
                 // console.log('not playable');
                 return null;
@@ -276,12 +276,12 @@ function (dojo, declare) {
         },
 
         markHexPlayable: function (rc) {
-            this.hexDiv(rc.row, rc.col).firstElementChild.firstElementChild
+            this.hexDiv(rc.row, rc.col)
                 .classList.add(this.CSS_PLAYABLE);
         },
 
         markHexUnplayable: function (rc2) {
-            this.hexDiv(rc2.row, rc2.col).firstElementChild.firstElementChild
+            this.hexDiv(rc2.row, rc2.col)
                 .classList.remove(this.CSS_PLAYABLE);
         },
 
@@ -640,9 +640,9 @@ function (dojo, declare) {
         renderPlayedPiece: function (row, col, piece, playerNumber) {
             let hex = this.hexDiv(row, col);
             if (playerNumber == null) {
-                hex.firstElementChild.className = piece;
+                hex.className = piece;
             } else {
-                hex.firstElementChild.className = piece + '_' + playerNumber;
+                hex.className = piece + '_' + playerNumber;
             }
         },
 

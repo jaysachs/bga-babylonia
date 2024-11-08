@@ -59,7 +59,7 @@
 
   const jstpl_hex =
     '<div id="hex_${row}_${col}" style="top:${top}px; left:${left}px;">\
-       <div><div></div></div>\
+       <div></div>\
      </div>';
 
 </script>
