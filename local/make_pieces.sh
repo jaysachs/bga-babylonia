@@ -23,3 +23,6 @@ magick -size 800x100 -gravity center canvas:none -stroke none -background black 
        +append img/stand.png
 
 magick -size 100x87 -gravity center \( canvas:none -stroke yellow -strokewidth 5 -fill none -draw 'circle 50,43 50,84' \) -append img/piecehl.png
+
+# remember this technique -- can specify alpha channel directly w/ 4-byte hex colors
+magick -size 100x87 -gravity center \( canvas:none -background none -stroke \#FFFFFF30 -strokewidth 2 -fill \#FFFFFF30 -draw 'circle 50,43,50,81' \) -append img/piecealpha.png

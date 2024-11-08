@@ -256,7 +256,6 @@ body {
     width: calc(var(--hex-width));
     height: calc(var(--hex-height));
     background-size: 400% 500%;
-    border-radius: 100%;
     border-style: none;
     margin-top: 5px;
     margin-bottom: 5px;
@@ -265,21 +264,8 @@ body {
 }
 
 #hand > div.empty {
-    /* consider distinguishing just-played hand spots with: */
-    /*
-    border-width: 2px;
-    border-style: dotted;
-    border-color: black;
-   */
-    height: calc(0.92*var(--hex-height));
-    width: calc(0.92*var(--hex-height));
-    margin-left: calc((var(--hex-width) - var(--hex-height)));
-    margin-right: calc(1.2*(var(--hex-width) - var(--hex-height)));
-    padding: 0px;
-    background-origin: content-box;
-    background-image: unset;
-    background-color: white;
-    opacity: 0.3;
+    background-image: url(img/piecealpha.png);
+    background-size: 100% 100%;
 }
 
 #hand > div.playable {
@@ -299,16 +285,7 @@ body {
 }
 
 #hand > div.selected {
-    /*
-    border-radius: 100%;
-    width: calc(var(--hex-height));
-    height: calc(var(--hex-height));
-    border-color: yellow;
-    border-style: solid;
-    border-width: 4px;
-   */
     content: url(img/piecehl.png);
-/*    opacity: 0.8; */
 }
 
 #available_zcards {
