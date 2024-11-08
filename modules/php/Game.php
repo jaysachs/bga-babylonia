@@ -162,9 +162,15 @@ class Game extends \Table
      */
     public function getGameProgression()
     {
-        // TODO: compute and return the game progression
-
-        return 0;
+        $model = new Model($this->ps, $this->activePlayerId());
+        $player_infos = $model->allPlayerInfo();
+        $total_pieces = 0;
+        $played_pieces = 0;
+        foreach ($player_infos as $pid => $pi) {
+            $total_pieces += 30;
+            $played_pieces += 30 - $pi->hand_size - $pi->pool_size;
+        }
+        return intval(($played_pieces * 100) / $total_pieces);
     }
 
     private function scoreHex(Model $model, Hex $hex): int {
