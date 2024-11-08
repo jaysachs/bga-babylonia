@@ -7,3 +7,17 @@
 13. Consider hex-highlighting (and piece?) via filters or other CSS-wizardry (but careful of iOS performance issues).
 19. Audit all notifications; are they all required? any missing? incomplete?
 21. Animate hex networks during city scoring.
+22. statistics:
+* which zig cards chosen
+* which zig cards available
+* cities captured
+* zigs captured
+* cities score triggering
+* zigs score triggering
+* largest number of tokens played per turn
+* fields captured
+  (broken down by type?)
+* points from captured fields
+* points from ziggurat "pings"
+* points from ziggurat cards
+* points from cities
