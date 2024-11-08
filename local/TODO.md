@@ -21,3 +21,4 @@
 * points from ziggurat "pings"
 * points from ziggurat cards
 * points from cities
+23. Fix rendering of unplayable hand pieces (piece-sized alpha as content?)
