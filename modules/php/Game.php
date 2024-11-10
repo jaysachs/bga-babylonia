@@ -34,7 +34,7 @@ class Game extends \Table
     //  the ID of the "primary" player, i.e. who should become active
     //  once the ziggurat card is selected.
     private const GLOBAL_PLAYER_ON_TURN = 'player_on_turn';
-    private const GLOBAL_NEXT_PLAYER_ACTIVE = 'next_player_active';
+    private const GLOBAL_NEXT_PLAYER_ACTIVE = 'next_player_to_be_active';
 
     private PersistentStore $ps;
     /**
@@ -53,7 +53,7 @@ class Game extends \Table
 
         $this->initGameStateLabels([
             Game::GLOBAL_PLAYER_ON_TURN => 10,
-            Game::GLOBAL_NEXT_PLAYER_ACTIVE => 11,
+            Game::GLOBAL_NEXT_PLAYER_TO_BE_ACTIVE => 11,
             Option::ADVANCED_ZIGGURAT_CARDS->value => 100
         ]);
 
@@ -268,7 +268,7 @@ class Game extends \Table
     }
 
     public function stZigguratScoring(): void {
-        $next_player_id = $this->nextActivePlayer();
+        $next_player_id = $this->nextPlayerToBeActive();
         if ($next_player_id != 0) {
             if ($next_player_id != $this->activePlayerId()) {
                 $this->gamestate->changeActivePlayer($next_player_id);
@@ -350,7 +350,7 @@ class Game extends \Table
         $piece = $hex->piece;
         $next_player = $this->scoreHex($model, $hex);
         if ($next_player != 0) {
-            $this->setNextActivePlayer($next_player);
+            $this->setNextPlayerToBeActive($next_player);
         }
 
         if ($piece->isCity()) {
@@ -371,7 +371,7 @@ class Game extends \Table
         $model = new Model($this->ps, $player_id);
         $hexes = $model->hexesRequiringScoring();
 
-        $this->setNextActivePlayer(0);
+        $this->setNextPlayerToBeActive(0);
 
         // TODO: make auto-choice when there is 1 a preference or game option.
         if (count($hexes) > 0 /* 1 */) {
@@ -443,7 +443,7 @@ class Game extends \Table
             ]
         );
 
-        $this->setNextActivePlayer(0);
+        $this->setNextPlayerToBeActive(0);
 
         if ($model->components()->hasUnusedZigguratCard($player_id, ZigguratCardtype::EXTRA_TURN)) {
             $this->gamestate->nextState("extraTurn");
@@ -563,12 +563,14 @@ class Game extends \Table
         $this->setGameStateValue(Game::GLOBAL_PLAYER_ON_TURN, $player_id);
     }
 
-    private function nextActivePlayer(): int {
-        return intval($this->getGameStateValue(Game::GLOBAL_NEXT_PLAYER_ACTIVE));
+    private function nextPlayerToBeActive(): int {
+        return intval(
+            $this->getGameStateValue(Game::GLOBAL_NEXT_PLAYER_TO_BE_ACTIVE));
     }
 
-    private function setNextActivePlayer(int $player_id) {
-        $this->setGameStateValue(Game::GLOBAL_NEXT_PLAYER_ACTIVE, $player_id);
+    private function setNextPlayerToBeActive(int $player_id) {
+        $this->setGameStateValue(Game::GLOBAL_NEXT_PLAYER_TO_BE_ACTIVE,
+                                 $player_id);
     }
 
 
