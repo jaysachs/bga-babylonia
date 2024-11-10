@@ -63,7 +63,7 @@
 </script>
 
     <div id="main">
-      <div id="vars"></div>
+      <span id="vars"></span>
       <div id="hand_container">
         <div class="hand" id="hand">
 	</div>
