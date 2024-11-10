@@ -225,8 +225,25 @@
       </div>
       <div class="board-spacer"></div>
       <div class="board" id="board" onClick="selectHex(event)">
+        <script>
+          var dojoConfig = {
+              async: true,
+              // This code registers the correct location of the "demo"
+              // package so we can load Dojo from the CDN whilst still
+              // being able to load local modules
+              packages: [{
+                  name: "babylonia",
+                  location: location.pathname.replace(/\/[^/]*$/, '') + '/../modules/js'
+              }]
+          };
+        </script>
+        <script src="//ajax.googleapis.com/ajax/libs/dojo/1.10.4/dojo/dojo.js"
+                data-dojo-config="async: true"></script>
         <script type="module">
-          import {hexLocation} from "../modules/js/hexloc.js";
+
+          require([
+              'babylonia/hexloc'
+          ], function(hexloc) {
 
           var boardData = [];
           for (var c = 0; c < 16; c++) {
@@ -242,7 +259,7 @@
 
           for( let h = 0; h < boardData.length; ++h) {
               let hex = boardData[h];
-              let tl = hexLocation(hex);
+              let tl = hexloc.hexLocation(hex);
 
               let top = tl.top;
               let left = tl.left;
@@ -266,6 +283,7 @@
                   `<div ${cl} id="hex_${hex.row}_${hex.ccol}" style="top:${top}px; left:${left}px;"><div></div></div>`
               );
           }
+          });
 
           </script>
       </div>
