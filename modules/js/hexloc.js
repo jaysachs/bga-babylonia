@@ -1,4 +1,5 @@
 define([
+    "dojo","dojo/_base/declare",
     'dojo/dom',
     'dojo/domReady!'
 ], function (dom) {

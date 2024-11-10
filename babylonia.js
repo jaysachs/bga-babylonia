@@ -18,11 +18,11 @@
 var thegame = null;
 define([
     'dojo','dojo/_base/declare',
+    g_gamethemeurl + "modules/js/hexloc.js",
     'ebg/core/gamegui',
     'ebg/counter',
-    'modules/js/hexloc',
 ],
-function (dojo, declare) {
+function (dojo, declare, hexloc) {
     return declare('bgagame.babylonia', ebg.core.gamegui, {
         constructor: function(){
             console.log('babylonia constructor');
@@ -118,54 +118,21 @@ function (dojo, declare) {
 
         setupBoard: function( boardData, playersData ) {
             console.log('Setting the the game board');
+            console.log(hexloc);
             let boardDiv = $( this.ID_BOARD );
             // console.log( gamedatas.board );
 
-
-
-            let calcrm = function(s) {
-                if (s.startsWith('calc(')) {
-                    s = s.substring(5);
-                }
-                if (s.endsWith('px)')) {
-                    s = s.substring(0, s.length-3);
-                }
-                return s;
-            };
-
-            var style = getComputedStyle(board);
-            let hexheight = style.getPropertyValue('--hex-height');
-            let hexwidth = style.getPropertyValue('--hex-width');
-            console.log(hexwidth, hexheight);
-            let s = $( 'vars' ).style;
-            s.setProperty('width', hexwidth);
-            s.setProperty('height', hexheight);
-            // console.log(s);
-            let hw = calcrm(s.getPropertyValue('width'));
-            let hh = calcrm(s.getPropertyValue('height'));
-            console.log(hw, hh);
-            let hoffset = hw * 0.75;
-            let voffset = hh * 1.0 + 1.0;
-            console.log(hoffset, voffset);
-            let hstart = 6; // this is related to board width but not sure how
-            let vstart = 7; // depends on board size too
-
-            for( let h = 0; h < data.length; ++h) {
-
-
             for( let h = 0; h < boardData.length; ++h) {
                 let hex = boardData[h];
-
-                let top = vstart + hex.row * (voffset) / 2;
-                let left = hstart + (hex.col * (hoffset+2));
+                let tl = hexloc.hexLocation(hex);
 
                 dojo.place( this.format_block('jstpl_hex',
                                               {
                                                   'row': hex.row,
                                                   'col': hex.col,
                                                   // or ... row / 2 * 63 + 6;
-                                                  'top': hex.row * 31.75 + 6,
-                                                  'left': 38 + (hex.col * 55)
+                                                  'top': tl.top,
+                                                  'left': tl.left,
                                               } ),
                             boardDiv );
 
