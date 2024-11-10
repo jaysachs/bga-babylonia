@@ -728,6 +728,22 @@ class Game extends \Table
 
         if ($state["type"] === "activeplayer") {
             switch ($state_name) {
+                case 'selectHexToScore':
+                {
+                    // If a player goes zombie when they are on turn
+                    // and have surrounded one or more ziggurats / cities.
+                    // the game cannot progress properly. So choose one
+                    // randomly.
+                    $player_id = $this->activePlayerId();
+                    $model = new Model($this->ps, $player_id);
+                    $hexes = $model->hexesRequiringScoring();
+                    if (count($hexes) > 0) {
+                        shuffle($hexes);
+                        $hex = array_shift($hexes);
+                        $this->actSelectHexToScore($hex->row, $hex->col);
+                    }
+                    break;
+                }
                 default:
                 {
                     $this->gamestate->nextState("zombiePass");

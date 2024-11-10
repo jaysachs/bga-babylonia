@@ -89,6 +89,7 @@ $machinestates = [
         "transitions" => [
             "playPieces" => STATE_PLAYER_PLAY_PIECES,
             "done" => STATE_END_OF_TURN_SCORING,
+            "zombiePass" => STATE_END_OF_TURN_SCORING,
         ]
     ],
 
@@ -118,6 +119,8 @@ $machinestates = [
         "transitions" => [
             "citySelected" => STATE_END_OF_TURN_SCORING,
             "zigguratSelected" => STATE_ZIGGURAT_SCORING,
+            // no "zombiePass" since we need to act on the zombie
+            //  player's behalf to properly progress the game.
         ]
     ],
 
@@ -146,6 +149,7 @@ $machinestates = [
         "updateGameProgression" => true,
         "transitions" => [
             "cardSelected" => STATE_END_OF_TURN_SCORING,
+            "zombiePass" => STATE_END_OF_TURN_SCORING,
         ]
     ],
 
@@ -186,6 +190,7 @@ $machinestates = [
         "transitions" => [
             "extraTurn" => STATE_PLAYER_PLAY_PIECES,
             "nextPlayer" => STATE_NEXT_PLAYER,
+            "zombiePass" => STATE_NEXT_PLAYER,
         ]
     ],
 
