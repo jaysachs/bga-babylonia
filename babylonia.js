@@ -175,6 +175,9 @@ function (dojo, declare) {
             // console.log('onHexSelection:' + event.target.id);
             event.preventDefault();
             event.stopPropagation();
+            if(! this.isCurrentPlayerActive() ) {
+                 return false;
+            }
             switch (this.stateName) {
                 case 'client_pickHexToPlay':
                     this.playSelectedPiece(event);
