@@ -212,6 +212,7 @@
 </head>
   <body>
     <div id="main">
+      <span id="vars"></span>
       <div id="hand_container">
         <div class="hand" id="hand" onClick="selectPieceToPlay(event)">
           <div id="hand_0" class="farmer_1"></div>
@@ -224,46 +225,49 @@
       </div>
       <div class="board-spacer"></div>
       <div class="board" id="board" onClick="selectHex(event)">
-        <script>
-          let b = document.getElementById("board");
-          for (let c = 0; c < 16; c++) {
+        <script type="module">
+          import {hexLocation} from "../modules/js/hexloc.js";
+
+          var boardData = [];
+          for (var c = 0; c < 16; c++) {
               let odd = c % 2 == 1;
               let start = odd ? 1 : 0;
               let end = odd ? 21 : 22
               for (let r = start; r <= end; r+=2) {
-                  let top = r * 31.75 + 6;
-                  let left = 38 + (c * 55);
-                  var cl="";
-                  if (c % 3 == 0) {
-                      cl = "class='playable'"
-                  }
-                  b.insertAdjacentHTML(
-                      `beforeend`,
-                      `<div ${cl} id="hex_${r}_${c}" style="top:${top}px; left:${left}px;"><div></div></div>`
-                  );
+                  boardData.push({row: r, col: c});
               }
           }
 
-          /*
-          for (i = 0; i < 7; ++i) {
-              console.log(i);
-              let h = document.getElementById("hand_" + i);
-              let d = h.classList;
+          let boardDiv = document.getElementById("board");
 
-              console.log(d);
-              d.keys().forEach((x,y) => d.remove(x));
-              console.log(d);
-              h.className = "";
-              console.log(h.classList);
+          for( let h = 0; h < boardData.length; ++h) {
+              let hex = boardData[h];
+              let tl = hexLocation(hex);
+
+              let top = tl.top;
+              let left = tl.left;
+
+              var cl = '';
+              if (hex.col % 3 == 0) {
+                  cl = "class='playable'"
               }
-          */
-          // for (i = 0; i < gamedatas.hand.length; ++i) {
-          //     let p = gamedatas.hand[i];
-          //     let c = document.getElementById("hand_" + i).classList;
-          //     c.add(p);
-          // }
 
-                             </script>
+              // dojo.place( this.format_block('jstpl_hex',
+              //                               {
+              //                                   'row': hex.row,
+              //                                   'col': hex.col,
+              //                                   // or ... row / 2 * 63 + 6;
+              //                                   'top': hex.row * 31.75 + 6,
+              //                                   'left': 38 + (hex.col * 55)
+              //                               } ),
+              //             boardDiv );
+              boardDiv.insertAdjacentHTML(
+                  `beforeend`,
+                  `<div ${cl} id="hex_${hex.row}_${hex.ccol}" style="top:${top}px; left:${left}px;"><div></div></div>`
+              );
+          }
+
+          </script>
       </div>
       <div id="available_zcards">
         <div class="zc_10pts"></div>

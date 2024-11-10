@@ -284,8 +284,8 @@ body {
 
 #hand > div.unplayable {
     cursor: not-allowed;
-    /* TODO: needs to be a less transparent version -- 0.6 */
     content: url(img/piecealpha.png);
+    opacity: 0.4;
 }
 
 #hand > div.selected {
