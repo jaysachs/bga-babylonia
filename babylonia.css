@@ -20,8 +20,12 @@ body {
     --board-width: 1024px;
     --board-height: 768px;
     --hex-ratio: 1.155;
+    /*
+      the denominator here works for height. but somehow width gets
+      slightly off.
+      maybe compute board height/width based on hex size instead?
+   */
     --hex-height: calc(var(--board-height)/12.59); /* 61px; */
-    --hex-width2: calc(var(--board-width)/14.63); /* 70px; */
     --hex-width: calc(var(--hex-height) * var(--hex-ratio)); /* 70px; */
 }
 

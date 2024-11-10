@@ -30,8 +30,11 @@ define([
     let hoffset = 0.75 * hw;
     let voffset = 1.0 * hh + 1.0;
     console.log(hoffset, voffset);
-    let hstart = 38.0; // this is related to board width but not sure how
-    let vstart = 9.0; // depends on board size too
+
+    var hstart = 38.0; // this is related to board width but not sure how
+    var vstart = 9.0; // depends on board size too
+    // hstart = 15.0;
+    // vstart = 5.0;
 
     return {
         hexLocation: function(hex) {
