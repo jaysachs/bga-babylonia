@@ -270,7 +270,10 @@ class Game extends \Table
     public function stZigguratScoring(): void {
         $next_player_id = $this->nextActivePlayer();
         if ($next_player_id != 0) {
-            $this->gamestate->changeActivePlayer($next_player_id);
+            if ($next_player_id != $this->activePlayerId()) {
+                $this->gamestate->changeActivePlayer($next_player_id);
+                $this->giveExtraTime($next_player_id);
+            }
             $this->gamestate->nextState("selectZiggurat");
         } else {
             $this->gamestate->nextState("next");
@@ -361,8 +364,8 @@ class Game extends \Table
         $player_id = $this->activePlayerId();
         $player_on_turn = $this->playerOnTurn();
         if ($player_id != $player_on_turn) {
-            $this->giveExtraTime($player_id);
             $this->gamestate->changeActivePlayer($player_on_turn);
+            $this->giveExtraTime($player_on_turn);
             $player_id = $player_on_turn;
         }
         $model = new Model($this->ps, $player_id);
@@ -391,7 +394,7 @@ class Game extends \Table
         $player_on_turn = $this->playerOnTurn();
         if ($player_on_turn != 0) {
             if ($player_on_turn != $player_id) {
-                $this->giveExtraTime($player_id);
+                $this->giveExtraTime($player_on_turn);
                 $this->gamestate->changeActivePlayer($player_on_turn);
                 $player_id = $player_on_turn;
             }
@@ -447,12 +450,12 @@ class Game extends \Table
             return;
         }
 
-        $this->giveExtraTime($player_id);
         $this->gamestate->nextState("nextPlayer");
     }
 
     public function stNextPlayer() {
         $this->activeNextPlayer();
+        $this->giveExtraTime($this->activePlayerId());
         $this->setPlayerOnTurn($this->activePlayerId());
         $this->gamestate->nextState("done");
     }
@@ -691,11 +694,9 @@ class Game extends \Table
 
         // Activate first player once everything has been initialized and ready.
         $this->activeNextPlayer();
-
-        $this->setGameStateInitialValue(Game::GLOBAL_PLAYER_ON_TURN,
-                                        $this->activePlayerId());
-        $this->setGameStateInitialValue(Game::GLOBAL_NEXT_PLAYER_ACTIVE, 0);
-
+        $this->giveExtraTime($this->activePlayerId());
+        $this->setPlayerOnTurn($this->activePlayerId());
+        $this->setNexPlayerActive(0);
     }
 
     private function optionEnabled(array $options, Option $option): bool {
