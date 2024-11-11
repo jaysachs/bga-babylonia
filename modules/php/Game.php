@@ -698,7 +698,7 @@ class Game extends \Table
         $this->activeNextPlayer();
         $this->giveExtraTime($this->activePlayerId());
         $this->setPlayerOnTurn($this->activePlayerId());
-        $this->setNexPlayerActive(0);
+        $this->setNextPlayerToBeActive(0);
     }
 
     private function optionEnabled(array $options, Option $option): bool {
