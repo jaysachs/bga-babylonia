@@ -248,6 +248,16 @@ class PersistentStore {
         return new TurnProgress($moves);
     }
 
+    public function updateAuxScores($aux_scores: array /* int -> int */): void {
+        $sql = 'UPDATE player SET player_score_aux = CASE player_id ';
+        for ($aux_scores as $pid => $city_count) {
+            $sql .= " WHEN {$pid} THEN {$city_count} ";
+        }
+        $sql .= ' ELSE 0 END WHERE player_id IN '
+                . '(' . implode(array_keys($aux_scores), ',') . ')';
+        $this->db->DbQuery($sql);
+    }
+
     public function retrieveAllPlayerInfo(): array /* int => PlayerInfo */ {
         // TODO: retrieve zig cards? or remove from PlayerInfo?
         $result = [];

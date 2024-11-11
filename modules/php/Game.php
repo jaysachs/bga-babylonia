@@ -405,7 +405,7 @@ class Game extends \Table
         if ($model->finishTurn()) {
             $this->notifyAllPlayers(
                 "gameEnded",
-                clienttranslate('${player_name} unable to refill their hand'),
+                clienttranslate('Game has ended'),
                 [
                     "player_id" => $player_id,
                     "player_name" => $this->getActivePlayerName(),

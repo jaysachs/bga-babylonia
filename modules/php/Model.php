@@ -265,11 +265,29 @@ class Model {
         // set sizes on info, persist it?
 
         if ($hand->size() == 0 || $this->board()->cityCount() <= 1) {
+            $this->resolveAnyTies();
             return true;
         }
 
         $this->ps->removeTurnProgress($this->player_id);
         return false;
+    }
+
+    private function resolveAnyTies(): void {
+        $infos = array_values($this->allPlayerInfo());
+        usort($infos, function ($i1, $i2): int {
+            return $i1->score - $i2->score;
+        });
+        $aux_scores=[];
+        for ($i = 1; $i < count($infos); $i++) {
+            if ($infos[$i]->score == $infos[$i-1]->score) {
+                $aux_scores[$info[$i]->player_id] =
+                    $info[$i]->captured_city_count;
+                $aux_scores[$info[$i-1]->player_id] =
+                    $info[$i-1]->captured_city_count;
+            }
+        }
+        $this->ps->updateAuxScores($aux_scores);
     }
 
     public function scoreZiggurat(Hex $hexrc): ScoredZiggurat {
