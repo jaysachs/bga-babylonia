@@ -30,9 +30,9 @@
 
 // Javascript HTML templates
 
-  const jstpl_log_piece = '<span class="log-element ${piece}"></span>';
-  const jstpl_log_city = '<span class="log-element ${city}"></span>';
-  const jstpl_log_zcard = '<span class="log-element ${zcard}"></span>';
+  const jstpl_log_piece = '<span class="log-element bbl_${piece}"></span>';
+  const jstpl_log_city = '<span class="log-element bbl_${city}"></span>';
+  const jstpl_log_zcard = '<span class="log-element bbl_${zcard}"></span>';
 
   const jstpl_player_board_ext =
         '<div class="bbl_playerboard_ext">\
@@ -65,11 +65,11 @@
     <div id="bbl_main">
       <span id="bbl_vars"></span>
       <div id="bbl_hand_container">
-        <div class="bbl_hand" id="bbl_hand">
+        <div id="bbl_hand">
 	</div>
       </div>
       <!-- needed since the board is absolutely positions / sized. for now. -->
-      <div class="bbl_board" id="bbl_board"></div>
+      <div id="bbl_board"></div>
       <div id="bbl_available_zcards">
       </div>
     </div>

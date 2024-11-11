@@ -41,7 +41,7 @@ body {
 }
 
 /* the outermost hex container */
-.bbl_board > div {
+#bbl_board > div {
     height: calc(var(--hex-height));
     width: calc(var(--hex-width));
     margin: 0;
@@ -58,7 +58,7 @@ body {
 }
 
 
-.bbl_board > div.bbl_playable {
+#bbl_board > div.bbl_playable {
     content: url(img/highlight.png);
     object-fit: cover;
     /*
@@ -72,20 +72,20 @@ body {
     cursor: pointer;
 }
 
-.bbl_board .bbl_city_count,
-.bbl_board .bbl_city_msp,
-.bbl_board .bbl_city_m,
-.bbl_board .bbl_city_back,
-.bbl_board .bbl_city_p,
-.bbl_board .bbl_city_s,
-.bbl_board .bbl_city_mp,
-.bbl_board .bbl_city_ms,
-.bbl_board .bbl_city_sp,
-.bbl_board .bbl_field_5,
-.bbl_board .bbl_field_6,
-.bbl_board .bbl_field_7,
-.bbl_board .bbl_field_X,
-.bbl_board .bbl_ziggurat
+#bbl_board .bbl_city_count,
+#bbl_board .bbl_city_msp,
+#bbl_board .bbl_city_m,
+#bbl_board .bbl_city_back,
+#bbl_board .bbl_city_p,
+#bbl_board .bbl_city_s,
+#bbl_board .bbl_city_mp,
+#bbl_board .bbl_city_ms,
+#bbl_board .bbl_city_sp,
+#bbl_board .bbl_field_5,
+#bbl_board .bbl_field_6,
+#bbl_board .bbl_field_7,
+#bbl_board .bbl_field_X,
+#bbl_board .bbl_ziggurat
 {
     height: var(--hex-height);
     width: var(--hex-width);
@@ -139,26 +139,26 @@ body {
     background: url(img/cities.png) 0% -1300%;
 }
 
-  .bbl_board > div.bbl_farmer_1,
+  .bbl_farmer_1,
   .bbl_merchant_1,
   .bbl_servant_1,
   .bbl_priest_1,
-  .hidden_1,
+  .bbl_hidden_1,
   .bbl_farmer_2,
   .bbl_merchant_2,
   .bbl_servant_2,
   .bbl_priest_2,
-  .hidden_2,
+  .bbl_hidden_2,
   .bbl_farmer_3,
   .bbl_merchant_3,
   .bbl_servant_3,
   .bbl_priest_3,
-  .hidden_3,
+  .bbl_hidden_3,
   .bbl_farmer_4,
   .bbl_merchant_4,
   .bbl_servant_4,
   .bbl_priest_4,
-  .hidden_4
+  .bbl_hidden_4
   {
       clip-path: none;
       /*
@@ -171,16 +171,16 @@ body {
     background-size: 400% 500%;
 }
 
-.hidden_1 {
+.bbl_hidden_1 {
     background-position: 0% 0;
 }
-.hidden_2    {
+.bbl_hidden_2    {
     background-position: -100% 0;
 }
-.hidden_3    {
+.bbl_hidden_3    {
     background-position: -200% 0;
 }
-.hidden_4    {
+.bbl_hidden_4    {
     background-position: -300% 0;
 }
 .bbl_farmer_1    {
@@ -245,7 +245,7 @@ body {
     justify-content:center;
 }
 
-.bbl_hand {
+#bbl_hand {
     position: relative;
     box-shadow: 0 3px 8px rgba(0,0,0,.3);
     display: inline-block;
@@ -257,8 +257,7 @@ body {
     padding-right: 16px;
 }
 
-
-.bbl_hand > div {
+#bbl_hand > div {
     position: relative;
     display: inline-block;
     width: calc(var(--hex-width));

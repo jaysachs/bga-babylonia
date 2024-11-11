@@ -36,7 +36,6 @@ function (dojo, declare, hexloc) {
             dojo.connect( $(this.ID_AVAILABLE_ZCARDS), 'onclick', this, 'onZcardSelected');
         },
 
-        PREFIX: 'bbl_',
         CSS_SELECTED: 'bbl_selected',
         CSS_PLAYABLE: 'bbl_playable',
         CSS_UNPLAYABLE: 'bbl_unplayable',
@@ -153,7 +152,7 @@ function (dojo, declare, hexloc) {
             for( let z = 0; z < zcards.length; z++) {
                 let card = zcards[z];
                 this.card_tooltips[card.type] = card.tooltip;
-                this.addZigguratCardDiv(this.PREFIX + `zig${z}`,
+                this.addZigguratCardDiv(`bbl_zig${z}`,
                                         this.ID_AVAILABLE_ZCARDS,
                                         card.type,
                                         card.used);
@@ -166,13 +165,13 @@ function (dojo, declare, hexloc) {
         },
 
         handcount_id: function(player_id) {
-            return this.PREFIX + 'handcount_' + player_id;
+            return 'bbl_handcount_' + player_id;
         },
         poolcount_id: function(player_id) {
-            return this.PREFIX + 'poolcount_' + player_id;
+            return 'bbl_poolcount_' + player_id;
         },
         citycount_id: function(player_id) {
-            return this.PREFIX + 'citycount_' + player_id;
+            return 'bbl_citycount_' + player_id;
         },
 
         onHexSelection: function (event) {
@@ -322,12 +321,12 @@ function (dojo, declare, hexloc) {
             let cl = e.classList;
             for (var i = 0; i < cl.length; ++i) {
                 let c = cl[i];
-                if (c.startsWith(this.PREFIX + 'zc_')) {
+                if (c.startsWith('bbl_zc_')) {
                     type = c.slice(4); // better way to do this?
                     this.bgaPerformAction('actSelectZigguratCard',
                                           { card_type: type });
                     let div = $( this.ID_AVAILABLE_ZCARDS );
-                    div.classList.remove(this.PREFIX + 'selecting');
+                    div.classList.remove('bbl_selecting');
                     return false;
                 }
             }
@@ -556,7 +555,7 @@ function (dojo, declare, hexloc) {
                     case 'selectZigguratCard':
                         let div = $( this.ID_AVAILABLE_ZCARDS );
                         div.scrollIntoView( false );
-                        div.classList.add(this.PREFIX + 'selecting');
+                        div.classList.add('bbl_selecting');
                         this.updateStatusBar(_('You must select a ziggurat card'));
                         break;
 
@@ -577,7 +576,7 @@ function (dojo, declare, hexloc) {
         },
 
         hexDivId: function(row, col) {
-            return this.PREFIX + `hex_${row}_${col}`;
+            return `bbl_hex_${row}_${col}`;
         },
 
         hexDiv: function (row, col) {
@@ -585,7 +584,7 @@ function (dojo, declare, hexloc) {
         },
 
         handPosDiv: function (i) {
-            let id = this.PREFIX + `hand_${i}`;
+            let id = `bbl_hand_${i}`;
             let div = $(id);
             if (div != null) {
                 return div;
@@ -593,7 +592,7 @@ function (dojo, declare, hexloc) {
             // dynamically extend hand as needed.
             const hand = $(this.ID_HAND);
             for (j = 0; j <= i; ++j) {
-                let id = this.PREFIX + `hand_${j}`;
+                let id = `bbl_hand_${j}`;
                 let d = $(id);
                 if (d == null) {
                     dojo.create('div',
@@ -609,14 +608,14 @@ function (dojo, declare, hexloc) {
 
         pieceClass: function (piece, playerNumber) {
             if (playerNumber == null) {
-                return this.PREFIX + piece;
+                return 'bbl_' + piece;
             } else {
-                return this.PREFIX + piece + '_' + playerNumber;
+                return 'bbl_' + piece + '_' + playerNumber;
             }
         },
 
         cardClass: function(card, used = false) {
-            return this.PREFIX + (used ? 'zc_used' : card);
+            return used ? 'bbl_zc_used' : ('bbl_' + card);
         },
 
         renderPlayedPiece: function (row, col, piece, playerNumber) {
@@ -628,8 +627,9 @@ function (dojo, declare, hexloc) {
             if (piece == null || piece == this.CSS_EMPTY) {
                 return this.CSS_EMPTY;
             }
-            return this.PREFIX + piece + '_'
-                + (playerNumber == null ? this.playerNumber : playerNumber);
+            return this.pieceClass(
+                piece,
+                playerNumber == null ? this.playerNumber : playerNumber);
         },
 
         updateCounter: function(counter, value, animate) {
