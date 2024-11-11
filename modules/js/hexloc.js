@@ -15,12 +15,12 @@ define([
     };
 
     // Extract the hex dimension from CSS:
-    let boardDiv = document.getElementById('board');
-    var style = getComputedStyle(board);
+    let boardDiv = document.getElementById('bbl_board');
+    var style = getComputedStyle(boardDiv);
     let hexheight = style.getPropertyValue('--hex-height');
     let hexwidth = style.getPropertyValue('--hex-width');
     console.log(hexwidth, hexheight);
-    let s = document.getElementById('vars').style;
+    let s = document.getElementById('bbl_vars').style;
     s.setProperty('width', hexwidth);
     s.setProperty('height', hexheight);
     // console.log(s);

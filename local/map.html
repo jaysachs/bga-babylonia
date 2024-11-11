@@ -3,41 +3,41 @@
   <script>
     function cycleThings(e) {
         let pieces = [
-            "farmer_1",
-            "merchant_1",
-            "servant_1",
-            "priest_1",
-            "hidden_1",
-            "farmer_2",
-            "merchant_2",
-            "servant_2",
+            "bbl_farmer_1",
+            "bbl_merchant_1",
+            "bbl_servant_1",
+            "bbl_priest_1",
+            "bbl_hidden_1",
+            "bbl_farmer_2",
+            "bbl_merchant_2",
+            "bbl_servant_2",
             "priest_2",
-            "hidden_2",
-            "farmer_3",
-            "merchant_3",
-            "servant_3",
-            "priest_3",
-            "hidden_3",
-            "farmer_4",
-            "merchant_4",
-            "servant_4",
-            "priest_4",
-            "hidden_4"
+            "bbl_hidden_2",
+            "bbl_farmer_3",
+            "bbl_merchant_3",
+            "bbl_servant_3",
+            "bbl_priest_3",
+            "bbl_hidden_3",
+            "bbl_farmer_4",
+            "bbl_merchant_4",
+            "bbl_servant_4",
+            "bbl_priest_4",
+            "bbl_hidden_4"
         ];
         let cities = [
-            "city_msp",
-            "city_m",
-            "city_back",
-            "city_p",
-            "city_s",
-            "city_ms",
-            "city_sp",
-            "city_mp",
-            "field_5",
-            "field_6",
-            "field_7",
-            "field_X",
-            "ziggurat",
+            "bbl_city_msp",
+            "bbl_city_m",
+            "bbl_city_back",
+            "bbl_city_p",
+            "bbl_city_s",
+            "bbl_city_ms",
+            "bbl_city_sp",
+            "bbl_city_mp",
+            "bbl_field_5",
+            "bbl_field_6",
+            "bbl_field_7",
+            "bbl_field_X",
+            "bbl_ziggurat",
         ];
         let all = cities.concat(pieces);
         c = e.classList;
@@ -60,7 +60,7 @@
         event.preventDefault();
         event.stopPropagation();
         let e = event.target;
-        while (e.parentElement != null && e.parentElement.id != "board") {
+        while (e.parentElement != null && e.parentElement.id != "bbl_board") {
             e = e.parentElement;
         }
         if (e.parentElement != null) {
@@ -76,15 +76,15 @@
         event.stopPropagation();
         let e = event.target;
         let hc = e.parentElement;
-        if (hc.id == "hand") {
+        if (hc.id == "bbl_hand") {
             let c = e.classList;
             if (c.length == 0) {
                 return;
             }
-            if (!c.contains("selected")) {
-                hc.querySelectorAll('.selected').forEach(div => div.classList.remove('selected'));
+            if (!c.contains("bbl_selected")) {
+                hc.querySelectorAll('.bbl_selected').forEach(div => div.classList.remove('bbl_selected'));
             }
-            c.toggle("selected");
+            c.toggle("bbl_selected");
         }
     }
   </script>
@@ -136,7 +136,6 @@
           overflow: hidden;
           position: relative;
       }
-
 
     .player-board {
         background-color: #ebd5bd;
@@ -211,20 +210,20 @@
   </style>
 </head>
   <body>
-    <div id="main">
-      <span id="vars"></span>
-      <div id="hand_container">
-        <div class="hand" id="hand" onClick="selectPieceToPlay(event)">
-          <div id="hand_0" class="farmer_1"></div>
-          <div id="hand_1"  class="priest_2 playable"></div>
+    <div id="bbl_main">
+      <span id="bbl_vars"></span>
+      <div id="bbl_hand_container">
+        <div class="bbl_hand" id="bbl_hand" onClick="selectPieceToPlay(event)">
+          <div id="bbl_hand_0" class="bbl_farmer_1"></div>
+          <div id="bbl_hand_1"  class="bbl_priest_2 playable"></div>
           <!-- this one was already played -->
-          <div id="hand_2"  class="hidden_2"></div>
-          <div  id="hand_3" class="farmer_3 selected"></div>
-          <div  id="hand_4" class="empty"></div>
+          <div id="bbl_hand_2"  class="bbl_hidden_2"></div>
+          <div  id="bbl_hand_3" class="bbl_farmer_3 bbl_selected"></div>
+          <div  id="bbl_hand_4" class="bbl_empty"></div>
         </div>
       </div>
-      <div class="board-spacer"></div>
-      <div class="board" id="board" onClick="selectHex(event)">
+      <div class="bbl_board-spacer"></div>
+      <div class="bbl_board" id="bbl_board" onClick="selectHex(event)">
         <script>
           var dojoConfig = {
               async: true,
@@ -255,7 +254,7 @@
               }
           }
 
-          let boardDiv = document.getElementById("board");
+          let boardDiv = document.getElementById("bbl_board");
 
           for( let h = 0; h < boardData.length; ++h) {
               let hex = boardData[h];
@@ -280,21 +279,21 @@
               //             boardDiv );
               boardDiv.insertAdjacentHTML(
                   `beforeend`,
-                  `<div ${cl} id="hex_${hex.row}_${hex.ccol}" style="top:${top}px; left:${left}px;"><div></div></div>`
+                  `<div ${cl} id="bbl_hex_${hex.row}_${hex.ccol}" style="top:${top}px; left:${left}px;"><div></div></div>`
               );
           }
           });
 
           </script>
       </div>
-      <div id="available_zcards">
-        <div class="zc_10pts"></div>
-        <div class="zc_xturn"></div>
-        <div class="zc_hand7"></div>
+      <div id="bbl_available_zcards">
+        <div class="bbl_zc_10pts"></div>
+        <div class="bbl_zc_xturn"></div>
+        <div class="bbl_zc_hand7"></div>
         <div class=""></div>
-        <div class="zc_3nobles"></div>
-        <div class="zc_3farmers"></div>
-        <div class="zc_citypts"></div>
+        <div class="bbl_zc_3nobles"></div>
+        <div class="bbl_zc_3farmers"></div>
+        <div class="bbl_zc_citypts"></div>
       </div>
 
       <!-- player board -->

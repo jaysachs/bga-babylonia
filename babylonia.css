@@ -29,7 +29,7 @@ body {
     --hex-width: calc(var(--hex-height) * var(--hex-ratio)); /* 70px; */
 }
 
-#board {
+#bbl_board {
     font-size: 0;
     background: url(img/mapb.jpg) no-repeat center;
     background-size: cover;
@@ -41,7 +41,7 @@ body {
 }
 
 /* the outermost hex container */
-.board > div {
+.bbl_board > div {
     height: calc(var(--hex-height));
     width: calc(var(--hex-width));
     margin: 0;
@@ -58,7 +58,7 @@ body {
 }
 
 
-.board > div.playable {
+.bbl_board > div.bbl_playable {
     content: url(img/highlight.png);
     object-fit: cover;
     /*
@@ -72,92 +72,92 @@ body {
     cursor: pointer;
 }
 
-.board .city_count,
-.board .city_msp,
-.board .city_m,
-.board .city_back,
-.board .city_p,
-.board .city_s,
-.board .city_mp,
-.board .city_ms,
-.board .city_sp,
-.board .field_5,
-.board .field_6,
-.board .field_7,
-.board .field_X,
-.board .ziggurat
+.bbl_board .bbl_city_count,
+.bbl_board .bbl_city_msp,
+.bbl_board .bbl_city_m,
+.bbl_board .bbl_city_back,
+.bbl_board .bbl_city_p,
+.bbl_board .bbl_city_s,
+.bbl_board .bbl_city_mp,
+.bbl_board .bbl_city_ms,
+.bbl_board .bbl_city_sp,
+.bbl_board .bbl_field_5,
+.bbl_board .bbl_field_6,
+.bbl_board .bbl_field_7,
+.bbl_board .bbl_field_X,
+.bbl_board .bbl_ziggurat
 {
     height: var(--hex-height);
     width: var(--hex-width);
     background-size: 100% 1400%;
 }
 
-.city_count {
+.bbl_city_count {
     background: url(img/cities.png) 0% -800%;
 }
 
-.city_back  {
+.bbl_city_back  {
     background: url(img/cities.png) 0% 0%;
 }
-.city_m    {
+.bbl_city_m    {
     background: url(img/cities.png) 0% -100%;
 }
-.city_p    {
+.bbl_city_p    {
     background: url(img/cities.png) 0% -300%;
 }
-.city_s    {
+.bbl_city_s    {
     background: url(img/cities.png) 0% -200%;
 }
-.city_mp   {
+.bbl_city_mp   {
     background: url(img/cities.png) 0% -500%;
 }
-.city_ms   {
+.bbl_city_ms   {
     background: url(img/cities.png) 0% -400%;
 }
-.city_sp   {
+.bbl_city_sp   {
     background: url(img/cities.png) 0% -600%;
 }
-.city_msp {
+.bbl_city_msp {
     background: url(img/cities.png) 0% -700%;
 }
-.city_blank {
+.bbl_city_blank {
     background: url(img/cities.png) 0% -800%;
 }
-.field_5     {
+.bbl_field_5     {
     background: url(img/cities.png) 0% -900%;
 }
-.field_6     {
+.bbl_field_6     {
     background: url(img/cities.png) 0% -1000%;
 }
-.field_7     {
+.bbl_field_7     {
     background: url(img/cities.png) 0% -1100%;
 }
-.field_X     {
+.bbl_field_X     {
     background: url(img/cities.png) 0% -1200%;
 }
-.ziggurat   {
+.bbl_ziggurat   {
     background: url(img/cities.png) 0% -1300%;
 }
 
-  .board > div.farmer_1,
-  .merchant_1,
-  .servant_1,
-  .priest_1,
+  .bbl_board > div.bbl_farmer_1,
+  .bbl_merchant_1,
+  .bbl_servant_1,
+  .bbl_priest_1,
   .hidden_1,
-  .farmer_2,
-  .merchant_2,
-  .servant_2,
-  .priest_2,
+  .bbl_farmer_2,
+  .bbl_merchant_2,
+  .bbl_servant_2,
+  .bbl_priest_2,
   .hidden_2,
-  .farmer_3,
-  .merchant_3,
-  .servant_3,
-  .priest_3,
+  .bbl_farmer_3,
+  .bbl_merchant_3,
+  .bbl_servant_3,
+  .bbl_priest_3,
   .hidden_3,
-  .farmer_4,
-  .merchant_4,
-  .servant_4,
-  .priest_4,
+  .bbl_farmer_4,
+  .bbl_merchant_4,
+  .bbl_servant_4,
+  .bbl_priest_4,
   .hidden_4
   {
       clip-path: none;
@@ -183,52 +183,52 @@ body {
 .hidden_4    {
     background-position: -300% 0;
 }
-.farmer_1    {
+.bbl_farmer_1    {
     background-position: 0% -100%;
 }
-.farmer_2   {
+.bbl_farmer_2   {
     background-position: -100% -100%;
 }
-.farmer_3 {
+.bbl_farmer_3 {
     background-position: -200% -100%;
 }
-.farmer_4 {
+.bbl_farmer_4 {
     background-position: -300% -100%;
 }
-.merchant_1 {
+.bbl_merchant_1 {
     background-position: 0% -200%;
 }
-.merchant_2 {
+.bbl_merchant_2 {
     background-position: -100% -200%;
 }
-.merchant_3 {
+.bbl_merchant_3 {
     background-position: -200% -200%;
 }
-.merchant_4 {
+.bbl_merchant_4 {
     background-position: -300% -200%;
 }
-.servant_1  {
+.bbl_servant_1  {
     background-position: 0% -300%;
 }
-.servant_2  {
+.bbl_servant_2  {
     background-position: -100% -300%;
 }
-.servant_3  {
+.bbl_servant_3  {
     background-position: -200% -300%;
 }
-.servant_4  {
+.bbl_servant_4  {
     background-position: -300% -300%;
 }
-.priest_1   {
+.bbl_priest_1   {
     background-position: 0% -400%;
 }
-.priest_2   {
+.bbl_priest_2   {
     background-position: -100% -400%;
 }
-.priest_3   {
+.bbl_priest_3   {
     background-position: -200% -400%;
 }
-.priest_4  {
+.bbl_priest_4  {
     background-position: -300% -400%;
 }
 
@@ -237,7 +237,7 @@ body {
  Styles for the hand and "rack".
 */
 
-#hand_container {
+#bbl_hand_container {
     padding-top: 10px;
     margin-top: 10px;
     width: calc(var(--board-width));
@@ -245,7 +245,7 @@ body {
     justify-content:center;
 }
 
-.hand {
+.bbl_hand {
     position: relative;
     box-shadow: 0 3px 8px rgba(0,0,0,.3);
     display: inline-block;
@@ -258,7 +258,7 @@ body {
 }
 
 
-.hand > div {
+.bbl_hand > div {
     position: relative;
     display: inline-block;
     width: calc(var(--hex-width));
@@ -271,12 +271,12 @@ body {
     background-image: url(img/pieces.png);
 }
 
-#hand > div.empty {
+#bbl_hand > div.bbl_empty {
     background-image: url(img/piecealpha.png);
     background-size: 100% 100%;
 }
 
-#hand > div.playable {
+#bbl_hand > div.bbl_playable {
     cursor: pointer;
     /*
     border-color: #ffFFdd;
@@ -286,24 +286,24 @@ body {
 */
 }
 
-#hand > div.unplayable {
+#bbl_hand > div.bbl_unplayable {
     cursor: not-allowed;
     content: url(img/piecealpha.png);
     opacity: 0.4;
 }
 
-#hand > div.selected {
+#bbl_hand > div.bbl_selected {
     content: url(img/piecehl.png);
 }
 
-#available_zcards {
+#bbl_available_zcards {
     position: relative;
     display: flex;
     justify-content: center;
     width: calc(var(--board-width));
 }
 
-#available_zcards > div {
+#bbl_available_zcards > div {
     display: inline-block;
     height: calc((var(--hex-height) - 4px) * 2.37); // 135px;
     width: calc((var(--hex-height) - 4px) * 1.58); // 90px;
@@ -312,46 +312,46 @@ body {
     background-image: url(img/zcards.png);
 }
 
-#available_zcards.selecting > div[class^="zc_"] {
+#bbl_available_zcards.bbl_selecting > div[class^="bbl_zc_"] {
     cursor: pointer;
 }
 
-#available_zcards > div:not([class]),
-#available_zcards > div[class=''] {
+#bbl_available_zcards > div:not([class]),
+#bbl_available_zcards > div[class=''] {
     background-image: unset;
     border-style: dotted;
     border-color: #444444;
     border-width: 1px;
 }
 
-.zc_used {
+.bbl_zc_used {
     background-position: -900% 0%;
 }
-.zc_10pts {
+.bbl_zc_10pts {
     background-position: 0% 0%;
 }
-.zc_xturn {
+.bbl_zc_xturn {
     background-position: -100% 0%;
 }
-.zc_hand7 {
+.bbl_zc_hand7 {
     background-position: -200% 0%;
 }
-.zc_3nobles {
+.bbl_zc_3nobles {
     background-position: -300% 0%;
 }
-.zc_3farmers {
+.bbl_zc_3farmers {
     background-position: -400% 0%;
 }
-.zc_fields {
+.bbl_zc_fields {
     background-position: -500% 0%;
 }
-.zc_citypts {
+.bbl_zc_citypts {
     background-position: -600% 0%;
 }
-.zc_land {
+.bbl_zc_land {
     background-position: -700% 0%;
 }
-.zc_river {
+.bbl_zc_river {
     background-position: -800% 0%;
 }
 
@@ -359,63 +359,63 @@ body {
  * Player boards
  */
 
-.b_playerboard_ext {
+.bbl_playerboard_ext {
     --label-height: 40px;
     --label-width: calc(var(--hex-ratio) * var(--label-height));
 }
 
-.b_handpoolcity {
+.bbl_handpoolcity {
     margin-top: 10px;
     display: flex;
     align-items: center;
 }
 
-.b_handpoolcity span:not(.b_counter) {
+.bbl_handpoolcity span:not(.bbl_counter) {
     width: calc(var(--label-width));
     display: inline-block;
 }
 
-.b_handpoolcity span {
+.bbl_handpoolcity span {
     vertical-align: middle;
     height: calc(var(--label-height));
 }
 
-.b_handpoolcity div {
+.bbl_handpoolcity div {
     display: inline-block;
     margin-left: 0px;
     margin-right: 0px;
     height: calc(var(--label-height));
 }
 
-.b_pool > .b_counter {
+.bbl_pool > .bbl_counter {
     margin-left: 0.5em;
 }
 
-.b_hand_label {
+.bbl_hand_label {
     background-image: url(img/pieces.png);
     background-size: 400% 500%;
 }
 
-.b_pool_label {
+.bbl_pool_label {
     margin-right: -2.3em;
     background-image: url(img/pieces.png);
     background-size: 400% 500%;
 }
 
-.b_citycount_label {
+.bbl_citycount_label {
     background: url(img/cities.png) 0% -800%;
     background-size: 100% 1400%;
 }
 
-div.b_handpoolcity > .b_pool > .b_counter {
+div.bbl_handpoolcity > .bbl_pool > .bbl_counter {
     margin-left: 1.7em;
 }
 
-div.b_zcards {
+div.bbl_zcards {
     margin-top: 0.5em;
 }
 
-div.b_zcards span.b_zcard_label {
+div.bbl_zcards span.bbl_zcard_label {
     display: inline-block;
     height: calc(var(--label-height));
     width: calc(var(--label-width));
@@ -424,7 +424,7 @@ div.b_zcards span.b_zcard_label {
     background-size: 100% 1400%;
 }
 
-div.b_zcards > div {
+div.bbl_zcards > div {
     display: inline-block;
     margin: 3px;
     height: 2.4em;
@@ -438,12 +438,12 @@ div.b_zcards > div {
  * image action buttons
  */
 
-a.action-button:has(> div.zcard) {
+a.action-button:has(> div.bbl_zcard) {
     padding: 0;
     border-style: none;
 }
 
-a.action-button > div.zcard {
+a.action-button > div.bbl_zcard {
     border: 0;
     border-style: none;
     height: 6em;
@@ -457,22 +457,22 @@ a.action-button > div.zcard {
  *   particularly images for pieces
  */
 
-.log-element.merchant_1,
-.log-element.priest_1,
-.log-element.farmer_1,
-.log-element.servant_1,
-.log-element.merchant_2,
-.log-element.priest_2,
-.log-element.farmer_2,
-.log-element.servant_2,
-.log-element.merchant_3,
-.log-element.priest_3,
-.log-element.farmer_3,
-.log-element.servant_3,
-.log-element.merchant_4,
-.log-element.priest_4,
-.log-element.farmer_4,
-.log-element.servant_4
+.log-element.bbl_merchant_1,
+.log-element.bbl_priest_1,
+.log-element.bbl_farmer_1,
+.log-element.bbl_servant_1,
+.log-element.bbl_merchant_2,
+.log-element.bbl_priest_2,
+.log-element.bbl_farmer_2,
+.log-element.bbl_servant_2,
+.log-element.bbl_merchant_3,
+.log-element.bbl_priest_3,
+.log-element.bbl_farmer_3,
+.log-element.bbl_servant_3,
+.log-element.bbl_merchant_4,
+.log-element.bbl_priest_4,
+.log-element.bbl_farmer_4,
+.log-element.bbl_servant_4
 {
     display: inline-block;
     margin: 0;
@@ -484,20 +484,20 @@ a.action-button > div.zcard {
     background-size: 400% 500%;
 }
 
-.log-element.city_msp,
-.log-element.city_m,
-.log-element.city_back,
-.log-element.city_count,
-.log-element.city_p,
-.log-element.city_s,
-.log-element.city_mp,
-.log-element.city_ms,
-.log-element.city_sp,
-.log-element.field_5,
-.log-element.field_6,
-.log-element.field_7,
-.log-element.field_X,
-.log-element.ziggurat
+.log-element.bbl_city_msp,
+.log-element.bbl_city_m,
+.log-element.bbl_city_back,
+.log-element.bbl_city_count,
+.log-element.bbl_city_p,
+.log-element.bbl_city_s,
+.log-element.bbl_city_mp,
+.log-element.bbl_city_ms,
+.log-element.bbl_city_sp,
+.log-element.bbl_field_5,
+.log-element.bbl_field_6,
+.log-element.bbl_field_7,
+.log-element.bbl_field_X,
+.log-element.bbl_ziggurat
 {
     height: 2.1em;
     width: 2.4em;
@@ -509,15 +509,15 @@ a.action-button > div.zcard {
     background-image: url(img/cities.png);
 }
 
-.log-element.zc_10pts,
-.log-element.zc_xturn,
-.log-element.zc_hand7,
-.log-element.zc_3nobles,
-.log-element.zc_3farmers,
-.log-element.zc_fields,
-.log-element.zc_citypts,
-.log-element.zc_land,
-.log-element.zc_river
+.log-element.bbl_zc_10pts,
+.log-element.bbl_zc_xturn,
+.log-element.bbl_zc_hand7,
+.log-element.bbl_zc_3nobles,
+.log-element.bbl_zc_3farmers,
+.log-element.bbl_zc_fields,
+.log-element.bbl_zc_citypts,
+.log-element.bbl_zc_land,
+.log-element.bbl_zc_river
 {
     display: inline-block;
     height: 2.1em;

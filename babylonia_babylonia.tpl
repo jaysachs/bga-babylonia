@@ -35,42 +35,42 @@
   const jstpl_log_zcard = '<span class="log-element ${zcard}"></span>';
 
   const jstpl_player_board_ext =
-        '<div class="b_playerboard_ext">\
-           <div class="b_handpoolcity">\
-             <div class="b_hand">\
-               <span class="b_hand_label hidden_${player_number}"></span>\
-               <span id="handcount_${player_id}" class="b_counter">5</span>\
+        '<div class="bbl_playerboard_ext">\
+           <div class="bbl_handpoolcity">\
+             <div class="bbl_hand">\
+               <span class="bbl_hand_label bbl_hidden_${player_number}"></span>\
+               <span id="bbl_handcount_${player_id}" class="bbl_counter">5</span>\
              </div>\
-             <div class="b_pool">\
-               <span class="b_pool_label hidden_${player_number}"></span>\
-               <span class="b_pool_label hidden_${player_number}"></span>\
-               <span class="b_pool_label hidden_${player_number}"></span>\
-               <span id="poolcount_${player_id}" class="b_counter">19</span>\
+             <div class="bbl_pool">\
+               <span class="bbl_pool_label hidden_${player_number}"></span>\
+               <span class="bbl_pool_label hidden_${player_number}"></span>\
+               <span class="bbl_pool_label hidden_${player_number}"></span>\
+               <span id="bbl_poolcount_${player_id}" class="bbl_counter">19</span>\
              </div>\
-             <div class="b_citycount">\
-               <span class="b_citycount_label"></span>\
-               <span id="citycount_${player_id}" class="b_counter">1</span>\
+             <div class="bbl_citycount">\
+               <span class="bbl_citycount_label"></span>\
+               <span id="bbl_citycount_${player_id}" class="bbl_counter">1</span>\
              </div>\
            </div>\
-           <div id="b_zcards_${player_id}" class="b_zcards">\
-             <span class="b_zcard_label"></span>\
+           <div id="bbl_zcards_${player_id}" class="bbl_zcards">\
+             <span class="bbl_zcard_label"></span>\
            </div>\
          </div>';
 
   const jstpl_hex =
-    '<div id="hex_${row}_${col}" style="top:${top}px; left:${left}px;"></div>';
+    '<div id="bbl_hex_${row}_${col}" style="top:${top}px; left:${left}px;"></div>';
 
 </script>
 
-    <div id="main">
-      <span id="vars"></span>
-      <div id="hand_container">
-        <div class="hand" id="hand">
+    <div id="bbl_main">
+      <span id="bbl_vars"></span>
+      <div id="bbl_hand_container">
+        <div class="bbl_hand" id="bbl_hand">
 	</div>
       </div>
       <!-- needed since the board is absolutely positions / sized. for now. -->
-      <div class="board" id="board"></div>
-      <div id="available_zcards">
+      <div class="bbl_board" id="bbl_board"></div>
+      <div id="bbl_available_zcards">
       </div>
     </div>
 
