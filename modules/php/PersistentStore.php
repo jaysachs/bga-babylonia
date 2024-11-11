@@ -249,6 +249,9 @@ class PersistentStore {
     }
 
     public function updateAuxScores(array /* int->int */ $aux_scores): void {
+        if (count($aux_scores) == 0) {
+            return;
+        }
         $sql = 'UPDATE player SET player_score_aux = CASE player_id ';
         foreach ($aux_scores as $pid => $city_count) {
             $sql .= " WHEN {$pid} THEN {$city_count} ";
