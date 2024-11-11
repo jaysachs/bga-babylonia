@@ -14,6 +14,7 @@ define([
         return s;
     };
 
+    // Extract the hex dimension from CSS:
     let boardDiv = document.getElementById('board');
     var style = getComputedStyle(board);
     let hexheight = style.getPropertyValue('--hex-height');
@@ -27,6 +28,7 @@ define([
     let hh = calcrm(s.getPropertyValue('height'));
 
     console.log(hw, hh);
+    // Now compute the per-hex offsets in both directions
     let hoffset = 0.75 * hw;
     let voffset = 1.0 * hh + 1.0;
     console.log(hoffset, voffset);
