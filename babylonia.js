@@ -814,13 +814,13 @@ function (dojo, declare, hexloc) {
 
             if ( notif.args.captured_by != 0 ) {
                 this.slideDiv(
-                    'city_blank',
+                    'bbl_city_blank',
                     hexDivId,
                     this.citycount_id(notif.args.captured_by)
                 );
             } else {
                 this.slideDiv(
-                    'city_blank',
+                    'bbl_city_blank',
                     hexDivId,
                     // TODO: find a location for 'off the board'
                     this.ID_AVAILABLE_ZCARDS
