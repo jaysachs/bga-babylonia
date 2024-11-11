@@ -248,13 +248,13 @@ class PersistentStore {
         return new TurnProgress($moves);
     }
 
-    public function updateAuxScores($aux_scores: array /* int -> int */): void {
+    public function updateAuxScores(array /* int->int */ $aux_scores): void {
         $sql = 'UPDATE player SET player_score_aux = CASE player_id ';
-        for ($aux_scores as $pid => $city_count) {
+        foreach ($aux_scores as $pid => $city_count) {
             $sql .= " WHEN {$pid} THEN {$city_count} ";
         }
         $sql .= ' ELSE 0 END WHERE player_id IN '
-                . '(' . implode(array_keys($aux_scores), ',') . ')';
+                . '(' . implode(',', array_keys($aux_scores)) . ')';
         $this->db->DbQuery($sql);
     }
 
