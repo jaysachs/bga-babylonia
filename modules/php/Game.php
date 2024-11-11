@@ -682,6 +682,8 @@ class Game extends \Table
         // Init global values with their initial values.
 
         // Init game statistics.
+        Stats::init($this, array_keys($players));
+
         //
         // NOTE: statistics used in this file must be defined in your `stats.inc.php` file.
 
