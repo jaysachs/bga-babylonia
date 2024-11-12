@@ -36,6 +36,8 @@
  * Then, anywhere you want to access/increment a stat, simply e.g.
  *
  *    Stats::PLAYER_NUMBER_TURNS->inc($player_id);
+ *
+ *    Stats::TABLE_GAME_ENDED_DUE_TO_PIECE_EXHAUSTION->set(true);
  */
 declare(strict_types=1);
 
