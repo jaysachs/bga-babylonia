@@ -76,7 +76,7 @@ echo "php\n";
 ?>
 declare(strict_types=1);
 
-namespace Bga\Games\<?php echo $gamename ?>\StatsImpl;
+namespace Bga\Games\<?php echo $gamename ?>\StatsGen;
 
 class Impl {
     static $impl = null;
@@ -179,7 +179,7 @@ enum BoolTableStats: string {
 }
 
 namespace Bga\Games\<?php echo $gamename ?>;
-use Bga\Games\<?php echo $gamename ?>\StatsImpl\ {
+use Bga\Games\<?php echo $gamename ?>\StatsGen\ {
     IntPlayerStats,
     BoolPlayerStats,
     IntTableStats,
