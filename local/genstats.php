@@ -76,7 +76,7 @@ echo "php\n";
 ?>
 declare(strict_types=1);
 
-namespace Bga\Games\<?php echo $gamename; ?>\StatsImpl;
+namespace Bga\Games\<?php echo $gamename ?>\StatsImpl;
 
 class Impl {
     static $impl = null;
@@ -190,22 +190,22 @@ use Bga\Games\<?php echo $gamename ?>\StatsImpl\ {
 class Stats {
     // Player int stats
 <?php foreach (statsFor("player", "int") as $n => $id) { ?>
-    const PLAYER_<?php echo $id; ?> = IntPlayerStats::<?php echo $id; ?>;
+    const PLAYER_<?php echo $id ?> = IntPlayerStats::<?php echo $id ?>;
 <?php } ?>
 
     // Player bool stats
 <?php foreach (statsFor("player", "bool") as $n => $id) { ?>
-    const PLAYER_<?php echo $id; ?> = BoolPlayerStats::<?php echo $id; ?>;
+    const PLAYER_<?php echo $id ?> = BoolPlayerStats::<?php echo $id ?>;
 <?php } ?>
 
     // Table int stats
 <?php foreach (statsFor("table", "int") as $n => $id) { ?>
-    const TABLE_<?php echo $id; ?> = IntTableStats::<?php echo $id; ?>;
+    const TABLE_<?php echo $id ?> = IntTableStats::<?php echo $id ?>;
 <?php } ?>
 
     // Table bool stats
 <?php foreach (statsFor("table", "bool") as $n => $id) { ?>
-    const TABLE_<?php echo $id; ?> = BoolTableStats::<?php echo $id; ?>;
+    const TABLE_<?php echo $id ?> = BoolTableStats::<?php echo $id ?>;
 <?php } ?>
 
     public static function init(mixed $the_impl): void {
@@ -213,7 +213,7 @@ class Stats {
     }
 
     /*
-     * Convenient method to initialize all stats to "zero".
+     * Convenience method to initialize all stats to "zero".
      */
     public static function initAll(array /* int */ $player_ids): void {
 <?php foreach (statsFor("player", "int") as $n => $id) { ?>
