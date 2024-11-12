@@ -22,7 +22,20 @@
  * See http://en.boardgamearena.com/#!doc/Studio for more information.
  */
 
+/*
+ * Usage: php genstats.php gamename > modules/php/Stats.php
+ */
 declare(strict_types=1);
+
+if (count($argv) != 2) {
+    error_log("Usage: php gentstats.php gamename");
+    exit(1);
+}
+$gamename = $argv[1];
+
+function toIdentifier(string $name): string {
+    return strtoupper($name);
+}
 
 function statsFor(string $t_or_p, string $type): array {
     static $payload = file_get_contents("stats.json");
@@ -41,7 +54,7 @@ echo "php\n";
 ?>
 declare(strict_types=1);
 
-namespace Bga\Games\babylonia;
+namespace Bga\Games\<?php echo $gamename; ?>;
 
 class Impl {
     static $impl = null;
@@ -50,7 +63,7 @@ class Impl {
 enum IntPlayerStats: string {
 <?php
     foreach (statsFor("player", "int") as $lname => $stat) {
-        $name = strtoupper($lname);
+        $name = toIdentifier($lname);
 ?>
     case <?php echo $name ?> = "<?php echo $lname?>";
 <?php
@@ -85,7 +98,7 @@ enum IntPlayerStats: string {
 enum IntTableStats: string {
 <?php
     foreach (statsFor("table", "int") as $lname => $stat) {
-        $name = strtoupper($lname);
+        $name = toIdentifier($lname);
 ?>
     case <?php echo $name ?> = "<?php echo $lname?>";
 <?php
@@ -112,7 +125,7 @@ enum IntTableStats: string {
 enum BoolPlayerStats: string {
 <?php
     foreach (statsFor("player", "bool") as $lname => $stat) {
-        $name = strtoupper($lname);
+        $name = toIdentifier($lname);
 ?>
     case <?php echo $name ?> = "<?php echo $lname?>";
 <?php
@@ -143,7 +156,7 @@ enum BoolPlayerStats: string {
 enum BoolTableStats: string {
 <?php
     foreach (statsFor("table", "bool") as $lname => $stat) {
-        $name = strtoupper($lname);
+        $name = toIdentifier($lname);
 ?>
     case <?php echo $name ?> = "<?php echo $lname?>";
 <?php
@@ -167,7 +180,7 @@ class Stats {
     // Player int stats
 <?php
     foreach (statsFor("player", "int") as $lname => $stat) {
-        $name = strtoupper($lname);
+        $name = toIdentifier($lname);
 ?>
     const PLAYER_<?php echo $name; ?> = IntPlayerStats::<?php echo $name; ?>;
 <?php
@@ -177,7 +190,7 @@ class Stats {
     // Player bool stats
 <?php
     foreach (statsFor("player", "bool") as $lname => $stat) {
-        $name = strtoupper($lname);
+        $name = toIdentifier($lname);
 ?>
     const PLAYER_<?php echo $name; ?> = BoolPlayerStats::<?php echo $name; ?>;
 <?php
@@ -187,7 +200,7 @@ class Stats {
     // Table int stats
 <?php
     foreach (statsFor("table", "int") as $lname => $stat) {
-        $name = strtoupper($lname);
+        $name = toIdentifier($lname);
 ?>
     const TABLE_<?php echo $name; ?> = IntTableStats::<?php echo $name; ?>;
 <?php
@@ -197,7 +210,7 @@ class Stats {
     // Table bool stats
 <?php
     foreach (statsFor("table", "bool") as $lname => $stat) {
-        $name = strtoupper($lname);
+        $name = toIdentifier($lname);
 ?>
     const TABLE_<?php echo $name; ?> = BoolTableStats::<?php echo $name; ?>;
 <?php
@@ -211,7 +224,7 @@ class Stats {
     public static function initAll(array /* int */ $player_ids): void {
 <?php
     foreach (statsFor("player", "int") as $lname => $stat) {
-        $name = strtoupper($lname);
+        $name = toIdentifier($lname);
 ?>
         self::PLAYER_<?php echo $name; ?>->init($player_ids, 0);
 <?php
@@ -219,7 +232,7 @@ class Stats {
 ?>
 <?php
     foreach (statsFor("player", "bool") as $lname => $stat) {
-        $name = strtoupper($lname);
+        $name = toIdentifier($lname);
 ?>
         self::PLAYER_<?php echo $name; ?>->init($player_ids, false);
 <?php
@@ -227,7 +240,7 @@ class Stats {
 ?>
 <?php
     foreach (statsFor("table", "int") as $lname => $stat) {
-        $name = strtoupper($lname);
+        $name = toIdentifier($lname);
 ?>
         self::TABLE_<?php echo $name; ?>->init(0);
 <?php
@@ -235,7 +248,7 @@ class Stats {
 ?>
 <?php
     foreach (statsFor("table", "bool") as $lname => $stat) {
-        $name = strtoupper($lname);
+        $name = toIdentifier($lname);
 ?>
         self::TABLE_<?php echo $name; ?>->init(false);
 <?php
