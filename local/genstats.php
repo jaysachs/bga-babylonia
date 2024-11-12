@@ -23,9 +23,14 @@
  */
 
 /*
- * Usage: php genstats.php gamename > modules/php/Stats.php
+ * Generate via:
  *
- * Configuration in Game.php constructor:
+ *  $ php genstats.php gamename > modules/php/Stats.php
+ *
+ * Usage in game code
+ * ==================
+ *
+ * One line configuration in Game.php constructor:
  *
  *    public function __construct() {
  *        ...
@@ -33,27 +38,35 @@
  *        ...
  *    }
  *
- * Initialize stats in setupNewGame:
+ * Initializing stats in setupNewGame():
  *
  *    protected function setupNewGame($players, $options = []) {
  *        ...
  *        // Initialize all stats to "zero" values
  *        Stats::initAll(array_keys($players));
- *        ...
+ *
  *        // Or, initialize each stat individually:
- *        Stats::PLAYER_MY_INT_STAT->initAll(array_keys($players), 5);
+ *        Stats::PLAYER_MY_FLOAT_STAT->initAll(array_keys($players), 1.732);
+ *        Stats::PLAYER_MY_BOOL_STAT->initAll(array_keys($players), true);
  *
  *        // Or, different per player id:
  *        for ($players as $player_id => $player) {
- *            Stats::PLAYER_OTHER_INT_STAT->init($player_id, rand(0, 4));
+ *            Stats::PLAYER_MY_INT_STAT->init($player_id, rand(0, 4));
  *        }
+ *        // or, alternatively use initMap:
+ *        Stats::PLAYER_MY_INT_STAT->initMap($array_keys($players),
+ *            function ($pid) { return rand(0, 4); });
+ *
+ *        // Table stats are simpler, only one possible init:
+ *        Stats::TABLE_MY_FLOAT_STAT->init(3.14159);
  *        ...
  *     }
  *
- * Then anywhere you want to access/increment a stat, simply:
+ * Updating / accessing stats (anywhere):
  *
  *    Stats::PLAYER_NUMBER_TURNS->inc($player_id);
  *    Stats::TABLE_GAME_ENDED_DUE_TO_PIECE_EXHAUSTION->set(true);
+ *    Stats::TABLE_OTHER_FLOAT->set(1.15 * Stats::TABLE_OTHER_FLOAT->get());
  */
 declare(strict_types=1);
 
