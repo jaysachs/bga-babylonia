@@ -66,6 +66,7 @@
  *    Stats::TABLE_OTHER_FLOAT->set(1.15 * Stats::TABLE_OTHER_FLOAT->get());
  *    ...
  *
+ * TODO: improve toIdentifier.
  * TODO: determine if need to include the BGA license boilerplate
  *       in the generated code.
  * TODO: need to let the Stats class name be customized?
