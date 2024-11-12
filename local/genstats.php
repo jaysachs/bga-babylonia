@@ -24,6 +24,18 @@
 
 /*
  * Usage: php genstats.php gamename > modules/php/Stats.php
+ *
+ * Then, in Game.php construtor:
+ *
+ * public function __construct() {
+ *   ...
+ *   Stats::init($this);
+ *   ...
+ * }
+ *
+ * Then, anywhere you want to access/increment a stat, simply e.g.
+ *
+ *    Stats::PLAYER_NUMBER_TURNS->inc($player_id);
  */
 declare(strict_types=1);
 
