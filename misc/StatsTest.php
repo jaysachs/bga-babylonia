@@ -49,7 +49,8 @@ final class StatsTest extends TestCase
 {
     public function testInit(): void
     {
-        Stats::init(new SImpl(), [0]);
+        Stats::init(new SImpl());
+        Stats::initAll([1,2,3]);
         $this->assertTrue(true);
     }
 
