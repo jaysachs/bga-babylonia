@@ -23,14 +23,16 @@
  */
 
 /*
- * Generate via:
+ * Generate via
  *
  *  $ php genstats.php gamename > modules/php/Stats.php
+ *
+ * (assumes you're in the main game directory where stats.json is located)
  *
  * Usage in game code
  * ==================
  *
- * One line configuration in Game.php constructor:
+ * Insert one line of configuration into the Game.php constructor:
  *
  *    public function __construct() {
  *        ...
@@ -38,7 +40,7 @@
  *        ...
  *    }
  *
- * Initializing stats in setupNewGame():
+ * Initialize stats in setupNewGame():
  *
  *    protected function setupNewGame($players, $options = []) {
  *        ...
@@ -49,12 +51,12 @@
  *        Stats::PLAYER_MY_FLOAT_STAT->initAll(array_keys($players), 1.732);
  *        Stats::PLAYER_MY_BOOL_STAT->initAll(array_keys($players), true);
  *
- *        // Or, different per player id:
+ *        // Or, different value per player id:
  *        for ($players as $player_id => $player) {
  *            Stats::PLAYER_MY_INT_STAT->init($player_id, rand(0, 4));
  *        }
- *        // or, alternatively use initMap:
- *        Stats::PLAYER_MY_INT_STAT->initMap($array_keys($players),
+ *        // or, alternatively use initMap():
+ *        Stats::PLAYER_MY_OTHER_INT_STAT->initMap($array_keys($players),
  *            function ($pid) { return rand(0, 4); });
  *
  *        // Table stats are simpler, only one possible init:
@@ -64,9 +66,14 @@
  *
  * Updating / accessing stats (anywhere):
  *
+ *    ...
  *    Stats::PLAYER_NUMBER_TURNS->inc($player_id);
  *    Stats::TABLE_GAME_ENDED_DUE_TO_PIECE_EXHAUSTION->set(true);
  *    Stats::TABLE_OTHER_FLOAT->set(1.15 * Stats::TABLE_OTHER_FLOAT->get());
+ *    ...
+ *
+ * TODO: determine if need to include the BGA license boilerplate
+ *       in the generated code.
  */
 declare(strict_types=1);
 
