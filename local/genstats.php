@@ -112,6 +112,36 @@ enum IntPlayerStats: string {
     }
 }
 
+enum FloatPlayerStats: string {
+<?php foreach (statsFor("player", "float") as $name => $id) { ?>
+    case <?php echo $id ?> = "<?php echo $name ?>";
+<?php } ?>
+
+    public function add(int $player_id, float $delta): void {
+        Impl::$impl->incStat($delta, $this->value, $player_id);
+    }
+
+    public function set(int $player_id, float $val): void {
+        Impl::$impl->setStat($val, $this->value, $player_id);
+    }
+
+    public function get(int $player_id): float {
+        return Impl::$impl->getStat($this->value, $player_id);
+    }
+
+    public function init(array /*int*/ $player_ids, float $val = 0.0): void {
+        foreach ($player_ids as $pid) {
+            Impl::$impl->initStat("player", $this->value, $val, $pid);
+        }
+    }
+
+    public function initf(array /* int */ $player_ids, Closure &$val): void {
+        foreach ($player_ids as $pid) {
+            Impl::$impl->initStat("player", $this->value, $val($pid), $pid);
+        }
+    }
+}
+
 enum IntTableStats: string {
 <?php foreach (statsFor("table", "int") as $name => $id) { ?>
     case <?php echo $id ?> = "<?php echo $name ?>";
@@ -130,6 +160,28 @@ enum IntTableStats: string {
     }
 
     public function init(int $val): void {
+        Impl::$impl->initStat("table", $this->value, $val);
+    }
+}
+
+enum FloatTableStats: string {
+<?php foreach (statsFor("table", "float") as $name => $id) { ?>
+    case <?php echo $id ?> = "<?php echo $name ?>";
+<?php } ?>
+
+    public function add(float $delta): void {
+        Impl::$impl->incStat($delta, $this->value);
+    }
+
+    public function set(float $val): void {
+        Impl::$impl->setStat($val, $this->value);
+    }
+
+    public function get(): float {
+        return Impl::$impl->getStat($this->value);
+    }
+
+    public function init(float $val): void {
         Impl::$impl->initStat("table", $this->value, $val);
     }
 }
@@ -182,8 +234,10 @@ namespace Bga\Games\<?php echo $gamename ?>;
 use Bga\Games\<?php echo $gamename ?>\StatsGen\ {
     IntPlayerStats,
     BoolPlayerStats,
+    FloatPlayerStats,
     IntTableStats,
     BoolTableStats,
+    FloatTableStats,
     Impl,
 };
 
@@ -191,6 +245,11 @@ class Stats {
     // Player int stats
 <?php foreach (statsFor("player", "int") as $n => $id) { ?>
     const PLAYER_<?php echo $id ?> = IntPlayerStats::<?php echo $id ?>;
+<?php } ?>
+
+    // Player float stats
+<?php foreach (statsFor("player", "float") as $n => $id) { ?>
+    const PLAYER_<?php echo $id ?> = FloatPlayerStats::<?php echo $id ?>;
 <?php } ?>
 
     // Player bool stats
@@ -201,6 +260,11 @@ class Stats {
     // Table int stats
 <?php foreach (statsFor("table", "int") as $n => $id) { ?>
     const TABLE_<?php echo $id ?> = IntTableStats::<?php echo $id ?>;
+<?php } ?>
+
+    // Table float stats
+<?php foreach (statsFor("table", "float") as $n => $id) { ?>
+    const TABLE_<?php echo $id ?> = FloatTableStats::<?php echo $id ?>;
 <?php } ?>
 
     // Table bool stats
@@ -219,11 +283,17 @@ class Stats {
 <?php foreach (statsFor("player", "int") as $n => $id) { ?>
         self::PLAYER_<?php echo $id ?>->init($player_ids, 0);
 <?php } ?>
+<?php foreach (statsFor("player", "float") as $n => $id) { ?>
+        self::PLAYER_<?php echo $id ?>->init($player_ids, 0.0);
+<?php } ?>
 <?php foreach (statsFor("player", "bool") as $n => $id) { ?>
         self::PLAYER_<?php echo $id ?>->init($player_ids, false);
 <?php } ?>
 <?php foreach (statsFor("table", "int") as $n => $id) { ?>
         self::TABLE_<?php echo $id ?>->init(0);
+<?php } ?>
+<?php foreach (statsFor("table", "float") as $n => $id) { ?>
+        self::TABLE_<?php echo $id ?>->init(0.0);
 <?php } ?>
 <?php foreach (statsFor("table", "bool") as $n => $id) { ?>
         self::TABLE_<?php echo $id ?>->init(false);
