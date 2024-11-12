@@ -235,6 +235,9 @@ class Stats {
         Impl::$impl = $the_impl;
     }
 
+    /*
+     * Convenient method to initialize all stats to "zero".
+     */
     public static function initAll(array /* int */ $player_ids): void {
 <?php
     foreach (statsFor("player", "int") as $lname => $stat) {
