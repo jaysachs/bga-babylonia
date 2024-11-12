@@ -1,9 +1,6 @@
 <?php
 /**
  *------
- * BGA framework: Gregory Isabelli & Emmanuel Colin & BoardGameArena
- * babylonia implementation : © Jay Sachs <jay@covariant.org>
- *
  * Copyright 2024 Jay Sachs <jay@covariant.org>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,13 +14,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
- * This code has been produced on the BGA studio platform for use on http://boardgamearena.com.
- * See http://en.boardgamearena.com/#!doc/Studio for more information.
  */
 
 /*
- * Generate via
+ * Generate the Stats class via
  *
  *  $ php genstats.php gamename > modules/php/Stats.php
  *
@@ -74,6 +68,7 @@
  *
  * TODO: determine if need to include the BGA license boilerplate
  *       in the generated code.
+ * TODO: need to let the Stats class name be customized?
  */
 declare(strict_types=1);
 
