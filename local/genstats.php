@@ -78,6 +78,10 @@ if (count($argv) != 2) {
 }
 $gamename = $argv[1];
 
+function toIdentifier($name): string {
+    return strtoupper($name);
+};
+
 function statsFor(string $t_or_p, string $type): array {
     static $payload = file_get_contents("stats.json");
     static $all_stats = json_decode($payload, true);
@@ -87,19 +91,17 @@ function statsFor(string $t_or_p, string $type): array {
         return [];
     }
 
-    $toIdentifier = function(string $name): string {
-        return strtoupper($name);
-    };
-
-    return array_map(
-        $toIdentifier,
-        array_keys(
-            array_filter(
-                $s,
-                function ($s) use ($type) { return $s["type"] == $type; }
-            )
-        )
+    $s = array_filter(
+        $s,
+        function ($v, $n) use ($type) { return $v["type"] == $type; },
+        ARRAY_FILTER_USE_BOTH
     );
+
+    $res = [];
+    foreach (array_keys($s) as $n) {
+        $res[$n] = toIdentifier($n);
+    }
+    return $res;
 }
 
 echo "<?";
