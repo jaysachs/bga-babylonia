@@ -402,9 +402,15 @@ class Game extends \Table
         }
 
         $model = new Model($this->ps, $player_id);
-        Stats::PLAYER_NUMBER_TURNS->inc($player_id);
 
-        if ($model->finishTurn()) {
+        $result = $model->finishTurn();
+        if ($result->gameOver()) {
+            if ($result->less_than_two_remaining_cities) {
+                Stats::TABLE_GAME_END_BY_POOL_EXHAUSTION->set(true);
+            }
+            if ($result->pieces_exhausted) {
+                Stats::TABLE_GAME_END_BY_CITY_CAPTURES->set(true);
+            }
             $this->notifyAllPlayers(
                 "gameEnded",
                 clienttranslate('Game has ended'),
@@ -457,8 +463,10 @@ class Game extends \Table
 
     public function stNextPlayer() {
         $this->activeNextPlayer();
-        $this->giveExtraTime($this->activePlayerId());
-        $this->setPlayerOnTurn($this->activePlayerId());
+        $player_id = $this->activePlayerId();
+        Stats::PLAYER_NUMBER_TURNS->inc($player_id);
+        $this->giveExtraTime($player_id);
+        $this->setPlayerOnTurn($player_id);
         $this->gamestate->nextState("done");
     }
 
@@ -700,8 +708,10 @@ class Game extends \Table
 
         // Activate first player once everything has been initialized and ready.
         $this->activeNextPlayer();
-        $this->giveExtraTime($this->activePlayerId());
-        $this->setPlayerOnTurn($this->activePlayerId());
+        $player_id = $this->activePlayerId();
+        $this->giveExtraTime($player_id);
+        $this->setPlayerOnTurn($player_id);
+        Stats::PLAYER_NUMBER_TURNS->inc($player_id);
         $this->setNextPlayerToBeActive(0);
     }
 

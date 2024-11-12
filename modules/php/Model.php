@@ -256,21 +256,21 @@ class Model {
     }
 
     /* return true if game should end */
-    public function finishTurn(): bool {
+    public function finishTurn(): TurnResult {
         $hand = $this->hand();
         $this->refillHand();
         $this->ps->upsertHand($this->player_id, $hand);
         $this->ps->upsertPool($this->player_id, $this->pool());
 
-        // set sizes on info, persist it?
-
-        if ($hand->size() == 0 || $this->board()->cityCount() <= 1) {
+        $result = new TurnResult($hand->size() == 0,
+                                 $this->board()->cityCount() <= 1);
+        if ($result->gameOver()) {
             $this->resolveAnyTies();
-            return true;
+            return $result;
         }
 
         $this->ps->removeTurnProgress($this->player_id);
-        return false;
+        return $result;
     }
 
     private function resolveAnyTies(): void {
