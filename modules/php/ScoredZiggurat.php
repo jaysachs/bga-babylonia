@@ -2,9 +2,9 @@
 /**
  *------
  * BGA framework: Gregory Isabelli & Emmanuel Colin & BoardGameArena
- * babylonia implementation : © Jay Sachs <jay@covariant.org>
+ * babylonia implementation : © Jay Sachs <vagabond@covariant.org>
  *
- * Copyright 2024 Jay Sachs <jay@covariant.org>
+ * Copyright 2024 Jay Sachs <vagabond@covariant.org>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
