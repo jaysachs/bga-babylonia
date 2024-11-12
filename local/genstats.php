@@ -21,7 +21,13 @@
  *
  *  $ php genstats.php gamename > modules/php/Stats.php
  *
- * (assumes you're in the main game directory where stats.json is located)
+ * (assumes you're in the main game directory where stats.json is located).
+ *
+ * The Stats.php file wil contain backed enums for each statistic defined
+ * in stats.json, with the enum name derived from the stats.json identifier,
+ * and with typed methods for the different kinds of stats (table / player,
+ * int / float / bool).
+ *
  *
  * Usage in game code
  * ==================
@@ -46,7 +52,7 @@
  *        Stats::PLAYER_MY_BOOL_STAT->initAll(array_keys($players), true);
  *
  *        // Or, different value per player id:
- *        for ($players as $player_id => $player) {
+ *        foreach ($players as $player_id => $player) {
  *            Stats::PLAYER_MY_INT_STAT->init($player_id, rand(0, 4));
  *        }
  *        // or, alternatively use initMap():
