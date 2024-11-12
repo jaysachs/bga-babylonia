@@ -204,8 +204,11 @@ class Stats {
     }
 ?>
 
-    static function init(mixed $the_impl, array $player_ids) {
+    public static function init(mixed $the_impl): void {
         Impl::$impl = $the_impl;
+    }
+
+    public static function initAll(array /* int */ $player_ids): void {
 <?php
     foreach (statsFor("player", "int") as $lname => $stat) {
         $name = strtoupper($lname);

@@ -58,6 +58,7 @@ class Game extends \Table
         ]);
 
         Logging::init($this);
+        Stats::init($this);
         $this->ps = new PersistentStore($this);
     }
 
@@ -401,6 +402,7 @@ class Game extends \Table
         }
 
         $model = new Model($this->ps, $player_id);
+        Stats::PLAYER_NUMBER_TURNS->inc($player_id);
 
         if ($model->finishTurn()) {
             $this->notifyAllPlayers(
@@ -682,7 +684,7 @@ class Game extends \Table
         // Init global values with their initial values.
 
         // Init game statistics.
-        Stats::init($this, array_keys($players));
+        Stats::initAll(array_keys($players));
 
         //
         // NOTE: statistics used in this file must be defined in your `stats.inc.php` file.
