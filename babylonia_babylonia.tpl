@@ -37,14 +37,14 @@
   const jstpl_player_board_ext =
         '<div class="bbl_playerboard_ext">\
            <div class="bbl_handpoolcity">\
-             <div class="bbl_hand">\
+             <div>\
                <span class="bbl_hand_label bbl_hidden_${player_number}"></span>\
                <span id="bbl_handcount_${player_id}" class="bbl_counter">5</span>\
              </div>\
              <div class="bbl_pool">\
-               <span class="bbl_pool_label hidden_${player_number}"></span>\
-               <span class="bbl_pool_label hidden_${player_number}"></span>\
-               <span class="bbl_pool_label hidden_${player_number}"></span>\
+               <span class="bbl_pool_label bbl_hidden_${player_number}"></span>\
+               <span class="bbl_pool_label bbl_hidden_${player_number}"></span>\
+               <span class="bbl_pool_label bbl_hidden_${player_number}"></span>\
                <span id="bbl_poolcount_${player_id}" class="bbl_counter">19</span>\
              </div>\
              <div class="bbl_citycount">\
