@@ -406,10 +406,10 @@ class Game extends \Table
         $result = $model->finishTurn();
         if ($result->gameOver()) {
             if ($result->less_than_two_remaining_cities) {
-                Stats::TABLE_GAME_END_BY_POOL_EXHAUSTION->set(true);
+                Stats::TABLE_GAME_END_BY_CITY_CAPTURES->set(true);
             }
             if ($result->pieces_exhausted) {
-                Stats::TABLE_GAME_END_BY_CITY_CAPTURES->set(true);
+                Stats::TABLE_GAME_END_BY_POOL_EXHAUSTION->set(true);
             }
             $this->notifyAllPlayers(
                 "gameEnded",
