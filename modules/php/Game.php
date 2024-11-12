@@ -219,6 +219,7 @@ class Game extends \Table
         $scored_city = $model->scoreCity($cityhex);
         $captured_by = $scored_city->captured_by;
         if ($captured_by > 0) {
+            Stats::PLAYER_CITIES_CAPTURED->inc($player_id);
             $pnk = $this->playerNameKey($captured_by);
             $msg = '${city} at (${row},${col}) scored, captured by ${' . $pnk . '}';
         } else {
@@ -299,6 +300,7 @@ class Game extends \Table
         $player_id = $this->activePlayerId();
         $model = new Model($this->ps, $player_id);
         $selection = $model->selectZigguratCard(ZigguratCardType::from($card_type));
+        Stats::PLAYER_ZIGGURAT_CARDS->inc($player_id);
 
         $this->notifyAllPlayers(
             "zigguratCardSelection",
