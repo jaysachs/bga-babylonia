@@ -624,7 +624,7 @@ function (dojo, declare, hexloc) {
         },
 
         handPieceClass: function(piece, playerNumber = null) {
-            if (piece == null || piece == this.CSS_EMPTY) {
+            if (piece == null || piece == "empty") {
                 return this.CSS_EMPTY;
             }
             return this.pieceClass(
