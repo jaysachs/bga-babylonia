@@ -511,8 +511,6 @@ a.action-button > div.bbl_zcard {
     margin: 0;
     padding: 0;
     background-color: transparent;
-    background-size: 100% 1400%;
-    background-image: url(img/cities.png);
 }
 
 .log-element.bbl_zc_10pts,
