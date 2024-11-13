@@ -9,3 +9,4 @@
 21. Animate hex networks during city scoring.
 22. Add more statistics. Needs undo support, which means TurnProgress needs to be more granular.
 23. Stats and undo: store as serialized JSON?
+24. City hexes animated are rendered incorrectly; size / bg position looks wrong.
