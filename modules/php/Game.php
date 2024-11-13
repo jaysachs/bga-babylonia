@@ -72,7 +72,7 @@ class Game extends \Table
         if ($move->captured_piece->isField()) {
             Stats::PLAYER_FIELDS_CAPTURED->inc($player_id);
         }
-        if ($piece->isHidden()) {
+        if ($move->piece->isHidden()) {
             Stats::PLAYER_RIVER_SPACES_PLAYED->inc($player_id);
         }
         $msg = "";
@@ -308,7 +308,18 @@ class Game extends \Table
         $model = new Model($this->ps, $player_id);
         $selection = $model->selectZigguratCard(ZigguratCardType::from($card_type));
         Stats::PLAYER_ZIGGURAT_CARDS->inc($player_id);
-
+        $stat = match ($selection->card->type) {
+            ZigguratCardType::PLUS_10 => Stats::PLAYER_ZIGGURAT_CARD_1_CHOSEN,
+            ZigguratCardType::EXTRA_TURN => Stats::PLAYER_ZIGGURAT_CARD_2_CHOSEN,
+            ZigguratCardType::HAND_SIZE_7 => Stats::PLAYER_ZIGGURAT_CARD_3_CHOSEN,
+            ZigguratCardType::NOBLES_3_KINDS => Stats::PLAYER_ZIGGURAT_CARD_4_CHOSEN,
+            ZigguratCardType::NOBLE_WITH_3_FARMERS => Stats::PLAYER_ZIGGURAT_CARD_5_CHOSEN,
+            ZigguratCardType::NOBLES_IN_FIELDS => Stats::PLAYER_ZIGGURAT_CARD_6_CHOSEN,
+            ZigguratCardType::EXTRA_CITY_POINTS => Stats::PLAYER_ZIGGURAT_CARD_7_CHOSEN,
+            ZigguratCardType::FREE_CENTER_LAND_CONNECTS => Stats::PLAYER_ZIGGURAT_CARD_8_CHOSEN,
+            ZigguratCardType::FREE_RIVER_CONNECTS => Stats::PLAYER_ZIGGURAT_CARD_9_CHOSEN,
+        };
+        $stat->set($player_id, true);
         $this->notifyAllPlayers(
             "zigguratCardSelection",
             clienttranslate('${player_name} chose ziggurat card ${zcard}'),
