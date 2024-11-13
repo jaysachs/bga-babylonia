@@ -205,7 +205,6 @@ class Model {
         case Piece::FIELD_7:
             $field_points = 7; break;
         case Piece::FIELD_CITIES:
-            // TODO?: use and maintain a global captured city-count?
             $field_points = $this->totalCapturedCities();
             break;
         }
@@ -215,7 +214,6 @@ class Model {
         if (count($zigs) > 0) {
             $ziggurat_points = $this->board()->adjacentZiggurats($this->player_id);
         }
-
         $move = new Move($this->player_id, $piece, $originalPiece, $handpos,
                          $row, $col, $hexPiece,
                          $field_points, $ziggurat_points);

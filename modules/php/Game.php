@@ -69,10 +69,17 @@ class Game extends \Table
         $move = $model->playPiece($handpos, $row, $col);
         $points = $move->points();
         $piece = $move->piece->value;
-
+        if ($move->captured_piece->isField()) {
+            Stats::PLAYER_FIELDS_CAPTURED->inc($player_id);
+        }
+        if ($piece->isHidden()) {
+            Stats::PLAYER_RIVER_SPACES_PLAYED->inc($player_id);
+        }
         $msg = "";
         if ($points > 0) {
             $msg = '${player_name} plays ${piece} to (${row},${col}) scoring ${points} points';
+            Stats::PLAYER_POINTS_FROM_FIELDS->inc($player_id, $move->field_points);
+            Stats::PLAYER_POINTS_FROM_ZIGGURATS->inc($player_id, $move->ziggurat_points);
         } else {
             $msg = '${player_name} plays ${piece} to (${row},${col})';
         }
@@ -272,7 +279,7 @@ class Game extends \Table
     public function stZigguratScoring(): void {
         $next_player_id = $this->nextPlayerToBeActive();
         if ($next_player_id != 0) {
-            if ($next_player_id != $this->activePlayerIdx()) {
+            if ($next_player_id != $this->activePlayerId()) {
                 $this->gamestate->changeActivePlayer($next_player_id);
                 $this->giveExtraTime($next_player_id);
             }
@@ -357,8 +364,10 @@ class Game extends \Table
         }
 
         if ($piece->isCity()) {
+            Stats::CITY_SCORING_TRIGGERED->inc($player_id);
             $this->gamestate->nextState("citySelected");
         } else {
+            Stats::ZIGGURAT_SCORING_TRIGGERED->inc($player_id);
             $this->gamestate->nextState("zigguratSelected");
         }
     }
@@ -473,8 +482,22 @@ class Game extends \Table
     }
 
     public function actUndoPlay() {
-        $model = new Model($this->ps, $this->activePlayerId());
+        $player_id = $this->activePlayerId();
+        $model = new Model($this->ps, $player_id);
         $move = $model->undo();
+
+        if ($move->piece->isHidden()) {
+            Stats::PLAYER_RIVER_SPACES_PLAYED->inc($player_id, -1);
+        }
+        if ($move->captured_piece->isField()) {
+            Stats::PLAYER_FIELDS_CAPTURED->inc($player_id, -1);
+        }
+        if ($move->points() > 0) {
+            Stats::PLAYER_POINTS_FROM_FIELDS->inc($player_id,
+                                                  -$move->field_points);
+            Stats::PLAYER_POINTS_FROM_ZIGGURATS->inc($player_id,
+                                                     -$move->ziggurat_points);
+        }
 
         foreach ($model->allPlayerIds() as $pid) {
             $args = [

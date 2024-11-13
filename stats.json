@@ -57,6 +57,16 @@
             "name": "Number of points gained from ziggurat adjacency",
             "type": "int"
         },
+        "points_from_fields": {
+            "id": 29,
+            "name": "Number of points gained from captured fields",
+            "type": "int"
+        },
+        "fields_captured": {
+            "id": 30,
+            "name": "Number of captured fields",
+            "type": "int"
+        },
         "ziggurat_card_1_chosen": {
             "id": 31,
             "name": "Whether ziggurat card 1 was chosen",

@@ -1,7 +1,7 @@
 #
 STATS=modules/php/Stats.php
 
-$(STATS): local/genstats.php
+$(STATS): local/genstats.php stats.json
 	php local/genstats.php babylonia > modules/php/Stats.php
 
 test: $(STATS)
