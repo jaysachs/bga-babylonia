@@ -315,11 +315,10 @@ body {
     border-style: none;
     margin-top: 5px;
     margin-bottom: 5px;
-    /* shared with .piece */
-    background-image: url(img/pieces.png);
 }
 
 #bbl_hand > div.bbl_empty {
+    /* TODO: put this in the pieces sprite file */
     background-image: url(img/piecealpha.png);
     background-size: 100% 100%;
 }
@@ -341,6 +340,7 @@ body {
 }
 
 #bbl_hand > div.bbl_selected {
+    /* TODO: put in pieces sprite file? */
     content: url(img/piecehl.png);
 }
 
@@ -407,14 +407,10 @@ body {
 }
 
 .bbl_hand_label {
-    background-image: url(img/pieces.png);
-    background-size: 400% 500%;
 }
 
 .bbl_pool_label {
     margin-right: -2.3em;
-    background-image: url(img/pieces.png);
-    background-size: 400% 500%;
 }
 
 .bbl_citycount_label {
@@ -434,6 +430,7 @@ div.bbl_zcards span.bbl_zcard_label {
     display: inline-block;
     height: calc(var(--label-height));
     width: calc(var(--label-width));
+    /* same as ziggurat */
     background: url(img/cities.png) 0% -1300%;
     background-color: transparent;
     background-size: 100% 1400%;
