@@ -7,6 +7,6 @@
 13. Consider hex-highlighting (and piece?) via filters or other CSS-wizardry (but careful of iOS performance issues).
 19. Audit all notifications; are they all required? any missing? incomplete?
 21. Animate hex networks during city scoring.
-22. Add more statistics. Needs undo support, which means TurnProgress needs to be more granular.
 23. Stats and undo: store as serialized JSON?
 24. City hexes animated are rendered incorrectly; size / bg position looks wrong.
+25. More granular points stats (aim for adding up breakdown).
