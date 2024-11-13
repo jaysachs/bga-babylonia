@@ -102,40 +102,69 @@
             "name": "Whether ziggurat card 7 was chosen",
             "type": "bool"
         },
+        "ziggurat_card_8_chosen": {
+            "id": 38,
+            "name": "Whether ziggurat card 8 was chosen",
+            "type": "bool"
+        },
+        "ziggurat_card_9_chosen": {
+            "id": 39,
+            "name": "Whether ziggurat card 9 was chosen",
+            "type": "bool"
+        },
         "ziggurat_card_1_used": {
             "id": 41,
             "name": "Number of times ziggurat card 1 was used",
-            "type": "int"
+            "type": "int",
+            "display": "limited"
         },
         "ziggurat_card_2_used": {
             "id": 42,
             "name": "Number of times ziggurat card 2 was used",
-            "type": "int"
+            "type": "int",
+            "display": "limited"
         },
         "ziggurat_card_3_used": {
             "id": 43,
             "name": "Number of times ziggurat card 3 was used",
-            "type": "int"
+            "type": "int",
+            "display": "limited"
         },
         "ziggurat_card_4_used": {
             "id": 44,
             "name": "Number of times ziggurat card 4 was used",
-            "type": "int"
+            "type": "int",
+            "display": "limited"
         },
         "ziggurat_card_5_used": {
             "id": 45,
             "name": "Number of times ziggurat card 5 was used",
-            "type": "int"
+            "type": "int",
+            "display": "limited"
         },
         "ziggurat_card_6_used": {
             "id": 46,
             "name": "Number of times ziggurat card 6 was used",
-            "type": "int"
+            "type": "int",
+            "display": "limited"
         },
         "ziggurat_card_7_used": {
             "id": 47,
             "name": "Number of times ziggurat card 7 was used",
-            "type": "int"
+            "type": "int",
+            "display": "limited"
+        },
+        "ziggurat_card_8_used": {
+            "id": 48,
+            "name": "Number of times ziggurat card 8 was used",
+            "type": "int",
+            "display": "limited"
+        },
+        "ziggurat_card_9_used": {
+            "id": 49,
+            "name": "Number of times ziggurat card 9 was used",
+            "type": "int",
+            "display": "limited"
         }
     }
 }
