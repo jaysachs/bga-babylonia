@@ -65,7 +65,8 @@ CREATE TABLE IF NOT EXISTS `turn_progress` (
   -- what field was "captured" if any
   `captured_piece` varchar(8) DEFAULT NULL,
   -- what was immediately scored (field and/or ziggurat adjacency)
-  `points` int(10) unsigned DEFAULT NULL,
+  `field_points` int(10) unsigned DEFAULT NULL,
+  `ziggurat_points` int(10) unsigned DEFAULT NULL,
   -- no need to record "inversion", as the hextype will tell us
   PRIMARY KEY (`seq_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;

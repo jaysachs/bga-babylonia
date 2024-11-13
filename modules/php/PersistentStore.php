@@ -173,11 +173,12 @@ class PersistentStore {
                      WHERE board_row=$move->row AND board_col=$move->col");
 
         // update player scores
-        if ($move->points > 0) {
+        $points = $move->points();
+        if ($points > 0) {
             $this->db->DbQuery(
                 "UPDATE player q
                  SET q.player_score = (
-                     SELECT p.sc - $move->points
+                     SELECT p.sc - $points
                      FROM (SELECT player_score sc
                            FROM player
                            WHERE player_id = $move->player_id) p)
@@ -201,19 +202,26 @@ class PersistentStore {
         $piece = $move->piece->value;
         $opiece = $move->original_piece->value;
         $this->db->DbQuery( "INSERT INTO turn_progress
-                      (player_id, seq_id, original_piece, piece, handpos, board_row, board_col, captured_piece, points)
-                      VALUES($move->player_id, NULL, '$opiece', '$piece', $move->handpos, $move->row, $move->col, '$captured_piece', $move->points)");
+                      (player_id, seq_id,
+                       original_piece, piece, handpos,
+                       board_row, board_col,
+                       captured_piece, field_points, ziggurat_points)
+                      VALUES($move->player_id, NULL, '$opiece', '$piece',
+                             $move->handpos, $move->row, $move->col,
+                             '$captured_piece', $move->field_points,
+                             $move->ziggurat_points)");
         // update board state
         $this->db->DbQuery("UPDATE board
                      SET piece='$piece', player_id=$move->player_id
                      WHERE board_row=$move->row AND board_col=$move->col");
 
         // update player scores
-        if ($move->points > 0) {
+        $points = $move->points();
+        if ($points > 0) {
             $this->db->DbQuery(
                 "UPDATE player q
                  SET q.player_score = (
-                     SELECT p.sc + $move->points
+                     SELECT p.sc + $points
                      FROM (SELECT player_score sc
                            FROM player
                            WHERE player_id = $move->player_id) p)
@@ -229,7 +237,7 @@ class PersistentStore {
 
     public function retrieveTurnProgress(int $player_id): TurnProgress {
         $dbresults = $this->db->getCollectionFromDb(
-            "SELECT seq_id, player_id, handpos, piece, original_piece, board_row, board_col, captured_piece, points
+            "SELECT seq_id, player_id, handpos, piece, original_piece, board_row, board_col, captured_piece, field_points, ziggurat_points
              FROM turn_progress
              WHERE player_id = $player_id
              ORDER BY seq_id");
@@ -242,7 +250,8 @@ class PersistentStore {
                                 intval($move['board_row']),
                                 intval($move['board_col']),
                                 Piece::from($move['captured_piece']),
-                                intval($move['points']),
+                                intval($move['field_points']),
+                                intval($move['ziggurat_points']),
                                 intval($move['seq_id']));
         }
         return new TurnProgress($moves);

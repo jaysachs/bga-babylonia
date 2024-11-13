@@ -194,31 +194,31 @@ class Model {
         }
         $hexPiece = $hex->playPiece($piece, $this->player_id);
 
-        $fs = 0;
-        $zs = 0;
+        $field_points = 0;
+        $ziggurat_points = 0;
         // score field
         switch ($hexPiece) {
         case Piece::FIELD_5:
-            $fs = 5; break;
+            $field_points = 5; break;
         case Piece::FIELD_6:
-            $fs = 6; break;
+            $field_points = 6; break;
         case Piece::FIELD_7:
-            $fs = 7; break;
+            $field_points = 7; break;
         case Piece::FIELD_CITIES:
             // TODO?: use and maintain a global captured city-count?
-            $fs = $this->totalCapturedCities();
+            $field_points = $this->totalCapturedCities();
             break;
         }
         $zigs = $this->board()->neighbors($hex, function (&$h): bool {
             return $h->piece == Piece::ZIGGURAT;
         });
         if (count($zigs) > 0) {
-            $zs = $this->board()->adjacentZiggurats($this->player_id);
+            $ziggurat_points = $this->board()->adjacentZiggurats($this->player_id);
         }
 
-        $points = $fs + $zs;
-
-        $move = new Move($this->player_id, $piece, $originalPiece, $handpos, $row, $col, $hexPiece, $points);
+        $move = new Move($this->player_id, $piece, $originalPiece, $handpos,
+                         $row, $col, $hexPiece,
+                         $field_points, $ziggurat_points);
         $this->turnProgress()->addMove($move);
 
         // update the database

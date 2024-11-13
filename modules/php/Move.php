@@ -35,16 +35,23 @@ class Move {
                          public int $row,
                          public int $col,
                          public Piece $captured_piece,
-                         public int $points,
+                         public int $field_points,
+                         public int $ziggurat_points,
                          public int $seq_id = 0) {}
 
+    public function points(): int {
+        return $this->field_points + $this->ziggurat_points;
+    }
+
     public function __toString(): string {
-        return sprintf("id:%d/%d piece:%s opiece:%s pos:$d %d:%d cap:%s points:%d ",
+        return sprintf("id:%d/%d piece:%s opiece:%s pos:$d %d:%d cap:%s field points:%d zig points:%d",
                        $this->player_id, $this->seq_id,
                        $this->piece->value, $this->original_piece->value,
                        $this->handpos,
                        $this->row, $this->col,
-                       $this->captured->value, $this->piece->value);
+                       $this->captured->value,
+                       $this->field_points,
+                       $this->ziggurat_points);
     }
 
 

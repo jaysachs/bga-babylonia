@@ -67,7 +67,7 @@ class Game extends \Table
         $player_id = $this->activePlayerId();
         $model = new Model($this->ps, $player_id);
         $move = $model->playPiece($handpos, $row, $col);
-        $points = $move->points;
+        $points = $move->points();
         $piece = $move->piece->value;
 
         $msg = "";
@@ -219,7 +219,7 @@ class Game extends \Table
         $scored_city = $model->scoreCity($cityhex);
         $captured_by = $scored_city->captured_by;
         if ($captured_by > 0) {
-            Stats::PLAYER_CITIES_CAPTURED->inc($player_id);
+            Stats::PLAYER_CITIES_CAPTURED->inc($captured_by);
             $pnk = $this->playerNameKey($captured_by);
             $msg = '${city} at (${row},${col}) scored, captured by ${' . $pnk . '}';
         } else {
@@ -272,7 +272,7 @@ class Game extends \Table
     public function stZigguratScoring(): void {
         $next_player_id = $this->nextPlayerToBeActive();
         if ($next_player_id != 0) {
-            if ($next_player_id != $this->activePlayerId()) {
+            if ($next_player_id != $this->activePlayerIdx()) {
                 $this->gamestate->changeActivePlayer($next_player_id);
                 $this->giveExtraTime($next_player_id);
             }
@@ -488,7 +488,7 @@ class Game extends \Table
                 "col" => $move->col,
                 "piece" => $move->piece->value,
                 "captured_piece" => $move->captured_piece->value,
-                "points" => $move->points,
+                "points" => $move->points(),
             ];
 
             if ($pid == $this->activePlayerId()) {
