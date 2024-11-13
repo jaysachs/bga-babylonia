@@ -57,7 +57,6 @@ body {
 /*    background-color: rgba(255, 22, 255, 0.2); */
 }
 
-
 #bbl_board > div.bbl_playable {
     content: url(img/highlight.png);
     object-fit: cover;
@@ -72,93 +71,97 @@ body {
     cursor: pointer;
 }
 
-#bbl_board .bbl_city_count,
-#bbl_board .bbl_city_msp,
-#bbl_board .bbl_city_m,
-#bbl_board .bbl_city_back,
-#bbl_board .bbl_city_p,
-#bbl_board .bbl_city_s,
-#bbl_board .bbl_city_mp,
-#bbl_board .bbl_city_ms,
-#bbl_board .bbl_city_sp,
-#bbl_board .bbl_field_5,
-#bbl_board .bbl_field_6,
-#bbl_board .bbl_field_7,
-#bbl_board .bbl_field_X,
-#bbl_board .bbl_ziggurat
-{
-    height: var(--hex-height);
-    width: var(--hex-width);
+/*
+ * Cities and fields sprites
+ */
+.bbl_city_count,
+.bbl_city_back,
+.bbl_city_m,
+.bbl_city_p,
+.bbl_city_s,
+.bbl_city_mp,
+.bbl_city_ms,
+.bbl_city_sp,
+.bbl_city_msp,
+.bbl_city_blank,
+.bbl_field_5,
+.bbl_field_6,
+.bbl_field_7,
+.bbl_field_X,
+.bbl_ziggurat {
+    background-image: url(img/cities.png);
     background-size: 100% 1400%;
 }
 
 .bbl_city_count {
-    background: url(img/cities.png) 0% -800%;
+    background-position: 0% -800%;
 }
-
-.bbl_city_back  {
-    background: url(img/cities.png) 0% 0%;
+.bbl_city_back {
+    background-position: 0% 0%;
 }
-.bbl_city_m    {
-    background: url(img/cities.png) 0% -100%;
+.bbl_city_m {
+    background-position: 0% -100%;
 }
-.bbl_city_p    {
-    background: url(img/cities.png) 0% -300%;
+.bbl_city_p {
+    background-position: 0% -300%;
 }
-.bbl_city_s    {
-    background: url(img/cities.png) 0% -200%;
+.bbl_city_s {
+    background-position: 0% -200%;
 }
-.bbl_city_mp   {
-    background: url(img/cities.png) 0% -500%;
+.bbl_city_mp {
+    background-position: 0% -500%;
 }
-.bbl_city_ms   {
-    background: url(img/cities.png) 0% -400%;
+.bbl_city_ms {
+    background-position: 0% -400%;
 }
-.bbl_city_sp   {
-    background: url(img/cities.png) 0% -600%;
+.bbl_city_sp {
+    background-position: 0% -600%;
 }
 .bbl_city_msp {
-    background: url(img/cities.png) 0% -700%;
+    background-position: 0% -700%;
 }
 .bbl_city_blank {
-    background: url(img/cities.png) 0% -800%;
+    background-position: 0% -800%;
 }
-.bbl_field_5     {
-    background: url(img/cities.png) 0% -900%;
+.bbl_field_5 {
+    background-position: 0% -900%;
 }
-.bbl_field_6     {
-    background: url(img/cities.png) 0% -1000%;
+.bbl_field_6 {
+    background-position: 0% -1000%;
 }
-.bbl_field_7     {
-    background: url(img/cities.png) 0% -1100%;
+.bbl_field_7 {
+    background-position: 0% -1100%;
 }
-.bbl_field_X     {
-    background: url(img/cities.png) 0% -1200%;
+.bbl_field_X {
+    background-position: 0% -1200%;
 }
-.bbl_ziggurat   {
-    background: url(img/cities.png) 0% -1300%;
+.bbl_ziggurat {
+    background-position: 0% -1300%;
 }
 
-  .bbl_farmer_1,
-  .bbl_merchant_1,
-  .bbl_servant_1,
-  .bbl_priest_1,
-  .bbl_hidden_1,
-  .bbl_farmer_2,
-  .bbl_merchant_2,
-  .bbl_servant_2,
-  .bbl_priest_2,
-  .bbl_hidden_2,
-  .bbl_farmer_3,
-  .bbl_merchant_3,
-  .bbl_servant_3,
-  .bbl_priest_3,
-  .bbl_hidden_3,
-  .bbl_farmer_4,
-  .bbl_merchant_4,
-  .bbl_servant_4,
-  .bbl_priest_4,
-  .bbl_hidden_4
+/*
+ * Player piece sprites
+ */
+.bbl_farmer_1,
+.bbl_merchant_1,
+.bbl_servant_1,
+.bbl_priest_1,
+.bbl_hidden_1,
+.bbl_farmer_2,
+.bbl_merchant_2,
+.bbl_servant_2,
+.bbl_priest_2,
+.bbl_hidden_2,
+.bbl_farmer_3,
+.bbl_merchant_3,
+.bbl_servant_3,
+.bbl_priest_3,
+.bbl_hidden_3,
+.bbl_farmer_4,
+.bbl_merchant_4,
+.bbl_servant_4,
+.bbl_priest_4,
+.bbl_hidden_4
   {
       clip-path: none;
       /*
@@ -170,7 +173,6 @@ body {
     background-image: url(img/pieces.png);
     background-size: 400% 500%;
 }
-
 .bbl_hidden_1 {
     background-position: 0% 0;
 }
@@ -230,6 +232,53 @@ body {
 }
 .bbl_priest_4  {
     background-position: -300% -400%;
+}
+
+/*
+ * Ziggurat card sprites
+ */
+.bbl_zc_10pts,
+.bbl_zc_xturn,
+.bbl_zc_hand7,
+.bbl_zc_3nobles,
+.bbl_zc_3farmers,
+.bbl_zc_fields,
+.bbl_zc_citypts,
+.bbl_zc_land,
+.bbl_zc_river
+{
+    background-size: 1000% 100%;
+    background-image: url(img/zcards.png);
+}
+.bbl_zc_used {
+    background-position: -900% 0%;
+}
+.bbl_zc_10pts {
+    background-position: 0% 0%;
+}
+.bbl_zc_xturn {
+    background-position: -100% 0%;
+}
+.bbl_zc_hand7 {
+    background-position: -200% 0%;
+}
+.bbl_zc_3nobles {
+    background-position: -300% 0%;
+}
+.bbl_zc_3farmers {
+    background-position: -400% 0%;
+}
+.bbl_zc_fields {
+    background-position: -500% 0%;
+}
+.bbl_zc_citypts {
+    background-position: -600% 0%;
+}
+.bbl_zc_land {
+    background-position: -700% 0%;
+}
+.bbl_zc_river {
+    background-position: -800% 0%;
 }
 
 
@@ -307,8 +356,6 @@ body {
     height: calc((var(--hex-height) - 4px) * 2.37); // 135px;
     width: calc((var(--hex-height) - 4px) * 1.58); // 90px;
     margin: 10px;
-    background-size: 1000% 100%;
-    background-image: url(img/zcards.png);
 }
 
 #bbl_available_zcards.bbl_selecting > div[class^="bbl_zc_"] {
@@ -321,37 +368,6 @@ body {
     border-style: dotted;
     border-color: #444444;
     border-width: 1px;
-}
-
-.bbl_zc_used {
-    background-position: -900% 0%;
-}
-.bbl_zc_10pts {
-    background-position: 0% 0%;
-}
-.bbl_zc_xturn {
-    background-position: -100% 0%;
-}
-.bbl_zc_hand7 {
-    background-position: -200% 0%;
-}
-.bbl_zc_3nobles {
-    background-position: -300% 0%;
-}
-.bbl_zc_3farmers {
-    background-position: -400% 0%;
-}
-.bbl_zc_fields {
-    background-position: -500% 0%;
-}
-.bbl_zc_citypts {
-    background-position: -600% 0%;
-}
-.bbl_zc_land {
-    background-position: -700% 0%;
-}
-.bbl_zc_river {
-    background-position: -800% 0%;
 }
 
 /*
@@ -428,8 +444,6 @@ div.bbl_zcards > div {
     margin: 3px;
     height: 2.4em;
     width: 1.6em;
-    background-size: 1000% 100%;
-    background-image: url(img/zcards.png);
 }
 
 
@@ -447,8 +461,6 @@ a.action-button > div.bbl_zcard {
     border-style: none;
     height: 6em;
     width: 4em;
-    background-size: 1000% 100%;
-    background-image: url(img/zcards.png);
 }
 
 /*
@@ -479,8 +491,6 @@ a.action-button > div.bbl_zcard {
     background-color: transparent;
     height: 2.1em;
     width: 2.4em;
-    background-image: url(img/pieces.png);
-    background-size: 400% 500%;
 }
 
 .log-element.bbl_city_msp,
@@ -521,6 +531,4 @@ a.action-button > div.bbl_zcard {
     display: inline-block;
     height: 2.1em;
     width: 1.4em;
-    background-size: 1000% 100%;
-    background-image: url(img/zcards.png);
 }
