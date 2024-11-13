@@ -364,10 +364,10 @@ class Game extends \Table
         }
 
         if ($piece->isCity()) {
-            Stats::CITY_SCORING_TRIGGERED->inc($player_id);
+            Stats::PLAYER_CITY_SCORING_TRIGGERED->inc($player_id);
             $this->gamestate->nextState("citySelected");
         } else {
-            Stats::ZIGGURAT_SCORING_TRIGGERED->inc($player_id);
+            Stats::PLAYER_ZIGGURAT_SCORING_TRIGGERED->inc($player_id);
             $this->gamestate->nextState("zigguratSelected");
         }
     }
