@@ -374,17 +374,76 @@ body {
  * Player boards
  */
 
-.bbl_playerboard_ext {
+.player-board-game-specific-content {
     --label-height: 40px;
     --label-width: calc(var(--hex-ratio) * var(--label-height));
 }
 
-.bbl_handpoolcity {
+.bbl_pb_handpoolcity {
     margin-top: 10px;
     display: flex;
-    align-items: center;
+/*    align-items: left; */
+    justify-content: space-around;
 }
 
+.bbl_pb_handpoolcity > div {
+    flex: 1;
+    justify-content: center;
+    display: flex;
+    /* for development */
+    background-color: #dfdfdf;
+    border-width: 1px;
+    border-color: black;
+    border-style: dashed;
+}
+
+.bbl_pb_handpoolcity > div > span {
+    height: calc(var(--label-height));
+    width: calc(var(--label-width));
+
+    font-weight: bold;
+    display: flex;
+    justify-content: center;
+
+    /* for development */
+    border-width: 1px;
+    border-color: #ff4444;
+    border-style: solid;
+}
+
+.bbl_pb_citycount {
+    color: white;
+    background: url(img/cities.png) 0% -800%/100% 1400%;
+/*    background-size: 100% 1400%; */
+}
+
+.bbl_pb_handpoolcity > div > span > span {
+    /* for development */
+    border-width: 1px;
+    border-color: #0088ff;
+    border-style: solid;
+}
+
+.bbl_pb_hand {
+}
+
+
+.bbl_pb_counter {
+}
+
+.bbl_pb_pool_label {
+    flex: 1;
+    width: calc(var(--label-width));
+    height: calc(var(--label-height));
+    margin-right: -2.5em;
+    display: inline-block;
+}
+/*
+.bbl_pb_pool > span {
+    flex-grow: 1;
+}
+*/
+/*
 .bbl_handpoolcity span:not(.bbl_counter) {
     width: calc(var(--label-width));
     display: inline-block;
@@ -394,39 +453,38 @@ body {
     vertical-align: middle;
     height: calc(var(--label-height));
 }
+*/
 
+/*
 .bbl_handpoolcity div {
     display: inline-block;
     margin-left: 0px;
     margin-right: 0px;
     height: calc(var(--label-height));
 }
+*/
 
-.bbl_pool > .bbl_counter {
+/*
+.bbl_pb_pool > .bbl_pb_counter {
     margin-left: 0.5em;
 }
 
-.bbl_hand_label {
-}
-
-.bbl_pool_label {
+.bbl_pb_pool_label {
     margin-right: -2.3em;
 }
+*/
 
-.bbl_citycount_label {
-    background: url(img/cities.png) 0% -800%;
-    background-size: 100% 1400%;
-}
-
-div.bbl_handpoolcity > .bbl_pool > .bbl_counter {
+/*
+div.bbl_pb_handpoolcity > .bbl_pb_pool > .bbl_pb_counter {
     margin-left: 1.7em;
 }
+*/
 
-div.bbl_zcards {
+div.bbl_pb_zcards {
     margin-top: 0.5em;
 }
 
-div.bbl_zcards span.bbl_zcard_label {
+div.bbl_pb_zcards span.bbl_pb_zcard_label {
     display: inline-block;
     height: calc(var(--label-height));
     width: calc(var(--label-width));
@@ -436,7 +494,7 @@ div.bbl_zcards span.bbl_zcard_label {
     background-size: 100% 1400%;
 }
 
-div.bbl_zcards > div {
+div.bbl_pb_zcards > div {
     display: inline-block;
     margin: 3px;
     height: 2.4em;
