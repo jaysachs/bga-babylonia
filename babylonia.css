@@ -386,6 +386,7 @@ body {
 
 .bbl_pb_handpoolcity > div {
     flex: 1;
+    display: flex;
 }
 
 .bbl_pb_handpoolcity > div > span {
@@ -404,6 +405,14 @@ body {
 }
 
 .bbl_pb_hand {
+/*    flex: 1; */
+}
+
+div:has(.bbl_pb_pool) {
+    flex: 2;
+}
+.bbl_pb_pool {
+    display:flex;
 }
 
 .bbl_pb_citycount {
@@ -412,15 +421,14 @@ body {
 }
 
 .bbl_pb_pool_label {
-    flex: 1;
+    flex: 0.5;
     width: calc(var(--label-width));
     height: calc(var(--label-height));
-    margin-right: -2.5em;
+    margin-right: calc(-1 * var(--label-height));
     display: inline-block;
 }
 
 /* for development */
-/*
 .bbl_pb_handpoolcity > div {
     background-color: #dfdfdf;
     border-width: 1px;
@@ -437,7 +445,8 @@ body {
     border-color: #0088ff;
     border-style: solid;
 }
-*/
+
+
 
 div.bbl_pb_zcards {
 /*    margin-top: 0.5em; */
