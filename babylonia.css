@@ -57,17 +57,12 @@ body {
 /*    background-color: rgba(255, 22, 255, 0.2); */
 }
 
-#bbl_board > div.bbl_playable {
-    content: url(img/highlight.png);
-    object-fit: cover;
-    /*
-    width: 100%;
-    height: 100%;
-*/
-    /*
-    background-color: white;
-    opacity: 0.2;
-   */
+#bbl_board > div.bbl_playable::before {
+    content: '';
+    display: inline-block;
+    height: calc(var(--hex-height));
+    width: calc(var(--hex-width));
+    background: url(img/sprites.png) 0% -400% / 700% 700%;
     cursor: pointer;
 }
 
