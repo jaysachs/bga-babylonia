@@ -35,26 +35,22 @@
   const jstpl_log_zcard = '<span class="log-element bbl_${zcard}"></span>';
 
   const jstpl_player_board_ext =
-        '<div class="bbl_playerboard_ext">\
-           <div class="bbl_handpoolcity">\
-             <div>\
-               <span class="bbl_hand_label bbl_hidden_${player_number}"></span>\
-               <span id="bbl_handcount_${player_id}" class="bbl_counter">5</span>\
-             </div>\
-             <div class="bbl_pool">\
-               <span class="bbl_pool_label bbl_hidden_${player_number}"></span>\
-               <span class="bbl_pool_label bbl_hidden_${player_number}"></span>\
-               <span class="bbl_pool_label bbl_hidden_${player_number}"></span>\
-               <span id="bbl_poolcount_${player_id}" class="bbl_counter">19</span>\
-             </div>\
-             <div class="bbl_citycount">\
-               <span class="bbl_citycount_label"></span>\
-               <span id="bbl_citycount_${player_id}" class="bbl_counter">1</span>\
-             </div>\
+        '<div class="bbl_pb_handpoolcity">\
+           <div class="bbl_pb_hand">\
+             <span class="bbl_pb_hand_label_${player_number}"></span>\
+             <span id="bbl_handcount_${player_id}" class="bbl_pb_counter">5</span>\
            </div>\
-           <div id="bbl_zcards_${player_id}" class="bbl_zcards">\
-             <span class="bbl_zcard_label"></span>\
+           <div class="bbl_pb_pool">\
+             <span class="bbl_pb_pool_label_${player_number}"></span>\
+             <span id="bbl_poolcount_${player_id}" class="bbl_pb_counter">19</span>\
            </div>\
+           <div class="bbl_pb_citycount">\
+             <span class="bbl_pb_citycount_label"></span>\
+             <span id="bbl_citycount_${player_id}" class="bbl_pb_counter">1</span>\
+           </div>\
+         </div>\
+         <div id="bbl_zcards_${player_id}" class="bbl_pb_zcards">\
+           <span class="bbl_pb_zcard_label"></span>\
          </div>';
 
   const jstpl_hex =
