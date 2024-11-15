@@ -440,6 +440,11 @@ div.bbl_pb_zcards {
     display: inline-block;
     /* TODO, these are hardcoded weirdness */
     margin-left: 7px;
+    /* TODO: figure out how to lay this out to enable border */
+    /*
+    border: 1px solid black;
+    width: 100%;
+*/
 }
 
 .bbl_pb_zcard_label {
