@@ -35,19 +35,17 @@
   const jstpl_log_zcard = '<span class="log-element bbl_${zcard}"></span>';
 
   const jstpl_player_board_ext =
-        '<div class="bbl_pb_handpoolcity">\
-           <div>\
-             <span class="bbl_pb_hand_label_${player_number}"></span>\
-             <span id="bbl_handcount_${player_id}">5</span>\
-           </div>\
-           <div>\
-             <span class="bbl_pb_pool_label_${player_number}"></span>\
-             <span id="bbl_poolcount_${player_id}">19</span>\
-           </div>\
-           <div>\
-             <span class="bbl_pb_citycount_label"></span>\
-             <span id="bbl_citycount_${player_id}">1</span>\
-           </div>\
+        '<div>\
+           <span class="bbl_pb_hand_label_${player_number}"></span>\
+           <span id="bbl_handcount_${player_id}">5</span>\
+         </div>\
+         <div>\
+           <span class="bbl_pb_pool_label_${player_number}"></span>\
+           <span id="bbl_poolcount_${player_id}">19</span>\
+         </div>\
+         <div>\
+           <span class="bbl_pb_citycount_label"></span>\
+           <span id="bbl_citycount_${player_id}">1</span>\
          </div>\
          <div id="bbl_zcards_${player_id}" class="bbl_pb_zcards">\
            <span class="bbl_pb_zcard_label"></span>\

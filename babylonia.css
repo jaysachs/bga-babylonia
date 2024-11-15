@@ -377,14 +377,13 @@ body {
 .player-board-game-specific-content {
     --label-height: 40px;
     --label-width: calc(var(--hex-ratio) * var(--label-height));
+    display: grid;
+    padding-top: 7px;
+    grid-template-columns: repeat(3, 1fr);
+    grid-row-gap: 7px;
 }
 
-.bbl_pb_handpoolcity {
-    margin-top: 10px;
-    display: flex;
-}
-
-.bbl_pb_handpoolcity > div {
+.player-board-game-specific-content > div {
     display: flex;
     flex: 1;
     align-items: center;
@@ -437,8 +436,12 @@ body {
 }
 
 div.bbl_pb_zcards {
+    grid-column-start: 1;
+    grid-column-end: 3;
+    grid-row-start: 2;
+    grid-row-end: 2;
+    display: inline-block;
     /* TODO, these are hardcoded weirdness */
-    margin-top: 7px;
     margin-left: 7px;
 }
 
