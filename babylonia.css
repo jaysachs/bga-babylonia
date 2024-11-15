@@ -318,8 +318,7 @@ body {
 }
 
 #bbl_hand > div.bbl_empty {
-    background-image: url(img/sprites.png);
-    background-size: 0% -600%;
+    background: url(img/sprites.png) 0% -600% / 700% 700%;
 }
 
 #bbl_hand > div.bbl_playable {
