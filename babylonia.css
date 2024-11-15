@@ -60,8 +60,8 @@ body {
 #bbl_board > div.bbl_playable::before {
     content: '';
     display: inline-block;
-    height: calc(var(--hex-height));
-    width: calc(var(--hex-width));
+    height: 100%;
+    width: 100%;
     background: url(img/sprites.png) 0% -400% / 700% 700%;
     cursor: pointer;
 }
@@ -156,17 +156,14 @@ body {
 .bbl_merchant_4,
 .bbl_servant_4,
 .bbl_priest_4,
-.bbl_hidden_4
-  {
-      clip-path: none;
-      /*
-    width: calc(var(--hex-height) - 4px);
-    height: calc(var(--hex-height) - 4px);
-    margin-top: 3px;
-    margin-left: 7px;
-*/
+.bbl_hidden_4,
+.bbl_empty {
+    clip-path: none;
     background-image: url(img/sprites.png);
     background-size: 700% 700%;
+}
+.bbl_empty {
+    background-position: 0% -600%;
 }
 .bbl_hidden_1 {
     background-position: -100% 0;
@@ -290,9 +287,8 @@ body {
 }
 
 #bbl_hand {
-    position: relative;
     box-shadow: 0 3px 8px rgba(0,0,0,.3);
-    display: inline-block;
+    display: flex;
     width: auto;
     background-image: url(img/stand.png);
     background-size: 100% 100%;
@@ -302,7 +298,6 @@ body {
 }
 
 #bbl_hand > div {
-    position: relative;
     display: inline-block;
     width: calc(var(--hex-width));
     height: calc(var(--hex-height));
@@ -312,10 +307,6 @@ body {
     margin-bottom: 5px;
 }
 
-#bbl_hand > div.bbl_empty {
-    background: url(img/sprites.png) 0% -600% / 700% 700%;
-}
-
 #bbl_hand > div.bbl_playable {
     cursor: pointer;
     /*
@@ -323,36 +314,28 @@ body {
     border-style: solid;
     margin: 4px;
     border-width: 1px;
-*/
+   */
 }
 
 #bbl_hand > div.bbl_unplayable::before {
     cursor: not-allowed;
-    height: calc(var(--hex-height));
-    width: calc(var(--hex-width));
+    height: 100%;
+    width: 100%;
     content: '';
     display: inline-block;
     background: url(img/sprites.png) 0% -600% / 700% 700%;
     opacity: 0.4;
 }
 
-/* TODO: put in pieces sprite file */
-#bbl_hand > div.bbl_selected {
-    content: url(img/piecehl.png);
-}
-/*
-  This doesn't work, as it increase the piece height/width.
-  Maybe using a grid or flow layout on the hand will solve this.
-*/
-/*
 #bbl_hand > div.bbl_selected::before {
-    height: calc(var(--hex-height));
-    width: calc(var(--hex-width));
+    height: 100%;
+    width: 100%;
     content: '';
     display: inline-block;
     background: url(img/sprites.png) 0% -500% / 700% 700%;
 }
-*/
+
+/* available ziggurat cards zone (TODO: "panel") */
 
 #bbl_available_zcards {
     position: relative;
@@ -363,6 +346,7 @@ body {
 
 #bbl_available_zcards > div {
     display: inline-block;
+    /* TODO: not sure computing these based on hex size is right */
     height: calc((var(--hex-height) - 4px) * 2.37); // 135px;
     width: calc((var(--hex-height) - 4px) * 1.58); // 90px;
     margin: 10px;
@@ -380,10 +364,12 @@ body {
     border-width: 1px;
 }
 
+
+
+
 /*
  * Player boards
  */
-
 
 .player-board-game-specific-content {
     --label-height: 40px;
