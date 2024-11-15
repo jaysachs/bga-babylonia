@@ -342,6 +342,7 @@ body {
 }
 
 /*
+TODO: this doesn't work, as it increase the piece height/width.
 #bbl_hand > div.bbl_selected::before {
     height: calc(var(--hex-height));
     width: calc(var(--hex-width));
