@@ -373,7 +373,6 @@ body {
  */
 
 
-/* TODO: consider making p-b-g-s-c a grid with 3 elements on row 1 and 1 on row 2 */
 .player-board-game-specific-content {
     --label-height: 40px;
     --label-width: calc(var(--hex-ratio) * var(--label-height));
