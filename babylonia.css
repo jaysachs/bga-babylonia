@@ -336,13 +336,15 @@ body {
     opacity: 0.4;
 }
 
+/* TODO: put in pieces sprite file */
 #bbl_hand > div.bbl_selected {
-    /* TODO: put in pieces sprite file? */
     content: url(img/piecehl.png);
 }
-
 /*
-TODO: this doesn't work, as it increase the piece height/width.
+  This doesn't work, as it increase the piece height/width.
+  Maybe using a grid or flow layout on the hand will solve this.
+*/
+/*
 #bbl_hand > div.bbl_selected::before {
     height: calc(var(--hex-height));
     width: calc(var(--hex-width));
