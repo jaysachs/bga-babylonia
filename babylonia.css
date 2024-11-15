@@ -326,9 +326,13 @@ body {
 */
 }
 
-#bbl_hand > div.bbl_unplayable {
+#bbl_hand > div.bbl_unplayable::before {
     cursor: not-allowed;
-    content: url(img/piecealpha.png);
+    height: calc(var(--hex-height));
+    width: calc(var(--hex-width));
+    content: '';
+    display: inline-block;
+    background: url(img/sprites.png) 0% -600% / 700% 700%;
     opacity: 0.4;
 }
 
@@ -336,6 +340,16 @@ body {
     /* TODO: put in pieces sprite file? */
     content: url(img/piecehl.png);
 }
+
+/*
+#bbl_hand > div.bbl_selected::before {
+    height: calc(var(--hex-height));
+    width: calc(var(--hex-width));
+    content: '';
+    display: inline-block;
+    background: url(img/sprites.png) 0% -500% / 700% 700%;
+}
+*/
 
 #bbl_available_zcards {
     position: relative;
