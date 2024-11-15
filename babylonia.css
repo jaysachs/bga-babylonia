@@ -372,48 +372,35 @@ body {
  * Player boards
  */
 
+
+/* TODO: consider making p-b-g-s-c a grid with 3 elements on row 1 and 1 on row 2 */
 .player-board-game-specific-content {
     --label-height: 40px;
-    --hex-ratio: 1.155;
     --label-width: calc(var(--hex-ratio) * var(--label-height));
 }
 
 .bbl_pb_handpoolcity {
     margin-top: 10px;
     display: flex;
-    flex-direction: row;
 }
 
 .bbl_pb_handpoolcity > div {
     display: flex;
-    vertical-align: middle;
-    justify-content: space-between;
+    flex: 1;
+    align-items: center;
+    justify-content: space-evenly;
 }
 
-.bbl_pb_handpoolcity > div > span {
-    vertical-align: middle;
-    justify-content: center;
-}
-
-.bbl_pb_counter {
-   height: calc(var(--label-height));
-    display: flex;
-    vertical-align: middle;
-    justify-content: center;
-    font-weight: bold;
-    vertical-align: middle;
-/*    margin-top: calc(0.5*(var(--label-height) - 1.1em)); */
-    height: 1em;
-}
-
-.bbl_pb_hand {
-    flex: 3;
-}
-
+.bbl_pb_citycount_label,
 .bbl_pb_hand_label_1,
 .bbl_pb_hand_label_2,
 .bbl_pb_hand_label_3,
-.bbl_pb_hand_label_4
+.bbl_pb_hand_label_4,
+.bbl_pb_pool_label_1,
+.bbl_pb_pool_label_2,
+.bbl_pb_pool_label_3,
+.bbl_pb_pool_label_4,
+.bbl_pb_zcard_label
 {
    width: calc(var(--label-width));
    height: calc(var(--label-height));
@@ -433,24 +420,6 @@ body {
 .bbl_pb_hand_label_4 {
     background-position: -400% -500%;
 }
-
-.bbl_pb_pool {
-    flex: 3;
-    display:flex;
-}
-
-.bbl_pb_pool_label_1,
-.bbl_pb_pool_label_2,
-.bbl_pb_pool_label_3,
-.bbl_pb_pool_label_4
-{
-   display: inline-block;
-   width: calc(var(--label-width));
-   height: calc(var(--label-height));
-   background-image: url(img/sprites.png);
-   background-size: 700% 700%;
-}
-
 .bbl_pb_pool_label_1 {
     background-position: -100% -600%;
 }
@@ -463,54 +432,26 @@ body {
 .bbl_pb_pool_label_4 {
     background-position: -400% -600%;
 }
-
-
-.bbl_pb_citycount {
-/*    display: flex; */
-    flex: 3;
-}
 .bbl_pb_citycount_label {
-   width: calc(var(--label-width));
+    background-position: 0% -200%;
 }
-
-.bbl_pb_citycount_label {
-    color: white;
-    background: url(img/sprites.png) 0% -200% / 700% 700%;
-}
-
-
-/* for development */
-/*
-.bbl_pb_handpoolcity > div {
-    background-color: #dfdfdf;
-    border-width: 1px;
-    border-color: black;
-    border-style: dashed;
-}
-.bbl_pb_handpoolcity > div > span {
-    border-width: 1px;
-    border-color: #ff4444;
-    border-style: solid;
-}
-*/
 
 div.bbl_pb_zcards {
-/*    margin-top: 0.5em; */
+    /* TODO, these are hardcoded weirdness */
+    margin-top: 7px;
+    margin-left: 7px;
 }
 
-div.bbl_pb_zcards span.bbl_pb_zcard_label {
+.bbl_pb_zcard_label {
     display: inline-block;
-    height: calc(var(--label-height));
-    width: calc(var(--label-width));
-    background: url(img/sprites.png) 0% -300%;
-    background-size: 700% 700%;
+    background-position: 0% -300%;
 }
 
 div.bbl_pb_zcards > div {
     display: inline-block;
     margin: 3px;
-    height: 2.4em;
-    width: 1.6em;
+    height: calc(var(--label-height));
+    width: calc(var(--label-height) * 0.67);
 }
 
 
