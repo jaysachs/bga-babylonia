@@ -8,5 +8,4 @@
 19. Audit all notifications; are they all required? any missing? incomplete?
 21. Animate hex networks during city scoring.
 23. Stats and undo: store as serialized JSON?
-24. City hexes animated are rendered incorrectly; size / bg position looks wrong.
 25. More granular points stats (aim for adding up breakdown).
