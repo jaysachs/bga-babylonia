@@ -63,6 +63,15 @@ class Components {
         return !$card->used;
     }
 
+    public function zigguratCardOwner(ZigguratCardType $type): int /* player_id */ {
+        foreach ($this->ziggurat_cards as $zc) {
+            if ($zc->type == $type) {
+                return $zc->owning_player_id;
+            }
+        }
+        return 0;
+    }
+
     public function zigguratCardsOwnedBy(int $player_id): array /* ZigguratCard */ {
         return array_values(
             array_filter(
