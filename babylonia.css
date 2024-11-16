@@ -157,7 +157,7 @@ body {
 .bbl_servant_4,
 .bbl_priest_4,
 .bbl_hidden_4,
-.bbl_empty {
+#bbl_hand > .bbl_empty {
     clip-path: none;
     background-image: url(img/sprites.png);
     background-size: 700% 700%;
