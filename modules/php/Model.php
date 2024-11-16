@@ -34,6 +34,7 @@ class Model {
     private ?Hand $_hand = null;
     private ?Pool $_pool = null;
     private ?Components $_components = null;
+    private ?Scorer $_scorer = null;
 
     public function __construct(private PersistentStore $ps, private int $player_id) { }
 
@@ -50,6 +51,16 @@ class Model {
         }
         $this->_components = Components::forNewGame($use_advanced_ziggurats);
         $this->ps->insertComponents($this->_components);
+    }
+
+    private function scorer(): Scorer {
+        if ($this->_scorer == null) {
+            $this->_scorer =
+                new Scorer($this->board(),
+                           $this->allPlayerInfo(),
+                           $this->components());
+        }
+        return $this->_scorer;
     }
 
     public function components(): Components {
@@ -298,43 +309,31 @@ class Model {
         if ($hex->scored) {
             throw new \InvalidArgumentException("Attempt to score and already scored ziggurat {$hex}");
         }
+
         if (!$this->hexRequiresScoring($hex)) {
             throw new \InvalidArgumentException("{$hex} is not ready to be scored");
         }
         $hex->scored = true;
         $this->ps->updateHex($hex);
 
-        return new ScoredZiggurat($this->computeHexWinner($hex));
+        return new ScoredZiggurat($this->scorer()->computeHexWinner($hex));
     }
 
     public function scoreCity(Hex $hex): ScoredCity {
         if (!$hex->piece->isCity()) {
             throw new \InvalidArgumentException("Attempt to score non-city {$hex} as a city");
         }
+
         if (!$this->hexRequiresScoring($hex)) {
             throw new \InvalidArgumentException("{$hex} is not a city to be scored");
         }
-        $scores = $this->computeCityScores($hex);
+        $scores = $this->scorer()->computeCityScores($hex);
         $player_infos = &$this->allPlayerInfo();
 
         // Increase captured_city_count for capturing player, if any
         if ($scores->captured_by > 0) {
             $player_infos[$scores->captured_by]->captured_city_count++;
         }
-
-        // Now each player gets 1 point for city they've captured.
-        foreach ($player_infos as $pid => $pi) {
-            // TODO: incorporate ziggurat card
-            $points = $pi->captured_city_count;
-            if ($this->components()->hasUnusedZigguratCard(
-                $pid,
-                ZigguratCardType::EXTRA_CITY_POINTS)) {
-                $points += intval(floor($points / 2));
-            }
-            $scores->captured_city_points[$pid] = $points;
-
-        }
-
         // Give players points for connected pieces
         foreach ($player_infos as $pid => $pi) {
             $pi->score += $scores->pointsForPlayer($pid);
@@ -352,91 +351,19 @@ class Model {
         return $scores;
     }
 
-    private function newEmptyPlayerMap(mixed $value): array {
+    public function hexesRequiringScoring(): array {
         $result = [];
-        foreach ($this->allPlayerIds() as $pid) {
-            $result[$pid] = $value;
-        }
-        return $result;
-    }
-
-    private function computeHexWinner(Hex $hex): int {
-        // first compute who will win the city / ziggurat, if anyone.
-        $neighbors = $this->board()->neighbors(
-            $hex,
-            function (&$h): bool { return $h->piece->isPlayerPiece(); }
-        );
-        $adjacent = $this->newEmptyPlayerMap(0);
-        foreach ($neighbors as $h) {
-            $adjacent[$h->player_id]++;
-        }
-        $captured_by = 0;
-        $maxc = 0;
-        foreach ($adjacent as $p => $c) {
-            if ($c > $maxc) {
-                $maxc = $c;
-                $captured_by = $p;
-            } else if ($c > 0 && $c == $maxc) {
-                $captured_by = 0;
-            }
-        }
-        return $captured_by;
-    }
-
-    private function computeCityScores(Hex $hex): ScoredCity {
-        $result = new ScoredCity($hex->piece, $this->allPlayerIds());
-        $result->captured_by = $this->computeHexWinner($hex);
-
-        $seen = [];
-        $neighbors = $this->board()->neighbors(
-            $hex,
-            function (&$h): bool { return $h->piece->isPlayerPiece(); }
-        );
-
-        foreach ($neighbors as $n) {
-            if (in_array($n, $seen)) {
-                continue;
-            }
-            $this->board()->bfs(
-                $n->row,
-                $n->col,
-                function (&$h) use (&$result, &$hex, &$n, &$seen) {
-                    if ($this->inNetwork($h, $n->player_id)) {
-                        if ($hex->piece->scores($h->piece)) {
-                            if (in_array($h, $seen)) {
-                                // nothing
-                            } else {
-                                $result->addScoredHex($h);
-                            }
-                        }
-                        $seen[] = $h;
-                        return true;
-                    }
-                    return false;
+        $this->board()->visitAll(
+            function (&$hex) use (&$result) {
+                if ($this->hexRequiresScoring($hex)) {
+                    $result[] = $hex;
                 }
-            );
-        }
+            }
+        );
         return $result;
     }
 
-    private function inNetwork(Hex $h, int $player_id): bool {
-        return
-            // Either it's one of the player's pieces
-            ($h->piece->isPlayerPiece() && $h->player_id == $player_id)
-            // Or it's an empty land hex in the center area and the player has
-            //   the appropriate bonus card
-            || ($h->landmass == Landmass::CENTER && $h->piece->isEmpty()
-                && $this->components()->hasUnusedZigguratCard(
-                    $player_id,
-                    ZigguratCardType::FREE_CENTER_LAND_CONNECTS))
-            // Or it's an empty water hex and the player has the river bonus card
-            || ($h->piece->isEmpty() && $h->isWater()
-                && $this->components()->hasUnusedZigguratCard(
-                    $player_id,
-                    ZigguratCardType::FREE_RIVER_CONNECTS));
-    }
-
-    public function hexRequiresScoring(Hex $hex): bool {
+    private function hexRequiresScoring(Hex $hex): bool {
         if (($hex->piece->isZiggurat() && !$hex->scored)
             || $hex->piece->isCity()) {
             $missing = $this->board()->neighbors(
@@ -449,18 +376,6 @@ class Model {
             return (count($missing) == 0);
         }
         return false;
-    }
-
-    public function hexesRequiringScoring(): array /* Hex */ {
-        $result = [];
-        $this->board()->visitAll(
-            function (&$hex) use (&$result) {
-                if ($this->hexRequiresScoring($hex)) {
-                    $result[] = $hex;
-                }
-            }
-        );
-        return $result;
     }
 
     public function canEndTurn(): bool {

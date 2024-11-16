@@ -260,7 +260,8 @@ class Game extends \Table
                     clienttranslate('${' . $pnk . '} scored ${points}'), [
                         // TODO: make more efficient, by only passing the delta?
                         "captured_city_count" => $pi->captured_city_count,
-                        "scored_hexes" => $scored_city->hexesScoringForPlayer($pid),
+                        "scored_hexes" => $scored_city->scoringHexesForPlayer($pid),
+                        "network_hexes" => $scored_city->networkHexesForPlayer($pid),
                         "points" => $points,
                         "score" => $pi->score,
                         "player_id" => $pid,

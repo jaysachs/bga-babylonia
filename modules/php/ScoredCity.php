@@ -28,29 +28,39 @@ namespace Bga\Games\babylonia;
 
 class ScoredCity {
 
-    private array $playerHexes = [];
+    private array /* player_id => Hex */ $scoringHexes = [];
+    private array /* player_id => Hex */ $networkHexes = [];
     public int $captured_by = 0;
     public array $captured_city_points = [];
 
     public function __construct(public Piece $type,
                                 array $player_ids) {
         foreach ($player_ids as $pid) {
-            $this->playerHexes[$pid] = [];
+            $this->networkHexes[$pid] = [];
+            $this->scoringHexes[$pid] = [];
             $this->captured_city_points[$pid] = 0;
         }
     }
 
-    public function addScoredHex(Hex $hex): void {
-        $this->playerHexes[$hex->player_id][] = $hex;
+    public function addScoredHex(Hex $hex, int $player_id): void {
+        $this->scoringHexes[$player_id][] = $hex;
+    }
+
+    public function addNetworkHex(Hex $hex, int $player_id): void {
+        $this->networkHexes[$player_id][] = $hex;
     }
 
     public function pointsForPlayer(int $player_id): int {
-        return 2 * count($this->playerHexes[$player_id])
+        return 2 * count($this->scoringHexes[$player_id])
             + $this->captured_city_points[$player_id];
     }
 
-    public function hexesScoringForPlayer(int $player_id): array {
-        return $this->playerHexes[$player_id];
+    public function scoringHexesForPlayer(int $player_id): array {
+        return $this->scoringHexes[$player_id];
+    }
+
+    public function networkHexesForPlayer(int $player_id): array {
+        return $this->networkHexes[$player_id];
     }
 }
 
