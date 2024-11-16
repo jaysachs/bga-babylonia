@@ -165,14 +165,13 @@ END;
         $queue = [ $this->hexAt($start_row, $start_col) ];
         while ($queue) {
             $hex = array_shift($queue);
-            if (in_array($hex, $seen)) {
-                continue;
-            }
             $seen[] = $hex;
             if ($visit($hex)) {
                 $nb = $this->neighbors($hex);
                 foreach ($nb as $n) {
-                    $queue[] = $n;
+                    if (!in_array($n, $seen) && !in_array($n, $queue)) {
+                        $queue[] = $n;
+                    }
                 }
             }
         }
