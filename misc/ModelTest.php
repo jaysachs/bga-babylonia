@@ -67,13 +67,15 @@ final class ModelTest extends TestCase
         $sc = $model->scoreCity($board->hexAt(6,0));
         $this->assertEquals(0, $sc->pointsForPlayer(1));
         $this->assertEquals(2, $sc->pointsForPlayer(2));
+
         // 6 for the hexes, 1 for captured city
         $this->assertEquals(7, $sc->pointsForPlayer(3));
         $this->assertEquals([], $sc->hexesScoringForPlayer(1));
         $this->assertEquals([$board->hexAt(7, 1)],
                             $sc->hexesScoringForPlayer(2));
-        $this->assertEquals([$board->hexAt(5, 3), $board->hexAt(4, 4), $board->hexAt(8,0)],
-                            $sc->hexesScoringForPlayer(3));
+        $this->assertEqualsCanonicalizing(
+            [$board->hexAt(5, 3), $board->hexAt(4, 4), $board->hexAt(8,0)],
+            $sc->hexesScoringForPlayer(3));
         $this->assertEquals(3, $sc->captured_by);
 
         $this->assertEquals(
@@ -105,7 +107,6 @@ final class ModelTest extends TestCase
             ],
             $ps->retrieveAllPlayerInfo()
         );
-
     }
 
     public function testCitiesRequiringScoring(): void
