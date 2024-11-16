@@ -22,7 +22,9 @@
             "bbl_merchant_4",
             "bbl_servant_4",
             "bbl_priest_4",
-            "bbl_hidden_4"
+            "bbl_hidden_4",
+
+            "bbl_empty",
         ];
         let cities = [
             "bbl_city_msp",
@@ -267,7 +269,7 @@
               let top = tl.top;
               let left = tl.left;
 
-              var cl = '';
+              var cl = 'class="bbl_empty"';
               if (hex.col == 16) {
                   cl = "class='bbl_playable'"
               }
