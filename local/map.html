@@ -249,7 +249,7 @@
           ], function(hexloc) {
 
           var boardData = [];
-          for (var c = 0; c < 16; c++) {
+          for (var c = 0; c <= 16; c++) {
               let odd = c % 2 == 1;
               let start = odd ? 1 : 0;
               let end = odd ? 21 : 22
@@ -268,7 +268,7 @@
               let left = tl.left;
 
               var cl = '';
-              if (hex.col % 3 == 0) {
+              if (hex.col == 16) {
                   cl = "class='bbl_playable'"
               }
 
@@ -283,7 +283,7 @@
               //             boardDiv );
               boardDiv.insertAdjacentHTML(
                   `beforeend`,
-                  `<div ${cl} id="bbl_hex_${hex.row}_${hex.col}" style="top:${top}px; left:${left}px;"></div>`
+                  `<div ${cl} id="bbl_hex_${hex.row}_${hex.col}" style="top:${top}px; left:${left}px;">${hex.row},${hex.col}</div>`
               );
           }
           });
