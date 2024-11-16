@@ -162,7 +162,7 @@ body {
     background-image: url(img/sprites.png);
     background-size: 700% 700%;
 }
-.bbl_empty {
+#bbl_hand > .bbl_empty {
     background-position: 0% -600%;
 }
 .bbl_hidden_1 {
