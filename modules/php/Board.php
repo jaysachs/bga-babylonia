@@ -164,14 +164,15 @@ END;
         $seen = [];
         $queue = [ $this->hexAt($start_row, $start_col) ];
         while ($queue) {
-            $hex = array_pop($queue);
+            $hex = array_shift($queue);
+            if (in_array($hex, $seen)) {
+                continue;
+            }
             $seen[] = $hex;
             if ($visit($hex)) {
-                $nb = $this->neighbors($hex, $visit);
+                $nb = $this->neighbors($hex);
                 foreach ($nb as $n) {
-                    if (!in_array($n, $seen)) {
-                        $queue[] = $n;
-                    }
+                    $queue[] = $n;
                 }
             }
         }
@@ -216,7 +217,7 @@ END;
         return $adjacent;
     }
 
-    public function neighbors(Hex &$hex, \Closure $matching): array {
+    public function neighbors(Hex &$hex, ?\Closure $matching = null): array {
         $r = $hex->row;
         $c = $hex->col;
 
@@ -229,7 +230,7 @@ END;
                     $this->hexAt($r+1, $c-1),
                     $this->hexAt($r-1, $c-1)
                 ], function ($nh) use ($matching) {
-                    return $nh != null && $matching($nh);
+                    return $nh != null && ($matching === null || $matching($nh));
                 }
             );
     }
