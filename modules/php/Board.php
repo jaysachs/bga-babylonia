@@ -217,7 +217,7 @@ END;
         return $adjacent;
     }
 
-    public function neighbors(Hex $hex, ?\Closure $matching = null): array {
+    public function neighbors(Hex &$hex, ?\Closure $matching = null): array {
         $r = $hex->row;
         $c = $hex->col;
 
@@ -232,7 +232,7 @@ END;
                 ], function ($nh) use ($matching) {
                     return $nh != null && ($matching === null || $matching($nh));
                 }
-        );
+            );
     }
 
     private static function initializePool(int $numPlayers, bool $random) {
