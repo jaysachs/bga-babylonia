@@ -24,24 +24,24 @@ final class ScorerTest extends TestCase
         ];
     }
 
+    const MAP1 = <<<'END'
+XXX   XXX  XXX
+   ---   XXX
+m-3   ===   p-1
+   ZZZ   C.P
+p-1   ===   m-3
+   p-3   m-3
+C.M   h-3
+   m-2
+m-3
+END;
     public function testCityScoring(): void
     {
-        $board = Board::forPlayerCount(2, false);
-
-        $board->hexAt(4, 0)->playPiece(Piece::PRIEST, 1);
-
-        $board->hexAt(7, 1)->playPiece(Piece::MERCHANT, 2);
-
-        $board->hexAt(2, 0)->playPiece(Piece::MERCHANT, 3);
-        $board->hexAt(5, 1)->playPiece(Piece::PRIEST, 3);
-        $board->hexAt(6, 2)->playPiece(Piece::HIDDEN, 3);
-        $board->hexAt(5, 3)->playPiece(Piece::MERCHANT, 3);
-        $board->hexAt(8, 0)->playPiece(Piece::MERCHANT, 3);
-        $board->hexAt(4, 4)->playPiece(Piece::MERCHANT, 3);
-        $board->hexAt(2, 4)->playPiece(Piece::PRIEST, 1);
-
+        $board = Board::fromTestMap(ScorerTest::MAP1);
         $scorer = new Scorer($board, $this->playerInfos(), new Components([]));
+
         $sc = $scorer->computeCityScores($board->hexAt(6,0));
+
         $this->assertEquals(0, $sc->pointsForPlayer(1));
         $this->assertEquals(2, $sc->pointsForPlayer(2));
 
@@ -68,20 +68,21 @@ final class ScorerTest extends TestCase
                             $sc->scoringHexesForPlayer(3));
     }
 
+const MAP2 = <<<'END'
+XXX   XXX  XXX
+   f-2   XXX
+m-3   ===   p-1
+   ZZZ   C.P
+p-1   ===   m-3
+   p-3   m-3
+C.M   h-3
+   m-2
+m-3
+END;
     public function testComputeHexWinner(): void {
-        $board = Board::forPlayerCount(2, false);
-
-        $board->hexAt(4, 0)->playPiece(Piece::PRIEST, 1);
-        $board->hexAt(7, 1)->playPiece(Piece::MERCHANT, 2);
-        $board->hexAt(2, 0)->playPiece(Piece::MERCHANT, 3);
-        $board->hexAt(5, 1)->playPiece(Piece::PRIEST, 3);
-        $board->hexAt(6, 2)->playPiece(Piece::HIDDEN, 3);
-        $board->hexAt(5, 3)->playPiece(Piece::MERCHANT, 3);
-        $board->hexAt(8, 0)->playPiece(Piece::MERCHANT, 3);
-        $board->hexAt(4, 4)->playPiece(Piece::MERCHANT, 3);
-        $board->hexAt(2, 4)->playPiece(Piece::PRIEST, 1);
-        $board->hexAt(1, 1)->playPiece(Piece::FARMER, 2);
+        $board = Board::fromTestMap(ScorerTest::MAP2);
         $scorer = new Scorer($board, $this->playerInfos(), new Components([]));
+
         $this->assertEquals(3, $scorer->computeHexWinner($board->hexAt(6, 0)));
         $this->assertEquals(3, $scorer->computeHexWinner($board->hexAt(3, 3)));
 
