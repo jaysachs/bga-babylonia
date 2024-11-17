@@ -59,8 +59,7 @@
     <div id="bbl_main">
       <span id="bbl_vars"></span>
       <div id="bbl_hand_container">
-        <div id="bbl_hand">
-	</div>
+        <div id="bbl_hand"></div>
       </div>
       <!-- needed since the board is absolutely positions / sized. for now. -->
       <div id="bbl_board"></div>
