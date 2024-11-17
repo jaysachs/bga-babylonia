@@ -54,7 +54,7 @@ class Hex {
         return $p;
     }
 
-    public function placeDevelopment(Piece $development) {
+    public function placeDevelopment(Piece $development): Hex {
         if ($this->piece != Piece::EMPTY) {
             throw new \LogicException("attempt to place city or field on top of $this");
         }
@@ -65,6 +65,7 @@ class Hex {
             throw new \LogicException("attempt to place a non-city or field on $this");
         }
         $this->piece = $development;
+        return $this;
     }
 
     public function playPiece(Piece $piece, int $player_id): Piece {
