@@ -64,7 +64,7 @@ class Scorer {
     }
 
     public function computeCityScores(Hex $hex): ScoredCity {
-        $result = new ScoredCity($hex->piece, array_keys($this->player_infos));
+        $result = ScoredCity::makeEmpty(array_keys($this->player_infos));
         $result->captured_by = $this->computeHexWinner($hex);
         $this->board->bfs(
             $hex->row,

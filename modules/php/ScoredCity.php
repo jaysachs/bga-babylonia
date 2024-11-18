@@ -28,18 +28,20 @@ namespace Bga\Games\babylonia;
 
 class ScoredCity {
 
-    private array /* player_id => Hex */ $scoringHexes = [];
-    private array /* player_id => Hex */ $networkHexes = [];
-    public int $captured_by = 0;
-    public array $captured_city_points = [];
+    public function __construct(
+        public int $captured_by,
+        public array /* player_id => int */ $captured_city_points,
+        private array /* player_id => Hex */ $scoringHexes,
+        private array /* player_id => Hex */ $networkHexes) { }
 
-    public function __construct(public Piece $type,
-                                array $player_ids) {
+    public static function makeEmpty(array $player_ids) {
+        $sc = new ScoredCity(0, [], [], []);
         foreach ($player_ids as $pid) {
-            $this->networkHexes[$pid] = [];
-            $this->scoringHexes[$pid] = [];
-            $this->captured_city_points[$pid] = 0;
+            $sc->networkHexes[$pid] = [];
+            $sc->scoringHexes[$pid] = [];
+            $sc->captured_city_points[$pid] = 0;
         }
+        return $sc;
     }
 
     public function addScoredHex(Hex $hex, int $player_id): void {
