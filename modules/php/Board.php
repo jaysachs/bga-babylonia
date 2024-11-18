@@ -101,27 +101,29 @@ class Board {
         $board = new Board();
         $lines = explode("\n", trim($map));
         $row = 0;
+
+        $matches = [];
+        // convenience utility function
+        $play = function(Hex $hex, Piece $piece) use (&$board, &$matches) {
+            $board->addHex($hex);
+            $hex->playPiece($piece, intval($matches[1]));
+        };
+
         foreach ($lines as &$s) {
             $col = ($row & 1) ? 1 : 0;
             foreach (preg_split("/\s+/", trim($s)) as $t) {
-                $matches = [];
                 if ($t == "XXX") {
                     // nothing, unplayable hex
                 } else if (preg_match('/^m-([0-9])$/', $t, $matches)) {
-                    $board->addHex(
-                        Hex::land($row, $col)->playPiece(Piece::MERCHANT, intval($matches[1])));
+                    $play(Hex::land($row, $col), Piece::MERCHANT);
                 } else if (preg_match('/^s-([0-9])$/', $t, $matches)) {
-                    $board->addHex(
-                        Hex::land($row, $col)->playPiece(Piece::SERVANT, intval($matches[1])));
+                    $play(Hex::land($row, $col), Piece::SERVANT);
                 } else if (preg_match('/^f-([0-9])$/', $t, $matches)) {
-                    $board->addHex(
-                        Hex::land($row, $col)->playPiece(Piece::FARMER, intval($matches[1])));
+                    $play(Hex::land($row, $col), Piece::FARMER);
                 } else if (preg_match('/^h-([0-9])$/', $t, $matches)) {
-                    $board->addHex(
-                        Hex::water($row, $col)->playPiece(Piece::HIDDEN, intval($matches[1])));
+                    $play(Hex::land($row, $col), Piece::HIDDEN);
                 } else if (preg_match('/^p-([0-9])$/', $t, $matches)) {
-                    $board->addHex(
-                        Hex::land($row, $col)->playPiece(Piece::PRIEST, intval($matches[1])));
+                    $play(Hex::land($row, $col), Piece::PRIEST);
                 } else if ($t == "---") {
                     $board->addHex(Hex::land($row, $col));
                 } else if ($t == "≈≈≈" || $t == '===') {
