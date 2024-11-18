@@ -6,19 +6,24 @@ use PHPUnit\Framework\TestCase;
 use Bga\Games\babylonia\ {
         Board,
         Components,
+        Hand,
         Hex,
         HexType,
         Model,
+        Move,
         PersistentStore,
         Piece,
         PlayerInfo,
         ScoredCity,
+        TurnProgress,
 };
 
 class TestStore extends PersistentStore {
-    private ?Board $board = null;
+    private Board $board;
     private array $player_infos = [];
     private Components $components;
+    private TurnProgress $turnProgress;
+    private Hand $hand;
 
     public static function fromMap(string $map): TestStore {
         return new TestStore(Board::fromTestMap($map));
@@ -26,13 +31,16 @@ class TestStore extends PersistentStore {
 
     public function __construct(Board $board) {
         $this->board = $board;
+        $this->hand = Hand::new();
         PersistentStore::__construct(null);
         for ($i = 1; $i <= 3; $i++) {
             $this->player_infos[$i] = new PlayerInfo($i, "", 0, 0, 0, 5, 25);
         }
         $this->components = Components::forNewGame(false);
+        $this->turnProgress = new TurnProgress();
     }
 
+    /* overrides of PersistentStore */
     public function insertBoard(Board $b): void { $this->board = $b; }
     public function insertPlayerInfos(array $pis): void { }
     public function insertZigguratCards(array $zs): void { }
@@ -46,10 +54,26 @@ class TestStore extends PersistentStore {
     public function retrieveComponents(): Components {
         return $this->components;
     }
+    public function retrieveTurnProgress(int $player_id): TurnProgress {
+        return $this->turnProgress;
+    }
+    public function retrieveHand(int $player_id): Hand {
+        return $this->hand;
+    }
+    public function insertMove(Move $move) {
+        $this->turnProgress->addMove($move);
+    }
 
+    /* test utility methods */
     public function hex(int $r, int $c) {
         return $this->board->hexAt($r, $c);
     }
+    public function setHand(array /* Piece */ $pieces) {
+        foreach ($pieces as $piece) {
+            $this->hand->replenish($piece);
+        }
+    }
+
 }
 
 final class ModelTest extends TestCase
@@ -138,5 +162,76 @@ END;
 
         $board->hexAt(3, 1)->scored = true;
         $this->assertEquals([], $model->hexesRequiringScoring());
+    }
+
+    const MAP4 = <<<'END'
+XXX   XXX  XXX
+   C.S   XXX
+---   h-1   f-2
+   ZZZ   C.P
+p-1   ===   s-2
+   f-2   m-1
+C.M   ---
+   p-3
+s-3
+END;
+
+    public function testIsPlayAllowedMoreThanThreeFarmers() {
+        $ps = new TestStore($board = Board::fromTestMap(ModelTest::MAP4));
+        $model = new Model($ps, 1);
+    }
+
+
+    public function testIsPlayAllowedFirstPieceOfTurn_allowed() {
+        $ps = new TestStore($board = Board::fromTestMap(ModelTest::MAP4));
+        $model = new Model($ps, 1);
+
+        $this->assertTrue($model->isPlayAllowed(Piece::MERCHANT, $ps->hex(2,0)));
+        $this->assertTrue($model->isPlayAllowed(Piece::HIDDEN, $ps->hex(4,2)));
+        $this->assertTrue($model->isPlayAllowed(Piece::FARMER, $ps->hex(4,2)));
+        $this->assertTrue($model->isPlayAllowed(Piece::SERVANT, $ps->hex(6,2)));
+    }
+
+    public function testIsPlayAllowedFirstPieceOfTurn_forbidden() {
+        $ps = new TestStore($board = Board::fromTestMap(ModelTest::MAP4));
+        $model = new Model($ps, 1);
+
+        // not on a city
+        $this->assertFalse($model->isPlayAllowed(Piece::MERCHANT, $ps->hex(1,1)));
+        // not on a ziggurat
+        $this->assertFalse($model->isPlayAllowed(Piece::SERVANT, $ps->hex(3,1)));
+        // not on a friendly piece
+        $this->assertFalse($model->isPlayAllowed(Piece::SERVANT, $ps->hex(4,0)));
+        // not on an opponent piece
+        $this->assertFalse($model->isPlayAllowed(Piece::SERVANT, $ps->hex(5,1)));
+    }
+
+    const MAP5 = <<<'END'
+XXX   XXX   XXX
+   C.S   XXX
+---   h-1   ---
+   ZZZ   C.P
+---   ===   s-2
+   f-2   m-1
+C.M   ---
+   ---
+s-3
+END;
+
+    public function testPlayPiecesMoreThanTwoFarmers() {
+        $ps = new TestStore($board = Board::fromTestMap(ModelTest::MAP5));
+        $model = new Model($ps, 1);
+        $ps->setHand([Piece::FARMER, Piece::SERVANT, Piece::FARMER, Piece::FARMER, Piece::FARMER]);
+        $m1 = $model->playPiece(0, 2, 0);
+        $m2 = $model->playPiece(3, 4, 0);
+        $m3 = $model->playPiece(2, 7, 1);
+        $m4 = $model->playPiece(4, 6, 2);
+        // if we had another farmer, it would be allowed
+        $this->assertTrue($model->isPlayAllowed(Piece::FARMER, $ps->hex(2, 4)));
+        // but only a farmer
+        $this->assertFalse($model->isPlayAllowed(Piece::SERVANT, $ps->hex(2, 4)));
+        // also, can't play an extra farmer into the water
+        // BUG!!!
+        $this->assertTrue($model->isPlayAllowed(Piece::FARMER, $ps->hex(4, 2)));
     }
 }
