@@ -6,9 +6,6 @@ use PHPUnit\Framework\TestCase;
 use Bga\Games\babylonia\ {
         Board,
         Components,
-        Hex,
-        HexType,
-        Piece,
         PlayerInfo,
         Scorer,
         ScoredCity,
@@ -35,49 +32,60 @@ C.M   h-3
    m-2
 m-3
 END;
+
+    private function assertEq(ScoredCity $expected, ScoredCity $actual):void {
+        $this->assertEqualsCanonicalizing($expected, $actual);
+    }
+
     public function testCityScoring(): void
     {
         $board = Board::fromTestMap(ScorerTest::MAP1);
         $scorer = new Scorer($board, $this->playerInfos(), new Components([]));
 
-        $sc = $scorer->computeCityScores($board->hexAt(6,0));
+        $hex = function(int $r, int $c) use(&$board) { return $board->hexAt($r, $c); };
+        $expected = new ScoredCity(
+            3,
+            [1 => 0, 2 => 0, 3 => 1],
+            [
+                1 => [],
+                2 => [$hex(7, 1)],
+                3 => [$hex(5, 3), $hex(4, 4), $hex(8,0)]
+            ],
+            [
+                1 => [$hex(4,0)],
+                2 => [$hex(7,1)],
+                3 => [$hex(8,0), $hex(6,2), $hex(5,1), $hex(5,3), $hex(4, 4)],
+            ]
+        );
+        $this->assertEq($expected, $scorer->computeCityScores($hex(6,0)));
 
-        $this->assertEquals(0, $sc->pointsForPlayer(1));
-        $this->assertEquals(2, $sc->pointsForPlayer(2));
-
-        $this->assertEquals(7, $sc->pointsForPlayer(3));
-        $this->assertEquals([], $sc->scoringHexesForPlayer(1));
-        $this->assertEquals([$board->hexAt(7, 1)],
-                            $sc->scoringHexesForPlayer(2));
-        $this->assertEqualsCanonicalizing(
-            [$board->hexAt(5, 3), $board->hexAt(4, 4), $board->hexAt(8,0)],
-            $sc->scoringHexesForPlayer(3));
-        $this->assertEquals(3, $sc->captured_by);
-
-
-        $sc = $scorer->computeCityScores($board->hexAt(3, 3));
-        $this->assertEquals(3, $sc->captured_by);
-        $this->assertEquals(2, $sc->pointsForPlayer(1));
-        $this->assertEquals(0, $sc->pointsForPlayer(2));
-        //        $this->assertEquals(4, $sc->pointsForPlayer(3));
-        $this->assertEquals([$board->hexAt(2, 4)],
-                            $sc->scoringHexesForPlayer(1));
-        $this->assertEquals([],
-                            $sc->scoringHexesForPlayer(2));
-        $this->assertEquals([$board->hexAt(5, 1)],
-                            $sc->scoringHexesForPlayer(3));
+        $expected = new ScoredCity(
+            3,
+            [1 => 0, 2 => 0, 3 => 1],
+            [
+                1 => [$hex(2, 4)],
+                2 => [],
+                3 => [$hex(5, 1)]
+            ],
+            [
+                1 => [$hex(2, 4)],
+                2 => [],
+                3 => [$hex(4, 4), $hex(5, 3), $hex(5,1), $hex(6,2)],
+            ]
+        );
+        $this->assertEq($expected, $scorer->computeCityScores($hex(3, 3)));
     }
 
 const MAP2 = <<<'END'
-XXX   XXX  XXX
-   f-2   XXX
-m-3   ===   p-1
-   ZZZ   C.P
-p-1   ===   m-3
-   p-3   m-3
-C.M   h-3
-   m-2
-m-3
+XXX   XXX   XXX   XXX
+   f-2   XXX   XXX
+m-3   ===   p-1   ---
+   ZZZ   C.P   ---
+p-1   ===   m-3   ---
+   p-3   m-3   ---
+C.M   h-3   ---   ---
+   m-2   ===   C**
+m-3   ---   ===   ---
 END;
     public function testComputeHexWinner(): void {
         $board = Board::fromTestMap(ScorerTest::MAP2);
@@ -85,10 +93,25 @@ END;
 
         $this->assertEquals(3, $scorer->computeHexWinner($board->hexAt(6, 0)));
         $this->assertEquals(3, $scorer->computeHexWinner($board->hexAt(3, 3)));
-
         // 3 has 2, 1 and 2 each have 1, so 3 wins
         $this->assertEquals(3, $scorer->computeHexWinner($board->hexAt(3, 1)));
-        $board->hexAt(2, 2)->playPiece(Piece::HIDDEN, 2);
+    }
+
+const MAP3 = <<<'END'
+XXX   XXX   XXX   XXX
+   f-2   XXX   XXX
+m-3   h-2   p-1   ---
+   ZZZ   C.P   ---
+p-1   ===   m-3   ---
+   p-3   m-3   ---
+C.M   h-3   ---   ---
+   m-2   ===   C**
+m-3   ---   ===   ---
+END;
+    public function testComputeHexWinner2(): void {
+        $board = Board::fromTestMap(ScorerTest::MAP3);
+        $scorer = new Scorer($board, $this->playerInfos(), new Components([]));
+
         $this->assertEquals(0, $scorer->computeHexWinner($board->hexAt(3, 1)));
     }
 }
