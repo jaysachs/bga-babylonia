@@ -27,7 +27,7 @@ declare(strict_types=1);
 namespace Bga\Games\babylonia;
 
 class TurnProgress {
-    function __construct(public array &$moves) {}
+    function __construct(public array &$moves = []) {}
 
     public function addMove(Move $move) {
         $this->moves[] = $move;
