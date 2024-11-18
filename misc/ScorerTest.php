@@ -108,7 +108,7 @@ C.M   h-3   ---   ---
    m-2   ===   C**
 m-3   ---   ===   ---
 END;
-    public function testComputeHexWinner2(): void {
+    public function testComputeHexWinnerNoWinner(): void {
         $board = Board::fromTestMap(ScorerTest::MAP3);
         $scorer = new Scorer($board, $this->playerInfos(), new Components([]));
 
