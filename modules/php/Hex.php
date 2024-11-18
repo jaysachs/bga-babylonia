@@ -68,7 +68,7 @@ class Hex {
         return $this;
     }
 
-    public function playPiece(Piece $piece, int $player_id): Hex {
+    public function playPiece(Piece $piece, int $player_id): Piece {
         if ($player_id == 0) {
             throw new \InvalidArgumentException("playing a piece requires a non-zero player_id");
         }
@@ -86,7 +86,7 @@ class Hex {
         $result = $this->piece;
         $this->piece = $piece;
         $this->player_id = $player_id;
-        return $this;
+        return $result;
     }
 
     public function isLand(): bool {
