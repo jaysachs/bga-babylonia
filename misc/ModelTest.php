@@ -16,6 +16,8 @@ use Bga\Games\babylonia\ {
         PlayerInfo,
         ScoredCity,
         TurnProgress,
+        ZigguratCard,
+        ZigguratCardType,
 };
 
 class TestStore extends PersistentStore {
@@ -61,7 +63,9 @@ class TestStore extends PersistentStore {
         return $this->hand;
     }
     public function insertMove(Move $move) {
-        $this->turnProgress->addMove($move);
+        // $this->turnProgress->addMove($move);
+    }
+    public function updateZigguratCard(ZigguratCard $card) {
     }
 
     /* test utility methods */
@@ -176,12 +180,6 @@ C.M   ---
 s-3
 END;
 
-    public function testIsPlayAllowedMoreThanThreeFarmers() {
-        $ps = new TestStore($board = Board::fromTestMap(ModelTest::MAP4));
-        $model = new Model($ps, 1);
-    }
-
-
     public function testIsPlayAllowedFirstPieceOfTurn_allowed() {
         $ps = new TestStore($board = Board::fromTestMap(ModelTest::MAP4));
         $model = new Model($ps, 1);
@@ -231,7 +229,55 @@ END;
         // but only a farmer
         $this->assertFalse($model->isPlayAllowed(Piece::SERVANT, $ps->hex(2, 4)));
         // also, can't play an extra farmer into the water
-        // BUG!!!
-        $this->assertTrue($model->isPlayAllowed(Piece::FARMER, $ps->hex(4, 2)));
+        $this->assertFalse($model->isPlayAllowed(Piece::FARMER, $ps->hex(4, 2)));
+    }
+
+
+    const MAP6 = <<<'END'
+---   ---   XXX
+   F.5   ---
+---   ===   ---
+END;
+
+    public function testPlayPiecesOnFields() {
+        $ps = new TestStore($board = Board::fromTestMap(ModelTest::MAP6));
+        $model = new Model($ps, 1);
+        $ps->setHand([Piece::FARMER, Piece::SERVANT, Piece::MERCHANT, Piece::FARMER, Piece::PRIEST]);
+
+        // No adjacent noble
+        $this->assertFalse($model->isPlayAllowed(Piece::FARMER, $ps->hex(1,1)));
+
+        $ps = new TestStore($board = Board::fromTestMap(ModelTest::MAP6));
+        $model = new Model($ps, 1);
+        $ps->setHand([Piece::FARMER, Piece::SERVANT, Piece::MERCHANT, Piece::FARMER, Piece::PRIEST]);
+        // Not a noble without zig card
+        $this->assertFalse($model->isPlayAllowed(Piece::SERVANT, $ps->hex(1,1)));
+
+        $ps = new TestStore($board = Board::fromTestMap(ModelTest::MAP6));
+        $model = new Model($ps, 1);
+        $ps->setHand([Piece::FARMER, Piece::SERVANT, Piece::MERCHANT, Piece::FARMER, Piece::PRIEST]);
+        // An adjacent farmer doesn't help
+        $m1 = $model->playPiece(0, 2, 0);
+        $this->assertFalse($model->isPlayAllowed(Piece::FARMER, $ps->hex(1,1)));
+
+        $ps = new TestStore($board = Board::fromTestMap(ModelTest::MAP6));
+        $model = new Model($ps, 1);
+        $ps->setHand([Piece::FARMER, Piece::SERVANT, Piece::MERCHANT, Piece::FARMER, Piece::PRIEST]);
+        // Nor does a noble in water
+        $m2 = $model->playPiece(1, 2, 2);
+        $this->assertFalse($model->isPlayAllowed(Piece::FARMER, $ps->hex(1,1)));
+
+        $ps = new TestStore($board = Board::fromTestMap(ModelTest::MAP6));
+        $model = new Model($ps, 1);
+        $ps->setHand([Piece::FARMER, Piece::SERVANT, Piece::MERCHANT, Piece::FARMER, Piece::PRIEST]);
+        // But an adjacent noble on land helps
+        $m3 = $model->playPiece(2, 0, 2);
+        $this->assertTrue($model->isPlayAllowed(Piece::FARMER, $ps->hex(1,1)));
+
+        $ps = new TestStore($board = Board::fromTestMap(ModelTest::MAP6));
+        $model = new Model($ps, 1);
+        $model->selectZigguratCard(ZigguratCardType::NOBLES_IN_FIELDS);
+        // Or we can have the appropriate zig card and play a noble
+        $this->assertTrue($model->isPlayAllowed(Piece::SERVANT, $ps->hex(1,1)));
     }
 }
