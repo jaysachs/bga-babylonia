@@ -110,6 +110,9 @@ class Board {
                 } else if (preg_match('/^m-([0-9])$/', $t, $matches)) {
                     $board->addHex(
                         Hex::land($row, $col)->playPiece(Piece::MERCHANT, intval($matches[1])));
+                } else if (preg_match('/^s-([0-9])$/', $t, $matches)) {
+                    $board->addHex(
+                        Hex::land($row, $col)->playPiece(Piece::SERVANT, intval($matches[1])));
                 } else if (preg_match('/^f-([0-9])$/', $t, $matches)) {
                     $board->addHex(
                         Hex::land($row, $col)->playPiece(Piece::FARMER, intval($matches[1])));
