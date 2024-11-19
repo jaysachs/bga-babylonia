@@ -213,7 +213,6 @@
 </head>
   <body>
     <div id="bbl_main">
-      <span id="bbl_vars"></span>
       <div id="bbl_hand_container">
         <div class="bbl_hand" id="bbl_hand" onClick="selectPieceToPlay(event)">
           <div id="bbl_hand_0" class="bbl_playable bbl_farmer_1"></div>
@@ -228,8 +227,9 @@
           -->
         </div>
       </div>
-      <div class="bbl_board-spacer"></div>
-      <div class="bbl_board" id="bbl_board" onClick="selectHex(event)">
+      <div id="bbl_board_container">
+        <span id="bbl_vars"></span>
+        <div class="bbl_board" id="bbl_board" onClick="selectHex(event)"></div>
         <script>
           var dojoConfig = {
               async: true,

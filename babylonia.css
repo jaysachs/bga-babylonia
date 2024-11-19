@@ -29,6 +29,22 @@ body {
     --hex-width: calc(var(--hex-height) * var(--hex-ratio)); /* 70px; */
 }
 
+#bbl_main {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#bbl_board_container {
+    flex: 1;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+#bbl_vars {
+    display: none;
+}
+
 #bbl_board {
     font-size: 0;
     background: url(img/mapb.jpg) no-repeat center;
@@ -36,8 +52,6 @@ body {
     width: calc(var(--board-width));
     height: calc(var(--board-height));
     position: relative;
-    margin-top: 10px;
-    margin-bottom: 10px;
 }
 
 /* the outermost hex container */

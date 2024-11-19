@@ -45,11 +45,13 @@ const jstpl_hex =
 
 document.getElementById('game_play_area').insertAdjacentHTML('beforeend', `
        <div id="bbl_main">
-         <span id="bbl_vars"></span>
          <div id="bbl_hand_container">
            <div id="${ID_HAND}"></div>
          </div>
-         <div id="${ID_BOARD}"></div>
+         <div id="bbl_board_container">
+           <span id="bbl_vars"></span>
+           <div id="${ID_BOARD}"></div>
+         </div>
          <div id="${ID_AVAILABLE_ZCARDS}">
         </div>
       </div>
