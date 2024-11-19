@@ -15,6 +15,46 @@
  *
  */
 
+const ID_AVAILABLE_ZCARDS = 'bbl_available_zcards';
+const ID_BOARD = 'bbl_board';
+const ID_HAND = 'bbl_hand';
+
+const jstpl_log_piece = '<span class="log-element bbl_${piece}"></span>';
+const jstpl_log_city = '<span class="log-element bbl_${city}"></span>';
+const jstpl_log_zcard = '<span class="log-element bbl_${zcard}"></span>';
+
+const jstpl_player_board_ext =
+      '<div>\
+         <span class="bbl_pb_hand_label_${player_number}"></span>\
+         <span id="bbl_handcount_${player_id}">5</span>\
+       </div>\
+       <div>\
+         <span class="bbl_pb_pool_label_${player_number}"></span>\
+         <span id="bbl_poolcount_${player_id}">19</span>\
+       </div>\
+       <div>\
+         <span class="bbl_pb_citycount_label"></span>\
+         <span id="bbl_citycount_${player_id}">1</span>\
+       </div>\
+       <div id="bbl_zcards_${player_id}" class="bbl_pb_zcards">\
+         <span class="bbl_pb_zcard_label"></span>\
+       </div>';
+
+const jstpl_hex =
+      '<div id="bbl_hex_${row}_${col}" style="top:${top}px; left:${left}px;"></div>';
+
+const game_html =
+      `<div id="bbl_main">
+         <span id="bbl_vars"></span>
+         <div id="bbl_hand_container">
+           <div id="${ID_HAND}"></div>
+         </div>
+         <div id="${ID_BOARD}"></div>
+         <div id="${ID_AVAILABLE_ZCARDS}">
+        </div>
+      </div>`;
+
+
 var thegame = null;
 define([
     'dojo','dojo/_base/declare',
@@ -23,6 +63,9 @@ define([
     'ebg/counter',
 ],
 function (dojo, declare, hexloc) {
+    document.getElementById('game_play_area').insertAdjacentHTML(
+        'beforeend', game_html);
+
     return declare('bgagame.babylonia', ebg.core.gamegui, {
         constructor: function(){
             console.log('babylonia constructor');
@@ -31,18 +74,15 @@ function (dojo, declare, hexloc) {
             // Example:
             // this.myGlobalValue = 0;
 
-            dojo.connect( $(this.ID_HAND), 'onclick', this, 'onPieceSelection' );
-            dojo.connect( $(this.ID_BOARD), 'onclick', this, 'onHexSelection' );
-            dojo.connect( $(this.ID_AVAILABLE_ZCARDS), 'onclick', this, 'onZcardSelected');
+            dojo.connect( $(ID_HAND), 'onclick', this, 'onPieceSelection' );
+            dojo.connect( $(ID_BOARD), 'onclick', this, 'onHexSelection' );
+            dojo.connect( $(ID_AVAILABLE_ZCARDS), 'onclick', this, 'onZcardSelected');
         },
 
         CSS_SELECTED: 'bbl_selected',
         CSS_PLAYABLE: 'bbl_playable',
         CSS_UNPLAYABLE: 'bbl_unplayable',
         CSS_EMPTY: 'bbl_empty',
-        ID_AVAILABLE_ZCARDS: 'bbl_available_zcards',
-        ID_BOARD: 'bbl_board',
-        ID_HAND: 'bbl_hand',
 
         selectedHandPos: null,
         pieceClasses: [ 'priest', 'servant', 'farmer', 'merchant' ],
@@ -119,7 +159,7 @@ function (dojo, declare, hexloc) {
         setupBoard: function( boardData, playersData ) {
             console.log('Setting the the game board');
             console.log(hexloc);
-            let boardDiv = $( this.ID_BOARD );
+            let boardDiv = $( ID_BOARD );
             // console.log( gamedatas.board );
 
             for( let h = 0; h < boardData.length; ++h) {
@@ -153,7 +193,7 @@ function (dojo, declare, hexloc) {
                 let card = zcards[z];
                 this.card_tooltips[card.type] = card.tooltip;
                 this.addZigguratCardDiv(`bbl_zig${z}`,
-                                        this.ID_AVAILABLE_ZCARDS,
+                                        ID_AVAILABLE_ZCARDS,
                                         card.type,
                                         card.used);
                 if ( card.owning_player_id != 0 ) {
@@ -194,7 +234,7 @@ function (dojo, declare, hexloc) {
         // Returns the hex (row,col) clicked on, or null if not a playable hex
         selectedHex: function(target) {
             let e = target;
-            while (e.parentElement != null && e.parentElement.id != this.ID_BOARD) {
+            while (e.parentElement != null && e.parentElement.id != ID_BOARD) {
                 e = e.parentElement;
             }
             if (e.parentElement == null) {
@@ -254,7 +294,7 @@ function (dojo, declare, hexloc) {
         },
 
         markAllHexesUnplayable: function() {
-            $(this.ID_BOARD).querySelectorAll('.' + this.CSS_PLAYABLE)
+            $(ID_BOARD).querySelectorAll('.' + this.CSS_PLAYABLE)
                 .forEach(div => div.classList.remove(this.CSS_PLAYABLE));
         },
 
@@ -315,7 +355,7 @@ function (dojo, declare, hexloc) {
             }
             let e = event.target;
             let zdiv = e.parentElement;
-            if (zdiv.id != this.ID_AVAILABLE_ZCARDS) {
+            if (zdiv.id != ID_AVAILABLE_ZCARDS) {
                 return false;
             }
             let cl = e.classList;
@@ -325,7 +365,7 @@ function (dojo, declare, hexloc) {
                     type = c.slice(4); // better way to do this?
                     this.bgaPerformAction('actSelectZigguratCard',
                                           { card_type: type });
-                    let div = $( this.ID_AVAILABLE_ZCARDS );
+                    let div = $( ID_AVAILABLE_ZCARDS );
                     div.classList.remove('bbl_selecting');
                     return false;
                 }
@@ -345,7 +385,7 @@ function (dojo, declare, hexloc) {
                 return false;
             }
             let selectedDiv = event.target;
-            if (selectedDiv.parentElement.id != this.ID_HAND) {
+            if (selectedDiv.parentElement.id != ID_HAND) {
                 return false;
             }
             var playable = false;
@@ -379,7 +419,7 @@ function (dojo, declare, hexloc) {
         },
 
         unselectAllHandPieces: function() {
-            handDiv = $(this.ID_HAND);
+            handDiv = $(ID_HAND);
             for (const div of handDiv.children) {
                 cl = div.classList;
                 if (cl.contains(this.CSS_SELECTED)) {
@@ -393,7 +433,7 @@ function (dojo, declare, hexloc) {
         },
 
         setPlayablePieces: function() {
-            handDiv = $(this.ID_HAND);
+            handDiv = $(ID_HAND);
             for (const div of handDiv.children) {
                 cl = div.classList;
                 if (! cl.contains(this.CSS_EMPTY)) {
@@ -553,7 +593,7 @@ function (dojo, declare, hexloc) {
                         break;
 
                     case 'selectZigguratCard':
-                        let div = $( this.ID_AVAILABLE_ZCARDS );
+                        let div = $( ID_AVAILABLE_ZCARDS );
                         div.scrollIntoView( false );
                         div.classList.add('bbl_selecting');
                         this.updateStatusBar(_('You must select a ziggurat card'));
@@ -590,7 +630,7 @@ function (dojo, declare, hexloc) {
                 return div;
             }
             // dynamically extend hand as needed.
-            const hand = $(this.ID_HAND);
+            const hand = $(ID_HAND);
             for (j = 0; j <= i; ++j) {
                 let id = `bbl_hand_${j}`;
                 let d = $(id);
@@ -697,7 +737,7 @@ function (dojo, declare, hexloc) {
                            from,
                            to,
                            onEnd = null,
-                           parent = this.ID_BOARD,
+                           parent = ID_BOARD,
                            delay = 0,
                            time = 500) {
             let a = this.slideTemporaryObject(
@@ -823,7 +863,7 @@ function (dojo, declare, hexloc) {
                     this.pieceClass(notif.args.city),
                     hexDivId,
                     // TODO: find a location for 'off the board'
-                    this.ID_AVAILABLE_ZCARDS
+                    ID_AVAILABLE_ZCARDS
                 );
             }
         },
@@ -917,7 +957,7 @@ function (dojo, declare, hexloc) {
                         this.handcount_id(this.player_id),
                         div.id,
                         () => { div.className = hc; },
-                        this.ID_HAND,
+                        ID_HAND,
                         delay
                     );
                     delay += 500;
