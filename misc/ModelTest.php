@@ -161,7 +161,7 @@ END;
 
     public function testZigguratsRequiringScoring(): void
     {
-        $ps = TestStore::fromMap(ModelTest::MAP2);
+        $ps = TestStore::fromMap(ModelTest::MAP7);
         $model = new Model($ps, 0);
 
         $this->assertEquals([], $model->hexesRequiringScoring());
