@@ -147,24 +147,30 @@ END;
     }
 
 
+    const MAP7 = <<<'END'
+XXX   XXX  XXX
+   p-2   XXX
+---   h-1   f-2
+   ZZZ   C.P
+p-1   ===   ---
+   m-2   m-1
+C.M   ---
+   ---
+s-3
+END;
+
     public function testZigguratsRequiringScoring(): void
     {
-        $board = Board::forPlayerCount(2);
-        $ps = new TestStore($board);
+        $ps = new TestStore(Board::fromTestMap(ModelTest::MAP7));
         $model = new Model($ps, 0);
 
         $this->assertEquals([], $model->hexesRequiringScoring());
 
-        $board->hexAt(2, 0)->playPiece(Piece::PRIEST, 1);
-        $board->hexAt(4, 0)->playPiece(Piece::FARMER, 2);
-        $board->hexAt(1, 1)->playPiece(Piece::PRIEST, 3);
-        $this->assertEquals([], $model->hexesRequiringScoring());
-
-        $board->hexAt(5, 1)->playPiece(Piece::PRIEST, 3);
-        $this->assertEquals([$board->hexAt(3, 1)],
+        $ps->hex(2, 0)->playPiece(Piece::PRIEST, 1);
+        $this->assertEquals([$ps->hex(3, 1)],
                             $model->hexesRequiringScoring());
 
-        $board->hexAt(3, 1)->scored = true;
+        $ps->hex(3, 1)->scored = true;
         $this->assertEquals([], $model->hexesRequiringScoring());
     }
 
