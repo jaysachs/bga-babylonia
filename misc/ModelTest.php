@@ -108,16 +108,16 @@ END;
     }
 
     const MAP2 = <<<'END'
-XXX   XXX  XXX
-   ---   XXX
----   ===   ---
-   ZZZ   C.P
-p-1   ===   ---
-   f-2   ---
-C.M   ---
-   p-3
-s-3
-END;
+        XXX   XXX  XXX
+           ---   XXX
+        ---   ===   ---
+           ZZZ   C.P
+        p-1   ===   ---
+           f-2   ---
+        C.M   ---
+           p-3
+        s-3
+    END;
 
     public function testCitiesRequiringScoringOneSurrounded(): void {
         $ps = TestStore::fromMap(ModelTest::MAP2);
@@ -127,16 +127,16 @@ END;
     }
 
     const MAP3 = <<<'END'
-XXX   XXX  XXX
-   C.S   XXX
----   h-1   f-2
-   ZZZ   C.P
-p-1   h-3   s-2
-   f-2   m-1
-C.M   ---
-   p-3
-s-3
-END;
+        XXX   XXX  XXX
+           C.S   XXX
+        ---   h-1   f-2
+           ZZZ   C.P
+        p-1   h-3   s-2
+           f-2   m-1
+        C.M   ---
+           p-3
+        s-3
+    END;
 
     public function testCitiesRequiringScoringMultipleSurrounded(): void {
         $ps = TestStore::fromMap(ModelTest::MAP3);
@@ -148,16 +148,16 @@ END;
 
 
     const MAP7 = <<<'END'
-XXX   XXX  XXX
-   p-2   XXX
----   h-1   f-2
-   ZZZ   C.P
-p-1   ===   ---
-   m-2   m-1
-C.M   ---
-   ---
-s-3
-END;
+        XXX   XXX  XXX
+           p-2   XXX
+        ---   h-1   f-2
+           ZZZ   C.P
+        p-1   ===   ---
+           m-2   m-1
+        C.M   ---
+           ---
+        s-3
+    END;
 
     public function testZigguratsRequiringScoring(): void
     {
@@ -175,16 +175,16 @@ END;
     }
 
     const MAP4 = <<<'END'
-XXX   XXX  XXX
-   C.S   XXX
----   h-1   f-2
-   ZZZ   C.P
-p-1   ===   s-2
-   f-2   m-1
-C.M   ---
-   p-3
-s-3
-END;
+        XXX   XXX  XXX
+           C.S   XXX
+        ---   h-1   f-2
+           ZZZ   C.P
+        p-1   ===   s-2
+           f-2   m-1
+        C.M   ---
+           p-3
+        s-3
+    END;
 
     public function testIsPlayAllowedFirstPieceOfTurn_allowed() {
         $ps = new TestStore($board = Board::fromTestMap(ModelTest::MAP4));
@@ -211,16 +211,16 @@ END;
     }
 
     const MAP5 = <<<'END'
-XXX   XXX   XXX
-   C.S   XXX
----   h-1   ---
-   ZZZ   C.P
----   ===   s-2
-   f-2   m-1
-C.M   ---
-   ---
-s-3
-END;
+        XXX   XXX   XXX
+           C.S   XXX
+        ---   h-1   ---
+           ZZZ   C.P
+        ---   ===   s-2
+           f-2   m-1
+        C.M   ---
+           ---
+        s-3
+    END;
 
     public function testPlayPiecesMoreThanTwoFarmers() {
         $ps = new TestStore($board = Board::fromTestMap(ModelTest::MAP5));
@@ -240,10 +240,10 @@ END;
 
 
     const MAP6 = <<<'END'
----   ---
-   F.5   ---
----   ===   ---
-END;
+        ---   ---
+            F.5   ---
+        ---   ===   ---
+    END;
 
     public function testPlayPiecesOnFields_noAdjacentNoble() {
         $ps = new TestStore($board = Board::fromTestMap(ModelTest::MAP6));
