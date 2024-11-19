@@ -241,7 +241,7 @@ END;
 
     const MAP6 = <<<'END'
         ---   ---
-            F.5   ---
+           F.5   ---
         ---   ===   ---
     END;
 
@@ -287,5 +287,31 @@ END;
         $model = new Model($ps, 1);
         $model->selectZigguratCard(ZigguratCardType::NOBLES_IN_FIELDS);
         $this->assertTrue($model->isPlayAllowed(Piece::SERVANT, $ps->hex(1,1)));
+    }
+
+    public function testPlayPieces_threeNoblesOnLand() {
+        $ps = new TestStore($board = Board::fromTestMap(ModelTest::MAP6));
+        $model = new Model($ps, 1);
+        $model->selectZigguratCard(ZigguratCardType::NOBLES_3_KINDS);
+        $ps->setHand([Piece::SERVANT, Piece::MERCHANT, Piece::PRIEST, Piece::FARMER, Piece::MERCHANT]);
+        $model->playPiece(0, 0, 0);
+        $model->playPiece(1, 2, 0);
+        $this->assertTrue($model->isPlayAllowed(Piece::PRIEST, $ps->hex(0, 2)));
+        $this->assertFalse($model->isPlayAllowed(Piece::SERVANT, $ps->hex(0, 2)));
+        $this->assertFalse($model->isPlayAllowed(Piece::FARMER, $ps->hex(0, 2)));
+        $model->playPiece(2, 0, 2);
+        $this->assertFalse($model->isPlayAllowed(PIECE::PRIEST, $ps->hex(1,3)));
+    }
+
+    public function testPlayPieces_threeNoblesOneInWater() {
+        $ps = new TestStore($board = Board::fromTestMap(ModelTest::MAP6));
+        $model = new Model($ps, 1);
+        $model->selectZigguratCard(ZigguratCardType::NOBLES_3_KINDS);
+        $ps->setHand([Piece::SERVANT, Piece::MERCHANT, Piece::PRIEST, Piece::FARMER, Piece::MERCHANT]);
+        $model->playPiece(0, 0, 0);
+        $model->playPiece(1, 2, 2);
+        $this->assertFalse($model->isPlayAllowed(Piece::PRIEST, $ps->hex(0, 2)));
+        $this->assertFalse($model->isPlayAllowed(Piece::SERVANT, $ps->hex(0, 2)));
+        $this->assertFalse($model->isPlayAllowed(Piece::FARMER, $ps->hex(0, 2)));
     }
 }
