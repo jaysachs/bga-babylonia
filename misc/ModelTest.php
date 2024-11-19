@@ -239,42 +239,47 @@ END;
 ---   ===   ---
 END;
 
-    public function testPlayPiecesOnFields() {
+    public function testPlayPiecesOnFields_noAdjacentNoble() {
         $ps = new TestStore($board = Board::fromTestMap(ModelTest::MAP6));
         $model = new Model($ps, 1);
-        // No adjacent noble
         $this->assertFalse($model->isPlayAllowed(Piece::FARMER, $ps->hex(1,1)));
+    }
 
+    public function testPlayPiecesOnFields_nobleNoZigguratCard() {
         $ps = new TestStore($board = Board::fromTestMap(ModelTest::MAP6));
         $model = new Model($ps, 1);
-        // Not a noble without zig card
         $this->assertFalse($model->isPlayAllowed(Piece::SERVANT, $ps->hex(1,1)));
+    }
 
+    public function testPlayPiecesOnFields_onlyAdjacentFarmer() {
         $ps = new TestStore($board = Board::fromTestMap(ModelTest::MAP6));
         $model = new Model($ps, 1);
         $ps->setHand([Piece::FARMER]);
         // An adjacent farmer doesn't help
         $m1 = $model->playPiece(0, 2, 0);
         $this->assertFalse($model->isPlayAllowed(Piece::FARMER, $ps->hex(1,1)));
+    }
 
+    public function testPlayPiecesOnFields_adjacentHiddenNobleInWater() {
         $ps = new TestStore($board = Board::fromTestMap(ModelTest::MAP6));
         $model = new Model($ps, 1);
         $ps->setHand([Piece::SERVANT]);
-        // Nor does a noble in water
         $m2 = $model->playPiece(0, 2, 2);
         $this->assertFalse($model->isPlayAllowed(Piece::FARMER, $ps->hex(1,1)));
+    }
 
+    public function testPlayPiecesOnFields_adjacentNobleOnLand() {
         $ps = new TestStore($board = Board::fromTestMap(ModelTest::MAP6));
         $model = new Model($ps, 1);
         $ps->setHand([Piece::SERVANT]);
-        // But an adjacent noble on land helps
         $m3 = $model->playPiece(0, 0, 2);
         $this->assertTrue($model->isPlayAllowed(Piece::FARMER, $ps->hex(1,1)));
+    }
 
+    public function testPlayPiecesOnFields_loneNobleWithZigguratCard() {
         $ps = new TestStore($board = Board::fromTestMap(ModelTest::MAP6));
         $model = new Model($ps, 1);
         $model->selectZigguratCard(ZigguratCardType::NOBLES_IN_FIELDS);
-        // Or we can have the appropriate zig card and play a noble
         $this->assertTrue($model->isPlayAllowed(Piece::SERVANT, $ps->hex(1,1)));
     }
 }
