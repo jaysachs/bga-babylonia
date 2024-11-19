@@ -43,8 +43,8 @@ const jstpl_player_board_ext =
 const jstpl_hex =
       '<div id="bbl_hex_${row}_${col}" style="top:${top}px; left:${left}px;"></div>';
 
-const game_html =
-      `<div id="bbl_main">
+document.getElementById('game_play_area').insertAdjacentHTML('beforeend', `
+       <div id="bbl_main">
          <span id="bbl_vars"></span>
          <div id="bbl_hand_container">
            <div id="${ID_HAND}"></div>
@@ -52,7 +52,8 @@ const game_html =
          <div id="${ID_BOARD}"></div>
          <div id="${ID_AVAILABLE_ZCARDS}">
         </div>
-      </div>`;
+      </div>
+`);
 
 
 var thegame = null;
@@ -63,9 +64,6 @@ define([
     'ebg/counter',
 ],
 function (dojo, declare, hexloc) {
-    document.getElementById('game_play_area').insertAdjacentHTML(
-        'beforeend', game_html);
-
     return declare('bgagame.babylonia', ebg.core.gamegui, {
         constructor: function(){
             console.log('babylonia constructor');
@@ -137,7 +135,6 @@ function (dojo, declare, hexloc) {
             let player_id = player.player_id;
             console.log('Setting up board for player ' + player_id);
             let player_board_div = this.getPlayerPanelElement(player_id);
-            console.log(player_board_div);
             dojo.place( this.format_block('jstpl_player_board_ext',
                                           {
                                               'player_id': player_id,
@@ -158,7 +155,6 @@ function (dojo, declare, hexloc) {
 
         setupBoard: function( boardData, playersData ) {
             console.log('Setting the the game board');
-            console.log(hexloc);
             let boardDiv = $( ID_BOARD );
             // console.log( gamedatas.board );
 

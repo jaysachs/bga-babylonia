@@ -13,49 +13,42 @@ define([
         }
         return s;
     };
-    var initDone = false;
-    var vstart = 0;
-    var hstart = 0;
-    var voffset = 0;
-    var hoffset = 0;
-    let init = function() {
-        if (initDone) {
-            return;
-        }
-        initDone = true;
+
+    let computeHexDimensions = function() {
         // Extract the hex dimension from CSS:
         let boardDiv = document.getElementById('bbl_board');
         var style = getComputedStyle(boardDiv);
         let hexheight = style.getPropertyValue('--hex-height');
         let hexwidth = style.getPropertyValue('--hex-width');
-        console.log(hexwidth, hexheight);
+        // console.log(hexwidth, hexheight);
+
+        // Now set it on a div so we can resolve the computed values
         let s = document.getElementById('bbl_vars').style;
         s.setProperty('width', hexwidth);
         s.setProperty('height', hexheight);
         // console.log(s);
-        let hw = calcrm(s.getPropertyValue('width'));
-        let hh = calcrm(s.getPropertyValue('height'));
-
-        console.log(hw, hh);
-
-
-        // Now compute the per-hex offsets in both directions
-        hoffset = 0.75 * hw;
-        voffset = 1.0 * hh + 1.0;
-        console.log(hoffset, voffset);
-
-        hstart = 38.0; // this is related to board width but not sure how
-        vstart = 9.0; // depends on board size too
-        // hstart = 15.0;
-        // vstart = 5.0;
+        return {
+            width: calcrm(s.getPropertyValue('width')),
+            height: calcrm(s.getPropertyValue('height'))
+        };
     };
+
+    hexDim = computeHexDimensions();
+    // console.log(hexDim);
+
+    // Now compute the per-hex deltas in both directions
+    let hdelta = 0.75 * hexDim.width + 2.0;
+    let vdelta = 1.0 * hexDim.height + 2.0;
+    // console.log(hdelta, vdelta);
+
+    let hstart = 38.0; // this is related to board width but not sure how
+    let vstart = 9.0; // depends on board size too
 
     return {
         hexLocation: function(hex) {
-            init();
             return {
-                top: vstart + hex.row * (voffset+1) / 2,
-                left: hstart + (hex.col * (hoffset+2)),
+                top: vstart + hex.row * vdelta / 2,
+                left: hstart + hex.col * hdelta,
             };
         }
     };
