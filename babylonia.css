@@ -317,6 +317,11 @@ body {
    */
 }
 
+#bbl_hand > div.bbl_unplayable {
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
 #bbl_hand > div.bbl_unplayable::before {
     cursor: not-allowed;
     height: 100%;
@@ -324,7 +329,6 @@ body {
     content: '';
     display: inline-block;
     background: url(img/sprites.png) 0% -600% / 700% 700%;
-    opacity: 0.4;
 }
 
 #bbl_hand > div.bbl_selected::before {
