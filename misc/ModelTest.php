@@ -242,36 +242,33 @@ END;
     public function testPlayPiecesOnFields() {
         $ps = new TestStore($board = Board::fromTestMap(ModelTest::MAP6));
         $model = new Model($ps, 1);
-        $ps->setHand([Piece::FARMER, Piece::SERVANT, Piece::MERCHANT, Piece::FARMER, Piece::PRIEST]);
-
         // No adjacent noble
         $this->assertFalse($model->isPlayAllowed(Piece::FARMER, $ps->hex(1,1)));
 
         $ps = new TestStore($board = Board::fromTestMap(ModelTest::MAP6));
         $model = new Model($ps, 1);
-        $ps->setHand([Piece::FARMER, Piece::SERVANT, Piece::MERCHANT, Piece::FARMER, Piece::PRIEST]);
         // Not a noble without zig card
         $this->assertFalse($model->isPlayAllowed(Piece::SERVANT, $ps->hex(1,1)));
 
         $ps = new TestStore($board = Board::fromTestMap(ModelTest::MAP6));
         $model = new Model($ps, 1);
-        $ps->setHand([Piece::FARMER, Piece::SERVANT, Piece::MERCHANT, Piece::FARMER, Piece::PRIEST]);
+        $ps->setHand([Piece::FARMER]);
         // An adjacent farmer doesn't help
         $m1 = $model->playPiece(0, 2, 0);
         $this->assertFalse($model->isPlayAllowed(Piece::FARMER, $ps->hex(1,1)));
 
         $ps = new TestStore($board = Board::fromTestMap(ModelTest::MAP6));
         $model = new Model($ps, 1);
-        $ps->setHand([Piece::FARMER, Piece::SERVANT, Piece::MERCHANT, Piece::FARMER, Piece::PRIEST]);
+        $ps->setHand([Piece::SERVANT]);
         // Nor does a noble in water
-        $m2 = $model->playPiece(1, 2, 2);
+        $m2 = $model->playPiece(0, 2, 2);
         $this->assertFalse($model->isPlayAllowed(Piece::FARMER, $ps->hex(1,1)));
 
         $ps = new TestStore($board = Board::fromTestMap(ModelTest::MAP6));
         $model = new Model($ps, 1);
-        $ps->setHand([Piece::FARMER, Piece::SERVANT, Piece::MERCHANT, Piece::FARMER, Piece::PRIEST]);
+        $ps->setHand([Piece::SERVANT]);
         // But an adjacent noble on land helps
-        $m3 = $model->playPiece(2, 0, 2);
+        $m3 = $model->playPiece(0, 0, 2);
         $this->assertTrue($model->isPlayAllowed(Piece::FARMER, $ps->hex(1,1)));
 
         $ps = new TestStore($board = Board::fromTestMap(ModelTest::MAP6));
