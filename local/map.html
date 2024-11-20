@@ -199,8 +199,11 @@
         font-size: 16px;
         display: flex;
         justify-content: space-between;
+        gap: 5px;
     }
     #tmp_right {
+        width: 240px;
+        flex-shrink: 0;
         display: flex;
 /*        align-items: center; */
         flex-flow: column;
@@ -211,7 +214,7 @@
   </style>
 </head>
   <body>
-    <div id="bbl_main" style="flex: 1;">
+    <div id="bbl_main" style="flex: 1; clear: left; position:relative;">
       <div id="bbl_hand_container">
         <div class="bbl_hand" id="bbl_hand" onClick="selectPieceToPlay(event)">
           <div id="bbl_hand_0" class="bbl_playable bbl_farmer_1"></div>
