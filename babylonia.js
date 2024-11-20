@@ -185,7 +185,7 @@ function (dojo, declare, hexloc) {
         },
 
         setupAvailableZcards: function(zcards) {
-            console.log('Setting up available ziggurat cards');
+            console.log('Setting up available ziggurat cards', zcards);
             // Set up the ziggurat tiles
             for( let z = 0; z < zcards.length; z++) {
                 let card = zcards[z];
@@ -731,24 +731,27 @@ function (dojo, declare, hexloc) {
             this.removeTooltip(s[0].id);
         },
 
+        lastId: 0,
         slideDiv: function(className,
                            from,
                            to,
                            onEnd = null,
-                           parent = ID_BOARD,
-                           delay = 0,
-                           time = 500) {
-            let a = this.slideTemporaryObject(
-                `<div class='${className}'></div>`,
-                parent,
-                from,
-                to,
-                time,
-                delay
-            );
-            if (onEnd != null) {
-                dojo.connect(a, 'onEnd', onEnd);
-            }
+                           parent = ID_BOARD) {
+            let id = `tempSlide${this.lastId++}`;
+
+            let prect = $(parent).getBoundingClientRect();
+            let frect = $(from).getBoundingClientRect();
+            let top = frect.top - prect.top;
+            let left = frect.left - prect.left;
+            let div = dojo.place(`<div id="${id}" class='${className}' style='position:absolute; top: ${top}px; left: ${left}px; z-index: 100;'></div>`,
+                                 parent);
+            let a = this.slideToObject(div, to);
+            dojo.connect(a, 'onEnd', () => {
+                dojo.destroy(div);
+                if (onEnd !== null) {
+                    onEnd();
+                }
+            });
             return a;
         },
 
@@ -810,157 +813,158 @@ function (dojo, declare, hexloc) {
 
         setupNotifications: function() {
             console.log( 'notifications subscriptions setup' );
-
-            // Can add 'wait time' in ms via
-            //   this.notifqueue.setSynchronous( 'cardPlayed', 3000 );
-            [
-                'piecePlayed',
-                'handRefilled',
-                'cityScored',
-                'cityScoredPlayer',
-                'turnFinished',
-                'zigguratCardSelection',
-                'extraTurnUsed',
-                'undoMove',
-            ].forEach(n => dojo.subscribe(n, this, `notif_${n}`));
+            this.bgaSetupPromiseNotifications();
         },
 
-        notif_extraTurnUsed: function ( notif ) {
-            console.log( 'notif_extraTurnUsed', notif );
+        notif_extraTurnUsed: async function ( args ) {
+            console.log( 'notif_extraTurnUsed', args );
             const carddiv = $( 'ozig_zc_xturn' );
             if ( carddiv == undefined ) {
                 console.error( 'Could not find owned extra turn card.' );
             } else {
                 carddiv.className = this.cardClass(null, true);
             }
+            return Promise.resolve();
         },
 
-        notif_zigguratCardSelection: function( notif ) {
-            console.log( 'notif_zigguratCardSelection', notif );
-            // TODO: also hand marking cards as 'used'?
-            this.setZigguratCardOwned(notif.args.player_id,
-                                      notif.args.zcard,
+        notif_zigguratCardSelection: async function( args ) {
+            console.log( 'notif_zigguratCardSelection', args );
+            this.setZigguratCardOwned(args.player_id,
+                                      args.zcard,
                                       // 10pts card used on acquisition
-                                      notif.args.zcard == 'zc_10pts');
-            this.scoreCtrl[notif.args.player_id].toValue(notif.args.score);
+                                      args.zcard == 'zc_10pts');
+            this.scoreCtrl[args.player_id].toValue(args.score);
+            return Promise.resolve();
         },
 
-        notif_cityScored: function( notif ) {
-            console.log( 'notif_cityScored', notif );
-            this.renderPlayedPiece( notif.args.row, notif.args.col, '', null );
-            const hexDivId = this.hexDivId(notif.args.row, notif.args.col);
+        notif_cityScored: async function( args ) {
+            console.log( 'notif_cityScored', args );
+            this.renderPlayedPiece( args.row, args.col, '', null );
+            const hexDivId = this.hexDivId(args.row, args.col);
 
-            if ( notif.args.captured_by != 0 ) {
+            anim = ( args.captured_by != 0 ) ?
                 this.slideDiv(
-                    this.pieceClass(notif.args.city),
+                    this.pieceClass(args.city),
                     hexDivId,
-                    this.citycount_id(notif.args.captured_by)
-                );
-            } else {
+                    this.citycount_id(args.captured_by)
+                )
+                :
                 this.slideDiv(
-                    this.pieceClass(notif.args.city),
+                    this.pieceClass(args.city),
                     hexDivId,
                     // TODO: find a location for 'off the board'
                     ID_AVAILABLE_ZCARDS
                 );
-            }
+            await this.bgaPlayDojoAnimation(anim);
         },
 
-        notif_turnFinished: function( notif ) {
-            console.log( 'notif_turnFinished', notif );
+        notif_turnFinished: async function( args ) {
+            console.log( 'notif_turnFinished', args );
 
-            this.updateHandCount( notif.args );
-            this.updatePoolCount( notif.args );
+            this.updateHandCount( args );
+            this.updatePoolCount( args );
+
+            return Promise.resolve();
         },
 
-        notif_cityScoredPlayer: function( notif ) {
-            console.log( 'notif_cityScoredPlayer', notif );
+        notif_cityScoredPlayer: async function( args ) {
+            console.log( 'notif_cityScoredPlayer', args );
 
             // TODO: animate hexes contributing to scoring
 
-            this.scoreCtrl[notif.args.player_id].toValue(notif.args.score);
-            this.updateCapturedCityCount(notif.args);
+            this.scoreCtrl[args.player_id].toValue(args.score);
+            this.updateCapturedCityCount(args);
+
+            return Promise.resolve();
         },
 
-        notif_undoMove: function( notif ) {
-            console.log( 'notif_undoMove', notif );
-            const isActive = this.playerNumber == notif.args.player_number;
-            var targetDivId = this.handcount_id(notif.args.player_id);
+        notif_undoMove: async function( args ) {
+            console.log( 'notif_undoMove', args );
+
+            const isActive = this.playerNumber == args.player_number;
+            var targetDivId = this.handcount_id(args.player_id);
             var handPosDiv = null;
             if (isActive) {
-                handPosDiv = this.handPosDiv(notif.args.handpos);
+                handPosDiv = this.handPosDiv(args.handpos);
                 targetDivId = handPosDiv.id;
             }
 
             // Put any piece (field) captured in the move back on the board
-            this.renderPlayedPiece( notif.args.row,
-                                    notif.args.col,
-                                    notif.args.captured_piece,
+            // TODO: animate this? (and animate the capture too?)
+            this.renderPlayedPiece( args.row,
+                                    args.col,
+                                    args.captured_piece,
                                     null );
-            this.slideDiv(
-                this.handPieceClass(notif.args.piece, notif.args.player_number),
-                this.hexDivId(notif.args.row, notif.args.col),
+            anim = this.slideDiv(
+                this.handPieceClass(args.piece, args.player_number),
+                this.hexDivId(args.row, args.col),
                 targetDivId,
                 () => {
                     if (isActive) {
                         cl = handPosDiv.classList;
                         cl.remove(this.CSS_EMPTY);
                         cl.add(this.CSS_PLAYABLE);
-                        cl.add(this.handPieceClass(notif.args.original_piece));
+                        cl.add(this.handPieceClass(args.original_piece));
                     }
-                    this.hand_counters[notif.args.player_id].incValue(1);
-                    this.scoreCtrl[notif.args.player_id].incValue(-notif.args.points);
+                    this.hand_counters[args.player_id].incValue(1);
+                    this.scoreCtrl[args.player_id].incValue(-args.points);
                 });
+            await this.bgaPlayDojoAnimation(anim);
         },
 
-        notif_piecePlayed: function( notif ) {
-            console.log( 'notif_piecePlayed', notif );
-            const isActive = this.playerNumber == notif.args.player_number;
-            var sourceDivId = this.handcount_id(notif.args.player_id);
-            let hpc = this.handPieceClass(notif.args.piece,
-                                          notif.args.player_number);
+        notif_piecePlayed: async function( args ) {
+            console.log( 'notif_piecePlayed', args );
+            const isActive = this.playerNumber == args.player_number;
+            var sourceDivId = this.handcount_id(args.player_id);
+            let hpc = this.handPieceClass(args.piece,
+                                          args.player_number);
             if (isActive) {
-                const handPosDiv = this.handPosDiv(notif.args.handpos);
+                const handPosDiv = this.handPosDiv(args.handpos);
                 sourceDivId = handPosDiv.id;
                 // Active player hand piece 'removed' from hand.
                 let cl = handPosDiv.classList;
                 cl.remove(hpc);
                 cl.add(this.CSS_EMPTY);
             }
-            this.slideDiv(
+            anim = this.slideDiv(
                 hpc,
                 sourceDivId,
-                this.hexDiv(notif.args.row, notif.args.col).id,
+                this.hexDiv(args.row, args.col).id,
                 () => {
-                    this.renderPlayedPiece( notif.args.row,
-                                            notif.args.col,
-                                            notif.args.piece,
-                                            notif.args.player_number );
-                    this.updateHandCount( notif.args );
-                    this.scoreCtrl[notif.args.player_id].toValue(notif.args.score);
+                    this.renderPlayedPiece( args.row,
+                                            args.col,
+                                            args.piece,
+                                            args.player_number );
+                    this.updateHandCount( args );
+                    this.scoreCtrl[args.player_id].toValue(args.score);
                 }
             );
+
+            await this.bgaPlayDojoAnimation(anim);
         },
 
-        notif_handRefilled: function( notif ) {
-            console.log( 'notif_handRefilled', notif );
-            var delay = 0;
-            for (i = 0; i < notif.args.hand.length; i++) {
+        notif_handRefilled: async function( args ) {
+            console.log( 'notif_handRefilled', args );
+            anim = [];
+            let pid = this.player_id;
+            for (i = 0; i < args.hand.length; i++) {
                 const div = this.handPosDiv(i);
-                let hc = this.handPieceClass(notif.args.hand[i]);
+                let hc = this.handPieceClass(args.hand[i]);
                 if (hc != this.CSS_EMPTY
                     && div.classList.contains(this.CSS_EMPTY)) {
                     const a = this.slideDiv(
                         hc,
-                        this.handcount_id(this.player_id),
+                        this.handcount_id(pid),
                         div.id,
-                        () => { div.className = hc; },
-                        ID_HAND,
-                        delay
+                        () => { console.log("set ", hc); div.className = hc; }
+                        // ,
+                        // ID_HAND
                     );
-                    delay += 500;
+                    anim.push(a);
                 }
             }
+            // return Promise.resolve();
+            await this.bgaPlayDojoAnimation(dojo.fx.chain(anim));
         },
     });
 });
