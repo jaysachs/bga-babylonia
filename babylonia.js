@@ -963,7 +963,9 @@ function (dojo, declare, hexloc) {
                     anim.push(a);
                 }
             }
-            // return Promise.resolve();
+            if (anim.length == 0) {
+                return Promise.resolve();
+            }
             await this.bgaPlayDojoAnimation(dojo.fx.chain(anim));
         },
     });
