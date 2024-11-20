@@ -112,11 +112,6 @@
       -webkit-locale: en;
       }
 
-      #logs_wrap {
-          position: absolute;
-          top: 200px;
-          left: 1040px;
-      }
       .log {
           word-wrap: break-word;
           color: red;
@@ -144,12 +139,6 @@
         border-radius: 8px 0 0 8px;
         box-shadow: 0 3px 8px rgba(0,0,0,.3);
         padding: 5px 3px;
-
-        top:10px;
-        left:1040px;
-        position: absolute;
-        border-style: solid;
-        width:240px;
     }
     .player_showcursor {
         display: none;
@@ -208,11 +197,21 @@
     body {
         font-family: Roboto,Arial,sans-serif;
         font-size: 16px;
+        display: flex;
+        justify-content: space-between;
+    }
+    #tmp_right {
+        display: flex;
+/*        align-items: center; */
+        flex-flow: column;
+    }
+
+    #logs_wrap {
     }
   </style>
 </head>
   <body>
-    <div id="bbl_main">
+    <div id="bbl_main" style="flex: 1;">
       <div id="bbl_hand_container">
         <div class="bbl_hand" id="bbl_hand" onClick="selectPieceToPlay(event)">
           <div id="bbl_hand_0" class="bbl_playable bbl_farmer_1"></div>
@@ -301,7 +300,8 @@
         <div class="bbl_zc_3farmers"></div>
         <div class="bbl_zc_citypts"></div>
       </div>
-
+    </div>
+    <div id="tmp_right">
       <!-- player board -->
       <div class="player-board">
 
@@ -359,7 +359,6 @@
           <div class="log  log_replayable" id="log_25" style="height: auto; display: block; color: rgb(0, 0, 0);"><div class="roundedbox"><!--PNS--><span class="playername" style="color:#88dddd;">vagabond0</span><!--PNE--> plays <span class="log-element farmer_2"></span> to (8,0)</div></div>
         </div>
       </div>
-    <h1>More Stuff HERE</h1>
-    yes, here it is.
+    </div>
   </body>
 </html>
