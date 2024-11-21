@@ -106,9 +106,9 @@
       color: rgb(0, 0, 0);
       direction: ltr;
       display: block;
-      height: 10973px;
+    /*  height: 10973px; */
       unicode-bidi: isolate;
-      width: 1292px;
+/*      width: 1292px; */
       -webkit-locale: en;
       }
 
@@ -201,11 +201,16 @@
         justify-content: space-between;
         gap: 5px;
     }
+
+    #bbl_main {
+      flex: 1;
+      position: relative;
+    }
+
     #tmp_right {
         width: 240px;
         flex-shrink: 0;
         display: flex;
-/*        align-items: center; */
         flex-flow: column;
     }
 
@@ -214,7 +219,7 @@
   </style>
 </head>
   <body>
-    <div id="bbl_main" style="flex: 1; clear: left; position:relative;">
+    <div id="bbl_main">
       <div id="bbl_hand_container">
         <div class="bbl_hand" id="bbl_hand" onClick="selectPieceToPlay(event)">
           <div id="bbl_hand_0" class="bbl_playable bbl_farmer_1"></div>
