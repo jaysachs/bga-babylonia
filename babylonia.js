@@ -814,9 +814,10 @@ function (dojo, declare, hexloc) {
                 console.error("Couldn't find ${args.card} zcard");
             } else {
                 this.zcards[z].used = args.used;
-                const carddiv = $( 'bbl_ozig_${z}' );
+                const carddiv = $( `bbl_ozig_${z}` );
                 if ( carddiv == undefined ) {
-                    console.error( 'Could not find div for owned ${args.card} card.' );
+                    console.error(`Could not find div for owned ${args.card} card`,
+                                  z, this.zcards[z] );
                 } else {
                     carddiv.className = this.zcardClass(null, true);
                 }
