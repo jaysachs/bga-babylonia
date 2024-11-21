@@ -323,11 +323,11 @@ class Game extends \Table
         $stat->set($player_id, true);
         $this->notifyAllPlayers(
             "zigguratCardSelection",
-            clienttranslate('${player_name} chose ziggurat card ${zcard}'),
+            clienttranslate('${player_name} chose ziggurat card ${card}'),
             [
                 "player_id" => $player_id,
                 "player_name" => $this->getActivePlayerName(),
-                "zcard" => $selection->card->type->value,
+                "card" => $selection->card->type->value,
                 "cardused" => $selection->card->used,
                 "points" => $selection->points,
                 "score" => $model->allPlayerInfo()[$player_id]->score,

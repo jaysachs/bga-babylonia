@@ -826,9 +826,9 @@ function (dojo, declare, hexloc) {
 
         notif_zigguratCardSelection: async function( args ) {
             console.log( 'notif_zigguratCardSelection', args );
-            const z = this.indexOfZcard('zc_xturn');
+            const z = this.indexOfZcard(args.card);
             if (z < 0) {
-                console.error("Couldn't find ${args.zcard} zcard");
+                console.error("Couldn't find ${args.card} zcard");
             } else {
                 this.zcards[z].owning_player_id = args.player_id;
                 this.zcards[z].used = args.cardused;
