@@ -357,6 +357,8 @@ body {
 /* available ziggurat cards zone (TODO: "panel") */
 
 #bbl_available_zcards {
+    clip-path: rect(auto auto auto auto round 10px);
+    background-color: #F8E6D0;
     position: relative;
     display: flex;
     justify-content: center;
