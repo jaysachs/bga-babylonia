@@ -688,6 +688,15 @@ function (dojo, declare, hexloc) {
             }
         },
 
+        indexOfZcard: function(cardType) {
+            for (var z = 0; z < this.zcards.length; ++z) {
+                if (this.zcards[z].type == cardType) {
+                    return z;
+                }
+            }
+            return -1;
+        },
+
         zcardClass: function(card, used = false) {
             return used ? 'bbl_zc_used' : ('bbl_' + card);
         },
@@ -800,36 +809,33 @@ function (dojo, declare, hexloc) {
 
         notif_extraTurnUsed: async function ( args ) {
             console.log( 'notif_extraTurnUsed', args );
-            for (var z = 0; z < this.zcards.length; ++z) {
-                if (this.zcards[z].type == 'zc_xturn') {
-                    this.zcards[z].used = true;
-                    const carddiv = $( 'bbl_ozig_${z}' );
-                    if ( carddiv == undefined ) {
-                        console.error( 'Could not find owned extra turn card.' );
-                    } else {
-                        carddiv.className = this.zcardClass(null, true);
-                    }
-                    return Promise.resolve();
+            const z = this.indexOfZcard(args.card);
+            if (z < 0) {
+                console.error("Couldn't find ${args.card} zcard");
+            } else {
+                this.zcards[z].used = args.used;
+                const carddiv = $( 'bbl_ozig_${z}' );
+                if ( carddiv == undefined ) {
+                    console.error( 'Could not find div for owned ${args.card} card.' );
+                } else {
+                    carddiv.className = this.zcardClass(null, true);
                 }
             }
-            console.error("Unable to find zcard zc_xturn");
             return Promise.resolve();
         },
 
         notif_zigguratCardSelection: async function( args ) {
             console.log( 'notif_zigguratCardSelection', args );
-            for (var z = 0; z < this.zcards.length; ++z) {
-                if (this.zcards[z].type == args.zcard) {
-                    this.zcards[z].owning_player_id = args.player_id;
-                    if (args.zcard == 'zc_10pts') {
-                        this.zcards[z].used = true;
-                    }
-                    this.scoreCtrl[args.player_id].toValue(args.score);
-                    this.setZigguratCardOwned(z);
-                    return Promise.resolve();
-                }
+            const z = this.indexOfZcard('zc_xturn');
+            if (z < 0) {
+                console.error("Couldn't find ${args.zcard} zcard");
+            } else {
+                this.zcards[z].owning_player_id = args.player_id;
+                this.zcards[z].used = args.cardused;
+                this.scoreCtrl[args.player_id].toValue(args.score);
+                this.setZigguratCardOwned(z);
+                // TODO: animate this.
             }
-            console.error("Unable to find zcard ${args.zcard}");
             return Promise.resolve();
         },
 

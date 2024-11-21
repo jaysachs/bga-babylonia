@@ -553,6 +553,8 @@ class Game extends \Table
                 [
                     "player_id" => $player_id,
                     "player_name" => $this->getActivePlayerName(),
+                    "card" => ZigguratCardType::EXTRA_TURN->value,
+                    "cardused" => true,
                 ]
             );
             $this->gamestate->nextState("extraTurn");
