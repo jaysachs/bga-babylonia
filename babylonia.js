@@ -691,11 +691,22 @@ function (dojo, declare, hexloc) {
             }
         },
 
-        addZcardDivInPlayerBoard: function(z) {
-            const newid = `bbl_ozig_${z}`;
+        playerBoardZcardsId: function(z) {
             const owner = this.zcards[z].owning_player_id;
-            this.addZigguratCardDiv(newid,
-                                    `bbl_zcards_${owner}`,
+            return `bbl_zcards_${owner}`;
+        },
+
+        ownedZcardId: function(z) {
+            return `bbl_ozig_${z}`;
+        },
+
+        availableZcardId: function(z) {
+            return `bbl_zig_${z}`;
+        },
+
+        addZcardDivInPlayerBoard: function(z) {
+            this.addZigguratCardDiv(this.ownedZcardId(z),
+                                    this.playerBoardZcardsId(z),
                                     z);
         },
 
@@ -806,10 +817,11 @@ function (dojo, declare, hexloc) {
                 console.error("Couldn't find ${args.card} zcard");
             } else {
                 this.zcards[z].used = args.used;
-                const carddiv = $( `bbl_ozig_${z}` );
+                const carddiv = $( this.ownedZcardId(z) );
                 if ( carddiv == undefined ) {
                     console.error(`Could not find div for owned ${args.card} card`,
-                                  z, this.zcards[z] );
+                                  z,
+                                  this.zcards[z] );
                 } else {
                     carddiv.className = this.zcardClass(null, true);
                 }
@@ -822,22 +834,26 @@ function (dojo, declare, hexloc) {
             const z = this.indexOfZcard(args.card);
             if (z < 0) {
                 console.error("Couldn't find ${args.card} zcard");
+                return Promise.resolve();
             } else {
                 this.zcards[z].owning_player_id = args.player_id;
                 this.zcards[z].used = args.cardused;
                 this.scoreCtrl[args.player_id].toValue(args.score);
 
-                // TODO: animate this.
+                const id = this.availableZcardId(z);
 
                 // mark the available zig card spot as 'taken'
-                let zdiv = $( `bbl_zig_${z}` );
-                zdiv.className = "";
-                this.removeTooltip(zdiv.id);
+                $( id ).className = "";
+                this.removeTooltip(id);
 
-                // and put the card in the player board
-                this.addZcardDivInPlayerBoard(z);
+                anim = this.slideDiv(
+                    this.zcardClass(this.zcards[z].type, false),
+                    id,
+                    this.playerBoardZcardsId(z),
+                    () => this.addZcardDivInPlayerBoard(z)
+                );
+                await this.bgaPlayDojoAnimation(anim);
             }
-            return Promise.resolve();
         },
 
         notif_cityScored: async function( args ) {
