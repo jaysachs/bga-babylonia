@@ -86,11 +86,11 @@ function (dojo, declare, hexloc) {
 
         selectedHandPos: null,
         pieceClasses: [ 'priest', 'servant', 'farmer', 'merchant' ],
-        card_tooltips: {},
         stateName: '',
         stateArgs: [],
+        lastId: 0,
+        zcards: [],
         playerNumber: -1,
-        thegamedatas: null,
         hand_counters: [],
         pool_counters: [],
         city_counters: [],
@@ -112,7 +112,6 @@ function (dojo, declare, hexloc) {
         setup: function( gamedatas ) {
             console.log( 'Starting game setup' );
             thegame = this;
-            this.thegamedatas = gamedatas;
             this.playerNumber = gamedatas.players[this.player_id].player_number;
 
             console.log('Setting up player boards');
@@ -180,24 +179,6 @@ function (dojo, declare, hexloc) {
                         ? null
                         : playersData[hex.board_player].player_number;
                     this.renderPlayedPiece(hex.row, hex.col, p, n);
-                }
-            }
-        },
-
-        setupAvailableZcards: function(zcards) {
-            console.log('Setting up available ziggurat cards', zcards);
-            // Set up the ziggurat tiles
-            for( let z = 0; z < zcards.length; z++) {
-                let card = zcards[z];
-                this.card_tooltips[card.type] = card.tooltip;
-                this.addZigguratCardDiv(`bbl_zig${z}`,
-                                        ID_AVAILABLE_ZCARDS,
-                                        card.type,
-                                        card.used);
-                if ( card.owning_player_id != 0 ) {
-                    this.setZigguratCardOwned(card.owning_player_id,
-                                              card.type,
-                                              card.used);
                 }
             }
         },
@@ -345,29 +326,24 @@ function (dojo, declare, hexloc) {
             console.log(event);
             event.preventDefault();
             event.stopPropagation();
-            if(! this.isCurrentPlayerActive() ) {
+            if (! this.isCurrentPlayerActive()) {
                  return false;
             }
             if (this.stateName != 'selectZigguratCard') {
                 return false;
             }
-            let e = event.target;
-            let zdiv = e.parentElement;
-            if (zdiv.id != ID_AVAILABLE_ZCARDS) {
+            let zdiv = event.target;
+            const re = /bbl_zig_(\d)/;
+            const matchInfo = re.exec(zdiv.id);
+            if (matchInfo == null) {
+                console.error("couldn't determine zcard from ", zdiv.id);
                 return false;
             }
-            let cl = e.classList;
-            for (var i = 0; i < cl.length; ++i) {
-                let c = cl[i];
-                if (c.startsWith('bbl_zc_')) {
-                    type = c.slice(4); // better way to do this?
-                    this.bgaPerformAction('actSelectZigguratCard',
-                                          { card_type: type });
-                    let div = $( ID_AVAILABLE_ZCARDS );
-                    div.classList.remove('bbl_selecting');
-                    return false;
-                }
-            }
+            const z = matchInfo[1];
+            this.bgaPerformAction('actSelectZigguratCard',
+                                  { card_type: this.zcards[z].type });
+            let div = $( ID_AVAILABLE_ZCARDS );
+            div.classList.remove('bbl_selecting');
             return false;
         },
 
@@ -652,10 +628,6 @@ function (dojo, declare, hexloc) {
             }
         },
 
-        cardClass: function(card, used = false) {
-            return used ? 'bbl_zc_used' : ('bbl_' + card);
-        },
-
         renderPlayedPiece: function (row, col, piece, playerNumber) {
             this.hexDiv(row, col).className =
                 this.pieceClass(piece, playerNumber);
@@ -702,33 +674,48 @@ function (dojo, declare, hexloc) {
             }
         },
 
-        addZigguratCardDiv: function(id, parentElem, card, used = false) {
-            const cls = this.cardClass(card, used);
-            const div = dojo.place( `<div id='${id}' class='${cls}'</div>`,
-                                    parentElem );
-            this.addTooltip( id, this.card_tooltips[card], '' );
-            // div.title = this.card_tooltips[card];
+        setupAvailableZcards: function(zcards) {
+            console.log('Setting up available ziggurat cards', zcards);
+            this.zcards = zcards;
+            for( let z = 0; z < zcards.length; z++) {
+                let card = zcards[z];
+                this.addZigguratCardDiv(`bbl_zig_${z}`,
+                                        ID_AVAILABLE_ZCARDS,
+                                        z);
+                if ( card.owning_player_id != 0 ) {
+                    this.setZigguratCardOwned(z);
+                }
+            }
         },
 
-        setZigguratCardOwned: function (player_id, card, used) {
+        zcardClass: function(card, used = false) {
+            return used ? 'bbl_zc_used' : ('bbl_' + card);
+        },
+
+        addZigguratCardDiv: function(id, parentElem, z) {
+            const cls = this.zcardClass(this.zcards[z].type, this.zcards[z].used);
+            const div = dojo.place( `<div id='${id}' class='${cls}'</div>`,
+                                    parentElem );
+            this.addTooltip( id, this.zcards[z].tooltip, '' );
+            // div.title = this.zcards[z].tooltip;
+        },
+
+        setZigguratCardOwned: function (z) {
             // add a div under div id bbl_zcards_{player_id}
             // with the card as class.
             // TODO: only if there isn't one already
-            const newid = `bbl_ozig_${card}`;
-            this.addZigguratCardDiv( newid, `bbl_zcards_${player_id}`, card, used );
+            let card = this.zcards[z];
+            const newid = `bbl_ozig_${z}`;
+            this.addZigguratCardDiv( newid,
+                                     `bbl_zcards_${card.owning_player_id}`,
+                                     z );
 
-            c = this.cardClass(card);
             // now mark the available zig card spot as 'no class'
-            var s = dojo.query( `#bbl_available_zcards .${c}` );
-            if (s.length == 0) {
-                console.error('Could not find available card ' + card);
-                return;
-            }
-            if (s.length > 1) {
-                console.warn('More than one of the same available zig card?');
-            }
-            s[0].classList.remove(this.cardClass(card));
-            this.removeTooltip(s[0].id);
+            let zdiv = $( `bbl_zig_${z}` );
+            zdiv.classList.remove(this.zcardClass(card.type));
+            // TODO: hack here. shouldn't have to remove this.
+            zdiv.classList.remove(this.zcardClass(card.type, true));
+            this.removeTooltip(zdiv.id);
         },
 
         lastId: 0,
@@ -813,22 +800,36 @@ function (dojo, declare, hexloc) {
 
         notif_extraTurnUsed: async function ( args ) {
             console.log( 'notif_extraTurnUsed', args );
-            const carddiv = $( 'ozig_zc_xturn' );
-            if ( carddiv == undefined ) {
-                console.error( 'Could not find owned extra turn card.' );
-            } else {
-                carddiv.className = this.cardClass(null, true);
+            for (var z = 0; z < this.zcards.length; ++z) {
+                if (this.zcards[z].type == 'zc_xturn') {
+                    this.zcards[z].used = true;
+                    const carddiv = $( 'bbl_ozig_${z}' );
+                    if ( carddiv == undefined ) {
+                        console.error( 'Could not find owned extra turn card.' );
+                    } else {
+                        carddiv.className = this.zcardClass(null, true);
+                    }
+                    return Promise.resolve();
+                }
             }
+            console.error("Unable to find zcard zc_xturn");
             return Promise.resolve();
         },
 
         notif_zigguratCardSelection: async function( args ) {
             console.log( 'notif_zigguratCardSelection', args );
-            this.setZigguratCardOwned(args.player_id,
-                                      args.zcard,
-                                      // 10pts card used on acquisition
-                                      args.zcard == 'zc_10pts');
-            this.scoreCtrl[args.player_id].toValue(args.score);
+            for (var z = 0; z < this.zcards.length; ++z) {
+                if (this.zcards[z].type == args.zcard) {
+                    this.zcards[z].owning_player_id = args.player_id;
+                    if (args.zcard == 'zc_10pts') {
+                        this.zcards[z].used = true;
+                    }
+                    this.scoreCtrl[args.player_id].toValue(args.score);
+                    this.setZigguratCardOwned(z);
+                    return Promise.resolve();
+                }
+            }
+            console.error("Unable to find zcard ${args.zcard}");
             return Promise.resolve();
         },
 
