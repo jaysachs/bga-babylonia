@@ -850,7 +850,8 @@ function (dojo, declare, hexloc) {
                     this.zcardClass(this.zcards[z].type, false),
                     id,
                     this.playerBoardZcardsId(z),
-                    () => this.addZcardDivInPlayerBoard(z)
+                    () => this.addZcardDivInPlayerBoard(z),
+                    ID_AVAILABLE_ZCARDS
                 );
                 await this.bgaPlayDojoAnimation(anim);
             }
