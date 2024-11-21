@@ -957,8 +957,6 @@ function (dojo, declare, hexloc) {
                         this.handcount_id(pid),
                         div.id,
                         () => { console.log("set ", hc); div.className = hc; }
-                        // ,
-                        // ID_HAND
                     );
                     anim.push(a);
                 }
