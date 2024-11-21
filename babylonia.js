@@ -128,7 +128,7 @@ function (dojo, declare, hexloc) {
             this.setupAvailableZcards(gamedatas.ziggurat_cards);
 
             console.log( 'setting up notifications' );
-            this.setupNotifications();
+            this.bgaSetupPromiseNotifications();
 
             console.log( 'Game setup done.' );
         },
@@ -809,11 +809,6 @@ function (dojo, declare, hexloc) {
                     break;
             }
             return 'NOT SURE WHAT HAPPENED';
-        },
-
-        setupNotifications: function() {
-            console.log( 'notifications subscriptions setup' );
-            this.bgaSetupPromiseNotifications();
         },
 
         notif_extraTurnUsed: async function ( args ) {
