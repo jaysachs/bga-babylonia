@@ -52,8 +52,7 @@ document.getElementById('game_play_area').insertAdjacentHTML('beforeend', `
            <span id="bbl_vars"></span>
            <div id="${ID_BOARD}"></div>
          </div>
-         <div id="${ID_AVAILABLE_ZCARDS}">
-        </div>
+         <div id="${ID_AVAILABLE_ZCARDS}"></div>
       </div>
 `);
 
