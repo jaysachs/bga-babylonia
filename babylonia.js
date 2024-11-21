@@ -679,13 +679,24 @@ function (dojo, declare, hexloc) {
             this.zcards = zcards;
             for( let z = 0; z < zcards.length; z++) {
                 let card = zcards[z];
-                this.addZigguratCardDiv(`bbl_zig_${z}`,
-                                        ID_AVAILABLE_ZCARDS,
-                                        z);
-                if ( card.owning_player_id != 0 ) {
-                    this.setZigguratCardOwned(z);
+                const id = `bbl_zig_${z}`;
+                if (card.owning_player_id != 0) {
+                    this.addZcardDivInPlayerBoard(z);
+                    // and "shell" in available cards
+                    dojo.place(`<div id='${id}'</div>`, ID_AVAILABLE_ZCARDS);
+                } else {
+                    // just in available cards
+                    this.addZigguratCardDiv(id, ID_AVAILABLE_ZCARDS, z);
                 }
             }
+        },
+
+        addZcardDivInPlayerBoard: function(z) {
+            const newid = `bbl_ozig_${z}`;
+            const owner = this.zcards[z].owning_player_id;
+            this.addZigguratCardDiv(newid,
+                                    `bbl_zcards_${owner}`,
+                                    z);
         },
 
         indexOfZcard: function(cardType) {
@@ -709,25 +720,6 @@ function (dojo, declare, hexloc) {
             // div.title = this.zcards[z].tooltip;
         },
 
-        setZigguratCardOwned: function (z) {
-            // add a div under div id bbl_zcards_{player_id}
-            // with the card as class.
-            // TODO: only if there isn't one already
-            let card = this.zcards[z];
-            const newid = `bbl_ozig_${z}`;
-            this.addZigguratCardDiv( newid,
-                                     `bbl_zcards_${card.owning_player_id}`,
-                                     z );
-
-            // now mark the available zig card spot as 'no class'
-            let zdiv = $( `bbl_zig_${z}` );
-            zdiv.classList.remove(this.zcardClass(card.type));
-            // TODO: hack here. shouldn't have to remove this.
-            zdiv.classList.remove(this.zcardClass(card.type, true));
-            this.removeTooltip(zdiv.id);
-        },
-
-        lastId: 0,
         slideDiv: function(className,
                            from,
                            to,
@@ -834,8 +826,16 @@ function (dojo, declare, hexloc) {
                 this.zcards[z].owning_player_id = args.player_id;
                 this.zcards[z].used = args.cardused;
                 this.scoreCtrl[args.player_id].toValue(args.score);
-                this.setZigguratCardOwned(z);
+
                 // TODO: animate this.
+
+                // mark the available zig card spot as 'taken'
+                let zdiv = $( `bbl_zig_${z}` );
+                zdiv.className = "";
+                this.removeTooltip(zdiv.id);
+
+                // and put the card in the player board
+                this.addZcardDivInPlayerBoard(z);
             }
             return Promise.resolve();
         },
