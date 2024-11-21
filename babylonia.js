@@ -89,6 +89,7 @@ function (dojo, declare, hexloc) {
         stateArgs: [],
         lastId: 0,
         zcards: [],
+        hand: [],
         playerNumber: -1,
         hand_counters: [],
         pool_counters: [],
@@ -121,7 +122,8 @@ function (dojo, declare, hexloc) {
             this.setupBoard(gamedatas.board, gamedatas.players);
 
             console.log("Setting up player hand");
-            this.renderHand(gamedatas.hand);
+            this.hand = gamedatas.hand;
+            this.renderHand();
 
             this.setupAvailableZcards(gamedatas.ziggurat_cards);
 
@@ -304,7 +306,7 @@ function (dojo, declare, hexloc) {
                 .classList.add(this.CSS_PLAYABLE);
         },
 
-        markHexUnplayable: function (rc2) {
+        unmarkHexPlayable: function (rc2) {
             this.hexDiv(rc2.row, rc2.col)
                 .classList.remove(this.CSS_PLAYABLE);
         },
@@ -317,8 +319,8 @@ function (dojo, declare, hexloc) {
             this.allowedMovesFor(cl).forEach(rc => this.markHexPlayable(rc));
         },
 
-        markHexesUnplayableForPiece: function(cl) {
-            this.allowedMovesFor(cl).forEach(rc => this.markHexUnplayable(rc));
+        unmarkHexesPlayableForPiece: function(cl) {
+            this.allowedMovesFor(cl).forEach(rc => this.unmarkHexPlayable(rc));
         },
 
         onZcardSelected: function (event) {
@@ -361,6 +363,7 @@ function (dojo, declare, hexloc) {
             if (selectedDiv.parentElement.id != ID_HAND) {
                 return false;
             }
+            const handpos = selectedDiv.id.split('_')[2];
             var playable = false;
             let c = selectedDiv.classList;
             if (this.allowedMovesFor(c).length > 0) {
@@ -369,12 +372,12 @@ function (dojo, declare, hexloc) {
                     this.markHexesPlayableForPiece(c);
                     playable = true;
                 } else {
-                    this.markHexesUnplayableForPiece(c);
+                    this.unmarkHexesPlayableForPiece(c);
                 }
                 c.toggle(this.CSS_SELECTED);
             }
             if (playable) {
-                this.selectedHandPos = selectedDiv.id.split('_')[2];
+                this.selectedHandPos = handpos;
                 this.setClientState('client_pickHexToPlay', {
                     descriptionmyturn : _('${you} must select a hex to play to'),
                 });
@@ -396,7 +399,7 @@ function (dojo, declare, hexloc) {
             for (const div of handDiv.children) {
                 cl = div.classList;
                 if (cl.contains(this.CSS_SELECTED)) {
-                    this.markHexesUnplayableForPiece(cl);
+                    this.unmarkHexesPlayableForPiece(cl);
                 }
                 cl.remove(this.CSS_SELECTED);
                 cl.remove(this.CSS_PLAYABLE);
@@ -667,9 +670,9 @@ function (dojo, declare, hexloc) {
                                animate);
         },
 
-        renderHand: function(hand) {
-            for (i = 0; i < hand.length; ++i) {
-                this.handPosDiv(i).className = this.handPieceClass(hand[i]);
+        renderHand: function() {
+            for (i = 0; i < this.hand.length; ++i) {
+                this.handPosDiv(i).className = this.handPieceClass(this.hand[i]);
             }
         },
 
@@ -938,6 +941,7 @@ function (dojo, declare, hexloc) {
             let hpc = this.handPieceClass(args.piece,
                                           args.player_number);
             if (isActive) {
+                this.hand[args.handpos] = null;
                 const handPosDiv = this.handPosDiv(args.handpos);
                 sourceDivId = handPosDiv.id;
                 // Active player hand piece 'removed' from hand.
@@ -967,8 +971,11 @@ function (dojo, declare, hexloc) {
             anim = [];
             let pid = this.player_id;
             for (i = 0; i < args.hand.length; i++) {
+                if (this.hand[i] == null) {
+                    this.hand[i] = args.hand[i];
+                }
                 const div = this.handPosDiv(i);
-                let hc = this.handPieceClass(args.hand[i]);
+                let hc = this.handPieceClass(this.hand[i]);
                 if (hc != this.CSS_EMPTY
                     && div.classList.contains(this.CSS_EMPTY)) {
                     const a = this.slideDiv(
