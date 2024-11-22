@@ -124,7 +124,6 @@ document.getElementById('game_play_area').insertAdjacentHTML('beforeend', `
 `);
 
 
-var thegame = null;
 define([
     'dojo','dojo/_base/declare', 'dojo/_base/fx',
     g_gamethemeurl + "modules/js/hexloc.js",
@@ -173,7 +172,6 @@ function (dojo, declare, fx, hexloc) {
         */
         setup: function(gamedatas) {
             console.log('Starting game setup');
-            thegame = this;
             this.playerNumber = gamedatas.players[this.player_id].player_number;
             CSS.playerNumber = this.playerNumber;
 
