@@ -247,7 +247,8 @@ class Game extends \Table
                 "captured_city_count" => $pi->captured_city_count,
                 "scored_hexes" => $scored_city->scoringHexesForPlayer($pid),
                 "network_hexes" => $scored_city->networkHexesForPlayer($pid),
-                "points" => $points,
+                "network_points" => $scored_city->networkPointsForPlayer($pid),
+                "capture_points" => $scored_city->capturePointsForPlayer($pid),
                 "score" => $pi->score,
             ];
             if ($points > 0) {
