@@ -180,12 +180,11 @@ function (dojo, declare, fx, hexloc) {
                                               } ),
                             boardDiv );
 
-                let p = hex.piece;
-                if (p != null) {
+                if (hex.piece != null) {
                     let n = (hex.board_player == 0)
                         ? null
                         : playersData[hex.board_player].player_number;
-                    this.renderPlayedPiece(hex.row, hex.col, p, n);
+                    this.renderPlayedPiece(hex.row, hex.col, hex.piece, n);
                 }
             }
         },
@@ -418,7 +417,7 @@ function (dojo, declare, fx, hexloc) {
 
         setPlayablePieces: function() {
             for (const p in this.hand) {
-                cl = $( `bbl_hand_${p}` ).classList;
+                let cl = $( `bbl_hand_${p}` ).classList;
                 if (this.allowedMovesFor(p).length > 0) {
                     cl.add(CSS.PLAYABLE);
                     cl.remove(CSS.UNPLAYABLE);
@@ -932,7 +931,7 @@ function (dojo, declare, fx, hexloc) {
             }
 
             const hexDivId = this.hexDivId(args.row, args.col);
-            a = ( args.captured_by != 0 ) ?
+            let a = ( args.captured_by != 0 ) ?
                 this.slideDiv(
                     this.pieceClass(args.city),
                     hexDivId,
@@ -987,7 +986,7 @@ function (dojo, declare, fx, hexloc) {
                                     args.col,
                                     args.captured_piece,
                                     null );
-            anim = this.slideDiv(
+            let anim = this.slideDiv(
                 this.handPieceClass(args.piece, args.player_number),
                 this.hexDivId(args.row, args.col),
                 targetDivId,
@@ -1038,7 +1037,7 @@ function (dojo, declare, fx, hexloc) {
 
         notif_handRefilled: async function( args ) {
             console.log( 'notif_handRefilled', args );
-            anim = [];
+            let anim = [];
             let pid = this.player_id;
             for (const i in args.hand) {
                 if (this.hand[i] == null) {
