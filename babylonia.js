@@ -16,7 +16,7 @@
  */
 
 const IDS = {
-    AVAILABLE_ZCARDS: 'bbl_avaialble_zcards',
+    AVAILABLE_ZCARDS: 'bbl_available_zcards',
     BOARD: 'bbl_board',
     HAND: 'bbl_hand'
 };
@@ -877,6 +877,23 @@ function (dojo, declare, fx, hexloc) {
                 this.scoreCtrl[player_id].toValue(details.score);
                 this.updateCapturedCityCount(details);
 
+                for (i = 0; i < details.scored_hexes.length; ++i) {
+                    this.hexDiv(details.scored_hexes[i].row, details.scored_hexes[i].col).classList.add(CSS.SELECTED);
+                }
+                a = [];
+                for (i = 0; i < details.network_hexes.length; ++i) {
+                    a.push(fx.fadeOut({
+                        node: this.hexDiv(details.network_hexes[i].row, details.network_hexes[i].col),
+                    }));
+                }
+                anim.push(dojo.fx.combine(a));
+                a = [];
+                for (i = 0; i < details.network_hexes.length; ++i) {
+                    a.push(fx.fadeIn({
+                        node: this.hexDiv(details.network_hexes[i].row, details.network_hexes[i].col),
+                    }));
+                }
+                anim.push(dojo.fx.combine(a));
                 a = [];
                 for (i = 0; i < details.network_hexes.length; ++i) {
                     a.push(fx.fadeOut({
@@ -934,6 +951,13 @@ function (dojo, declare, fx, hexloc) {
                     }));
                 }
                 anim.push(dojo.fx.combine(a));
+                dojo.connect(anim[anim.length-1],
+                             'onEnd',
+                             () => {
+                                 for (i = 0; i < details.scored_hexes.length; ++i) {
+                                     this.hexDiv(details.scored_hexes[i].row, details.scored_hexes[i].col).classList.remove(CSS.SELECTED);
+                                 }
+                             });
             }
 
             anim.push( ( args.captured_by != 0 ) ?
