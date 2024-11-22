@@ -76,6 +76,41 @@ END;
         $this->assertEq($expected, $scorer->computeCityScores($hex(3, 3)));
     }
 
+    const MAP4 = <<<'END'
+XXX   ===  XXX
+   ===   m-3
+m-3   h-3   p-1
+   s-3   h-1
+p-1   h-3   ---
+   p-3   h-1
+C.M   h-2
+   m-2
+m-3
+END;
+   public function testCityScoring_overRivers(): void {
+        $board = Board::fromTestMap(ScorerTest::MAP4);
+        $scorer = new Scorer($board, $this->playerInfos(), new Components([]));
+
+        $hex = function(int $r, int $c) use(&$board) { return $board->hexAt($r, $c); };
+        $expected = new ScoredCity(
+            3,
+            [1 => 0, 2 => 0, 3 => 1],
+            [
+                1 => [],
+                2 => [$hex(7, 1)],
+                3 => [$hex(8, 0), $hex(1, 3)]
+            ],
+            [
+                1 => [$hex(4, 0)],
+                2 => [$hex(7, 1), $hex(6, 2)],
+                3 => [$hex(5, 1), $hex(3, 1),  $hex(2, 2), $hex(4, 2), $hex(8,0), $hex(1, 3)]
+            ]
+        );
+        $got = $scorer->computeCityScores($hex(6,0));
+        $this->assertEq($expected, $got);
+    }
+
+
 const MAP2 = <<<'END'
 XXX   XXX   XXX   XXX
    f-2   XXX   XXX
