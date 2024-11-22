@@ -18,15 +18,70 @@
 const IDS = {
     AVAILABLE_ZCARDS: 'bbl_available_zcards',
     BOARD: 'bbl_board',
-    HAND: 'bbl_hand'
+    HAND: 'bbl_hand',
+
+    handPos: function(pos) {
+        return `bbl_hand_${pos}`;
+    },
+
+    handcount: function(player_id) {
+        return 'bbl_handcount_' + player_id;
+    },
+
+    poolcount: function(player_id) {
+        return 'bbl_poolcount_' + player_id;
+    },
+
+    citycount: function(player_id) {
+        return 'bbl_citycount_' + player_id;
+    },
+
+    hexDiv: function(row, col) {
+        return `bbl_hex_${row}_${col}`;
+    },
+
+    playerBoardZcards: function(player_id) {
+        return `bbl_zcards_${player_id}`;
+    },
+
+    ownedZcard: function(z) {
+        return `bbl_ozig_${z}`;
+    },
+
+    availableZcard: function(z) {
+        return `bbl_zig_${z}`;
+    },
 };
 
 const CSS = {
+    playerNumber: null,
+
     SELECTING: 'bbl_selecting',
     SELECTED: 'bbl_selected',
     PLAYABLE: 'bbl_playable',
     UNPLAYABLE: 'bbl_unplayable',
-    EMPTY: 'bbl_empty'
+    EMPTY: 'bbl_empty',
+
+    piece: function (piece, playerNumber) {
+        if (playerNumber == null) {
+            return 'bbl_' + piece;
+        } else {
+            return 'bbl_' + piece + '_' + playerNumber;
+        }
+    },
+
+    handPiece: function(piece, playerNumber = null) {
+        if (piece == null || piece == "empty") {
+            return CSS.EMPTY;
+        }
+        return CSS.piece(
+            piece,
+            playerNumber == null ? this.playerNumber : playerNumber);
+    },
+    zcard: function(card, used = false) {
+        return used ? 'bbl_zc_used' : ('bbl_' + card);
+    }
+
 };
 
 
@@ -120,6 +175,7 @@ function (dojo, declare, fx, hexloc) {
             console.log('Starting game setup');
             thegame = this;
             this.playerNumber = gamedatas.players[this.player_id].player_number;
+            CSS.playerNumber = this.playerNumber;
 
             console.log('Setting up player boards');
             for (const player_id in gamedatas.players) {
@@ -152,11 +208,11 @@ function (dojo, declare, fx, hexloc) {
                         player_board_div);
             // create counters per player
             this.hand_counters[player_id]=new ebg.counter();
-            this.hand_counters[player_id].create(this.handcount_id(player_id));
+            this.hand_counters[player_id].create(IDS.handcount(player_id));
             this.pool_counters[player_id]=new ebg.counter();
-            this.pool_counters[player_id].create(this.poolcount_id(player_id));
+            this.pool_counters[player_id].create(IDS.poolcount(player_id));
             this.city_counters[player_id]=new ebg.counter();
-            this.city_counters[player_id].create(this.citycount_id(player_id));
+            this.city_counters[player_id].create(IDS.citycount(player_id));
             this.updateHandCount(player, false);
             this.updatePoolCount(player, false);
             this.updateCapturedCityCount(player, false);
@@ -187,16 +243,6 @@ function (dojo, declare, fx, hexloc) {
                     this.renderPlayedPiece(hex.row, hex.col, hex.piece, n);
                 }
             }
-        },
-
-        handcount_id: function(player_id) {
-            return 'bbl_handcount_' + player_id;
-        },
-        poolcount_id: function(player_id) {
-            return 'bbl_poolcount_' + player_id;
-        },
-        citycount_id: function(player_id) {
-            return 'bbl_citycount_' + player_id;
         },
 
         onHexSelection: function (event) {
@@ -286,7 +332,7 @@ function (dojo, declare, fx, hexloc) {
         pieceForHandDivClassList: function(cl) {
             // console.log('pieceFor: ' + cl);
             for (const pc of this.pieceClasses) {
-                if (cl.contains(this.handPieceClass(pc))) {
+                if (cl.contains(CSS.handPiece(pc))) {
                     return pc;
                 }
             }
@@ -404,7 +450,7 @@ function (dojo, declare, fx, hexloc) {
 
         unselectAllHandPieces: function() {
             for (const p in this.hand) {
-                let cl = $(`bbl_hand_${p}`).classList;
+                let cl = $(IDS.handPos(p)).classList;
                 if (cl.contains(CSS.SELECTED)) {
                     this.unmarkHexesPlayableForPiece(p);
                 }
@@ -417,7 +463,7 @@ function (dojo, declare, fx, hexloc) {
 
         setPlayablePieces: function() {
             for (const p in this.hand) {
-                let cl = $(`bbl_hand_${p}`).classList;
+                let cl = $(IDS.handPos(p)).classList;
                 if (this.allowedMovesFor(p).length > 0) {
                     cl.add(CSS.PLAYABLE);
                     cl.remove(CSS.UNPLAYABLE);
@@ -595,16 +641,12 @@ function (dojo, declare, fx, hexloc) {
             $('pagemaintitletext').innerHTML = _(message);
         },
 
-        hexDivId: function(row, col) {
-            return `bbl_hex_${row}_${col}`;
-        },
-
         hexDiv: function (row, col) {
-            return $(this.hexDivId(row,col));
+            return $(IDS.hexDiv(row,col));
         },
 
         handPosDiv: function (i) {
-            let id = `bbl_hand_${i}`;
+            let id = IDS.handPos(i);
             let div = $(id);
             if (div != null) {
                 return div;
@@ -612,7 +654,7 @@ function (dojo, declare, fx, hexloc) {
             // dynamically extend hand as needed.
             const hand = $(IDS.HAND);
             for (let j = 0; j <= i; ++j) {
-                let id = `bbl_hand_${j}`;
+                let id = IDS.handPos(j);
                 let d = $(id);
                 if (d == null) {
                     dojo.create('div',
@@ -626,26 +668,8 @@ function (dojo, declare, fx, hexloc) {
             return $(id);
         },
 
-        pieceClass: function (piece, playerNumber) {
-            if (playerNumber == null) {
-                return 'bbl_' + piece;
-            } else {
-                return 'bbl_' + piece + '_' + playerNumber;
-            }
-        },
-
         renderPlayedPiece: function (row, col, piece, playerNumber) {
-            this.hexDiv(row, col).className =
-                this.pieceClass(piece, playerNumber);
-        },
-
-        handPieceClass: function(piece, playerNumber = null) {
-            if (piece == null || piece == "empty") {
-                return CSS.EMPTY;
-            }
-            return this.pieceClass(
-                piece,
-                playerNumber == null ? this.playerNumber : playerNumber);
+            this.hexDiv(row, col).className = CSS.piece(piece, playerNumber);
         },
 
         updateCounter: function(counter, value, animate) {
@@ -676,7 +700,7 @@ function (dojo, declare, fx, hexloc) {
 
         renderHand: function() {
             for (const i in this.hand) {
-                this.handPosDiv(i).className = this.handPieceClass(this.hand[i]);
+                this.handPosDiv(i).className = CSS.handPiece(this.hand[i]);
             }
         },
 
@@ -684,10 +708,10 @@ function (dojo, declare, fx, hexloc) {
             console.log('Setting up available ziggurat cards', zcards);
             this.zcards = zcards;
             for (const z in zcards) {
-                const id = `bbl_zig_${z}`;
+                const id = IDS.availableZcard(z);
                 if (zcards[z].owning_player_id != 0) {
                     this.addZcardDivInPlayerBoard(z);
-                    // and "shell" in available cards
+                    // also "shell" in available cards
                     dojo.place(`<div id='${id}'</div>`, IDS.AVAILABLE_ZCARDS);
                 } else {
                     // just in available cards
@@ -696,23 +720,12 @@ function (dojo, declare, fx, hexloc) {
             }
         },
 
-        playerBoardZcardsId: function(z) {
-            const owner = this.zcards[z].owning_player_id;
-            return `bbl_zcards_${owner}`;
-        },
-
-        ownedZcardId: function(z) {
-            return `bbl_ozig_${z}`;
-        },
-
-        availableZcardId: function(z) {
-            return `bbl_zig_${z}`;
-        },
-
         addZcardDivInPlayerBoard: function(z) {
-            this.addZigguratCardDiv(this.ownedZcardId(z),
-                                    this.playerBoardZcardsId(z),
-                                    z);
+            this.addZigguratCardDiv(
+                IDS.ownedZcard(z),
+                IDS.playerBoardZcards(this.zcards[z].owning_player_id),
+                z
+            );
         },
 
         indexOfZcard: function(cardType) {
@@ -724,12 +737,8 @@ function (dojo, declare, fx, hexloc) {
             return -1;
         },
 
-        zcardClass: function(card, used = false) {
-            return used ? 'bbl_zc_used' : ('bbl_' + card);
-        },
-
         addZigguratCardDiv: function(id, parentElem, z) {
-            const cls = this.zcardClass(this.zcards[z].type, this.zcards[z].used);
+            const cls = CSS.zcard(this.zcards[z].type, this.zcards[z].used);
             const div = dojo.place(`<div id='${id}' class='${cls}'</div>`,
                                     parentElem);
             this.addTooltip(id, this.zcards[z].tooltip, '');
@@ -821,13 +830,13 @@ function (dojo, declare, fx, hexloc) {
                 console.error("Couldn't find ${args.card} zcard");
             } else {
                 this.zcards[z].used = args.used;
-                const carddiv = $(this.ownedZcardId(z));
+                const carddiv = $(IDS.ownedZcard(z));
                 if (carddiv == undefined) {
                     console.error(`Could not find div for owned ${args.card} card`,
                                   z,
                                   this.zcards[z]);
                 } else {
-                    carddiv.className = this.zcardClass(null, true);
+                    carddiv.className = CSS.zcard(null, true);
                 }
             }
             return Promise.resolve();
@@ -844,16 +853,16 @@ function (dojo, declare, fx, hexloc) {
                 this.zcards[z].used = args.cardused;
                 this.scoreCtrl[args.player_id].toValue(args.score);
 
-                const id = this.availableZcardId(z);
+                const id = IDS.availableZcard(z);
 
                 // mark the available zig card spot as 'taken'
                 $(id).className = "";
                 this.removeTooltip(id);
 
                 anim = this.slideDiv(
-                    this.zcardClass(this.zcards[z].type, false),
+                    CSS.zcard(this.zcards[z].type, false),
                     id,
-                    this.playerBoardZcardsId(z),
+                    IDS.playerBoardZcards(args.player_id),
                     () => this.addZcardDivInPlayerBoard(z),
                     IDS.AVAILABLE_ZCARDS
                 );
@@ -930,17 +939,17 @@ function (dojo, declare, fx, hexloc) {
                              });
             }
 
-            const hexDivId = this.hexDivId(args.row, args.col);
+            const hexDivId = IDS.hexDiv(args.row, args.col);
             let a = (args.captured_by != 0) ?
                 this.slideDiv(
-                    this.pieceClass(args.city),
+                    CSS.piece(args.city),
                     hexDivId,
-                    this.citycount_id(args.captured_by),
+                    IDS.citycount(args.captured_by),
                     () => this.renderPlayedPiece(args.row, args.col, '', null)
                 )
                 :
                 this.slideDiv(
-                    this.pieceClass(args.city),
+                    CSS.piece(args.city),
                     hexDivId,
                     // TODO: find a location for 'off the board'
                     IDS.AVAILABLE_ZCARDS,
@@ -972,7 +981,7 @@ function (dojo, declare, fx, hexloc) {
             console.log('notif_undoMove', args);
 
             const isActive = this.playerNumber == args.player_number;
-            var targetDivId = this.handcount_id(args.player_id);
+            var targetDivId = IDS.handcount(args.player_id);
             var handPosDiv = null;
             if (isActive) {
                 this.hand[args.handpos] = args.original_piece;
@@ -987,15 +996,15 @@ function (dojo, declare, fx, hexloc) {
                                     args.captured_piece,
                                     null);
             let anim = this.slideDiv(
-                this.handPieceClass(args.piece, args.player_number),
-                this.hexDivId(args.row, args.col),
+                CSS.handPiece(args.piece, args.player_number),
+                IDS.hexDiv(args.row, args.col),
                 targetDivId,
                 () => {
                     if (isActive) {
                         cl = handPosDiv.classList;
                         cl.remove(CSS.EMPTY);
                         cl.add(CSS.PLAYABLE);
-                        cl.add(this.handPieceClass(args.original_piece));
+                        cl.add(CSS.handPiece(args.original_piece));
                     }
                     this.hand_counters[args.player_id].incValue(1);
                     this.scoreCtrl[args.player_id].incValue(-args.points);
@@ -1006,9 +1015,8 @@ function (dojo, declare, fx, hexloc) {
         notif_piecePlayed: async function(args) {
             console.log('notif_piecePlayed', args);
             const isActive = this.playerNumber == args.player_number;
-            var sourceDivId = this.handcount_id(args.player_id);
-            let hpc = this.handPieceClass(args.piece,
-                                          args.player_number);
+            var sourceDivId = IDS.handcount(args.player_id);
+            let hpc = CSS.handPiece(args.piece, args.player_number);
             if (isActive) {
                 this.hand[args.handpos] = null;
                 const handPosDiv = this.handPosDiv(args.handpos);
@@ -1044,12 +1052,12 @@ function (dojo, declare, fx, hexloc) {
                     this.hand[i] = args.hand[i];
                 }
                 const div = this.handPosDiv(i);
-                let hc = this.handPieceClass(this.hand[i]);
+                let hc = CSS.handPiece(this.hand[i]);
                 if (hc != CSS.EMPTY
                     && div.classList.contains(CSS.EMPTY)) {
                     const a = this.slideDiv(
                         hc,
-                        this.handcount_id(pid),
+                        IDS.handcount(pid),
                         div.id,
                         () => { div.className = hc; }
                     );
