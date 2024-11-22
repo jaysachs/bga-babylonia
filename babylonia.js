@@ -887,16 +887,20 @@ function (dojo, declare, fx, hexloc) {
 
             anim = [];
 
-            for( var player_id in args.details ) {
+            for( let player_id in args.details ) {
                 let details = args.details[player_id];
-                this.scoreCtrl[player_id].toValue(details.score);
-                this.updateCapturedCityCount(details);
 
-                for (i = 0; i < details.scored_hexes.length; ++i) {
-                    this.hexDiv(details.scored_hexes[i].row,
-                                details.scored_hexes[i].col).classList.add(CSS.SELECTED);
-                }
                 anim.push(this.fadeOut(details.network_hexes));
+
+                dojo.connect(anim[anim.length-1],
+                             'onBegin',
+                             () => {
+                                 for (let i = 0; i < details.scored_hexes.length; ++i) {
+                                     this.hexDiv(details.scored_hexes[i].row,
+                                                 details.scored_hexes[i].col).classList.add(CSS.SELECTED);
+                                 }
+                             });
+
                 anim.push(this.fadeIn(details.network_hexes));
                 anim.push(this.fadeOut(details.network_hexes));
                 anim.push(this.fadeIn(details.network_hexes));
@@ -907,9 +911,9 @@ function (dojo, declare, fx, hexloc) {
 
                 var nonscoring = [];
                 var scoring = [];
-                for (i = 0; i < details.network_hexes.length; ++i) {
+                for (let i = 0; i < details.network_hexes.length; ++i) {
                     var found = false;
-                    for (j = 0; j < details.scored_hexes.length; ++j) {
+                    for (let j = 0; j < details.scored_hexes.length; ++j) {
                         if (eq(details.scored_hexes[j], details.network_hexes[i])) {
                             found = true;
                             break;
@@ -937,9 +941,11 @@ function (dojo, declare, fx, hexloc) {
                 dojo.connect(anim[anim.length-1],
                              'onEnd',
                              () => {
-                                 for (i = 0; i < details.scored_hexes.length; ++i) {
+                                 for (let i = 0; i < details.scored_hexes.length; ++i) {
                                      this.hexDiv(details.scored_hexes[i].row, details.scored_hexes[i].col).classList.remove(CSS.SELECTED);
                                  }
+                                 this.scoreCtrl[player_id].toValue(details.score);
+                                 this.updateCapturedCityCount(details);
                              });
             }
 
