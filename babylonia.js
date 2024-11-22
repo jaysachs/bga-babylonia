@@ -122,13 +122,13 @@ function (dojo, declare, fx, hexloc) {
             this.playerNumber = gamedatas.players[this.player_id].player_number;
 
             console.log('Setting up player boards');
-            for( var player_id in gamedatas.players ) {
+            for (const player_id in gamedatas.players) {
                 this.setupPlayerBoard( gamedatas.players[player_id] );
             }
 
             this.setupBoard(gamedatas.board, gamedatas.players);
 
-            console.log("Setting up player hand");
+            console.log('Setting up player hand');
             this.hand = gamedatas.hand;
             this.renderHand();
 
@@ -167,8 +167,7 @@ function (dojo, declare, fx, hexloc) {
             let boardDiv = $(IDS.BOARD);
             // console.log( gamedatas.board );
 
-            for( let h = 0; h < boardData.length; ++h) {
-                let hex = boardData[h];
+            for (const hex of boardData) {
                 let tl = hexloc.hexLocation(hex);
 
                 dojo.place( this.format_block('jstpl_hex',
@@ -205,7 +204,7 @@ function (dojo, declare, fx, hexloc) {
             // console.log('onHexSelection:' + event.target.id);
             event.preventDefault();
             event.stopPropagation();
-            if(! this.isCurrentPlayerActive() ) {
+            if (! this.isCurrentPlayerActive() ) {
                  return false;
             }
             switch (this.stateName) {
@@ -287,9 +286,9 @@ function (dojo, declare, fx, hexloc) {
 
         pieceForHandDivClassList: function(cl) {
             // console.log('pieceFor: ' + cl);
-            for (var i = 0; i < this.pieceClasses.length; ++i) {
-                if (cl.contains(this.handPieceClass(this.pieceClasses[i]))) {
-                    return this.pieceClasses[i];
+            for (const pc of this.pieceClasses) {
+                if (cl.contains(this.handPieceClass(pc))) {
+                    return pc;
                 }
             }
             return null;
@@ -358,7 +357,7 @@ function (dojo, declare, fx, hexloc) {
             console.log('onPieceSelection');
             event.preventDefault();
             event.stopPropagation();
-            if(! this.isCurrentPlayerActive() ) {
+            if (! this.isCurrentPlayerActive() ) {
                  return false;
             }
             if (this.stateName != 'client_selectPieceOrEndTurn'
@@ -405,8 +404,8 @@ function (dojo, declare, fx, hexloc) {
         },
 
         unselectAllHandPieces: function() {
-            for (let p = 0; p < this.hand.length; ++p) {
-                cl = $( `bbl_hand_${p}` ).classList;
+            for (const p in this.hand) {
+                let cl = $( `bbl_hand_${p}` ).classList;
                 if (cl.contains(CSS.SELECTED)) {
                     this.unmarkHexesPlayableForPiece(p);
                 }
@@ -418,7 +417,7 @@ function (dojo, declare, fx, hexloc) {
         },
 
         setPlayablePieces: function() {
-            for (let p = 0; p < this.hand.length; ++p) {
+            for (const p in this.hand) {
                 cl = $( `bbl_hand_${p}` ).classList;
                 if (this.allowedMovesFor(p).length > 0) {
                     cl.add(CSS.PLAYABLE);
@@ -431,7 +430,7 @@ function (dojo, declare, fx, hexloc) {
         },
 
         setStatusBarForPlayState: function() {
-            if( !this.isCurrentPlayerActive() ) {
+            if ( !this.isCurrentPlayerActive() ) {
                 return;
             }
             this.selectedHandPos = null;
@@ -549,7 +548,7 @@ function (dojo, declare, fx, hexloc) {
                          args );
             this.stateName = stateName;
             this.stateArgs = args;
-            if( this.isCurrentPlayerActive() ) {
+            if ( this.isCurrentPlayerActive() ) {
                 switch( stateName ) {
                     case 'chooseExtraTurn':
                         this.addActionButton(
@@ -670,14 +669,14 @@ function (dojo, declare, fx, hexloc) {
                                animate);
         },
 
-        updateCapturedCityCount: function (player, animate=true) {
+        updateCapturedCityCount: function(player, animate=true) {
             this.updateCounter(this.city_counters[player.player_id],
                                player.captured_city_count,
                                animate);
         },
 
         renderHand: function() {
-            for (i = 0; i < this.hand.length; ++i) {
+            for (const i in this.hand) {
                 this.handPosDiv(i).className = this.handPieceClass(this.hand[i]);
             }
         },
@@ -685,10 +684,9 @@ function (dojo, declare, fx, hexloc) {
         setupAvailableZcards: function(zcards) {
             console.log('Setting up available ziggurat cards', zcards);
             this.zcards = zcards;
-            for( let z = 0; z < zcards.length; z++) {
-                let card = zcards[z];
+            for (const z in zcards) {
                 const id = `bbl_zig_${z}`;
-                if (card.owning_player_id != 0) {
+                if (zcards[z].owning_player_id != 0) {
                     this.addZcardDivInPlayerBoard(z);
                     // and "shell" in available cards
                     dojo.place(`<div id='${id}'</div>`, IDS.AVAILABLE_ZCARDS);
@@ -719,7 +717,7 @@ function (dojo, declare, fx, hexloc) {
         },
 
         indexOfZcard: function(cardType) {
-            for (var z = 0; z < this.zcards.length; ++z) {
+            for (const z in this.zcards) {
                 if (this.zcards[z].type == cardType) {
                     return z;
                 }
@@ -771,7 +769,7 @@ function (dojo, declare, fx, hexloc) {
 
                     // list of special keys we want to replace with images
                     var keys = ['piece', 'city', 'zcard', 'original_piece'];
-                    for ( var key of keys) {
+                    for (const key of keys) {
                         if (key in args) {
                             saved[key] = args[key];
                             args[key] = this.richFormat(key, args);
@@ -784,7 +782,7 @@ function (dojo, declare, fx, hexloc) {
             try {
                 return this.inherited({callee: format_string_recursive}, arguments);
             } finally {
-                for ( var i in saved ) {
+                for (const i in saved) {
                     args[i] = saved[i];
                 }
             }
@@ -880,7 +878,7 @@ function (dojo, declare, fx, hexloc) {
 
             anim = [];
 
-            for( const player_id in args.details ) {
+            for (const player_id in args.details) {
                 const details = args.details[player_id];
 
                 anim.push(this.fadeOut(details.network_hexes));
@@ -888,7 +886,7 @@ function (dojo, declare, fx, hexloc) {
                 dojo.connect(anim[anim.length-1],
                              'onBegin',
                              () => {
-                                 for (const hex of details.scored_hexes.values()) {
+                                 for (const hex of details.scored_hexes) {
                                      this.hexDiv(hex.row, hex.col).classList.add(CSS.SELECTED);
                                  }
                              });
@@ -903,7 +901,7 @@ function (dojo, declare, fx, hexloc) {
 
                 var nonscoring = [];
                 var scoring = [];
-                for (const nh of details.network_hexes.values()) {
+                for (const nh of details.network_hexes) {
                     if (!details.scored_hexes.some(sh => eq(nh, sh))) {
                         nonscoring.push(nh);
                     }
