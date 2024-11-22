@@ -346,7 +346,7 @@ body {
     background: url(img/sprites.png) 0% -600% / 700% 700%;
 }
 
-#bbl_hand > div.bbl_selected::before {
+div.bbl_selected::before {
     height: 100%;
     width: 100%;
     content: '';
