@@ -771,8 +771,7 @@ function (dojo, declare, fx, hexloc) {
 
                     // list of special keys we want to replace with images
                     var keys = ['piece', 'city', 'zcard', 'original_piece'];
-                    for ( var i in keys) {
-                        var key = keys[i];
+                    for ( var key of keys) {
                         if (key in args) {
                             saved[key] = args[key];
                             args[key] = this.richFormat(key, args);
@@ -866,20 +865,14 @@ function (dojo, declare, fx, hexloc) {
         },
 
         fadeOut: function(hexes) {
-            a = [];
-            for (i = 0; i < hexes.length; ++i) {
-                let hex = hexes[i];
-                a.push(fx.fadeOut({ node: this.hexDiv(hex.row, hex.col) }));
-            }
-            return dojo.fx.combine(a);
+            return dojo.fx.combine(
+                hexes.map(h => fx.fadeOut({ node: this.hexDiv(h.row, h.col) }))
+            );
         },
         fadeIn: function(hexes) {
-            a = [];
-            for (i = 0; i < hexes.length; ++i) {
-                let hex = hexes[i];
-                a.push(fx.fadeIn({ node: this.hexDiv(hex.row, hex.col) }));
-            }
-            return dojo.fx.combine(a);
+            return dojo.fx.combine(
+                hexes.map(h => fx.fadeIn({ node: this.hexDiv(h.row, h.col) }))
+            );
         },
 
         notif_cityScored: async function( args ) {
@@ -887,17 +880,16 @@ function (dojo, declare, fx, hexloc) {
 
             anim = [];
 
-            for( let player_id in args.details ) {
-                let details = args.details[player_id];
+            for( const player_id in args.details ) {
+                const details = args.details[player_id];
 
                 anim.push(this.fadeOut(details.network_hexes));
 
                 dojo.connect(anim[anim.length-1],
                              'onBegin',
                              () => {
-                                 for (let i = 0; i < details.scored_hexes.length; ++i) {
-                                     this.hexDiv(details.scored_hexes[i].row,
-                                                 details.scored_hexes[i].col).classList.add(CSS.SELECTED);
+                                 for (const hex of details.scored_hexes.values()) {
+                                     this.hexDiv(hex.row, hex.col).classList.add(CSS.SELECTED);
                                  }
                              });
 
@@ -911,16 +903,9 @@ function (dojo, declare, fx, hexloc) {
 
                 var nonscoring = [];
                 var scoring = [];
-                for (let i = 0; i < details.network_hexes.length; ++i) {
-                    var found = false;
-                    for (let j = 0; j < details.scored_hexes.length; ++j) {
-                        if (eq(details.scored_hexes[j], details.network_hexes[i])) {
-                            found = true;
-                            break;
-                        }
-                    }
-                    if (!found) {
-                        nonscoring.push(details.network_hexes[i]);
+                for (const nh of details.network_hexes.values()) {
+                    if (!details.scored_hexes.some(sh => eq(nh, sh))) {
+                        nonscoring.push(nh);
                     }
                 }
 
@@ -941,10 +926,10 @@ function (dojo, declare, fx, hexloc) {
                 dojo.connect(anim[anim.length-1],
                              'onEnd',
                              () => {
-                                 for (let i = 0; i < details.scored_hexes.length; ++i) {
-                                     this.hexDiv(details.scored_hexes[i].row, details.scored_hexes[i].col).classList.remove(CSS.SELECTED);
-                                 }
-                                 this.scoreCtrl[player_id].toValue(details.score);
+                                 details.scored_hexes.forEach(
+                                     hex => this.hexDiv(hex.row, hex.col).classList.remove(CSS.SELECTED));
+                                 // this.scoreCtrl[player_id].toValue(details.score);
+                                 this.scoreCtrl[player_id].incValue(details.network_points);
                                  this.updateCapturedCityCount(details);
                              });
             }
@@ -965,7 +950,15 @@ function (dojo, declare, fx, hexloc) {
                     IDS.AVAILABLE_ZCARDS,
                     () => this.renderPlayedPiece( args.row, args.col, '', null )
                 );
-
+            dojo.connect(a,
+                         'onEnd',
+                         () => {
+                             for (const player_id in args.details) {
+                                 const details = args.details[player_id];
+                                 this.scoreCtrl[player_id].incValue(details.capture_points);
+                                 this.updateCapturedCityCount(details);
+                             }
+                         });
             anim.push(a);
             await this.bgaPlayDojoAnimation(dojo.fx.chain(anim));
         },
