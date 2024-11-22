@@ -383,14 +383,19 @@ function (dojo, declare, fx, hexloc) {
             if (this.stateName != 'selectZigguratCard') {
                 return false;
             }
-            let zdiv = event.target;
-            const re = /bbl_zig_(\d)/;
-            const matchInfo = re.exec(zdiv.id);
-            if (matchInfo == null) {
-                console.error("couldn't determine zcard from ", zdiv.id);
+            const tid = event.target;
+
+            var z = -1;
+            for (const i in this.zcards) {
+                if (tid == CSS.availableZcard(i)) {
+                    z = i;
+                    break;
+                }
+            }
+            if (z < 0) {
+                console.error("couldn't determine zcard from ", tid);
                 return false;
             }
-            const z = matchInfo[1];
             this.bgaPerformAction('actSelectZigguratCard',
                                   { card_type: this.zcards[z].type });
             let div = $(IDS.AVAILABLE_ZCARDS);
