@@ -612,7 +612,7 @@ function (dojo, declare, fx, hexloc) {
             }
             // dynamically extend hand as needed.
             const hand = $(IDS.HAND);
-            for (j = 0; j <= i; ++j) {
+            for (let j = 0; j <= i; ++j) {
                 let id = `bbl_hand_${j}`;
                 let d = $(id);
                 if (d == null) {
@@ -876,7 +876,7 @@ function (dojo, declare, fx, hexloc) {
         notif_cityScored: async function( args ) {
             console.log( 'notif_cityScored', args );
 
-            anim = [];
+            let anim = [];
 
             for (const player_id in args.details) {
                 const details = args.details[player_id];
@@ -926,7 +926,6 @@ function (dojo, declare, fx, hexloc) {
                              () => {
                                  details.scored_hexes.forEach(
                                      hex => this.hexDiv(hex.row, hex.col).classList.remove(CSS.SELECTED));
-                                 // this.scoreCtrl[player_id].toValue(details.score);
                                  this.scoreCtrl[player_id].incValue(details.network_points);
                                  this.updateCapturedCityCount(details);
                              });
@@ -1041,7 +1040,7 @@ function (dojo, declare, fx, hexloc) {
             console.log( 'notif_handRefilled', args );
             anim = [];
             let pid = this.player_id;
-            for (i = 0; i < args.hand.length; i++) {
+            for (const i in args.hand) {
                 if (this.hand[i] == null) {
                     this.hand[i] = args.hand[i];
                 }
