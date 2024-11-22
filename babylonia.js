@@ -865,6 +865,13 @@ function (dojo, declare, fx, hexloc) {
             }
         },
 
+        fadeOut: function(rc) {
+            return fx.fadeOut({ node: this.hexDiv(rc.row, rc.col) });
+        },
+        fadeIn: function(rc) {
+            return fx.fadeIn({ node: this.hexDiv(rc.row, rc.col) });
+        },
+
         notif_cityScored: async function( args ) {
             console.log( 'notif_cityScored', args );
             this.renderPlayedPiece( args.row, args.col, '', null );
@@ -878,34 +885,27 @@ function (dojo, declare, fx, hexloc) {
                 this.updateCapturedCityCount(details);
 
                 for (i = 0; i < details.scored_hexes.length; ++i) {
-                    this.hexDiv(details.scored_hexes[i].row, details.scored_hexes[i].col).classList.add(CSS.SELECTED);
+                    this.hexDiv(details.scored_hexes[i].row,
+                                details.scored_hexes[i].col).classList.add(CSS.SELECTED);
                 }
                 a = [];
                 for (i = 0; i < details.network_hexes.length; ++i) {
-                    a.push(fx.fadeOut({
-                        node: this.hexDiv(details.network_hexes[i].row, details.network_hexes[i].col),
-                    }));
-                }
-                anim.push(dojo.fx.combine(a));
-                a = [];
-                for (i = 0; i < details.network_hexes.length; ++i) {
-                    a.push(fx.fadeIn({
-                        node: this.hexDiv(details.network_hexes[i].row, details.network_hexes[i].col),
-                    }));
+                    a.push(this.fadeOut(details.network_hexes[i]));
                 }
                 anim.push(dojo.fx.combine(a));
                 a = [];
                 for (i = 0; i < details.network_hexes.length; ++i) {
-                    a.push(fx.fadeOut({
-                        node: this.hexDiv(details.network_hexes[i].row, details.network_hexes[i].col),
-                    }));
+                    a.push(this.fadeIn(details.network_hexes[i]));
                 }
                 anim.push(dojo.fx.combine(a));
                 a = [];
                 for (i = 0; i < details.network_hexes.length; ++i) {
-                    a.push(fx.fadeIn({
-                        node: this.hexDiv(details.network_hexes[i].row, details.network_hexes[i].col),
-                    }));
+                    a.push(this.fadeOut(details.network_hexes[i]));
+                }
+                anim.push(dojo.fx.combine(a));
+                a = [];
+                for (i = 0; i < details.network_hexes.length; ++i) {
+                    a.push(this.fadeIn(details.network_hexes[i]));
                 }
                 anim.push(dojo.fx.combine(a));
 
@@ -930,9 +930,7 @@ function (dojo, declare, fx, hexloc) {
 
                 a = [];
                 for (i = 0; i < nonscoring.length; ++i) {
-                    a.push(fx.fadeOut({
-                        node: this.hexDiv(nonscoring[i].row, nonscoring[i].col),
-                    }));
+                    a.push(this.fadeOut(nonscoring[i]));
                 }
                 anim.push(dojo.fx.combine(a));
 
@@ -946,9 +944,7 @@ function (dojo, declare, fx, hexloc) {
 
                 a = [];
                 for (i = 0; i < nonscoring.length; ++i) {
-                    a.push(fx.fadeIn({
-                        node: this.hexDiv(nonscoring[i].row, nonscoring[i].col),
-                    }));
+                    a.push(this.fadeIn(nonscoring[i]));
                 }
                 anim.push(dojo.fx.combine(a));
                 dojo.connect(anim[anim.length-1],
