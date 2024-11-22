@@ -53,8 +53,16 @@ class ScoredCity {
     }
 
     public function pointsForPlayer(int $player_id): int {
-        return 2 * count($this->scoringHexes[$player_id])
-            + $this->captured_city_points[$player_id];
+        return $this->networkPointsForPlayer($player_id)
+            + $this->capturePointsForPlayer($player_id);
+    }
+
+    public function networkPointsForPlayer(int $player_id): int {
+        return 2 * count($this->scoringHexes[$player_id]);
+    }
+
+    public function capturePointsForPlayer(int $player_id): int {
+        return $this->captured_city_points[$player_id];
     }
 
     public function scoringHexesForPlayer(int $player_id): array {
