@@ -85,9 +85,9 @@ function (dojo, declare, fx, hexloc) {
             // Example:
             // this.myGlobalValue = 0;
 
-            dojo.connect( $(IDS.HAND), 'onclick', this, 'onPieceSelection' );
-            dojo.connect( $(IDS.BOARD), 'onclick', this, 'onHexSelection' );
-            dojo.connect( $(IDS.AVAILABLE_ZCARDS), 'onclick', this, 'onZcardSelected');
+            dojo.connect($(IDS.HAND), 'onclick', this, 'onPieceSelection');
+            dojo.connect($(IDS.BOARD), 'onclick', this, 'onHexSelection');
+            dojo.connect($(IDS.AVAILABLE_ZCARDS), 'onclick', this, 'onZcardSelected');
         },
 
         selectedHandPos: null,
@@ -116,14 +116,14 @@ function (dojo, declare, fx, hexloc) {
             'gamedatas' argument contains all datas retrieved by your
             'getAllDatas' PHP method.
         */
-        setup: function( gamedatas ) {
-            console.log( 'Starting game setup' );
+        setup: function(gamedatas) {
+            console.log('Starting game setup');
             thegame = this;
             this.playerNumber = gamedatas.players[this.player_id].player_number;
 
             console.log('Setting up player boards');
             for (const player_id in gamedatas.players) {
-                this.setupPlayerBoard( gamedatas.players[player_id] );
+                this.setupPlayerBoard(gamedatas.players[player_id]);
             }
 
             this.setupBoard(gamedatas.board, gamedatas.players);
@@ -134,22 +134,22 @@ function (dojo, declare, fx, hexloc) {
 
             this.setupAvailableZcards(gamedatas.ziggurat_cards);
 
-            console.log( 'setting up notifications' );
+            console.log('setting up notifications');
             this.bgaSetupPromiseNotifications();
 
-            console.log( 'Game setup done.' );
+            console.log('Game setup done.');
         },
 
-        setupPlayerBoard: function( player ) {
+        setupPlayerBoard: function(player) {
             let player_id = player.player_id;
             console.log('Setting up board for player ' + player_id);
             let player_board_div = this.getPlayerPanelElement(player_id);
-            dojo.place( this.format_block('jstpl_player_board_ext',
+            dojo.place(this.format_block('jstpl_player_board_ext',
                                           {
                                               'player_id': player_id,
                                               'player_number': player.player_number
-                                          } ),
-                        player_board_div );
+                                          }),
+                        player_board_div);
             // create counters per player
             this.hand_counters[player_id]=new ebg.counter();
             this.hand_counters[player_id].create(this.handcount_id(player_id));
@@ -162,23 +162,23 @@ function (dojo, declare, fx, hexloc) {
             this.updateCapturedCityCount(player, false);
         },
 
-        setupBoard: function( boardData, playersData ) {
+        setupBoard: function(boardData, playersData) {
             console.log('Setting the the game board');
             let boardDiv = $(IDS.BOARD);
-            // console.log( gamedatas.board );
+            // console.log(gamedatas.board);
 
             for (const hex of boardData) {
                 let tl = hexloc.hexLocation(hex);
 
-                dojo.place( this.format_block('jstpl_hex',
+                dojo.place(this.format_block('jstpl_hex',
                                               {
                                                   'row': hex.row,
                                                   'col': hex.col,
                                                   // or ... row / 2 * 63 + 6;
                                                   'top': tl.top,
                                                   'left': tl.left,
-                                              } ),
-                            boardDiv );
+                                              }),
+                            boardDiv);
 
                 if (hex.piece != null) {
                     let n = (hex.board_player == 0)
@@ -203,7 +203,7 @@ function (dojo, declare, fx, hexloc) {
             // console.log('onHexSelection:' + event.target.id);
             event.preventDefault();
             event.stopPropagation();
-            if (! this.isCurrentPlayerActive() ) {
+            if (! this.isCurrentPlayerActive()) {
                  return false;
             }
             switch (this.stateName) {
@@ -249,7 +249,7 @@ function (dojo, declare, fx, hexloc) {
                 row: hex.row,
                 col: hex.col
             };
-            this.bgaPerformAction('actSelectHexToScore', rc ).then(() =>  {
+            this.bgaPerformAction('actSelectHexToScore', rc).then(() =>  {
                 this.unmarkHexPlayable(rc);
             });
         },
@@ -347,7 +347,7 @@ function (dojo, declare, fx, hexloc) {
             const z = matchInfo[1];
             this.bgaPerformAction('actSelectZigguratCard',
                                   { card_type: this.zcards[z].type });
-            let div = $( IDS.AVAILABLE_ZCARDS );
+            let div = $(IDS.AVAILABLE_ZCARDS);
             div.classList.remove(CSS.SELECTING);
             return false;
         },
@@ -356,7 +356,7 @@ function (dojo, declare, fx, hexloc) {
             console.log('onPieceSelection');
             event.preventDefault();
             event.stopPropagation();
-            if (! this.isCurrentPlayerActive() ) {
+            if (! this.isCurrentPlayerActive()) {
                  return false;
             }
             if (this.stateName != 'client_selectPieceOrEndTurn'
@@ -404,7 +404,7 @@ function (dojo, declare, fx, hexloc) {
 
         unselectAllHandPieces: function() {
             for (const p in this.hand) {
-                let cl = $( `bbl_hand_${p}` ).classList;
+                let cl = $(`bbl_hand_${p}`).classList;
                 if (cl.contains(CSS.SELECTED)) {
                     this.unmarkHexesPlayableForPiece(p);
                 }
@@ -417,7 +417,7 @@ function (dojo, declare, fx, hexloc) {
 
         setPlayablePieces: function() {
             for (const p in this.hand) {
-                let cl = $( `bbl_hand_${p}` ).classList;
+                let cl = $(`bbl_hand_${p}`).classList;
                 if (this.allowedMovesFor(p).length > 0) {
                     cl.add(CSS.PLAYABLE);
                     cl.remove(CSS.UNPLAYABLE);
@@ -429,7 +429,7 @@ function (dojo, declare, fx, hexloc) {
         },
 
         setStatusBarForPlayState: function() {
-            if ( !this.isCurrentPlayerActive() ) {
+            if (!this.isCurrentPlayerActive()) {
                 return;
             }
             this.selectedHandPos = null;
@@ -474,13 +474,13 @@ function (dojo, declare, fx, hexloc) {
         //                  use this method to perform some user
         //                  interface changes at this moment.
         //
-        onEnteringState: function( stateName, stateInfo ) {
-            console.log( 'Entering state: '+stateName,
+        onEnteringState: function(stateName, stateInfo) {
+            console.log('Entering state: '+stateName,
                          this.isCurrentPlayerActive(),
-                         stateInfo );
+                         stateInfo);
             // All other important things are done in onUpdateActionButtons.
             // let args = stateInfo.args;
-            switch( stateName ) {
+            switch(stateName) {
                 case 'endOfTurnScoring':
                     // this.markAllHexesUnplayable();
                     break;
@@ -499,17 +499,17 @@ function (dojo, declare, fx, hexloc) {
         //                 method to perform some user interface
         //                 changes at this moment.
         //
-        onLeavingState: function( stateName ) {
-            console.log( 'Leaving state: '+stateName );
+        onLeavingState: function(stateName) {
+            console.log('Leaving state: '+stateName);
             this.stateName = '';
-            switch( stateName ) {
+            switch(stateName) {
                     /* Example:
 
                        case 'myGameState':
 
                        // Hide the HTML block we are displaying only
                        // during this game state
-                       dojo.style( 'my_html_block_id', 'display', 'none' );
+                       dojo.style('my_html_block_id', 'display', 'none');
 
                        break;
                     */
@@ -541,14 +541,14 @@ function (dojo, declare, fx, hexloc) {
         //                        in the action status bar (ie: the
         //                        HTML links in the status bar).
         //
-        onUpdateActionButtons: function( stateName, args ) {
-            console.log( 'onUpdateActionButtons: '+stateName,
+        onUpdateActionButtons: function(stateName, args) {
+            console.log('onUpdateActionButtons: '+stateName,
                          this.isCurrentPlayerActive(),
-                         args );
+                         args);
             this.stateName = stateName;
             this.stateArgs = args;
-            if ( this.isCurrentPlayerActive() ) {
-                switch( stateName ) {
+            if (this.isCurrentPlayerActive()) {
+                switch(stateName) {
                     case 'chooseExtraTurn':
                         this.addActionButton(
                             'extra-turn-btn',
@@ -573,8 +573,8 @@ function (dojo, declare, fx, hexloc) {
                         break;
 
                     case 'selectZigguratCard':
-                        let div = $( IDS.AVAILABLE_ZCARDS );
-                        div.scrollIntoView( false );
+                        let div = $(IDS.AVAILABLE_ZCARDS);
+                        div.scrollIntoView(false);
                         div.classList.add(CSS.SELECTING);
                         this.updateStatusBar(_('You must select a ziggurat card'));
                         break;
@@ -730,9 +730,9 @@ function (dojo, declare, fx, hexloc) {
 
         addZigguratCardDiv: function(id, parentElem, z) {
             const cls = this.zcardClass(this.zcards[z].type, this.zcards[z].used);
-            const div = dojo.place( `<div id='${id}' class='${cls}'</div>`,
-                                    parentElem );
-            this.addTooltip( id, this.zcards[z].tooltip, '' );
+            const div = dojo.place(`<div id='${id}' class='${cls}'</div>`,
+                                    parentElem);
+            this.addTooltip(id, this.zcards[z].tooltip, '');
             // div.title = this.zcards[z].tooltip;
         },
 
@@ -814,18 +814,18 @@ function (dojo, declare, fx, hexloc) {
             return 'NOT SURE WHAT HAPPENED';
         },
 
-        notif_extraTurnUsed: async function ( args ) {
-            console.log( 'notif_extraTurnUsed', args );
+        notif_extraTurnUsed: async function (args) {
+            console.log('notif_extraTurnUsed', args);
             const z = this.indexOfZcard(args.card);
             if (z < 0) {
                 console.error("Couldn't find ${args.card} zcard");
             } else {
                 this.zcards[z].used = args.used;
-                const carddiv = $( this.ownedZcardId(z) );
-                if ( carddiv == undefined ) {
+                const carddiv = $(this.ownedZcardId(z));
+                if (carddiv == undefined) {
                     console.error(`Could not find div for owned ${args.card} card`,
                                   z,
-                                  this.zcards[z] );
+                                  this.zcards[z]);
                 } else {
                     carddiv.className = this.zcardClass(null, true);
                 }
@@ -833,8 +833,8 @@ function (dojo, declare, fx, hexloc) {
             return Promise.resolve();
         },
 
-        notif_zigguratCardSelection: async function( args ) {
-            console.log( 'notif_zigguratCardSelection', args );
+        notif_zigguratCardSelection: async function(args) {
+            console.log('notif_zigguratCardSelection', args);
             const z = this.indexOfZcard(args.card);
             if (z < 0) {
                 console.error("Couldn't find ${args.card} zcard");
@@ -847,7 +847,7 @@ function (dojo, declare, fx, hexloc) {
                 const id = this.availableZcardId(z);
 
                 // mark the available zig card spot as 'taken'
-                $( id ).className = "";
+                $(id).className = "";
                 this.removeTooltip(id);
 
                 anim = this.slideDiv(
@@ -872,8 +872,8 @@ function (dojo, declare, fx, hexloc) {
             );
         },
 
-        notif_cityScored: async function( args ) {
-            console.log( 'notif_cityScored', args );
+        notif_cityScored: async function(args) {
+            console.log('notif_cityScored', args);
 
             let anim = [];
 
@@ -931,12 +931,12 @@ function (dojo, declare, fx, hexloc) {
             }
 
             const hexDivId = this.hexDivId(args.row, args.col);
-            let a = ( args.captured_by != 0 ) ?
+            let a = (args.captured_by != 0) ?
                 this.slideDiv(
                     this.pieceClass(args.city),
                     hexDivId,
                     this.citycount_id(args.captured_by),
-                    () => this.renderPlayedPiece( args.row, args.col, '', null )
+                    () => this.renderPlayedPiece(args.row, args.col, '', null)
                 )
                 :
                 this.slideDiv(
@@ -944,7 +944,7 @@ function (dojo, declare, fx, hexloc) {
                     hexDivId,
                     // TODO: find a location for 'off the board'
                     IDS.AVAILABLE_ZCARDS,
-                    () => this.renderPlayedPiece( args.row, args.col, '', null )
+                    () => this.renderPlayedPiece(args.row, args.col, '', null)
                 );
             dojo.connect(a,
                          'onEnd',
@@ -959,17 +959,17 @@ function (dojo, declare, fx, hexloc) {
             await this.bgaPlayDojoAnimation(dojo.fx.chain(anim));
         },
 
-        notif_turnFinished: async function( args ) {
-            console.log( 'notif_turnFinished', args );
+        notif_turnFinished: async function(args) {
+            console.log('notif_turnFinished', args);
 
-            this.updateHandCount( args );
-            this.updatePoolCount( args );
+            this.updateHandCount(args);
+            this.updatePoolCount(args);
 
             return Promise.resolve();
         },
 
-        notif_undoMove: async function( args ) {
-            console.log( 'notif_undoMove', args );
+        notif_undoMove: async function(args) {
+            console.log('notif_undoMove', args);
 
             const isActive = this.playerNumber == args.player_number;
             var targetDivId = this.handcount_id(args.player_id);
@@ -982,10 +982,10 @@ function (dojo, declare, fx, hexloc) {
 
             // Put any piece (field) captured in the move back on the board
             // TODO: animate this? (and animate the capture too?)
-            this.renderPlayedPiece( args.row,
+            this.renderPlayedPiece(args.row,
                                     args.col,
                                     args.captured_piece,
-                                    null );
+                                    null);
             let anim = this.slideDiv(
                 this.handPieceClass(args.piece, args.player_number),
                 this.hexDivId(args.row, args.col),
@@ -1003,8 +1003,8 @@ function (dojo, declare, fx, hexloc) {
             await this.bgaPlayDojoAnimation(anim);
         },
 
-        notif_piecePlayed: async function( args ) {
-            console.log( 'notif_piecePlayed', args );
+        notif_piecePlayed: async function(args) {
+            console.log('notif_piecePlayed', args);
             const isActive = this.playerNumber == args.player_number;
             var sourceDivId = this.handcount_id(args.player_id);
             let hpc = this.handPieceClass(args.piece,
@@ -1023,11 +1023,11 @@ function (dojo, declare, fx, hexloc) {
                 sourceDivId,
                 this.hexDiv(args.row, args.col).id,
                 () => {
-                    this.renderPlayedPiece( args.row,
+                    this.renderPlayedPiece(args.row,
                                             args.col,
                                             args.piece,
-                                            args.player_number );
-                    this.updateHandCount( args );
+                                            args.player_number);
+                    this.updateHandCount(args);
                     this.scoreCtrl[args.player_id].toValue(args.score);
                 }
             );
@@ -1035,8 +1035,8 @@ function (dojo, declare, fx, hexloc) {
             await this.bgaPlayDojoAnimation(anim);
         },
 
-        notif_handRefilled: async function( args ) {
-            console.log( 'notif_handRefilled', args );
+        notif_handRefilled: async function(args) {
+            console.log('notif_handRefilled', args);
             let anim = [];
             let pid = this.player_id;
             for (const i in args.hand) {
