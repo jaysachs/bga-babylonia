@@ -237,7 +237,28 @@ class Game extends \Table
             $captured_by > 0 ? $this->getPlayerNameById($captured_by) : "noone";
 
         $player_infos = $model->allPlayerInfo();
-        // First notify that the city was captured
+
+        $details = [];
+        foreach ($player_infos as $pid => $pi) {
+            $points = $scored_city->pointsForPlayer($pid);
+            $details[$pid] = [
+                "player_id" => $pid,
+                "player_name" => $this->getPlayerNameById($pid),
+                "captured_city_count" => $pi->captured_city_count,
+                "scored_hexes" => $scored_city->scoringHexesForPlayer($pid),
+                "network_hexes" => $scored_city->networkHexesForPlayer($pid),
+                "points" => $points,
+                "score" => $pi->score,
+            ];
+            if ($points > 0) {
+                // TODO: figure out what to do here.
+                $pnk2 = $this->playerNameKey($pid);
+                $details[$pid]["message"] =
+                    clienttranslate('${' . $pnk2 . '} scored ${points}');
+                $details[$pid][$pnk] = $this->getPlayerNameById($pid);
+            }
+        }
+
         $this->notifyAllPlayers(
             "cityScored",
             clienttranslate($msg), [
@@ -246,30 +267,9 @@ class Game extends \Table
                 "col" => $cityhex->col,
                 $pnk => $capturer_name,
                 "captured_by" => $captured_by,
+                "details" => $details,
             ]
         );
-
-        // Then notify of the scoring details
-        foreach ($player_infos as $pid => $pi) {
-            // foreach (array_keys($this->loadPlayersBasicInfos()) as $pid) {
-            $points = $scored_city->pointsForPlayer($pid);
-            if ($points > 0) {
-                $pnk = $this->playerNameKey($pid);
-                $this->notifyAllPlayers(
-                    "cityScoredPlayer",
-                    clienttranslate('${' . $pnk . '} scored ${points}'), [
-                        // TODO: make more efficient, by only passing the delta?
-                        "captured_city_count" => $pi->captured_city_count,
-                        "scored_hexes" => $scored_city->scoringHexesForPlayer($pid),
-                        "network_hexes" => $scored_city->networkHexesForPlayer($pid),
-                        "points" => $points,
-                        "score" => $pi->score,
-                        "player_id" => $pid,
-                        $pnk => $this->getPlayerNameById($pid),
-                    ]
-                );
-            }
-        }
     }
 
 

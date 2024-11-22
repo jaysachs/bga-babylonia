@@ -71,12 +71,12 @@ document.getElementById('game_play_area').insertAdjacentHTML('beforeend', `
 
 var thegame = null;
 define([
-    'dojo','dojo/_base/declare',
+    'dojo','dojo/_base/declare', 'dojo/_base/fx',
     g_gamethemeurl + "modules/js/hexloc.js",
     'ebg/core/gamegui',
     'ebg/counter',
 ],
-function (dojo, declare, hexloc) {
+function (dojo, declare, fx, hexloc) {
     return declare('bgagame.babylonia', ebg.core.gamegui, {
         constructor: function(){
             console.log('babylonia constructor');
@@ -870,7 +870,73 @@ function (dojo, declare, hexloc) {
             this.renderPlayedPiece( args.row, args.col, '', null );
             const hexDivId = this.hexDivId(args.row, args.col);
 
-            anim = ( args.captured_by != 0 ) ?
+            anim = [];
+
+            for( var player_id in args.details ) {
+                let details = args.details[player_id];
+                this.scoreCtrl[player_id].toValue(details.score);
+                this.updateCapturedCityCount(details);
+
+                a = [];
+                for (i = 0; i < details.network_hexes.length; ++i) {
+                    a.push(fx.fadeOut({
+                        node: this.hexDiv(details.network_hexes[i].row, details.network_hexes[i].col),
+                    }));
+                }
+                anim.push(dojo.fx.combine(a));
+                a = [];
+                for (i = 0; i < details.network_hexes.length; ++i) {
+                    a.push(fx.fadeIn({
+                        node: this.hexDiv(details.network_hexes[i].row, details.network_hexes[i].col),
+                    }));
+                }
+                anim.push(dojo.fx.combine(a));
+
+                let eq = function(h1, h2) {
+                    return h1.row == h2.row && h1.col == h2.col;
+                }
+
+                var nonscoring = [];
+                var scoring = [];
+                for (i = 0; i < details.network_hexes.length; ++i) {
+                    var found = false;
+                    for (j = 0; j < details.scored_hexes.length; ++j) {
+                        if (eq(details.scored_hexes[j], details.network_hexes[i])) {
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (!found) {
+                        nonscoring.push(details.network_hexes[i]);
+                    }
+                }
+
+                a = [];
+                for (i = 0; i < nonscoring.length; ++i) {
+                    a.push(fx.fadeOut({
+                        node: this.hexDiv(nonscoring[i].row, nonscoring[i].col),
+                    }));
+                }
+                anim.push(dojo.fx.combine(a));
+
+                // this achieves a "pause". TODO: find a better way.
+                anim.push(fx.fadeIn({
+                    node: 'bbl_vars',
+                    duration: 1000,
+                }));
+                // TODO: add an animation stage showing the player score, and
+                //   updating that player score
+
+                a = [];
+                for (i = 0; i < nonscoring.length; ++i) {
+                    a.push(fx.fadeIn({
+                        node: this.hexDiv(nonscoring[i].row, nonscoring[i].col),
+                    }));
+                }
+                anim.push(dojo.fx.combine(a));
+            }
+
+            anim.push( ( args.captured_by != 0 ) ?
                 this.slideDiv(
                     this.pieceClass(args.city),
                     hexDivId,
@@ -882,8 +948,8 @@ function (dojo, declare, hexloc) {
                     hexDivId,
                     // TODO: find a location for 'off the board'
                     IDS.AVAILABLE_ZCARDS
-                );
-            await this.bgaPlayDojoAnimation(anim);
+                ) );
+            await this.bgaPlayDojoAnimation(dojo.fx.chain(anim));
         },
 
         notif_turnFinished: async function( args ) {
@@ -891,17 +957,6 @@ function (dojo, declare, hexloc) {
 
             this.updateHandCount( args );
             this.updatePoolCount( args );
-
-            return Promise.resolve();
-        },
-
-        notif_cityScoredPlayer: async function( args ) {
-            console.log( 'notif_cityScoredPlayer', args );
-
-            // TODO: animate hexes contributing to scoring
-
-            this.scoreCtrl[args.player_id].toValue(args.score);
-            this.updateCapturedCityCount(args);
 
             return Promise.resolve();
         },
