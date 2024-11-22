@@ -865,17 +865,25 @@ function (dojo, declare, fx, hexloc) {
             }
         },
 
-        fadeOut: function(rc) {
-            return fx.fadeOut({ node: this.hexDiv(rc.row, rc.col) });
+        fadeOut: function(hexes) {
+            a = [];
+            for (i = 0; i < hexes.length; ++i) {
+                let hex = hexes[i];
+                a.push(fx.fadeOut({ node: this.hexDiv(hex.row, hex.col) }));
+            }
+            return dojo.fx.combine(a);
         },
-        fadeIn: function(rc) {
-            return fx.fadeIn({ node: this.hexDiv(rc.row, rc.col) });
+        fadeIn: function(hexes) {
+            a = [];
+            for (i = 0; i < hexes.length; ++i) {
+                let hex = hexes[i];
+                a.push(fx.fadeIn({ node: this.hexDiv(hex.row, hex.col) }));
+            }
+            return dojo.fx.combine(a);
         },
 
         notif_cityScored: async function( args ) {
             console.log( 'notif_cityScored', args );
-            this.renderPlayedPiece( args.row, args.col, '', null );
-            const hexDivId = this.hexDivId(args.row, args.col);
 
             anim = [];
 
@@ -888,26 +896,10 @@ function (dojo, declare, fx, hexloc) {
                     this.hexDiv(details.scored_hexes[i].row,
                                 details.scored_hexes[i].col).classList.add(CSS.SELECTED);
                 }
-                a = [];
-                for (i = 0; i < details.network_hexes.length; ++i) {
-                    a.push(this.fadeOut(details.network_hexes[i]));
-                }
-                anim.push(dojo.fx.combine(a));
-                a = [];
-                for (i = 0; i < details.network_hexes.length; ++i) {
-                    a.push(this.fadeIn(details.network_hexes[i]));
-                }
-                anim.push(dojo.fx.combine(a));
-                a = [];
-                for (i = 0; i < details.network_hexes.length; ++i) {
-                    a.push(this.fadeOut(details.network_hexes[i]));
-                }
-                anim.push(dojo.fx.combine(a));
-                a = [];
-                for (i = 0; i < details.network_hexes.length; ++i) {
-                    a.push(this.fadeIn(details.network_hexes[i]));
-                }
-                anim.push(dojo.fx.combine(a));
+                anim.push(this.fadeOut(details.network_hexes));
+                anim.push(this.fadeIn(details.network_hexes));
+                anim.push(this.fadeOut(details.network_hexes));
+                anim.push(this.fadeIn(details.network_hexes));
 
                 let eq = function(h1, h2) {
                     return h1.row == h2.row && h1.col == h2.col;
@@ -928,25 +920,20 @@ function (dojo, declare, fx, hexloc) {
                     }
                 }
 
-                a = [];
-                for (i = 0; i < nonscoring.length; ++i) {
-                    a.push(this.fadeOut(nonscoring[i]));
-                }
-                anim.push(dojo.fx.combine(a));
+                anim.push(this.fadeOut(nonscoring));
 
-                // this achieves a "pause". TODO: find a better way.
+                // this achieves a "pause".
+                // TODO: find a better way.
                 anim.push(fx.fadeIn({
                     node: 'bbl_vars',
-                    duration: 1000,
+                    duration: 700,
                 }));
+
                 // TODO: add an animation stage showing the player score, and
                 //   updating that player score
 
-                a = [];
-                for (i = 0; i < nonscoring.length; ++i) {
-                    a.push(this.fadeIn(nonscoring[i]));
-                }
-                anim.push(dojo.fx.combine(a));
+                anim.push(this.fadeIn(nonscoring));
+
                 dojo.connect(anim[anim.length-1],
                              'onEnd',
                              () => {
@@ -956,19 +943,24 @@ function (dojo, declare, fx, hexloc) {
                              });
             }
 
-            anim.push( ( args.captured_by != 0 ) ?
+            const hexDivId = this.hexDivId(args.row, args.col);
+            a = ( args.captured_by != 0 ) ?
                 this.slideDiv(
                     this.pieceClass(args.city),
                     hexDivId,
-                    this.citycount_id(args.captured_by)
+                    this.citycount_id(args.captured_by),
+                    () => this.renderPlayedPiece( args.row, args.col, '', null )
                 )
                 :
                 this.slideDiv(
                     this.pieceClass(args.city),
                     hexDivId,
                     // TODO: find a location for 'off the board'
-                    IDS.AVAILABLE_ZCARDS
-                ) );
+                    IDS.AVAILABLE_ZCARDS,
+                    () => this.renderPlayedPiece( args.row, args.col, '', null )
+                );
+
+            anim.push(a);
             await this.bgaPlayDojoAnimation(dojo.fx.chain(anim));
         },
 
