@@ -154,7 +154,7 @@ END;
 
 
     const MAP8 = <<<'END'
-XXX   C.M   XXX
+---   C.M   XXX
    m-2   m-1
 ---   m-1   ---
    p-2   m-1
@@ -180,6 +180,36 @@ END;
             ]
         );
         $got = $scorer->computeCityScores($hex(0, 2));
+        $this->assertEq($expected, $got);
+    }
+
+    const MAP9 = <<<'END'
+---   p-1   p-2
+   s-1   C.M   s-2
+---   m-2   m-1
+   p-1   m-1   ---
+---   p-1   ---
+END;
+   public function testCityScoring_multipleNonAdjacentStarts(): void {
+        $board = Board::fromTestMap(ScorerTest::MAP9);
+        $scorer = new Scorer($board, $this->playerInfos(), new Components([]));
+
+        $hex = function(int $r, int $c) use(&$board) { return $board->hexAt($r, $c); };
+        $expected = new ScoredCity(
+            1,
+            [1 => 1, 2 => 0, 3 => 0],
+            [
+                1 => [$hex(2, 4), $hex(3, 3)],
+                2 => [$hex(2, 2)],
+                3 => []
+            ],
+            [
+                1 => [$hex(2, 4), $hex(3, 3), $hex(4, 2), $hex(3,1), $hex(1,1), $hex(0, 2)],
+                2 => [$hex(2, 2), $hex(0, 4), $hex(1, 5)],
+                3 => []
+            ]
+        );
+        $got = $scorer->computeCityScores($hex(1, 3));
         $this->assertEq($expected, $got);
     }
 }
