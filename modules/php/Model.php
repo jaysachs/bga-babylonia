@@ -327,16 +327,16 @@ class Model {
         if (!$this->hexRequiresScoring($hex)) {
             throw new \InvalidArgumentException("{$hex} is not a city to be scored");
         }
-        $scores = $this->scorer()->computeCityScores($hex);
+        $scoredCity = $this->scorer()->computeCityScores($hex);
         $player_infos = &$this->allPlayerInfo();
 
         // Increase captured_city_count for capturing player, if any
-        if ($scores->captured_by > 0) {
-            $player_infos[$scores->captured_by]->captured_city_count++;
+        if ($scoredCity->captured_by > 0) {
+            $player_infos[$scoredCity->captured_by]->captured_city_count++;
         }
         // Give players points for connected pieces
         foreach ($player_infos as $pid => $pi) {
-            $pi->score += $scores->pointsForPlayer($pid);
+            $pi->score += $scoredCity->pointsForPlayer($pid);
         }
 
         // Mark the hex captured
@@ -348,7 +348,7 @@ class Model {
         $this->ps->updateHex($captured_hex);
         $this->ps->updatePlayers($player_infos);
 
-        return $scores;
+        return $scoredCity;
     }
 
     public function hexesRequiringScoring(): array {
