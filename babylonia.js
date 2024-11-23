@@ -54,8 +54,6 @@ const IDS = {
 };
 
 const CSS = {
-    playerNumber: null,
-
     SELECTING: 'bbl_selecting',
     SELECTED: 'bbl_selected',
     PLAYABLE: 'bbl_playable',
@@ -173,7 +171,6 @@ function (dojo, declare, fx, hexloc) {
         setup: function(gamedatas) {
             console.log('Starting game setup');
             this.playerNumber = gamedatas.players[this.player_id].player_number;
-            CSS.playerNumber = this.playerNumber;
 
             console.log('Setting up player boards');
             for (const player_id in gamedatas.players) {
@@ -258,6 +255,7 @@ function (dojo, declare, fx, hexloc) {
                     this.selectHexToScore(event);
                     break;
             }
+            return false;
         },
 
         // Returns the hex (row,col) clicked on, or null if not a playable hex
@@ -330,7 +328,7 @@ function (dojo, declare, fx, hexloc) {
         pieceForHandDivClassList: function(cl) {
             // console.log('pieceFor: ' + cl);
             for (const pc of this.pieceClasses) {
-                if (cl.contains(CSS.handPiece(pc))) {
+                if (cl.contains(CSS.handPiece(pc, this.playerNumber))) {
                     return pc;
                 }
             }
@@ -381,11 +379,11 @@ function (dojo, declare, fx, hexloc) {
             if (this.stateName != 'selectZigguratCard') {
                 return false;
             }
-            const tid = event.target;
+            const tid = event.target.id;
 
             var z = -1;
             for (const i in this.zcards) {
-                if (tid == CSS.availableZcard(i)) {
+                if (tid == IDS.availableZcard(i)) {
                     z = i;
                     break;
                 }
@@ -703,7 +701,7 @@ function (dojo, declare, fx, hexloc) {
 
         renderHand: function() {
             for (const i in this.hand) {
-                this.handPosDiv(i).className = CSS.handPiece(this.hand[i]);
+                this.handPosDiv(i).className = CSS.handPiece(this.hand[i], this.playerNumber);
             }
         },
 
@@ -715,7 +713,7 @@ function (dojo, declare, fx, hexloc) {
                 if (zcards[z].owning_player_id != 0) {
                     this.addZcardDivInPlayerBoard(z);
                     // also "shell" in available cards
-                    dojo.place(`<div id='${id}'</div>`, IDS.AVAILABLE_ZCARDS);
+                    dojo.place(`<div id='${id}'></div>`, IDS.AVAILABLE_ZCARDS);
                 } else {
                     // just in available cards
                     this.addZigguratCardDiv(id, IDS.AVAILABLE_ZCARDS, z);
@@ -742,7 +740,7 @@ function (dojo, declare, fx, hexloc) {
 
         addZigguratCardDiv: function(id, parentElem, z) {
             const cls = CSS.zcard(this.zcards[z].type, this.zcards[z].used);
-            const div = dojo.place(`<div id='${id}' class='${cls}'</div>`,
+            const div = dojo.place(`<div id='${id}' class='${cls}'></div>`,
                                     parentElem);
             this.addTooltip(id, this.zcards[z].tooltip, '');
             // div.title = this.zcards[z].tooltip;
@@ -1007,7 +1005,7 @@ function (dojo, declare, fx, hexloc) {
                         cl = handPosDiv.classList;
                         cl.remove(CSS.EMPTY);
                         cl.add(CSS.PLAYABLE);
-                        cl.add(CSS.handPiece(args.original_piece));
+                        cl.add(CSS.handPiece(args.original_piece, this.playerNumber));
                     }
                     this.hand_counters[args.player_id].incValue(1);
                     this.scoreCtrl[args.player_id].incValue(-args.points);
@@ -1055,7 +1053,7 @@ function (dojo, declare, fx, hexloc) {
                     this.hand[i] = args.hand[i];
                 }
                 const div = this.handPosDiv(i);
-                let hc = CSS.handPiece(this.hand[i]);
+                let hc = CSS.handPiece(this.hand[i], this.playerNumber);
                 if (hc != CSS.EMPTY
                     && div.classList.contains(CSS.EMPTY)) {
                     const a = this.slideDiv(
