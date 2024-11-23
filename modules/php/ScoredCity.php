@@ -45,12 +45,11 @@ class ScoredCity {
         return $sc;
     }
 
-    public function addScoredHex(Hex $hex, int $player_id): void {
-        $this->scoringHexes[$player_id][] = $hex;
-    }
-
     public function addNetworkHex(Hex $hex, int $player_id): void {
         $this->networkHexes[$player_id][] = $hex;
+        if ($this->scoredHex->piece->scores($hex->piece)) {
+            $this->scoringHexes[$player_id][] = $hex;
+        }
     }
 
     public function pointsForPlayer(int $player_id): int {

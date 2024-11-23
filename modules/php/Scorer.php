@@ -87,9 +87,6 @@ class Scorer {
                 if ($player_id == $pid) {
                     if ($this->inNetwork($h, $result->scoredHex, $result->networkHexesForPlayer($player_id))) {
                         $result->addNetworkHex($h, $player_id);
-                        if ($result->scoredHex->piece->scores($h->piece)) {
-                            $result->addScoredHex($h, $player_id);
-                        }
                         return true;
                     }
                 }
