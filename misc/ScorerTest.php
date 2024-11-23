@@ -149,4 +149,37 @@ END;
 
         $this->assertEquals(0, $scorer->computeHexWinner($board->hexAt(3, 1)));
     }
+
+
+
+
+    const MAP8 = <<<'END'
+---   C.M   ---
+   m-2   m-1
+---   m-1   ---
+   p-2   m-1
+---   m-2   ---
+END;
+   public function testCityScoring_naiveBfs(): void {
+        $board = Board::fromTestMap(ScorerTest::MAP8);
+        $scorer = new Scorer($board, $this->playerInfos(), new Components([]));
+
+        $hex = function(int $r, int $c) use(&$board) { return $board->hexAt($r, $c); };
+        $expected = new ScoredCity(
+            0,
+            [1 => 1, 2 => 0, 3 => 0],
+            [
+                1 => [$hex(1,3), $hex(2, 2), $hex(3, 3)],
+                2 => [$hex(1, 1), $hex(4, 2)],
+                3 => []
+            ],
+            [
+                1 => [$hex(1,3), $hex(2, 2), $hex(3, 3)],
+                2 => [$hex(1, 1), $hex(3, 1), $hex(4, 2)],
+                3 => []
+            ]
+        );
+        $got = $scorer->computeCityScores($hex(0, 2));
+        $this->assertEq($expected, $got);
+    }
 }
