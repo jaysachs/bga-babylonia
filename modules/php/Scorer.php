@@ -93,9 +93,14 @@ class Scorer {
     }
 
     private function computeCapturedCityPoints(ScoredCity $result): void {
+        if ($result->captured_by == 0) {
+            // if no capturer of city, no points for anyone
+            return;
+        }
         // Now each player gets 1 point for city they've captured.
         foreach ($this->player_infos as $pid => $pi) {
             $points = $pi->captured_city_count;
+            // Include the currently captured city
             if ($result->captured_by == $pid) {
                 $points++;
             }
@@ -104,7 +109,6 @@ class Scorer {
                 $points += intval(floor($points / 2));
             }
             $result->captured_city_points[$pid] = $points;
-
         }
     }
 

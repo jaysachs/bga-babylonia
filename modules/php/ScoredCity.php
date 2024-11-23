@@ -76,7 +76,7 @@ class ScoredCity {
     }
 
     public function capturePointsForPlayer(int $player_id): int {
-        return intval(floor($this->captured_city_points[$player_id]/2));
+        return $this->captured_city_points[$player_id];
     }
 
     public function scoringHexesForPlayer(int $player_id): array {
