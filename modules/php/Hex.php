@@ -97,6 +97,10 @@ class Hex {
         return $this->type == HexType::WATER;
     }
 
+    public function isNeighbor(Hex $hex): bool {
+        return abs($this->col - $hex->col) + abs($this->row - $hex->row) == 2;
+    }
+
     public static function land(int $row, int $col):Hex {
         return new Hex(HexType::LAND, $row, $col);
     }
