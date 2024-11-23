@@ -84,13 +84,10 @@ class Scorer {
                     return true;
                 }
                 $player_id = $this->networkOwnerOf($h);
-                if ($player_id == $pid) {
-                    if ($this->inNetwork($h, $result->scoredHex, $result->networkHexesForPlayer($player_id))) {
-                        $result->addNetworkHex($h, $player_id);
-                        return true;
-                    }
+                if ($player_id != $pid) {
+                    return false;
                 }
-                return false;
+                return $result->addIfInNetwork($h, $player_id);
             }
         );
     }
@@ -109,22 +106,6 @@ class Scorer {
             $result->captured_city_points[$pid] = $points;
 
         }
-    }
-
-    private function inNetwork(Hex $h,
-                               Hex $scored_hex,
-                               array $network_hexes): bool {
-        foreach ($this->board->neighbors($h) as $nbh) {
-            if ($nbh == $scored_hex) {
-                return true;
-            }
-            foreach ($network_hexes as $nwh) {
-                if ($nwh == $nbh) {
-                    return true;
-                }
-            }
-        }
-        return false;
     }
 
     private function networkOwnerOf(Hex $h): int /* player_id */ {

@@ -45,6 +45,20 @@ class ScoredCity {
         return $sc;
     }
 
+    public function addIfInNetwork(Hex $hex, int $player_id): bool {
+        if ($hex->isNeighbor($this->scoredHex)) {
+            $this->addNetworkHex($hex, $player_id);
+            return true;
+        }
+        foreach ($this->networkHexes[$player_id] as $nwh) {
+            if ($hex->isNeighbor($nwh)) {
+                $this->addNetworkHex($hex, $player_id);
+                return true;
+            }
+        }
+        return false;
+    }
+
     public function addNetworkHex(Hex $hex, int $player_id): void {
         $this->networkHexes[$player_id][] = $hex;
         if ($this->scoredHex->piece->scores($hex->piece)) {
