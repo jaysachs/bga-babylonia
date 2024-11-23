@@ -4,4 +4,3 @@
 6. (NEVER DONE) Add unit tests.
 19. Audit all notifications; are they all required? any missing? incomplete?
 23. Stats and undo: store as serialized JSON?
-25. More granular points stats (aim for adding up breakdown).
