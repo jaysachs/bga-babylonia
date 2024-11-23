@@ -4,7 +4,7 @@ define([
     'dojo/domReady!'
 ], function (dom) {
 
-    let calcrm = function(s) {
+    let calcrm = function (s) {
         if (s.startsWith('calc(')) {
             s = s.substring(5);
         }
@@ -33,7 +33,7 @@ define([
         };
     };
 
-    hexDim = computeHexDimensions();
+    const hexDim = computeHexDimensions();
     // console.log(hexDim);
 
     // Now compute the per-hex deltas in both directions
