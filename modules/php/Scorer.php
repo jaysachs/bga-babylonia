@@ -66,6 +66,14 @@ class Scorer {
     public function computeCityScores(Hex $hex): ScoredCity {
         $result = ScoredCity::makeEmpty(array_keys($this->player_infos));
         $result->captured_by = $this->computeHexWinner($hex);
+
+        $this->computeNetworks($hex, $result);
+        $this->computeCapturedCityPoints($result);
+
+        return $result;
+    }
+
+    private function computeNetworks(Hex $hex, ScoredCity $result) {
         $this->board->bfs(
             $hex->row,
             $hex->col,
@@ -86,7 +94,9 @@ class Scorer {
                 return false;
             }
         );
+    }
 
+    private function computeCapturedCityPoints(ScoredCity $result): void {
         // Now each player gets 1 point for city they've captured.
         foreach ($this->player_infos as $pid => $pi) {
             $points = $pi->captured_city_count;
@@ -100,8 +110,6 @@ class Scorer {
             $result->captured_city_points[$pid] = $points;
 
         }
-
-        return $result;
     }
 
     private function inNetwork(Hex $h,
