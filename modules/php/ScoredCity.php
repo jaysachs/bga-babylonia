@@ -59,7 +59,7 @@ class ScoredCity {
         return false;
     }
 
-    public function addNetworkHex(Hex $hex, int $player_id): void {
+    private function addNetworkHex(Hex $hex, int $player_id): void {
         $this->networkHexes[$player_id][] = $hex;
         if ($this->scoredHex->piece->scores($hex->piece)) {
             $this->scoringHexes[$player_id][] = $hex;
