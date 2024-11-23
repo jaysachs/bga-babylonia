@@ -288,6 +288,7 @@ class PersistentStore {
 
     const SQL_PLAYER_INFO =
         "SELECT P.player_id id, P.player_id, P.player_score score,
+                P.player_color player_color,
                 P.captured_city_count captured_city_count, P.player_no player_number,
                 P.player_name player_name, H.hand_size, Q.pool_size
          FROM player P
@@ -309,6 +310,7 @@ class PersistentStore {
     private function playerInfoFromData(int $player_id, array $pd): PlayerInfo {
         return new PlayerInfo($player_id,
                               $pd["player_name"],
+                              $pd["player_color"],
                               intval($pd["player_number"]),
                               intval($pd["score"]),
                               intval($pd["captured_city_count"]),
