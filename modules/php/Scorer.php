@@ -68,26 +68,26 @@ class Scorer {
         $result->captured_by = $this->computeHexWinner($hex);
 
         foreach (array_keys($this->player_infos) as $pid) {
-            $this->computeNetwork($hex, $result, $pid);
+            $this->computeNetwork($result, $pid);
         }
         $this->computeCapturedCityPoints($result);
 
         return $result;
     }
 
-    private function computeNetwork(Hex $hex, ScoredCity $result, int $pid) {
+    private function computeNetwork(ScoredCity $result, int $pid) {
         $this->board->bfs(
-            $hex->row,
-            $hex->col,
-            function (&$h) use (&$result, &$hex, $pid) {
-                if ($h == $hex) {
+            $result->scoredHex->row,
+            $result->scoredHex->col,
+            function (&$h) use (&$result, $pid) {
+                if ($h == $result->scoredHex) {
                     return true;
                 }
                 $player_id = $this->networkOwnerOf($h);
                 if ($player_id == $pid) {
-                    if ($this->inNetwork($h, $hex, $result->networkHexesForPlayer($player_id))) {
+                    if ($this->inNetwork($h, $result->scoredHex, $result->networkHexesForPlayer($player_id))) {
                         $result->addNetworkHex($h, $player_id);
-                        if ($hex->piece->scores($h->piece)) {
+                        if ($result->scoredHex->piece->scores($h->piece)) {
                             $result->addScoredHex($h, $player_id);
                         }
                         return true;
