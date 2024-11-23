@@ -322,14 +322,8 @@ body {
     margin-bottom: 5px;
 }
 
-#bbl_hand > div.bbl_playable {
+.bbl_playable {
     cursor: pointer;
-    /*
-    border-color: #ffFFdd;
-    border-style: solid;
-    margin: 4px;
-    border-width: 1px;
-   */
 }
 
 #bbl_hand > div.bbl_unplayable {
