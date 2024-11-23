@@ -360,7 +360,6 @@ div.bbl_selected::before {
     position: relative;
     display: flex;
     justify-content: center;
-    width: calc(var(--board-width));
 }
 
 #bbl_available_zcards > div {
