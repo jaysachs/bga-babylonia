@@ -241,6 +241,8 @@ class Game extends \Table
         $details = [];
         foreach ($player_infos as $pid => $pi) {
             $points = $scored_city->pointsForPlayer($pid);
+            Stats::PLAYER_POINTS_FROM_CITY_NETWORKS->inc($pid, $scored_city->networkPointsForPlayer($pid));
+            Stats::PLAYER_POINTS_FROM_CAPTURED_CITIES->inc($pid, $scored_city->capturePointsForPlayer($pid));
             $details[$pid] = [
                 "player_id" => $pid,
                 "player_name" => $this->getPlayerNameById($pid),
