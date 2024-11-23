@@ -29,13 +29,14 @@ namespace Bga\Games\babylonia;
 class ScoredCity {
 
     public function __construct(
+        public Hex $scoredHex,
         public int $captured_by,
         public array /* player_id => int */ $captured_city_points,
         private array /* player_id => Hex */ $scoringHexes,
         private array /* player_id => Hex */ $networkHexes) { }
 
-    public static function makeEmpty(array $player_ids) {
-        $sc = new ScoredCity(0, [], [], []);
+    public static function makeEmpty(Hex $scoredHex, array $player_ids) {
+        $sc = new ScoredCity($scoredHex, 0, [], [], []);
         foreach ($player_ids as $pid) {
             $sc->networkHexes[$pid] = [];
             $sc->scoringHexes[$pid] = [];

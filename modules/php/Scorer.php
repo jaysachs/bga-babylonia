@@ -64,7 +64,7 @@ class Scorer {
     }
 
     public function computeCityScores(Hex $hex): ScoredCity {
-        $result = ScoredCity::makeEmpty(array_keys($this->player_infos));
+        $result = ScoredCity::makeEmpty($hex, array_keys($this->player_infos));
         $result->captured_by = $this->computeHexWinner($hex);
 
         foreach (array_keys($this->player_infos) as $pid) {
@@ -85,7 +85,7 @@ class Scorer {
                 }
                 $player_id = $this->networkOwnerOf($h);
                 if ($player_id == $pid) {
-                    if ($this->inNetwork($h, $hex, $player_id, $result->networkHexesForPlayer($player_id))) {
+                    if ($this->inNetwork($h, $hex, $result->networkHexesForPlayer($player_id))) {
                         $result->addNetworkHex($h, $player_id);
                         if ($hex->piece->scores($h->piece)) {
                             $result->addScoredHex($h, $player_id);
@@ -116,14 +116,12 @@ class Scorer {
 
     private function inNetwork(Hex $h,
                                Hex $scored_hex,
-                               int $player_id,
-                               array $nwhexes): bool {
-        $nb = $this->board->neighbors($h);
-        foreach ($nb as $nbh) {
+                               array $network_hexes): bool {
+        foreach ($this->board->neighbors($h) as $nbh) {
             if ($nbh == $scored_hex) {
                 return true;
             }
-            foreach ($nwhexes as $nwh) {
+            foreach ($network_hexes as $nwh) {
                 if ($nwh == $nbh) {
                     return true;
                 }

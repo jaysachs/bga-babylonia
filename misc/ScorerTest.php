@@ -44,6 +44,7 @@ END;
 
         $hex = function(int $r, int $c) use(&$board) { return $board->hexAt($r, $c); };
         $expected = new ScoredCity(
+            $hex(6, 0),
             3,
             [1 => 0, 2 => 0, 3 => 1],
             [
@@ -57,9 +58,11 @@ END;
                 3 => [$hex(8,0), $hex(6,2), $hex(5,1), $hex(5,3), $hex(4, 4)],
             ]
         );
-        $this->assertEq($expected, $scorer->computeCityScores($hex(6,0)));
+        $got = $scorer->computeCityScores($expected->scoredHex);
+        $this->assertEq($expected, $got);
 
         $expected = new ScoredCity(
+            $hex(3, 3),
             3,
             [1 => 0, 2 => 0, 3 => 1],
             [
@@ -73,7 +76,8 @@ END;
                 3 => [$hex(4, 4), $hex(5, 3), $hex(5,1), $hex(6,2)],
             ]
         );
-        $this->assertEq($expected, $scorer->computeCityScores($hex(3, 3)));
+        $got = $scorer->computeCityScores($expected->scoredHex);
+        $this->assertEq($expected, $got);
     }
 
     const MAP4 = <<<'END'
@@ -93,6 +97,7 @@ END;
 
         $hex = function(int $r, int $c) use(&$board) { return $board->hexAt($r, $c); };
         $expected = new ScoredCity(
+            $hex(6, 0),
             3,
             [1 => 0, 2 => 0, 3 => 1],
             [
@@ -106,7 +111,7 @@ END;
                 3 => [$hex(5, 1), $hex(3, 1), $hex(2, 2), $hex(4, 2), $hex(8,0), $hex(1, 3), $hex(2, 0)]
             ]
         );
-        $got = $scorer->computeCityScores($hex(6,0));
+        $got = $scorer->computeCityScores($expected->scoredHex);
         $this->assertEq($expected, $got);
     }
 
@@ -166,6 +171,7 @@ END;
 
         $hex = function(int $r, int $c) use(&$board) { return $board->hexAt($r, $c); };
         $expected = new ScoredCity(
+            $hex(0, 2),
             1,
             [1 => 1, 2 => 0, 3 => 0],
             [
@@ -179,7 +185,7 @@ END;
                 3 => []
             ]
         );
-        $got = $scorer->computeCityScores($hex(0, 2));
+        $got = $scorer->computeCityScores($expected->scoredHex);
         $this->assertEq($expected, $got);
     }
 
@@ -196,6 +202,7 @@ END;
 
         $hex = function(int $r, int $c) use(&$board) { return $board->hexAt($r, $c); };
         $expected = new ScoredCity(
+            $hex(1, 3),
             1,
             [1 => 1, 2 => 0, 3 => 0],
             [
@@ -209,7 +216,7 @@ END;
                 3 => []
             ]
         );
-        $got = $scorer->computeCityScores($hex(1, 3));
+        $got = $scorer->computeCityScores($expected->scoredHex);
         $this->assertEq($expected, $got);
     }
 }
