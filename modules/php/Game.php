@@ -739,7 +739,7 @@ class Game extends \Table
         $model = new Model($this->ps, 0);
         $model->createNewGame(
             array_keys($players),
-            $this->optionEnabled($options, Option::ADVANCED_ZIGGURAT_CARDS));
+            $this->optionEnabled(Option::ADVANCED_ZIGGURAT_CARDS));
 
         // Activate first player once everything has been initialized and ready.
         $this->activeNextPlayer();
@@ -750,7 +750,7 @@ class Game extends \Table
         $this->setNextPlayerToBeActive(0);
     }
 
-    private function optionEnabled(array $options, Option $option): bool {
+    private function optionEnabled(Option $option): bool {
         return $this->getGameStateValue($option->value) > 0;
     }
 
