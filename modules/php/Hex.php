@@ -98,7 +98,9 @@ class Hex {
     }
 
     public function isNeighbor(Hex $hex): bool {
-        return abs($this->col - $hex->col) + abs($this->row - $hex->row) == 2;
+        $cd = abs($this->col - $hex->col);
+        $rd = abs($this->row - $hex->row);
+        return $cd == 1 && $rd == 1 || $cd == 0 && $rd == 2;
     }
 
     public static function land(int $row, int $col):Hex {
