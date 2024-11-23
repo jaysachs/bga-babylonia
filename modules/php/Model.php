@@ -328,14 +328,14 @@ class Model {
             throw new \InvalidArgumentException("{$hex} is not a city to be scored");
         }
         $scoredCity = $this->scorer()->computeCityScores($hex);
-        $player_infos = &$this->allPlayerInfo();
+        $playerInfos = &$this->allPlayerInfo();
 
         // Increase captured_city_count for capturing player, if any
         if ($scoredCity->captured_by > 0) {
-            $player_infos[$scoredCity->captured_by]->captured_city_count++;
+            $playerInfos[$scoredCity->captured_by]->captured_city_count++;
         }
         // Give players points for connected pieces
-        foreach ($player_infos as $pid => $pi) {
+        foreach ($playerInfos as $pid => $pi) {
             $pi->score += $scoredCity->pointsForPlayer($pid);
         }
 
@@ -346,7 +346,7 @@ class Model {
         $_unused = $captured_hex->captureCity();
 
         $this->ps->updateHex($captured_hex);
-        $this->ps->updatePlayers($player_infos);
+        $this->ps->updatePlayers($playerInfos);
 
         return $scoredCity;
     }
