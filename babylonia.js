@@ -125,10 +125,11 @@ document.getElementById('game_play_area').insertAdjacentHTML('beforeend', `
 define([
     'dojo','dojo/_base/declare', 'dojo/_base/fx',
     g_gamethemeurl + "modules/js/hexloc.js",
+    g_gamethemeurl + "modules/js/fx.js",
     'ebg/core/gamegui',
     'ebg/counter',
 ],
-function (dojo, declare, fx, hexloc) {
+function (dojo, declare, fx, hexloc, bblfx) {
     return declare('bgagame.babylonia', ebg.core.gamegui, {
         constructor: function(){
             console.log('babylonia constructor');
@@ -153,6 +154,7 @@ function (dojo, declare, fx, hexloc) {
         hand_counters: [],
         pool_counters: [],
         city_counters: [],
+        gamedatas: null,
 
         /*
             setup:
@@ -170,6 +172,7 @@ function (dojo, declare, fx, hexloc) {
         */
         setup: function(gamedatas) {
             console.log('Starting game setup');
+            this.gamedatas = gamedatas;
             this.playerNumber = gamedatas.players[this.player_id].player_number;
 
             console.log('Setting up player boards');
@@ -340,11 +343,7 @@ function (dojo, declare, fx, hexloc) {
             if (piece == null) {
                 return [];
             }
-            let m = this.stateArgs.allowedMoves[piece];
-            if (m == null) {
-                m = [];
-            }
-            return m;
+            return this.stateArgs.allowedMoves[piece] || [];
         },
 
         markHexPlayable: function (rc) {
@@ -925,8 +924,10 @@ function (dojo, declare, fx, hexloc) {
                     duration: 700,
                 }));
 
-                // TODO: add an animation stage showing the player score, and
-                //   updating that player score
+                anim.push(bblfx.spinGrow(
+                    `+${details.network_points}`,
+                    'bbl_board_container',
+                    { color: this.gamedatas.players[player_id].player_color }));
 
                 anim.push(this.fadeIn(nonscoring));
 

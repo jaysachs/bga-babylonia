@@ -234,6 +234,7 @@
           -->
         </div>
       </div>
+      <div id='greeting' style="z-index:1">Hello</div>
       <div id="bbl_board_container">
         <span id="bbl_vars"></span>
         <div class="bbl_board" id="bbl_board" onClick="selectHex(event)"></div>
@@ -252,11 +253,12 @@
         <script src="https://ajax.googleapis.com/ajax/libs/dojo/1.10.4/dojo/dojo.js"
                 data-dojo-config="async: true"></script>
         <script type="module">
-
-          require([
-              'babylonia/hexloc'
-          ], function(hexloc) {
-
+        require([
+            'dojo/dom',
+            'dojo/fx',
+            'babylonia/hexloc',
+            'babylonia/fx'
+        ], function (dom, fx, hexloc, bblfx) {
           var boardData = [];
           for (var c = 0; c <= 16; c++) {
               let odd = c % 2 == 1;
@@ -295,12 +297,67 @@
                   `<div ${cl} id="bbl_hex_${hex.row}_${hex.col}" style="top:${top}px; left:${left}px;">${hex.row},${hex.col}</div>`
               );
           }
-          });
 
-          </script>
+            let spinGrow2 = function(text, parent, params = { color: null, duration: null, persistTime: null }) {
+                let color = params.color || 'inherit';
+                let duration = params.duration || 700;
+                let persistTime = params.persistTime || 700;
+                let id = 'foobar';
+                let prect = dom.byId(parent).getBoundingClientRect();
+
+                let node = dojo.place(`<div id=${id} style="position:absolute; top: ${(prect.bottom - prect.top)/2}px; left: ${(prect.right - prect.left)/2}px;  z-index: 1000; font-size: 0pt; font-family: "Helvetica"; font-style: bold;>${text}</div>`, parent);
+                return fx.combine([
+                    new dojo.Animation({
+                        duration: duration,
+                        curve: [0, 128],
+                        onAnimate: function(v) {
+                            node.style["font-size"] = `${v}pt`;
+                        },
+                    }),
+                    new dojo.Animation({
+                        duration: duration,
+                        curve: [0, 720],
+                        onAnimate: function (v) {
+                            node.style["transform"] = 'rotate(' + v + 'deg)';
+                        }
+                    }),
+                    new dojo.Animation({
+                        duration: duration + persistTime,
+                        curve: [0, 0],
+                        onAnimate: function (v) { },
+                        onEnd: () => {
+                            dojo.destroy(node);
+                        }
+                    }),
+                ]);
+            };
+
+            var greeting = dom.byId('greeting');
+            greeting.innerHTML += ' <em>from Dojo!</em>';
+            // ...but now, with an animation!
+            let tl = hexloc.hexLocation({row: 13, col:3});
+            console.log(tl);
+            fx.combine([
+                fx.slideTo({
+                    duration: 1200,
+                    node: greeting,
+                    top: tl.top,
+                    left: tl.left
+                }),
+                new dojo.Animation({
+                    curve: [0, 720],
+                    duration: 1200,
+                    onAnimate: function (v) {
+                        greeting.style["transform"] = 'rotate(' + v + 'deg)';
+                    }
+                }),
+                bblfx.spinGrow('+7', 'bbl_board_container', { color: 'ff0000' })
+            ]).play();
+        });
+        </script>
       </div>
       <div id="bbl_available_zcards_container">
-        <span>Available ziggurat cards</span>
+<!--        <span>Available ziggurat cards</span> -->
       <div id="bbl_available_zcards">
         <div class="bbl_zc_10pts"></div>
         <div class="bbl_zc_xturn"></div>
