@@ -98,12 +98,12 @@ END;
             [
                 1 => [],
                 2 => [$hex(7, 1)],
-                3 => [$hex(8, 0), $hex(1, 3)]
+                3 => [$hex(8, 0), $hex(1, 3), $hex(2, 0)]
             ],
             [
                 1 => [$hex(4, 0)],
                 2 => [$hex(7, 1), $hex(6, 2)],
-                3 => [$hex(5, 1), $hex(3, 1),  $hex(2, 2), $hex(4, 2), $hex(8,0), $hex(1, 3)]
+                3 => [$hex(5, 1), $hex(3, 1), $hex(2, 2), $hex(4, 2), $hex(8,0), $hex(1, 3), $hex(2, 0)]
             ]
         );
         $got = $scorer->computeCityScores($hex(6,0));
@@ -154,7 +154,7 @@ END;
 
 
     const MAP8 = <<<'END'
----   C.M   ---
+XXX   C.M   XXX
    m-2   m-1
 ---   m-1   ---
    p-2   m-1
@@ -166,7 +166,7 @@ END;
 
         $hex = function(int $r, int $c) use(&$board) { return $board->hexAt($r, $c); };
         $expected = new ScoredCity(
-            0,
+            1,
             [1 => 1, 2 => 0, 3 => 0],
             [
                 1 => [$hex(1,3), $hex(2, 2), $hex(3, 3)],
