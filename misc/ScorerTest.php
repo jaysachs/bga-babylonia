@@ -15,9 +15,9 @@ final class ScorerTest extends TestCase
 {
     private function playerInfos(): array {
         return [
-            1 => new PlayerInfo(1, "", "black", 1, 0, 0, 0, 0),
+            1 => new PlayerInfo(1, "", "black", 1, 0, 3, 0, 0),
             2 => new PlayerInfo(2, "", "blue", 2, 0, 0, 0, 0),
-            3 => new PlayerInfo(3, "", "red", 3, 0, 0, 0, 0)
+            3 => new PlayerInfo(3, "", "red", 3, 0, 2, 0, 0)
         ];
     }
 
@@ -46,7 +46,7 @@ END;
         $expected = new ScoredCity(
             $hex(6, 0),
             3,
-            [1 => 0, 2 => 0, 3 => 1],
+            [1 => 3, 2 => 0, 3 => 3],
             [
                 1 => [],
                 2 => [$hex(7, 1)],
@@ -64,7 +64,7 @@ END;
         $expected = new ScoredCity(
             $hex(3, 3),
             3,
-            [1 => 0, 2 => 0, 3 => 1],
+            [1 => 3, 2 => 0, 3 => 3],
             [
                 1 => [$hex(2, 4)],
                 2 => [],
@@ -99,7 +99,7 @@ END;
         $expected = new ScoredCity(
             $hex(6, 0),
             3,
-            [1 => 0, 2 => 0, 3 => 1],
+            [1 => 3, 2 => 0, 3 => 3],
             [
                 1 => [],
                 2 => [$hex(7, 1)],
@@ -173,7 +173,7 @@ END;
         $expected = new ScoredCity(
             $hex(0, 2),
             1,
-            [1 => 1, 2 => 0, 3 => 0],
+            [1 => 4, 2 => 0, 3 => 2],
             [
                 1 => [$hex(1,3), $hex(2, 2), $hex(3, 3)],
                 2 => [$hex(1, 1), $hex(4, 2)],
@@ -204,7 +204,7 @@ END;
         $expected = new ScoredCity(
             $hex(1, 3),
             1,
-            [1 => 1, 2 => 0, 3 => 0],
+            [1 => 4, 2 => 0, 3 => 2],
             [
                 1 => [$hex(2, 4), $hex(3, 3)],
                 2 => [$hex(2, 2)],
@@ -214,6 +214,38 @@ END;
                 1 => [$hex(2, 4), $hex(3, 3), $hex(4, 2), $hex(3,1), $hex(1,1), $hex(0, 2)],
                 2 => [$hex(2, 2), $hex(0, 4), $hex(1, 5)],
                 3 => []
+            ]
+        );
+        $got = $scorer->computeCityScores($expected->scoredHex);
+        $this->assertEq($expected, $got);
+    }
+
+
+    const MAP7 = <<<'END'
+---   s-3   ---
+   p-1   p-2
+---   C.M   ---
+   m-3   m-1
+---   s-2
+END;
+   public function testCityScoring_noCapturer(): void {
+        $board = Board::fromTestMap(ScorerTest::MAP7);
+        $scorer = new Scorer($board, $this->playerInfos(), new Components([]));
+
+        $hex = function(int $r, int $c) use(&$board) { return $board->hexAt($r, $c); };
+        $expected = new ScoredCity(
+            $hex(2, 2),
+            0,
+            [1 => 0, 2 => 0, 3 => 0],
+            [
+                1 => [$hex(3, 3)],
+                2 => [],
+                3 => [$hex(3, 1)]
+            ],
+            [
+                1 => [$hex(3, 3), $hex(1, 1)],
+                2 => [$hex(1, 3), $hex(4, 2)],
+                3 => [$hex(3, 1), $hex(0, 2)]
             ]
         );
         $got = $scorer->computeCityScores($expected->scoredHex);
