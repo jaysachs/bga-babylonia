@@ -36,7 +36,7 @@ class TestStore extends PersistentStore {
         $this->hand = Hand::new();
         PersistentStore::__construct(null);
         for ($i = 1; $i <= 3; $i++) {
-            $this->player_infos[$i] = new PlayerInfo($i, "", 0, 0, 0, 5, 25);
+            $this->player_infos[$i] = new PlayerInfo($i, "", "black", 0, 0, 0, 5, 25);
         }
         $this->components = Components::forNewGame(false);
         $this->turnProgress = new TurnProgress();
