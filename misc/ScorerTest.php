@@ -160,7 +160,7 @@ END;
    p-2   m-1
 ---   m-2   ---
 END;
-   public function testCityScoring_naiveBfs(): void {
+   public function testCityScoring_naiveBfsApproachFails(): void {
         $board = Board::fromTestMap(ScorerTest::MAP8);
         $scorer = new Scorer($board, $this->playerInfos(), new Components([]));
 
