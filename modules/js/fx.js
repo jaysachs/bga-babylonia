@@ -17,11 +17,11 @@ define([
     return {
         spinGrowText : function(params = defParms) {
             let p = Object.assign(Object.assign({}, defParams), params);
-            let id = `spinGrowFx-${lastId++}`;
+            let id = `bbl_tmp_spinGrowFx-${lastId++}`;
             // We use a container node to hold the final size.
             //   something in BGA's CSS and structure gets in the way
             //   and shrinks the node down to its minimum.
-            let outer = dojo.place(`<span id="${id}">${p.text}</span>`, p.parent);
+            let outer = dojo.place(`<span id="${id}">${p.text}</span>`, p.parent, 'last');
             outer.style.color = "transparent";
             outer.style.position = "absolute";
             outer.style.fontSize = p.fontSize + "pt";
