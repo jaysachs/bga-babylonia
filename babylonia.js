@@ -295,8 +295,8 @@ function (dojo, declare, fx, hexloc, bblfx) {
                 col: hex.col
             };
             this.bgaPerformAction('actSelectHexToScore', rc).then(() =>  {
-                this.unmarkHexPlayable(rc);
             });
+            this.unmarkHexPlayable(rc);
         },
 
         playSelectedPiece: function(event) {
@@ -351,8 +351,8 @@ function (dojo, declare, fx, hexloc, bblfx) {
                 .classList.add(CSS.PLAYABLE);
         },
 
-        unmarkHexPlayable: function (rc2) {
-            this.hexDiv(rc2.row, rc2.col)
+        unmarkHexPlayable: function (rc) {
+            this.hexDiv(rc.row, rc.col)
                 .classList.remove(CSS.PLAYABLE);
         },
 
@@ -883,6 +883,7 @@ function (dojo, declare, fx, hexloc, bblfx) {
 
         notif_cityScored: async function(args) {
             console.log('notif_cityScored', args);
+            this.renderPlayedPiece(args.row, args.col, null, null);
 
             let anim = [];
 
@@ -917,17 +918,12 @@ function (dojo, declare, fx, hexloc, bblfx) {
 
                 anim.push(this.fadeOut(nonscoring));
 
-                // this achieves a "pause".
-                // TODO: find a better way.
-                anim.push(fx.fadeIn({
-                    node: 'bbl_vars',
-                    duration: 700,
+                anim.push(bblfx.spinGrowText({
+                    text: `+${details.network_points}`,
+                    parent: IDS.BOARD,
+                    centeredOn: IDS.hexDiv(args.row, args.col),
+                    color: '#' + this.gamedatas.players[player_id].player_color
                 }));
-
-                anim.push(bblfx.spinGrow(
-                    `+${details.network_points}`,
-                    'bbl_board_container',
-                    { color: this.gamedatas.players[player_id].player_color }));
 
                 anim.push(this.fadeIn(nonscoring));
 
@@ -942,21 +938,19 @@ function (dojo, declare, fx, hexloc, bblfx) {
             }
 
             const hexDivId = IDS.hexDiv(args.row, args.col);
-            let a = (args.captured_by != 0) ?
-                this.slideDiv(
-                    CSS.piece(args.city),
-                    hexDivId,
-                    IDS.citycount(args.captured_by),
-                    () => this.renderPlayedPiece(args.row, args.col, '', null)
-                )
-                :
-                this.slideDiv(
-                    CSS.piece(args.city),
-                    hexDivId,
-                    // TODO: find a location for 'off the board'
-                    IDS.AVAILABLE_ZCARDS,
-                    () => this.renderPlayedPiece(args.row, args.col, '', null)
-                );
+            let a = (args.captured_by != 0)
+                ? this.slideDiv(CSS.piece(args.city),
+                                hexDivId,
+                                IDS.citycount(args.captured_by))
+                : this.slideDiv(CSS.piece(args.city),
+                                hexDivId,
+                                // TODO: find a better location for 'off the board'
+                                IDS.AVAILABLE_ZCARDS);
+            dojo.connect(a,
+                         'onBegin',
+                         () => {
+                             this.renderPlayedPiece(args.row, args.col, 'empty', null);
+                         });
             dojo.connect(a,
                          'onEnd',
                          () => {
@@ -967,7 +961,8 @@ function (dojo, declare, fx, hexloc, bblfx) {
                              }
                          });
             anim.push(a);
-            await this.bgaPlayDojoAnimation(dojo.fx.chain(anim));
+            dojo.fx.chain(anim).play();
+            return Promise.resolve(); // await this.bgaPlayDojoAnimation();
         },
 
         notif_turnFinished: async function(args) {
@@ -994,9 +989,9 @@ function (dojo, declare, fx, hexloc, bblfx) {
             // Put any piece (field) captured in the move back on the board
             // TODO: animate this? (and animate the capture too?)
             this.renderPlayedPiece(args.row,
-                                    args.col,
-                                    args.captured_piece,
-                                    null);
+                                   args.col,
+                                   args.captured_piece,
+                                   null);
             let anim = this.slideDiv(
                 CSS.handPiece(args.piece, args.player_number),
                 IDS.hexDiv(args.row, args.col),
@@ -1034,9 +1029,9 @@ function (dojo, declare, fx, hexloc, bblfx) {
                 this.hexDiv(args.row, args.col).id,
                 () => {
                     this.renderPlayedPiece(args.row,
-                                            args.col,
-                                            args.piece,
-                                            args.player_number);
+                                           args.col,
+                                           args.piece,
+                                           args.player_number);
                     this.updateHandCount(args);
                     this.scoreCtrl[args.player_id].toValue(args.score);
                 }

@@ -298,45 +298,15 @@
               );
           }
 
-            let spinGrow2 = function(text, parent, params = { color: null, duration: null, persistTime: null }) {
-                let color = params.color || 'inherit';
-                let duration = params.duration || 700;
-                let persistTime = params.persistTime || 700;
-                let id = 'foobar';
-                let prect = dom.byId(parent).getBoundingClientRect();
-
-                let node = dojo.place(`<div id=${id} style="position:absolute; top: ${(prect.bottom - prect.top)/2}px; left: ${(prect.right - prect.left)/2}px;  z-index: 1000; font-size: 0pt; font-family: "Helvetica"; font-style: bold;>${text}</div>`, parent);
-                return fx.combine([
-                    new dojo.Animation({
-                        duration: duration,
-                        curve: [0, 128],
-                        onAnimate: function(v) {
-                            node.style["font-size"] = `${v}pt`;
-                        },
-                    }),
-                    new dojo.Animation({
-                        duration: duration,
-                        curve: [0, 720],
-                        onAnimate: function (v) {
-                            node.style["transform"] = 'rotate(' + v + 'deg)';
-                        }
-                    }),
-                    new dojo.Animation({
-                        duration: duration + persistTime,
-                        curve: [0, 0],
-                        onAnimate: function (v) { },
-                        onEnd: () => {
-                            dojo.destroy(node);
-                        }
-                    }),
-                ]);
-            };
+            let someHex = dom.byId('bbl_hex_7_1');
+            cycleThings(someHex);
+            someHex.classList.add('bbl_playable');
 
             var greeting = dom.byId('greeting');
             greeting.innerHTML += ' <em>from Dojo!</em>';
             // ...but now, with an animation!
             let tl = hexloc.hexLocation({row: 13, col:3});
-            console.log(tl);
+
             fx.combine([
                 fx.slideTo({
                     duration: 1200,
@@ -351,7 +321,9 @@
                         greeting.style["transform"] = 'rotate(' + v + 'deg)';
                     }
                 }),
-                bblfx.spinGrow('+7', 'bbl_board_container', { color: 'ff0000' })
+                bblfx.spinGrowText({ text: '+117', parent: 'bbl_board_container', centeredOn: 'bbl_hex_0_8', color: '#ff0000' }),
+                bblfx.spinGrowText({ text: '+35', parent: 'bbl_board', centeredOn: 'bbl_hex_7_1', color: '#00ff00' }),
+                bblfx.spinGrowText({ text: '+8', parent: 'bbl_board', centeredOn: 'bbl_hex_17_13', color: '#0000ff' })
             ]).play();
         });
         </script>
