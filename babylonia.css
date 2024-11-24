@@ -53,7 +53,9 @@
 }
 
 /* the outermost hex container */
-#bbl_board > div {
+
+#bbl_board > div[id^="bbl_hex_"],
+#bbl_board > div[id^="bbl_tmp_"] {
     height: calc(var(--hex-height));
     width: calc(var(--hex-width));
     margin: 0;
