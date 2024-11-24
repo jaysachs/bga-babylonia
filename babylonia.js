@@ -114,7 +114,7 @@ document.getElementById('game_play_area').insertAdjacentHTML('beforeend', `
          <div id="bbl_hand_container">
            <div id="${IDS.HAND}"></div>
          </div>
-         <div id="bbl_board_container">
+         <div id="${IDS.BOARD_CONTAINER}">
            <div id="${IDS.BOARD}"></div>
            <span id="bbl_vars"></span>
          </div>
@@ -751,20 +751,26 @@ function (dojo, declare, fx, hexloc, bblfx) {
                            to,
                            onEnd = null,
                            parent = IDS.BOARD) {
-            let id = `tempSlide${this.lastId++}`;
+            let id = `bbl_tmp_slide${this.lastId++}`;
 
             let prect = $(parent).getBoundingClientRect();
             let frect = $(from).getBoundingClientRect();
             let top = frect.top - prect.top;
             let left = frect.left - prect.left;
-            let div = dojo.place(`<div id="${id}" class='${className}' style='position:absolute; top: ${top}px; left: ${left}px; z-index: 100;'></div>`,
+            // TODO: unclear why including "display:none" here befeore
+            // the slideToObject call messes things up
+            let div = dojo.place(`<div id="${id}" class='${className}' style='position:absolute; top: ${top}px; left: ${left}px; z-index: 100'></div>`,
                                  parent);
             let a = this.slideToObject(div, to);
+            div.style.display = 'none';
             dojo.connect(a, 'onEnd', () => {
                 dojo.destroy(div);
                 if (onEnd !== null) {
                     onEnd();
                 }
+            });
+            dojo.connect(a, 'beforeBegin', () => {
+                div.style.display = 'inline-block';
             });
             return a;
         },
@@ -884,7 +890,6 @@ function (dojo, declare, fx, hexloc, bblfx) {
 
         notif_cityScored: async function(args) {
             console.log('notif_cityScored', args);
-            this.renderPlayedPiece(args.row, args.col, null, null);
 
             let anim = [];
 
@@ -920,7 +925,7 @@ function (dojo, declare, fx, hexloc, bblfx) {
 
                 anim.push(bblfx.spinGrowText({
                     text: `+${details.network_points}`,
-                    parent: IDS.BOARD_CONTAINER,
+                    parent: IDS.BOARD,
                     centeredOn: IDS.hexDiv(args.row, args.col),
                     color: '#' + this.gamedatas.players[player_id].player_color
                 }));
@@ -949,7 +954,7 @@ function (dojo, declare, fx, hexloc, bblfx) {
             dojo.connect(a,
                          'onBegin',
                          () => {
-                             this.renderPlayedPiece(args.row, args.col, 'empty', null);
+                             this.renderPlayedPiece(args.row, args.col, null, null);
                          });
             dojo.connect(a,
                          'onEnd',
