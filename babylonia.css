@@ -388,6 +388,7 @@ div.bbl_selected::before {
  */
 
 .player-board-game-specific-content {
+    --hex-ratio: 1.155;
     --label-height: 40px;
     --label-width: calc(var(--hex-ratio) * var(--label-height));
     display: grid;
