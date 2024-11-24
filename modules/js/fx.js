@@ -4,7 +4,8 @@ define([
     'dojox/fx'
 ], function (dojo, dom, fx) {
     let lastId = 0;
-    const defParams = {
+
+    const defaultSpinGrowTextParams = {
         text: "",
         parent: null,
         color: 'inherit',
@@ -14,9 +15,44 @@ define([
         duration: 700,
         fadeTime: 1000
     };
+
+    const defaultSlideTemporaryDivParams = {
+        from: null,
+        to: null,
+        parent: null,
+        onEnd: null,
+        duration: 700,
+    };
+
     return {
-        spinGrowText : function(params = defParms) {
-            let p = Object.assign(Object.assign({}, defParams), params);
+        slideTemporaryDiv: function(params = defaultSlideTemporaryDivParams) {
+            let p = Object.assign(Object.assign({}, defaultSlideTemporaryDivParams), params);
+            let id = `bbl_tmp_slideTmpDiv${this.lastId++}`;
+
+            let prect = $(p.parent).getBoundingClientRect();
+            let frect = $(p.from).getBoundingClientRect();
+            let top = frect.top - prect.top;
+            let left = frect.left - prect.left;
+            // TODO: unclear why including "display:none" here befeore
+            // the slideToObject call messes things up
+            let div = dojo.place(`<div id="${id}" class='${p.className}' style='position:absolute; top: ${top}px; left: ${left}px; z-index: 100'></div>`,
+                                 p.parent);
+            let a = this.slideToObject(div, p.to);
+            div.style.display = 'none';
+            dojo.connect(a, 'onEnd', () => {
+                dojo.destroy(div);
+                if (p.onEnd !== null) {
+                    p.onEnd();
+                }
+            });
+            dojo.connect(a, 'beforeBegin', () => {
+                div.style.display = 'inline-block';
+            });
+            return a;
+        },
+
+        spinGrowText : function(params = defaultSpinGrowTextParams) {
+            let p = Object.assign(Object.assign({}, defaultSpinGrowTextParams), params);
             let id = `bbl_tmp_spinGrowFx-${lastId++}`;
             // We use a container node to hold the final size.
             //   something in BGA's CSS and structure gets in the way

@@ -751,28 +751,13 @@ function (dojo, declare, fx, hexloc, bblfx) {
                            to,
                            onEnd = null,
                            parent = IDS.BOARD) {
-            let id = `bbl_tmp_slide${this.lastId++}`;
-
-            let prect = $(parent).getBoundingClientRect();
-            let frect = $(from).getBoundingClientRect();
-            let top = frect.top - prect.top;
-            let left = frect.left - prect.left;
-            // TODO: unclear why including "display:none" here befeore
-            // the slideToObject call messes things up
-            let div = dojo.place(`<div id="${id}" class='${className}' style='position:absolute; top: ${top}px; left: ${left}px; z-index: 100'></div>`,
-                                 parent);
-            let a = this.slideToObject(div, to);
-            div.style.display = 'none';
-            dojo.connect(a, 'onEnd', () => {
-                dojo.destroy(div);
-                if (onEnd !== null) {
-                    onEnd();
-                }
+            return bblfx.slideTemporaryDiv({
+                className: className,
+                from: from,
+                to: to,
+                onEnd: onEnd,
+                parent: parent,
             });
-            dojo.connect(a, 'beforeBegin', () => {
-                div.style.display = 'inline-block';
-            });
-            return a;
         },
 
         /* @Override */
