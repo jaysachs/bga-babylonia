@@ -27,6 +27,7 @@ define([
     return {
         slideTemporaryDiv: function(params = defaultSlideTemporaryDivParams) {
             let p = Object.assign(Object.assign({}, defaultSlideTemporaryDivParams), params);
+            console.log(p);
             let id = `bbl_tmp_slideTmpDiv${this.lastId++}`;
 
             let prect = $(p.parent).getBoundingClientRect();
@@ -37,7 +38,18 @@ define([
             // the slideToObject call messes things up
             let div = dojo.place(`<div id="${id}" class='${p.className}' style='position:absolute; top: ${top}px; left: ${left}px; z-index: 100'></div>`,
                                  p.parent);
-            let a = this.slideToObject(div, p.to);
+
+            let drect = div.getBoundingClientRect();
+            let trect = $(p.to).getBoundingClientRect();
+            let toTop = trect.top - prect.top + (trect.height - drect.height)/2;
+            let toLeft = trect.left - prect.left + (trect.width - drect.width)/2;
+            let a = fx.slideTo({
+                node: div,
+                top: toTop,
+                left: toLeft,
+                unit: 'px',
+                duration: p.duration
+            });
             div.style.display = 'none';
             dojo.connect(a, 'onEnd', () => {
                 dojo.destroy(div);
