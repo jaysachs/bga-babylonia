@@ -909,15 +909,14 @@ function (dojo, declare, fx, hexloc, bblfx) {
                     return h1.row == h2.row && h1.col == h2.col;
                 }
 
-                var nonscoring = [];
-                var scoring = [];
+                var nonscoring_hexes = [];
                 for (const nh of details.network_hexes) {
                     if (!details.scored_hexes.some(sh => eq(nh, sh))) {
-                        nonscoring.push(nh);
+                        nonscoring_hexes.push(nh);
                     }
                 }
 
-                anim.push(this.fadeOut(nonscoring));
+                anim.push(this.fadeOut(nonscoring_hexes));
 
                 anim.push(bblfx.spinGrowText({
                     text: `+${details.network_points}`,
@@ -926,7 +925,7 @@ function (dojo, declare, fx, hexloc, bblfx) {
                     color: '#' + this.gamedatas.players[player_id].player_color
                 }));
 
-                anim.push(this.fadeIn(nonscoring));
+                anim.push(this.fadeIn(nonscoring_hexes));
 
                 dojo.connect(anim[anim.length-1],
                              'onEnd',
