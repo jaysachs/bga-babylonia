@@ -16,7 +16,7 @@
 
 /* inspired from https://css-tricks.com/hexagons-and-beyond-flexible-responsive-grid-patterns-sans-media-queries/ */
 
-body {
+#bbl_main {
     --board-width: 1024px;
     --board-height: 768px;
     --hex-ratio: 1.155;
@@ -24,12 +24,9 @@ body {
       the denominator here works for height. but somehow width gets
       slightly off.
       maybe compute board height/width based on hex size instead?
-   */
+    */
     --hex-height: calc(var(--board-height)/12.59); /* 61px; */
     --hex-width: calc(var(--hex-height) * var(--hex-ratio)); /* 70px; */
-}
-
-#bbl_main {
     display: flex;
     flex-direction: column;
     align-items: center;
