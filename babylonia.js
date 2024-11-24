@@ -114,8 +114,8 @@ document.getElementById('game_play_area').insertAdjacentHTML('beforeend', `
            <div id="${IDS.HAND}"></div>
          </div>
          <div id="bbl_board_container">
-           <span id="bbl_vars"></span>
            <div id="${IDS.BOARD}"></div>
+           <span id="bbl_vars"></span>
          </div>
          <div id="${IDS.AVAILABLE_ZCARDS}"></div>
       </div>
