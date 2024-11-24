@@ -18,6 +18,7 @@
 const IDS = {
     AVAILABLE_ZCARDS: 'bbl_available_zcards',
     BOARD: 'bbl_board',
+    BOARD_CONTAINER: 'bbl_board_container',
     HAND: 'bbl_hand',
 
     handPos: function(pos) {
@@ -920,7 +921,7 @@ function (dojo, declare, fx, hexloc, bblfx) {
 
                 anim.push(bblfx.spinGrowText({
                     text: `+${details.network_points}`,
-                    parent: IDS.BOARD,
+                    parent: IDS.BOARD_CONTAINER,
                     centeredOn: IDS.hexDiv(args.row, args.col),
                     color: '#' + this.gamedatas.players[player_id].player_color
                 }));
