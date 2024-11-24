@@ -159,7 +159,7 @@ END;
 
 
     const MAP8 = <<<'END'
----   C.M   XXX
+===   C.M   ===
    m-2   m-1
 ---   m-1   ---
    p-2   m-1
