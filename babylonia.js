@@ -961,8 +961,7 @@ function (dojo, declare, fx, hexloc, bblfx) {
                              }
                          });
             anim.push(a);
-            dojo.fx.chain(anim).play();
-            return Promise.resolve(); // await this.bgaPlayDojoAnimation();
+            await this.bgaPlayDojoAnimation(dojo.fx.chain(anim));
         },
 
         notif_turnFinished: async function(args) {
