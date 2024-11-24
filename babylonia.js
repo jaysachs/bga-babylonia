@@ -746,11 +746,11 @@ function (dojo, declare, fx, hexloc, bblfx) {
             // div.title = this.zcards[z].tooltip;
         },
 
-        slideDiv: function(className,
-                           from,
-                           to,
-                           onEnd = null,
-                           parent = IDS.BOARD) {
+        slideTemporaryDiv: function(className,
+                                    from,
+                                    to,
+                                    onEnd = null,
+                                    parent = IDS.BOARD) {
             return bblfx.slideTemporaryDiv({
                 className: className,
                 from: from,
@@ -851,7 +851,7 @@ function (dojo, declare, fx, hexloc, bblfx) {
                 $(id).className = "";
                 this.removeTooltip(id);
 
-                anim = this.slideDiv(
+                anim = this.slideTemporaryDiv(
                     CSS.zcard(this.zcards[z].type, false),
                     id,
                     IDS.playerBoardZcards(args.player_id),
@@ -929,13 +929,17 @@ function (dojo, declare, fx, hexloc, bblfx) {
 
             const hexDivId = IDS.hexDiv(args.row, args.col);
             let a = (args.captured_by != 0)
-                ? this.slideDiv(CSS.piece(args.city),
-                                hexDivId,
-                                IDS.citycount(args.captured_by))
-                : this.slideDiv(CSS.piece(args.city),
-                                hexDivId,
-                                // TODO: find a better location for 'off the board'
-                                IDS.AVAILABLE_ZCARDS);
+                ? this.slideTemporaryDiv(
+                    CSS.piece(args.city),
+                    hexDivId,
+                    IDS.citycount(args.captured_by)
+                )
+                : this.slideTemporaryDiv(
+                    CSS.piece(args.city),
+                    hexDivId,
+                    // TODO: find a better location for 'off the board'
+                    IDS.AVAILABLE_ZCARDS
+                );
             dojo.connect(a,
                          'onBegin',
                          () => {
@@ -981,7 +985,7 @@ function (dojo, declare, fx, hexloc, bblfx) {
                                    args.col,
                                    args.captured_piece,
                                    null);
-            let anim = this.slideDiv(
+            let anim = this.slideTemporaryDiv(
                 CSS.handPiece(args.piece, args.player_number),
                 IDS.hexDiv(args.row, args.col),
                 targetDivId,
@@ -1012,7 +1016,7 @@ function (dojo, declare, fx, hexloc, bblfx) {
                 cl.remove(hpc);
                 cl.add(CSS.EMPTY);
             }
-            anim = this.slideDiv(
+            anim = this.slideTemporaryDiv(
                 hpc,
                 sourceDivId,
                 this.hexDiv(args.row, args.col).id,
@@ -1041,7 +1045,7 @@ function (dojo, declare, fx, hexloc, bblfx) {
                 let hc = CSS.handPiece(this.hand[i], this.playerNumber);
                 if (hc != CSS.EMPTY
                     && div.classList.contains(CSS.EMPTY)) {
-                    const a = this.slideDiv(
+                    const a = this.slideTemporaryDiv(
                         hc,
                         IDS.handcount(pid),
                         div.id,
