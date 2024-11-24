@@ -37,6 +37,7 @@ body {
 
 #bbl_board_container {
     flex: 1;
+    position: relative;
     margin-top: 10px;
     margin-bottom: 10px;
 }
