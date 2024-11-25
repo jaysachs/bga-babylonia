@@ -21,7 +21,7 @@ define([
         to: null,
         parent: null,
         onEnd: null,
-        duration: 700,
+        duration: 500,
     };
 
     return {
