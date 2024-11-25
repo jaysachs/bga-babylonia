@@ -393,7 +393,7 @@ function (dojo, declare, fx, hexloc, bblfx) {
                 return false;
             }
             this.bgaPerformAction('actSelectZigguratCard',
-                                  { card_type: this.zcards[z].type });
+                                  { zctype: this.zcards[z].type });
             let div = $(IDS.AVAILABLE_ZCARDS);
             div.classList.remove(CSS.SELECTING);
             return false;
