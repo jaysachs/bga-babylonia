@@ -248,14 +248,7 @@ class Game extends \Table
     }
 
     public function stAutoScoringHexSelection(): void {
-        $player_id = $this->activePlayerId();
-        $player_on_turn = $this->playerOnTurn();
-        if ($player_id != $player_on_turn) {
-            $this->gamestate->changeActivePlayer($player_on_turn);
-            $this->giveExtraTime($player_on_turn);
-            $player_id = $player_on_turn;
-        }
-        $model = new Model($this->ps, $player_id);
+        $model = new Model($this->ps, $this->playerOnTurn());
         $hexes = $model->hexesRequiringScoring();
         if (count($hexes) == 0) {
             $this->gamestate->nextState("done");
@@ -393,24 +386,24 @@ class Game extends \Table
 
         $this->setNextPlayerToBeActive(0);
 
-        if (count($hexes) > 0) {
-            if ($this->optionEnabled(Option::AUTOMATED_SCORING_SELECTION)) {
-                $this->gamestate->nextState("automatedHexSelection");
-                return;
-            }
-
-            $this->notifyAllPlayers(
-                "scoringHexChoice",
-                clienttranslate('${player_name} must select a hex to score'),
-                [
-                    "player_name" => $this->getActivePlayerName(),
-                ]
-            );
-            $this->gamestate->nextState("selectHex");
+        if (count($hexes) == 0) {
+            $this->gamestate->nextState("done");
             return;
         }
 
-        $this->gamestate->nextState("done");
+        if ($this->optionEnabled(Option::AUTOMATED_SCORING_SELECTION)) {
+            $this->gamestate->nextState("automatedHexSelection");
+            return;
+        }
+
+        $this->notifyAllPlayers(
+            "scoringHexChoice",
+            clienttranslate('${player_name} must select a hex to score'),
+            [
+                "player_name" => $this->getActivePlayerName(),
+            ]
+        );
+        $this->gamestate->nextState("selectHex");
     }
 
     public function stFinishTurn(): void {
@@ -484,12 +477,17 @@ class Game extends \Table
         $this->gamestate->nextState("nextPlayer");
     }
 
-    public function stNextPlayer() {
+    private function turnToNextPlayer(): void {
         $this->activeNextPlayer();
         $player_id = $this->activePlayerId();
         Stats::PLAYER_NUMBER_TURNS->inc($player_id);
         $this->giveExtraTime($player_id);
         $this->setPlayerOnTurn($player_id);
+        $this->setNextPlayerToBeActive(0);
+    }
+
+    public function stNextPlayer() {
+        $this->turnToNextPlayer();
         $this->gamestate->nextState("done");
     }
 
@@ -740,14 +738,7 @@ class Game extends \Table
             $this->optionEnabled(Option::ADVANCED_ZIGGURAT_CARDS));
 
         // Activate first player once everything has been initialized and ready.
-        $this->activeNextPlayer();
-        $player_id = $this->activePlayerId();
-        $this->giveExtraTime($player_id);
-
-        // Initialize the globals regarding active player / player-on-turn
-        $this->setPlayerOnTurn($player_id);
-        Stats::PLAYER_NUMBER_TURNS->inc($player_id);
-        $this->setNextPlayerToBeActive(0);
+        $this->turnToNextPlayer();
     }
 
     private function optionEnabled(Option $option): bool {
