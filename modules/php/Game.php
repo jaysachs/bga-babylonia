@@ -161,16 +161,6 @@ class Game extends \Table
         return intval(($played_pieces * 100) / $total_pieces);
     }
 
-    private function scoreHex(Model $model, Hex $hex): int {
-        if ($hex->piece->isCity()) {
-            $this->scoreCity($model, $hex);
-            return 0;
-        } else if ($hex->piece->isZiggurat()) {
-            return $this->scoreZiggurat($model, $hex);
-        }
-        return 0;
-    }
-
     private function scoreZiggurat(Model $model, Hex $zighex): int {
         $scored_zig = $model->scoreZiggurat($zighex);
         $winner = $scored_zig->winning_player_id;
@@ -374,16 +364,17 @@ class Game extends \Table
                 "col" => $col,
             ]
         );
-        $piece = $hex->piece;
-        $next_player = $this->scoreHex($model, $hex);
-        if ($next_player != 0) {
-            $this->setNextPlayerToBeActive($next_player);
-        }
 
-        if ($piece->isCity()) {
+        $next_player = 0;
+        if ($hex->piece->isCity()) {
+            $this->scoreCity($model, $hex);
             Stats::PLAYER_CITY_SCORING_TRIGGERED->inc($player_id);
             $this->gamestate->nextState("citySelected");
-        } else {
+        } else if ($hex->piece->isZiggurat()) {
+            $next_player = $this->scoreZiggurat($model, $hex);
+            if ($next_player != 0) {
+                $this->setNextPlayerToBeActive($next_player);
+            }
             Stats::PLAYER_ZIGGURAT_SCORING_TRIGGERED->inc($player_id);
             $this->gamestate->nextState("zigguratSelected");
         }
