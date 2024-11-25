@@ -364,9 +364,9 @@ class Model {
             // order is:
             // 0: ziggurats that player on turn is winning
             // 1: ziggurats no one is winning
-            // 2: cities that other players are winning
+            // 2: cities that player on turn is winning
             // 3: cities that no one is winning
-            // 4: cities that player on turn is winning
+            // 4: cities that other players are winning
             // 5: zigurats that other players are winning
 
             $winner = $this->scorer()->computeHexWinner($hex);
