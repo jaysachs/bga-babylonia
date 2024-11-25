@@ -127,10 +127,11 @@ define([
     'dojo','dojo/_base/declare', 'dojo/_base/fx',
     g_gamethemeurl + "modules/js/hexloc.js",
     g_gamethemeurl + "modules/js/fx.js",
+    "dojo/on", "dojo/query",
     'ebg/core/gamegui',
     'ebg/counter',
 ],
-function (dojo, declare, fx, hexloc, bblfx) {
+function (dojo, declare, fx, hexloc, bblfx, on) {
     return declare('bgagame.babylonia', ebg.core.gamegui, {
         constructor: function(){
             console.log('babylonia constructor');
@@ -138,10 +139,6 @@ function (dojo, declare, fx, hexloc, bblfx) {
             // Here, you can init the global variables of your user interface
             // Example:
             // this.myGlobalValue = 0;
-
-            dojo.connect($(IDS.HAND), 'onclick', this, 'onPieceSelection');
-            dojo.connect($(IDS.BOARD), 'onclick', this, 'onHexSelection');
-            dojo.connect($(IDS.AVAILABLE_ZCARDS), 'onclick', this, 'onZcardSelected');
         },
 
         selectedHandPos: null,
@@ -156,6 +153,18 @@ function (dojo, declare, fx, hexloc, bblfx) {
         poolCounters: [],
         cityCounters: [],
         gamedatas: null,
+
+        handlers: [],
+        resumeOnClickHandlers: function() {
+            for (const h of this.handlers) {
+                h.resume();
+            }
+        },
+        pauseOnClickHandlers: function() {
+            for (const h of this.handlers) {
+                h.pause();
+            }
+        },
 
         /*
             setup:
@@ -191,6 +200,19 @@ function (dojo, declare, fx, hexloc, bblfx) {
 
             console.log('setting up notifications');
             this.bgaSetupPromiseNotifications();
+
+            console.log('adding onclick handlers');
+            this.handlers.push(on.pausable(
+                $(IDS.HAND), 'click', this.onHandClicked.bind(this)
+            ));
+            this.handlers.push(on.pausable(
+                $(IDS.BOARD), 'click', this.onBoardClicked.bind(this)
+            ));
+            this.handlers.push(on.pausable(
+                $(IDS.AVAILABLE_ZCARDS),
+                'click',
+                this.onZcardClicked.bind(this)
+            ));
 
             console.log('Game setup done.');
         },
@@ -244,8 +266,8 @@ function (dojo, declare, fx, hexloc, bblfx) {
             }
         },
 
-        onHexSelection: function (event) {
-            // console.log('onHexSelection:' + event.target.id);
+        onBoardClicked: function (event) {
+            console.log('onBoardClicked:' + event.target.id);
             event.preventDefault();
             event.stopPropagation();
             if (! this.isCurrentPlayerActive()) {
@@ -369,8 +391,8 @@ function (dojo, declare, fx, hexloc, bblfx) {
             this.allowedMovesFor(pos).forEach(rc => this.unmarkHexPlayable(rc));
         },
 
-        onZcardSelected: function (event) {
-            console.log(event);
+        onZcardClicked: function (event) {
+            console.log('onZcardClicked', event);
             event.preventDefault();
             event.stopPropagation();
             if (! this.isCurrentPlayerActive()) {
@@ -399,10 +421,13 @@ function (dojo, declare, fx, hexloc, bblfx) {
             return false;
         },
 
-        onPieceSelection: function(event) {
-            console.log('onPieceSelection');
+        onHandClicked: function(event) {
+            console.log('onHandClicked', event);
             event.preventDefault();
             event.stopPropagation();
+            if (this.inFlight > 0) {
+                return false;
+            }
             if (! this.isCurrentPlayerActive()) {
                  return false;
             }
@@ -858,7 +883,7 @@ function (dojo, declare, fx, hexloc, bblfx) {
                     () => this.addZcardDivInPlayerBoard(z),
                     IDS.AVAILABLE_ZCARDS
                 );
-                await this.bgaPlayDojoAnimation(anim);
+                await this.playAnimation(anim);
             }
         },
 
@@ -955,7 +980,14 @@ function (dojo, declare, fx, hexloc, bblfx) {
                              }
                          });
             anim.push(a);
-            await this.bgaPlayDojoAnimation(dojo.fx.chain(anim));
+            await this.playAnimation(dojo.fx.chain(anim));
+        },
+
+        playAnimation: async function(anim) {
+            let p = this.bgaPlayDojoAnimation(anim);
+            this.pauseOnClickHandlers();
+            p.then(() => this.resumeOnClickHandlers());
+            return p;
         },
 
         notif_turnFinished: async function(args) {
@@ -999,7 +1031,7 @@ function (dojo, declare, fx, hexloc, bblfx) {
                     this.handCounters[args.player_id].incValue(1);
                     this.scoreCtrl[args.player_id].incValue(-args.points);
                 });
-            await this.bgaPlayDojoAnimation(anim);
+            await this.playAnimation(anim);
         },
 
         notif_piecePlayed: async function(args) {
@@ -1030,7 +1062,7 @@ function (dojo, declare, fx, hexloc, bblfx) {
                 }
             );
 
-            await this.bgaPlayDojoAnimation(anim);
+            await this.playAnimation(anim);
         },
 
         notif_handRefilled: async function(args) {
@@ -1057,7 +1089,7 @@ function (dojo, declare, fx, hexloc, bblfx) {
             if (anim.length == 0) {
                 return Promise.resolve();
             }
-            await this.bgaPlayDojoAnimation(dojo.fx.chain(anim));
+            await this.playAnimation(dojo.fx.chain(anim));
         },
     });
 });
