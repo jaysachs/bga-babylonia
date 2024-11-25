@@ -25,24 +25,24 @@ const IDS = {
         return `bbl_hand_${pos}`;
     },
 
-    handcount: function(player_id) {
-        return 'bbl_handcount_' + player_id;
+    handcount: function(playerId) {
+        return 'bbl_handcount_' + playerId;
     },
 
-    poolcount: function(player_id) {
-        return 'bbl_poolcount_' + player_id;
+    poolcount: function(playerId) {
+        return 'bbl_poolcount_' + playerId;
     },
 
-    citycount: function(player_id) {
-        return 'bbl_citycount_' + player_id;
+    citycount: function(playerId) {
+        return 'bbl_citycount_' + playerId;
     },
 
     hexDiv: function(row, col) {
         return `bbl_hex_${row}_${col}`;
     },
 
-    playerBoardZcards: function(player_id) {
-        return `bbl_zcards_${player_id}`;
+    playerBoardZcards: function(playerId) {
+        return `bbl_zcards_${playerId}`;
     },
 
     ownedZcard: function(z) {
@@ -152,9 +152,9 @@ function (dojo, declare, fx, hexloc, bblfx) {
         zcards: [],
         hand: [],
         playerNumber: -1,
-        hand_counters: [],
-        pool_counters: [],
-        city_counters: [],
+        handCounters: [],
+        poolCounters: [],
+        cityCounters: [],
         gamedatas: null,
 
         /*
@@ -177,8 +177,8 @@ function (dojo, declare, fx, hexloc, bblfx) {
             this.playerNumber = gamedatas.players[this.player_id].player_number;
 
             console.log('Setting up player boards');
-            for (const player_id in gamedatas.players) {
-                this.setupPlayerBoard(gamedatas.players[player_id]);
+            for (const playerId in gamedatas.players) {
+                this.setupPlayerBoard(gamedatas.players[playerId]);
             }
 
             this.setupBoard(gamedatas.board, gamedatas.players);
@@ -196,22 +196,22 @@ function (dojo, declare, fx, hexloc, bblfx) {
         },
 
         setupPlayerBoard: function(player) {
-            let player_id = player.player_id;
-            console.log('Setting up board for player ' + player_id);
-            let player_board_div = this.getPlayerPanelElement(player_id);
+            let playerId = player.player_id;
+            console.log('Setting up board for player ' + playerId);
+            let player_board_div = this.getPlayerPanelElement(playerId);
             dojo.place(this.format_block('jstpl_player_board_ext',
                                           {
-                                              'player_id': player_id,
+                                              'player_id': playerId,
                                               'player_number': player.player_number
                                           }),
                         player_board_div);
             // create counters per player
-            this.hand_counters[player_id]=new ebg.counter();
-            this.hand_counters[player_id].create(IDS.handcount(player_id));
-            this.pool_counters[player_id]=new ebg.counter();
-            this.pool_counters[player_id].create(IDS.poolcount(player_id));
-            this.city_counters[player_id]=new ebg.counter();
-            this.city_counters[player_id].create(IDS.citycount(player_id));
+            this.handCounters[playerId]=new ebg.counter();
+            this.handCounters[playerId].create(IDS.handcount(playerId));
+            this.poolCounters[playerId]=new ebg.counter();
+            this.poolCounters[playerId].create(IDS.poolcount(playerId));
+            this.cityCounters[playerId]=new ebg.counter();
+            this.cityCounters[playerId].create(IDS.citycount(playerId));
             this.updateHandCount(player, false);
             this.updatePoolCount(player, false);
             this.updateCapturedCityCount(player, false);
@@ -682,19 +682,19 @@ function (dojo, declare, fx, hexloc, bblfx) {
         },
 
         updateHandCount: function(player, animate=true) {
-            this.updateCounter(this.hand_counters[player.player_id],
+            this.updateCounter(this.handCounters[player.player_id],
                                player.hand_size,
                                animate);
         },
 
         updatePoolCount: function (player, animate=true) {
-            this.updateCounter(this.pool_counters[player.player_id],
+            this.updateCounter(this.poolCounters[player.player_id],
                                player.pool_size,
                                animate);
         },
 
         updateCapturedCityCount: function(player, animate=true) {
-            this.updateCounter(this.city_counters[player.player_id],
+            this.updateCounter(this.cityCounters[player.player_id],
                                player.captured_city_count,
                                animate);
         },
@@ -878,8 +878,8 @@ function (dojo, declare, fx, hexloc, bblfx) {
 
             let anim = [];
 
-            for (const player_id in args.details) {
-                const details = args.details[player_id];
+            for (const playerId in args.details) {
+                const details = args.details[playerId];
 
                 anim.push(this.fadeOut(details.network_hexes));
 
@@ -899,30 +899,30 @@ function (dojo, declare, fx, hexloc, bblfx) {
                     return h1.row == h2.row && h1.col == h2.col;
                 }
 
-                var nonscoring_hexes = [];
+                var nonscoringHexes = [];
                 for (const nh of details.network_hexes) {
                     if (!details.scored_hexes.some(sh => eq(nh, sh))) {
-                        nonscoring_hexes.push(nh);
+                        nonscoringHexes.push(nh);
                     }
                 }
 
-                anim.push(this.fadeOut(nonscoring_hexes));
+                anim.push(this.fadeOut(nonscoringHexes));
 
                 anim.push(bblfx.spinGrowText({
                     text: `+${details.network_points}`,
                     parent: IDS.BOARD,
                     centeredOn: IDS.hexDiv(args.row, args.col),
-                    color: '#' + this.gamedatas.players[player_id].player_color
+                    color: '#' + this.gamedatas.players[playerId].player_color
                 }));
 
-                anim.push(this.fadeIn(nonscoring_hexes));
+                anim.push(this.fadeIn(nonscoringHexes));
 
                 dojo.connect(anim[anim.length-1],
                              'onEnd',
                              () => {
                                  details.scored_hexes.forEach(
                                      hex => this.hexDiv(hex.row, hex.col).classList.remove(CSS.SELECTED));
-                                 this.scoreCtrl[player_id].incValue(details.network_points);
+                                 this.scoreCtrl[playerId].incValue(details.network_points);
                                  this.updateCapturedCityCount(details);
                              });
             }
@@ -948,9 +948,9 @@ function (dojo, declare, fx, hexloc, bblfx) {
             dojo.connect(a,
                          'onEnd',
                          () => {
-                             for (const player_id in args.details) {
-                                 const details = args.details[player_id];
-                                 this.scoreCtrl[player_id].incValue(details.capture_points);
+                             for (const playerId in args.details) {
+                                 const details = args.details[playerId];
+                                 this.scoreCtrl[playerId].incValue(details.capture_points);
                                  this.updateCapturedCityCount(details);
                              }
                          });
@@ -996,7 +996,7 @@ function (dojo, declare, fx, hexloc, bblfx) {
                         cl.add(CSS.PLAYABLE);
                         cl.add(CSS.handPiece(args.original_piece, this.playerNumber));
                     }
-                    this.hand_counters[args.player_id].incValue(1);
+                    this.handCounters[args.player_id].incValue(1);
                     this.scoreCtrl[args.player_id].incValue(-args.points);
                 });
             await this.bgaPlayDojoAnimation(anim);

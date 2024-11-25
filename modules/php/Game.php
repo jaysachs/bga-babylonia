@@ -37,16 +37,7 @@ class Game extends \Table
     private const GLOBAL_NEXT_PLAYER_TO_BE_ACTIVE = 'next_player_to_be_active';
 
     private PersistentStore $ps;
-    /**
-     * Your global variables labels:
-     *
-     * Here, you can assign labels to global variables you are using for this game. You can use any number of global
-     * variables with IDs between 10 and 99. If your game has options (variants), you also have to associate here a
-     * label to the corresponding ID in `gameoptions.inc.php`.
-     *
-     * NOTE: afterward, you can get/set the global variables with `getGameStateValue`, `setGameStateInitialValue` or
-     * `setGameStateValue` functions.
-     */
+
     public function __construct()
     {
         parent::__construct();
@@ -78,8 +69,10 @@ class Game extends \Table
         $msg = "";
         if ($points > 0) {
             $msg = '${player_name} plays ${piece} to (${row},${col}) scoring ${points} points';
-            Stats::PLAYER_POINTS_FROM_FIELDS->inc($player_id, $move->field_points);
-            Stats::PLAYER_POINTS_FROM_ZIGGURATS->inc($player_id, $move->ziggurat_points);
+            Stats::PLAYER_POINTS_FROM_FIELDS->
+                inc($player_id, $move->field_points);
+            Stats::PLAYER_POINTS_FROM_ZIGGURATS->
+                inc($player_id, $move->ziggurat_points);
         } else {
             $msg = '${player_name} plays ${piece} to (${row},${col})';
         }
@@ -127,15 +120,6 @@ class Game extends \Table
         $this->gamestate->nextState("done");
     }
 
-    /**
-     * Game state arguments, example content.
-     *
-     * This method returns some additional information that is very
-     * specific to the `playerTurn` game state.
-     *
-     * @return array
-     * @see ./states.inc.php
-     */
     public function argPlayPieces(): array
     {
         $model = new Model($this->ps, $this->activePlayerId());
@@ -160,13 +144,8 @@ class Game extends \Table
     /**
      * Compute and return the current game progression.
      *
-     * The number returned must be an integer between 0 and 100.
-     *
-     * This method is called each time we are in a game state with the
-     * "updateGameProgression" property set to true.
-     *
-     * @return int
-     * @see ./states.inc.php
+     * This is based on total number of pieces played. Probably
+     * can improve based on taking the max of that and cities scored.
      */
     public function getGameProgression()
     {
@@ -241,8 +220,10 @@ class Game extends \Table
         $details = [];
         foreach ($player_infos as $pid => $pi) {
             $points = $scored_city->pointsForPlayer($pid);
-            Stats::PLAYER_POINTS_FROM_CITY_NETWORKS->inc($pid, $scored_city->networkPointsForPlayer($pid));
-            Stats::PLAYER_POINTS_FROM_CAPTURED_CITIES->inc($pid, $scored_city->capturePointsForPlayer($pid));
+            Stats::PLAYER_POINTS_FROM_CITY_NETWORKS->
+                inc($pid, $scored_city->networkPointsForPlayer($pid));
+            Stats::PLAYER_POINTS_FROM_CAPTURED_CITIES->
+                inc($pid, $scored_city->capturePointsForPlayer($pid));
             $details[$pid] = [
                 "player_id" => $pid,
                 "player_name" => $this->getPlayerNameById($pid),
@@ -307,10 +288,11 @@ class Game extends \Table
         ];
     }
 
-    public function actSelectZigguratCard(string $card_type) {
+    public function actSelectZigguratCard(string $zctype) {
         $player_id = $this->activePlayerId();
         $model = new Model($this->ps, $player_id);
-        $selection = $model->selectZigguratCard(ZigguratCardType::from($card_type));
+        $selection =
+            $model->selectZigguratCard(ZigguratCardType::from($zctype));
         Stats::PLAYER_ZIGGURAT_CARDS->inc($player_id);
         $stat = match ($selection->card->type) {
             ZigguratCardType::PLUS_10 => Stats::PLAYER_ZIGGURAT_CARD_1_CHOSEN,
@@ -449,10 +431,9 @@ class Game extends \Table
             return;
         }
 
-        // TODO: this doesn't have to return the whole hand,
-        // just the refilled parts.
-        // Could capture the delta and return *that*. Then it can be animated on
-        // the client.
+        // TODO: this doesn't have to return the whole hand, just the
+        // refilled parts.  Could capture the delta and return
+        // *that*. Then it can be animated on the client.
 
         $this->notifyPlayer(
             $player_id,
@@ -479,7 +460,8 @@ class Game extends \Table
 
         $this->setNextPlayerToBeActive(0);
 
-        if ($model->components()->hasUnusedZigguratCard($player_id, ZigguratCardtype::EXTRA_TURN)) {
+        if ($model->components()->
+            hasUnusedZigguratCard($player_id, ZigguratCardtype::EXTRA_TURN)) {
             $this->gamestate->nextState("extraTurn");
             return;
         }
@@ -508,16 +490,17 @@ class Game extends \Table
             Stats::PLAYER_FIELDS_CAPTURED->inc($player_id, -1);
         }
         if ($move->points() > 0) {
-            Stats::PLAYER_POINTS_FROM_FIELDS->inc($player_id,
-                                                  -$move->field_points);
-            Stats::PLAYER_POINTS_FROM_ZIGGURATS->inc($player_id,
-                                                     -$move->ziggurat_points);
+            Stats::PLAYER_POINTS_FROM_FIELDS->
+                inc($player_id, -$move->field_points);
+            Stats::PLAYER_POINTS_FROM_ZIGGURATS->inc(
+                $player_id, -$move->ziggurat_points);
         }
 
         foreach ($model->allPlayerIds() as $pid) {
             $args = [
                 "player_name" => $this->getActivePlayerName(),
-                "player_number" => $this->getPlayerNoById($this->activePlayerId()),
+                "player_number" =>
+                    $this->getPlayerNoById($this->activePlayerId()),
                 "preserve" => [
                     "player_number",
                 ],
@@ -638,7 +621,8 @@ class Game extends \Table
      */
     protected function getAllDatas()
     {
-        // WARNING: We must only return information visible by the current player.
+        // WARNING: We must only return information visible by the
+        // current player.
 
         $model = new Model($this->ps, $this->currentPlayerId());
 
@@ -702,8 +686,9 @@ class Game extends \Table
      */
     protected function setupNewGame($players, $options = [])
     {
-        // Set the colors of the players with HTML color code. The default below is red/green/blue/orange/brown. The
-        // number of colors defined here must correspond to the maximum number of players allowed for the gams.
+        // Set the colors of the players with HTML color code.The
+        // number of colors defined here must correspond to the
+        // maximum number of players allowed for the gams.
         $gameinfos = $this->getGameinfos();
         $default_colors = $gameinfos['player_colors'];
 
@@ -719,9 +704,6 @@ class Game extends \Table
         }
 
         // Create players based on generic information.
-        //
-        // NOTE: You can add extra field on player table in the database (see dbmodel.sql) and initialize
-        // additional fields directly here.
         static::DbQuery(
             sprintf(
                 "INSERT INTO player (player_id, player_color, player_canal, player_name, player_avatar) VALUES %s",
@@ -729,14 +711,14 @@ class Game extends \Table
             )
         );
 
-        // $this->reattributeColorsBasedOnPreferences($players, $gameinfos["player_colors"]);
-        // $this->reloadPlayersBasicInfos();
-
-        // Init global values with their initial values.
+        $this->reattributeColorsBasedOnPreferences($players,
+                                                   $gameinfos["player_colors"]);
+        $this->reloadPlayersBasicInfos();
 
         // Init game statistics.
         Stats::initAll(array_keys($players));
 
+        // Create the game mode.
         $model = new Model($this->ps, 0);
         $model->createNewGame(
             array_keys($players),
@@ -746,6 +728,8 @@ class Game extends \Table
         $this->activeNextPlayer();
         $player_id = $this->activePlayerId();
         $this->giveExtraTime($player_id);
+
+        // Initialize the globals regarding active player / player-on-turn
         $this->setPlayerOnTurn($player_id);
         Stats::PLAYER_NUMBER_TURNS->inc($player_id);
         $this->setNextPlayerToBeActive(0);
