@@ -28,6 +28,7 @@ namespace Bga\Games\babylonia;
 
 enum Option: string {
     case ADVANCED_ZIGGURAT_CARDS = 'advanced_ziggurat_cards';
+    case AUTOMATED_SCORING_SELECTION = 'automated_scoring_selection';
 }
 
 ?>

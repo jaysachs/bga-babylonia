@@ -59,7 +59,7 @@ if ( !defined('STATE_END_GAME')) { // guard since this included multiple times
     define("STATE_START_TURN", 8);
     define("STATE_PLAYER_EXTRA_TURN", 9);
     define("STATE_NEXT_PLAYER", 10);
-    //    define("STATE_PLAYER_GAME_END", 98);
+    define("STATE_AUTO_SCORING_HEX_SELECTION", 11);
     define("STATE_END_GAME", 99);
 }
 
@@ -102,7 +102,19 @@ $machinestates = [
         "updateGameProgression" => true,
         "transitions" => [
             "selectHex" => STATE_PLAYER_SELECT_SCORING_HEX,
+            "automatedHexSelection" => STATE_AUTO_SCORING_HEX_SELECTION,
             "done" => STATE_FINISH_TURN,
+        ],
+    ],
+
+    STATE_AUTO_SCORING_HEX_SELECTION => [
+        "name" => "autoScoringHexSelection",
+        "type" => "game",
+        "description" => '',
+        "action" => "stAutoScoringHexSelection",
+        "transitions" => [
+            "citySelected" => STATE_END_OF_TURN_SCORING,
+            "zigguratSelected" => STATE_ZIGGURAT_SCORING,
         ],
     ],
 

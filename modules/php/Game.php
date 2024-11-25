@@ -45,7 +45,8 @@ class Game extends \Table
         $this->initGameStateLabels([
             Game::GLOBAL_PLAYER_ON_TURN => 10,
             Game::GLOBAL_NEXT_PLAYER_TO_BE_ACTIVE => 11,
-            Option::ADVANCED_ZIGGURAT_CARDS->value => 100
+            Option::ADVANCED_ZIGGURAT_CARDS->value => 100,
+            Option::AUTOMATED_SCORING_SELECTION->value => 101
         ]);
 
         Logging::init($this);
@@ -256,6 +257,22 @@ class Game extends \Table
         );
     }
 
+    public function stAutoScoringHexSelection(): void {
+        $player_id = $this->activePlayerId();
+        $player_on_turn = $this->playerOnTurn();
+        if ($player_id != $player_on_turn) {
+            $this->gamestate->changeActivePlayer($player_on_turn);
+            $this->giveExtraTime($player_on_turn);
+            $player_id = $player_on_turn;
+        }
+        $model = new Model($this->ps, $player_id);
+        $hexes = $model->hexesRequiringScoring();
+        if (count($hexes) == 0) {
+            $this->gamestate->nextState("done");
+            return;
+        }
+        $this->actSelectHexToScore($hexes[0]->row, $hexes[0]->col);
+    }
 
     public function argZigguratScoring(): array {
         return [];
@@ -382,8 +399,12 @@ class Game extends \Table
 
         $this->setNextPlayerToBeActive(0);
 
-        // TODO: make auto-choice when there is 1 a preference or game option.
-        if (count($hexes) > 0 /* 1 */) {
+        if (count($hexes) > 0) {
+            if ($this->optionEnabled(Option::AUTOMATED_SCORING_SELECTION)) {
+                $this->gamestate->nextState("automatedHexSelection");
+                return;
+            }
+
             $this->notifyAllPlayers(
                 "scoringHexChoice",
                 clienttranslate('${player_name} must select a hex to score'),
@@ -775,7 +796,6 @@ class Game extends \Table
                     $model = new Model($this->ps, $player_id);
                     $hexes = $model->hexesRequiringScoring();
                     if (count($hexes) > 0) {
-                        shuffle($hexes);
                         $hex = array_shift($hexes);
                         $this->actSelectHexToScore($hex->row, $hex->col);
                     }
