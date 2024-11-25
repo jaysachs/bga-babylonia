@@ -772,11 +772,23 @@ function (dojo, declare, fx, hexloc, bblfx, on) {
             // div.title = this.zcards[z].tooltip;
         },
 
+        shouldAnimate: function() {
+            return document.visibilityState !== 'hidden'
+                && !this.instantaeousMode;
+        },
+
         slideTemporaryDiv: function(className,
                                     from,
                                     to,
                                     onEnd = null,
                                     parent = IDS.BOARD) {
+            if (!this.shouldAnimate()) {
+                let a = bblfx.empty();
+                if (onEnd != null) {
+                    dojo.connect(a, 'onEnd', onEnd);
+                }
+                return a;
+            }
             return bblfx.slideTemporaryDiv({
                 className: className,
                 from: from,
@@ -889,11 +901,17 @@ function (dojo, declare, fx, hexloc, bblfx, on) {
         },
 
         fadeOut: function(hexes) {
+            if (!this.shouldAnimate()) {
+                return  bblfx.empty();
+            }
             return dojo.fx.combine(
                 hexes.map(h => fx.fadeOut({ node: this.hexDiv(h.row, h.col) }))
             );
         },
         fadeIn: function(hexes) {
+            if (!this.shouldAnimate()) {
+                return  bblfx.empty();
+            }
             return dojo.fx.combine(
                 hexes.map(h => fx.fadeIn({ node: this.hexDiv(h.row, h.col) }))
             );
@@ -934,13 +952,14 @@ function (dojo, declare, fx, hexloc, bblfx, on) {
 
                 anim.push(this.fadeOut(nonscoringHexes));
 
-                anim.push(bblfx.spinGrowText({
-                    text: `+${details.network_points}`,
-                    parent: IDS.BOARD,
-                    centeredOn: IDS.hexDiv(args.row, args.col),
-                    color: '#' + this.gamedatas.players[playerId].player_color
-                }));
-
+                if (this.shouldAnimate()) {
+                    anim.push(bblfx.spinGrowText({
+                        text: `+${details.network_points}`,
+                        parent: IDS.BOARD,
+                        centeredOn: IDS.hexDiv(args.row, args.col),
+                        color: '#' + this.gamedatas.players[playerId].player_color
+                    }));
+                }
                 anim.push(this.fadeIn(nonscoringHexes));
 
                 dojo.connect(anim[anim.length-1],
