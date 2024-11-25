@@ -63,6 +63,14 @@ define([
             return a;
         },
 
+        empty: function() {
+            return new dojo.Animation({
+                duration: 0,
+                curve: [0, 0],
+                onAnimate: function (v) { }
+            });
+        },
+
         spinGrowText : function(params = defaultSpinGrowTextParams) {
             let p = Object.assign(Object.assign({}, defaultSpinGrowTextParams), params);
             let id = `bbl_tmp_spinGrowFx-${lastId++}`;
