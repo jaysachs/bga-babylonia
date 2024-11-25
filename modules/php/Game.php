@@ -361,9 +361,12 @@ class Game extends \Table
         if ($hex == null) {
             throw new \InvalidArgumentException("Hex at ({$row},{$col}) can't be scored");
         }
+        $msg = $this->optionEnabled(Option::AUTOMATED_SCORING_SELECTION)
+            ? 'hex (${row},${col}) is scored'
+            : '${player_name} chose hex (${row},${col}) to score';
         $this->notifyAllPlayers(
             "scoringSelection",
-            clienttranslate('${player_name} chose hex (${row},${col}) to score'),
+            clienttranslate($msg),
             [
                 "player_id" => $player_id,
                 "player_name" => $this->getActivePlayerName(),
