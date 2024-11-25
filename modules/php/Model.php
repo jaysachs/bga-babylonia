@@ -362,11 +362,11 @@ class Model {
         );
         $val = function ($hex): int {
             // order is:
-            // 0: ziggurats that player_id is winning
+            // 0: ziggurats that player on turn is winning
             // 1: ziggurats no one is winning
             // 2: cities that other players are winning
             // 3: cities that no one is winning
-            // 4: cities that player_id is winning
+            // 4: cities that player on turn is winning
             // 5: zigurats that other players are winning
 
             $winner = $this->scorer()->computeHexWinner($hex);
@@ -381,12 +381,12 @@ class Model {
             }
             if ($hex->piece->isCity()) {
                 if ($winner == $this->player_id) {
-                    return 4;
+                    return 2;
                 }
                 if ($winner == 0) {
                     return 3;
                 }
-                return 2;
+                return 4;
             }
             // TODO: throw exception?
             return 10;
