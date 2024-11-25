@@ -135,10 +135,6 @@ function (dojo, declare, fx, hexloc, bblfx, on) {
     return declare('bgagame.babylonia', ebg.core.gamegui, {
         constructor: function(){
             console.log('babylonia constructor');
-
-            // Here, you can init the global variables of your user interface
-            // Example:
-            // this.myGlobalValue = 0;
         },
 
         selectedHandPos: null,
@@ -155,15 +151,30 @@ function (dojo, declare, fx, hexloc, bblfx, on) {
         gamedatas: null,
 
         handlers: [],
-        resumeOnClickHandlers: function() {
-            for (const h of this.handlers) {
-                h.resume();
-            }
+        playAnimation: async function(anim) {
+            let p = this.bgaPlayDojoAnimation(anim);
+            this.pauseHandlers();
+            p.then(() => this.resumeHandlers());
+            return p;
         },
-        pauseOnClickHandlers: function() {
-            for (const h of this.handlers) {
-                h.pause();
-            }
+        setupHandlers: function() {
+            this.handlers.push(on.pausable(
+                $(IDS.HAND), 'click', this.onHandClicked.bind(this)
+            ));
+            this.handlers.push(on.pausable(
+                $(IDS.BOARD), 'click', this.onBoardClicked.bind(this)
+            ));
+            this.handlers.push(on.pausable(
+                $(IDS.AVAILABLE_ZCARDS),
+                'click',
+                this.onZcardClicked.bind(this)
+            ));
+        },
+        resumeHandlers: function() {
+            this.handlers.forEach(h => h.resume());
+        },
+        pauseHandlers: function() {
+            this.handlers.forEach(h => h.pause());
         },
 
         /*
@@ -181,18 +192,19 @@ function (dojo, declare, fx, hexloc, bblfx, on) {
             'getAllDatas' PHP method.
         */
         setup: function(gamedatas) {
-            console.log('Starting game setup');
+            console.log('starting game setup');
             this.gamedatas = gamedatas;
             this.playerNumber = gamedatas.players[this.player_id].player_number;
 
-            console.log('Setting up player boards');
+            console.log('setting up player boards');
             for (const playerId in gamedatas.players) {
                 this.setupPlayerBoard(gamedatas.players[playerId]);
             }
 
-            this.setupBoard(gamedatas.board, gamedatas.players);
+            console.log('setting the the game board');
+            this.setupGameBoard(gamedatas.board, gamedatas.players);
 
-            console.log('Setting up player hand');
+            console.log('setting up player hand');
             this.hand = gamedatas.hand;
             this.renderHand();
 
@@ -201,20 +213,10 @@ function (dojo, declare, fx, hexloc, bblfx, on) {
             console.log('setting up notifications');
             this.bgaSetupPromiseNotifications();
 
-            console.log('adding onclick handlers');
-            this.handlers.push(on.pausable(
-                $(IDS.HAND), 'click', this.onHandClicked.bind(this)
-            ));
-            this.handlers.push(on.pausable(
-                $(IDS.BOARD), 'click', this.onBoardClicked.bind(this)
-            ));
-            this.handlers.push(on.pausable(
-                $(IDS.AVAILABLE_ZCARDS),
-                'click',
-                this.onZcardClicked.bind(this)
-            ));
+            console.log('adding event handlers');
+            this.setupHandlers();
 
-            console.log('Game setup done.');
+            console.log('finished game setup.');
         },
 
         setupPlayerBoard: function(player) {
@@ -239,8 +241,7 @@ function (dojo, declare, fx, hexloc, bblfx, on) {
             this.updateCapturedCityCount(player, false);
         },
 
-        setupBoard: function(boardData, playersData) {
-            console.log('Setting the the game board');
+        setupGameBoard: function(boardData, playersData) {
             let boardDiv = $(IDS.BOARD);
             // console.log(gamedatas.board);
 
@@ -981,13 +982,6 @@ function (dojo, declare, fx, hexloc, bblfx, on) {
                          });
             anim.push(a);
             await this.playAnimation(dojo.fx.chain(anim));
-        },
-
-        playAnimation: async function(anim) {
-            let p = this.bgaPlayDojoAnimation(anim);
-            this.pauseOnClickHandlers();
-            p.then(() => this.resumeOnClickHandlers());
-            return p;
         },
 
         notif_turnFinished: async function(args) {
