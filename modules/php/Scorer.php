@@ -28,14 +28,18 @@ namespace Bga\Games\babylonia;
 
 class Scorer {
 
+    /** @param array<int, PlayerInfo> $player_infos */
     public function __construct(private Board $board,
-                                private array /* PlayerInfo */ $player_infos,
+                                private array $player_infos,
                                 private Components $components) { }
 
-    private function newEmptyPlayerMap(mixed $value): array {
+    /**
+     * @return array<int,int>
+     */
+    private function newEmptyPlayerMap(): array {
         $result = [];
         foreach ($this->player_infos as $pi) {
-            $result[$pi->player_id] = $value;
+            $result[$pi->player_id] = 0;
         }
         return $result;
     }
@@ -46,7 +50,7 @@ class Scorer {
             $hex,
             function (Hex $h): bool { return $h->piece->isPlayerPiece(); }
         );
-        $adjacent = $this->newEmptyPlayerMap(0);
+        $adjacent = $this->newEmptyPlayerMap();
         foreach ($neighbors as $h) {
             $adjacent[$h->player_id]++;
         }

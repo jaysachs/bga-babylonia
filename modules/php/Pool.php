@@ -28,14 +28,12 @@ namespace Bga\Games\babylonia;
 
 class Pool {
 
-    // associative array from int (ID) => Piece
-    private array $pieces = [];
     // straight list of IDs taken
+    /** @var int[] */
     private array $taken = [];
 
-    public function __construct(array $pieces) {
-        $this->pieces = $pieces;
-    }
+    /** @param array<int,Piece> $pieces */
+    public function __construct(private array $pieces) { }
 
     public static function new(): Pool {
         $pieces = [];

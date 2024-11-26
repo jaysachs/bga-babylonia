@@ -30,7 +30,8 @@ class Model {
 
     private ?Board $_board = null;
     private ?TurnProgress $_turn_progress = null;
-    private ?array /* PlayerInfo */ $_allPlayerInfo = null;
+    /** @var array<int, PlayerInfo> */
+    private ?array $_allPlayerInfo = null;
     private ?Hand $_hand = null;
     private ?Pool $_pool = null;
     private ?Components $_components = null;
@@ -38,6 +39,7 @@ class Model {
 
     public function __construct(private PersistentStore $ps, private int $player_id) { }
 
+    /** @param int[] $player_ids */
     public function createNewGame(array $player_ids, bool $use_advanced_ziggurats): void {
         $this->_board = Board::forPlayerCount(count($player_ids));
         $this->ps->insertBoard($this->_board);
@@ -70,7 +72,8 @@ class Model {
         return $this->_components;
     }
 
-    public function &allPlayerInfo(): array /* PlayerInfo */ {
+    /** @return array<int,PlayerInfo> */
+    public function &allPlayerInfo(): array {
         if ($this->_allPlayerInfo == null) {
             $this->_allPlayerInfo = $this->ps->retrieveAllPlayerInfo();
         }
@@ -271,7 +274,7 @@ class Model {
 
     private function resolveAnyTies(): void {
         $infos = array_values($this->allPlayerInfo());
-        usort($infos, function ($i1, $i2): int {
+        usort($infos, function (PlayerInfo $i1, PlayerInfo $i2): int {
             return $i1->score - $i2->score;
         });
         $aux_scores=[];
@@ -379,7 +382,7 @@ class Model {
             return 10;
         };
         usort($result,
-              function ($a, $b) use($val) {
+              function (Hex $a, Hex $b) use($val): int {
                   return $val($a) - $val($b);
               });
         return $result;

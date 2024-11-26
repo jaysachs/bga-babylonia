@@ -110,6 +110,7 @@ class Board {
         return self::fromMap($map, $dev_locs);
     }
 
+    /** @param array[] $dev_locs */
     private static function fromMap(string $map, array &$dev_locs): Board {
         $board = new Board();
         $lines = explode("\n", trim($map));
@@ -241,6 +242,7 @@ END;
         return $board;
     }
 
+    /** @param Piece[] $available_developments */
     private function placeDevelopments(array &$available_developments,
                                        array &$development_locations): void {
         foreach ($development_locations as $rc) {
@@ -268,7 +270,8 @@ END;
         }
     }
 
-    public static function fromHexes(array /* Hex */ &$hexes): Board {
+    /** @param Hex[] $hexes */
+    public static function fromHexes(array &$hexes): Board {
         $board = new Board();
         foreach ($hexes as $hex) {
             $board->addHex($hex);
@@ -277,6 +280,7 @@ END;
     }
 
     private function __construct() {}
+    /** @var array<int,array<int,Hex>> */
     private array $hexes = [];
 
     /* visit should return true if continue exploring */
@@ -311,6 +315,7 @@ END;
         );
     }
 
+    /** @param array[] $development_locations */
     private function removeLandmass(Landmass $landmass, array &$development_locations): void {
         foreach ($this->hexes as &$hexrow) {
             foreach ($hexrow as $hex) {
@@ -341,6 +346,9 @@ END;
         return $adjacent;
     }
 
+    /**
+     * @return Hex[]
+     */
     public function neighbors(Hex $hex, ?\Closure $matching = null): array {
         $r = $hex->row;
         $c = $hex->col;
@@ -359,6 +367,7 @@ END;
             );
     }
 
+    /** @return Piece[] */
     private static function initializePool(int $numPlayers, bool $random): array {
         $available_developments = array();
         for ($i = 0; $i < 2; $i++) {

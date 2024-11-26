@@ -70,6 +70,7 @@ enum Piece: string {
         };
     }
 
+    /** @return Piece[] */
     public static function playerPieces(): array {
         return [Piece::FARMER, Piece::MERCHANT, Piece::SERVANT, Piece::PRIEST];
     }

@@ -28,11 +28,8 @@ namespace Bga\Games\babylonia;
 
 class Hand {
 
-    private array $pieces = [];
-
-    public function __construct(array $pieces) {
-        $this->pieces = $pieces;
-    }
+    /** @param Piece[] $pieces */
+    public function __construct(private array $pieces) { }
 
     public static function new(int $size = 5): Hand {
         $pieces = [];

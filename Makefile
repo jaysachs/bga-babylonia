@@ -22,7 +22,7 @@ deploy: test
 	./local/bgasync.sh
 
 psalm: $(STUBS) $(PSALM_CONFIG)
-	psalm -c $(PSALM_CONFIG) modules/php
+	psalm --show-info=true -c $(PSALM_CONFIG) modules/php
 
 stubs: $(STUBS)
 

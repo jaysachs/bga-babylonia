@@ -270,7 +270,8 @@ class PersistentStore {
         $this->db->DbQuery($sql);
     }
 
-    public function retrieveAllPlayerInfo(): array /* int => PlayerInfo */ {
+    /** @return array<int,PlayerInfo> */
+    public function retrieveAllPlayerInfo(): array {
         // TODO: retrieve zig cards? or remove from PlayerInfo?
         $result = [];
         $data = $this->db->getCollectionFromDB( PersistentStore::SQL_PLAYER_INFO );
