@@ -280,7 +280,7 @@ class Game extends \Table
         $zcards = $model->components()->availableZigguratCards();
         return [
             "available_cards" => array_map(
-                function ($z) {
+                function ($z): string {
                     return $z->type->value;
                 },
                 $model->components()->availableZigguratCards()
@@ -288,7 +288,7 @@ class Game extends \Table
         ];
     }
 
-    public function actSelectZigguratCard(string $zctype) {
+    public function actSelectZigguratCard(string $zctype): void {
         $player_id = $this->activePlayerId();
         $model = new Model($this->ps, $player_id);
         $selection =
