@@ -1,6 +1,7 @@
 #
 STATS=modules/php/Stats.php
 GENSTATS=../bgautil/genstats/genstats.php
+
 $(STATS): $(GENSTATS) stats.json
 	php $(GENSTATS) babylonia > modules/php/Stats.php
 
