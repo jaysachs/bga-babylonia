@@ -42,9 +42,9 @@ class Hand {
         return new Hand($pieces);
     }
 
-    public function extend(int $newsize) {
+    public function extend(int $newsize): void {
         if ($newsize <= count($this->pieces)) {
-            throw \InvalidArgumentException("Can't shrink hand from " . $this->size() . " to " . $newsize);
+            throw new \InvalidArgumentException("Can't shrink hand from " . $this->size() . " to " . $newsize);
         }
         error_log("extending from " . count($this->pieces) . " to " . $newsize);
         for ($i = count($this->pieces); $i < $newsize; $i++) {
@@ -87,9 +87,9 @@ class Hand {
         return $this->size() == 0;
     }
 
-    public function replenish(Piece $piece) {
+    public function replenish(Piece $piece): void {
         if (!$piece->isPlayerPiece() || $piece == Piece::HIDDEN) {
-            throw new \InvalidArgumentException("Can't add $piece to hand");
+            throw new \InvalidArgumentException("Can't add $piece->value to hand");
         }
         for ($i = 0; $i < count($this->pieces); $i++) {
             if ($this->pieces[$i]->isEmpty()) {

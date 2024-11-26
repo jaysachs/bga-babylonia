@@ -62,10 +62,10 @@ class TestStore extends PersistentStore {
     public function retrieveHand(int $player_id): Hand {
         return $this->hand;
     }
-    public function insertMove(Move $move) {
+    public function insertMove(Move $move): void {
         // $this->turnProgress->addMove($move);
     }
-    public function updateZigguratCard(ZigguratCard $card) {
+    public function updateZigguratCard(ZigguratCard $card): void {
     }
 
     /* test utility methods */

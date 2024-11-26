@@ -44,7 +44,7 @@ class Scorer {
         // first compute who will win the city / ziggurat, if anyone.
         $neighbors = $this->board->neighbors(
             $hex,
-            function (&$h): bool { return $h->piece->isPlayerPiece(); }
+            function (Hex $h): bool { return $h->piece->isPlayerPiece(); }
         );
         $adjacent = $this->newEmptyPlayerMap(0);
         foreach ($neighbors as $h) {
@@ -75,11 +75,11 @@ class Scorer {
         return $result;
     }
 
-    private function computeNetwork(ScoredCity $result, int $pid) {
+    private function computeNetwork(ScoredCity $result, int $pid): void {
         $this->board->bfs(
             $result->scoredHex->row,
             $result->scoredHex->col,
-            function (&$h) use (&$result, $pid) {
+            function (Hex $h) use (&$result, $pid): bool {
                 if ($h == $result->scoredHex) {
                     return true;
                 }

@@ -27,9 +27,9 @@ declare(strict_types=1);
 namespace Bga\Games\babylonia;
 
 class Components {
-    public static function forNewGame(bool $use_advanced_ziggurats) {
+    public static function forNewGame(bool $use_advanced_ziggurats): Components {
         $cards = array_map(
-            function ($z) { return new ZigguratCard($z); },
+            function (ZigguratCardType $z) { return new ZigguratCard($z); },
             ZigguratCardType::sevenTypes($use_advanced_ziggurats)
         );
         return new Components($cards);
@@ -83,20 +83,20 @@ class Components {
         );
     }
 
-    public function takeCard(int $player_id, ZigguratCardType $type): ?ZigguratCard {
+    public function takeCard(int $player_id, ZigguratCardType $type): ZigguratCard {
         foreach ($this->allZigguratCards() as &$card) {
             if ($card->type == $type) {
                 if ($card->owning_player_id != 0) {
-                    throw new \InvalidArgumentException("Ziggurat card $type is already taken (by $card->owning_player_id).");
+                    throw new \InvalidArgumentException("Ziggurat card $type->value is already taken (by $card->owning_player_id).");
                 }
                 if ($card->used) {
-                    throw new \InvalidArgumentException("Ziggurat card $type is already used.");
+                    throw new \InvalidArgumentException("Ziggurat card $type->value is already used.");
                 }
                 $card->owning_player_id = $player_id;
                 return $card;
             }
         }
-        return null;
+        throw new \InvalidArgumentException("Ziggurat card $type->value not found");
     }
 }
 ?>

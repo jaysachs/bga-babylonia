@@ -35,7 +35,7 @@ class ScoredCity {
         private array /* player_id => Hex */ $scoringHexes,
         private array /* player_id => Hex */ $networkHexes) { }
 
-    public static function makeEmpty(Hex $scoredHex, array $player_ids) {
+    public static function makeEmpty(Hex $scoredHex, array $player_ids): ScoredCity {
         $sc = new ScoredCity($scoredHex, 0, [], [], []);
         foreach ($player_ids as $pid) {
             $sc->networkHexes[$pid] = [];

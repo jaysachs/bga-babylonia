@@ -44,12 +44,12 @@ class Move {
     }
 
     public function __toString(): string {
-        return sprintf("id:%d/%d piece:%s opiece:%s pos:$d %d:%d cap:%s field points:%d zig points:%d",
+        return sprintf("id:%d/%d piece:%s opiece:%s pos:%d %d:%d cap:%s field points:%d zig points:%d",
                        $this->player_id, $this->seq_id,
                        $this->piece->value, $this->original_piece->value,
                        $this->handpos,
                        $this->row, $this->col,
-                       $this->captured->value,
+                       $this->captured_piece->value,
                        $this->field_points,
                        $this->ziggurat_points);
     }

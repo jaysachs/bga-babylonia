@@ -35,7 +35,7 @@ class PersistentStore {
         return $b ? 'TRUE' : 'FALSE';
     }
 
-    private function enumValue($e): string {
+    private function enumValue(mixed $e): string {
         return $e == null ? 'NULL' : "'$e->value'";
     }
 
@@ -60,7 +60,7 @@ class PersistentStore {
     public function insertBoard(Board $board): void {
         $sql = "INSERT INTO board (board_row, board_col, hextype, piece, scored, player_id, landmass) VALUES ";
         $sql_values = [];
-        $board->visitAll(function ($hex) use (&$sql_values) {
+        $board->visitAll(function (Hex $hex) use (&$sql_values) {
             $piece = $this->enumValue($hex->piece);
             $player_id = $hex->player_id;
             $scored = $this->boolValue($hex->scored);
@@ -111,7 +111,7 @@ class PersistentStore {
             true
         );
         return new Pool(
-            array_map(function ($p): Piece { return Piece::from($p); }, $data)
+            array_map(function (string $p): Piece { return Piece::from($p); }, $data)
         );
     }
 
@@ -137,7 +137,7 @@ class PersistentStore {
             true
         );
         return new Hand(
-            array_map(function ($p): Piece { return Piece::from($p); }, $data)
+            array_map(function (string $p): Piece { return Piece::from($p); }, $data)
         );
     }
 
@@ -161,7 +161,7 @@ class PersistentStore {
         $this->db->DbQuery( $sql );
     }
 
-    public function undoMove(Move $move) {
+    public function undoMove(Move $move): void {
         $this->db->DbQuery( "DELETE FROM turn_progress
                              WHERE player_id = $move->player_id
                              AND seq_id = $move->seq_id" );
@@ -197,7 +197,7 @@ class PersistentStore {
     // Right now, this updates the score but the model doesn't get
     // updated, so it can't be used in Game::actPlayPiece to return the score
     // which is a bit of a smell.
-    public function insertMove(Move $move) {
+    public function insertMove(Move $move): void {
         $captured_piece = $move->captured_piece->value;
         $piece = $move->piece->value;
         $opiece = $move->original_piece->value;
@@ -286,7 +286,7 @@ class PersistentStore {
         return $this->playerInfoFromData($player_id, $player_data);
     }
 
-    const SQL_PLAYER_INFO =
+    const string SQL_PLAYER_INFO =
         "SELECT P.player_id id, P.player_id, P.player_score score,
                 P.player_color player_color,
                 P.captured_city_count captured_city_count, P.player_no player_number,
@@ -333,7 +333,7 @@ class PersistentStore {
 
     public function retrieveComponents(): Components {
         return new Components(array_map(
-            function ($d) {
+            function (array $d) {
                 return new ZigguratCard(ZigguratCardType::from($d["card_type"]),
                                         intval($d["player_id"]),
                                         boolval($d["used"]));
@@ -343,7 +343,7 @@ class PersistentStore {
         ));
     }
 
-    public function updateZigguratCard(ZigguratCard $card) {
+    public function updateZigguratCard(ZigguratCard $card): void {
         $player_id = $card->owning_player_id;
         $used = $this->boolValue($card->used);
         $type = $card->type->value;

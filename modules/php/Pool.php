@@ -65,7 +65,7 @@ class Pool {
         return $this->taken;
     }
 
-    public function take($random = true): Piece {
+    public function take(bool $random = true): Piece {
         $ids = array_keys($this->pieces);
         if ($random) {
             $id = $ids[array_rand($ids)];
