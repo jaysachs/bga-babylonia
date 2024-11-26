@@ -191,9 +191,6 @@ class Model {
 
         $piece = $this->hand()->play($handpos);
         $hex = $this->board()->hexAt($row, $col);
-        if ($hex == null) {
-            throw new \LogicException("Hex at $row $col was null");
-        }
         if (!$this->isPlayAllowed($piece, $hex)) {
             $pv = $piece->value;
             throw new \InvalidArgumentException("Illegal to play $pv to $row, $col by $this->player_id");

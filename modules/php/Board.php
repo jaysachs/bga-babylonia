@@ -36,7 +36,15 @@ class Board {
         $hexrow[$hex->col] = $hex;
     }
 
-    public function hexAt(int $row, int $col) : ?Hex {
+    public function hexAt(int $row, int $col) : Hex {
+        $hex = $this->maybeHexAt($row, $col);
+        if ($hex != null) {
+            return $hex;
+        }
+        throw new \InvalidArgumentException("No hex at $row:$col");
+    }
+
+    private function maybeHexAt(int $row, int $col) : ?Hex {
         if (key_exists($row, $this->hexes)) {
             return @ $this->hexes[$row][$col];
         }
@@ -97,7 +105,12 @@ class Board {
         return $x;
     }
 
-    public static function fromTestMap(string $map, array &$dev_locs = null): Board {
+    public static function fromTestMap(string $map): Board {
+        $dev_locs = [];
+        return self::fromMap($map, $dev_locs);
+    }
+
+    private static function fromMap(string $map, array &$dev_locs): Board {
         $board = new Board();
         $lines = explode("\n", trim($map));
         $row = 0;
@@ -132,9 +145,7 @@ class Board {
                     $board->addHex(Hex::ziggurat($row, $col));
                 } else if ($t == "CCC") {
                     $board->addHex(Hex::land($row, $col));
-                    if ($dev_locs !== null) {
-                        $dev_locs[] = [ $row, $col ];
-                    }
+                    $dev_locs[] = [ $row, $col ];
                 } else if ($t == "C.P") {
                     $board->addHex(
                         Hex::land($row, $col)->placeDevelopment(Piece::CITY_P));
@@ -209,17 +220,17 @@ END;
             throw new \InvalidArgumentException(sprintf("invalid number of players: %s", $numPlayers));
         }
         $development_locations = [];
-        $board = Board::fromTestMap(Board::ACTUAL_MAP, $development_locations);
+        $board = Board::fromMap(Board::ACTUAL_MAP, $development_locations);
         $board->markLandmass(Landmass::WEST, 18, 16);
         $board->markLandmass(Landmass::EAST, 2, 0);
         $board->markLandmass(Landmass::CENTER, 11, 7);
 
         switch ($numPlayers) {
         case 2:
-            $board->removeLandmass(Landmass::WEST);
+            $board->removeLandmass(Landmass::WEST, $development_locations);
             break;
         case 3:
-            $board->removeLandmass(Landmass::EAST);
+            $board->removeLandmass(Landmass::EAST, $development_locations);
         }
 
         $available_developments = self::initializePool($numPlayers, $random);
@@ -234,10 +245,8 @@ END;
                                        array &$development_locations): void {
         foreach ($development_locations as $rc) {
             $hex = $this->hexAt($rc[0], $rc[1]);
-            if ($hex != null) {
-                $x = array_shift($available_developments);
-                $hex->placeDevelopment($x);
-            }
+            $x = array_shift($available_developments);
+            $hex->placeDevelopment($x);
         }
     }
 
@@ -302,11 +311,16 @@ END;
         );
     }
 
-    private function removeLandmass(Landmass $landmass): void {
+    private function removeLandmass(Landmass $landmass, array &$development_locations): void {
         foreach ($this->hexes as &$hexrow) {
             foreach ($hexrow as $hex) {
                 if ($hex->landmass == $landmass) {
                     unset($hexrow[$hex->col]);
+                    $v = array_search([$hex->row, $hex->col],
+                                      $development_locations);
+                    if ($v !== false) {
+                        array_splice($development_locations, $v, 1);
+                    }
                 }
             }
         }
@@ -333,12 +347,12 @@ END;
 
         return array_filter(
                 [
-                    $this->hexAt($r-2, $c),
-                    $this->hexAt($r-1, $c+1),
-                    $this->hexAt($r+1, $c+1),
-                    $this->hexAt($r+2, $c),
-                    $this->hexAt($r+1, $c-1),
-                    $this->hexAt($r-1, $c-1)
+                    $this->maybeHexAt($r-2, $c),
+                    $this->maybeHexAt($r-1, $c+1),
+                    $this->maybeHexAt($r+1, $c+1),
+                    $this->maybeHexAt($r+2, $c),
+                    $this->maybeHexAt($r+1, $c-1),
+                    $this->maybeHexAt($r-1, $c-1)
                 ], function ($nh) use ($matching) {
                     return $nh != null && ($matching === null || $matching($nh));
                 }

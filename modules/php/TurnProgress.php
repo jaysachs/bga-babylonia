@@ -61,9 +61,6 @@ class TurnProgress {
                 return false;
             }
             $hex = $board->hexAt($move->row, $move->col);
-            if ($hex === null) {
-                throw new \LogicException("Board does not have hex referenced in move");
-            }
             if ($hex->isWater()) {
                 return false;
             }
