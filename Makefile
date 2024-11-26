@@ -3,6 +3,7 @@ STATS=modules/php/Stats.php
 GENSTATS=../bgautil/genstats/genstats.php
 WORK=work
 STUBS=$(WORK)/module/table/table.game.php
+PSALM_CONFIG=psalm.xml
 
 $(WORK):
 	mkdir $(WORK)
@@ -20,8 +21,8 @@ test: $(STATS) $(STUBS)
 deploy: test
 	./local/bgasync.sh
 
-psalm: $(STUBS)
-	psalm modules/php
+psalm: $(STUBS) $(PSALM_CONFIG)
+	psalm -c $(PSALM_CONFIG) modules/php
 
 stubs: $(STUBS)
 
