@@ -1,6 +1,6 @@
 <?php
 
-define('APP_GAMEMODULE_PATH', '');
+require_once('work/module/table/table.game.php');
 
 spl_autoload_register(function ($class) {
     if (str_starts_with($class, 'Bga\\Games\\babylonia\\')) {
