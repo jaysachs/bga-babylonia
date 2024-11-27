@@ -127,19 +127,8 @@ class Game extends \Table
     {
         $model = new Model($this->ps, $this->activePlayerId());
 
-        /** @var array<string,Hex[]> */
-        $allowed_moves = $model->getAllowedMoves();
-
-        $am = [];
-        foreach ($allowed_moves as $piece => &$hexlist) {
-            $m = [];
-            foreach ($hexlist as &$hex) {
-                $m[] = [ 'row'=> $hex->rc->row, 'col' => $hex->rc->col ];
-            }
-            $am[$piece] = $m;
-        }
         return [
-            "allowedMoves" => $am,
+            "allowedMoves" => $model->getAllowedMoves(),
             "canEndTurn" => $model->canEndTurn(),
             "canUndo" => $model->turnProgress()->canUndo(),
         ];

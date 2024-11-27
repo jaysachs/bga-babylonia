@@ -80,6 +80,7 @@ class Model {
         return $this->_allPlayerInfo;
     }
 
+    /** @return int[] */
     public function allPlayerIds(): array {
         return array_keys($this->allPlayerInfo());
     }
@@ -168,8 +169,10 @@ class Model {
     }
 
     /*
-     * Returns an array ["piece" => [hex1, hex2,...], ...]
+     * Returns an array ["piece" => [rc1, rc2,...], ...]
      * for piece types that are in hand
+     *
+     * @return RowCol[]
      */
     public function getAllowedMoves(): array {
         $result = [];
@@ -181,7 +184,7 @@ class Model {
                         if (!isset($result[$piece->value])) {
                             $result[$piece->value] = [];
                         }
-                        $result[$piece->value][] = $hex;
+                        $result[$piece->value][] = $hex->rc;
                     }
                 }
             }
