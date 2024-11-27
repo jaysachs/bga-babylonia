@@ -290,8 +290,6 @@ class Model {
     }
 
     public function scoreZiggurat(Hex $hexrc): ScoredZiggurat {
-        // TODO: really implement this, checking for a winner,
-        //  and executing a state change
         $hex = $this->board()->hexAt($hexrc->row, $hexrc->col);
         if (!$hex->piece->isZiggurat()) {
             throw new \InvalidArgumentException("Attempt to score non-ziggurat {$hex} as a ziggurat");
