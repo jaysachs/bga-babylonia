@@ -318,7 +318,7 @@ class Model {
             throw new \InvalidArgumentException("{$hex} is not a city to be scored");
         }
         $scoredCity = $this->scorer()->computeCityScores($hex);
-        $playerInfos = &$this->allPlayerInfo();
+        $playerInfos = $this->allPlayerInfo();
 
         // Increase captured_city_count for capturing player, if any
         if ($scoredCity->captured_by > 0) {

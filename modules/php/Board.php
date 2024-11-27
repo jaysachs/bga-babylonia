@@ -28,8 +28,9 @@ namespace Bga\Games\babylonia;
 
 class Board {
 
+    // TODO: switch to a single associative array approach.
     private function addHex(Hex $hex): void {
-        @ $hexrow = &$this->hexes[$hex->row];
+        @ $hexrow = $this->hexes[$hex->row];
         if ($hexrow == null) {
             $this->hexes[$hex->row] = [];
         }
@@ -221,7 +222,8 @@ END;
             throw new \InvalidArgumentException(sprintf("invalid number of players: %s", $numPlayers));
         }
         /** TODO: define an actual Location class to hold row,col */
-        /** @var array{0:int,1:int}[] $development_locations */
+
+        /** @var array{0:int, 1:int}[] */
         $development_locations = [];
         $board = Board::fromMap(Board::ACTUAL_MAP, $development_locations);
         $board->markLandmass(Landmass::WEST, 18, 16);
@@ -320,7 +322,7 @@ END;
         );
     }
 
-    /** @param array[] $development_locations */
+    /** @param array{0:int,1:int}[] $development_locations */
     private function removeLandmass(Landmass $landmass, array &$development_locations): void {
         foreach ($this->hexes as &$hexrow) {
             foreach ($hexrow as $hex) {
@@ -329,7 +331,7 @@ END;
                     $v = array_search([$hex->row, $hex->col],
                                       $development_locations);
                     if ($v !== false) {
-                        array_splice($development_locations, $v, 1);
+                        array_splice($development_locations, intval($v), 1);
                     }
                 }
             }
