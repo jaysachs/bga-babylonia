@@ -36,12 +36,12 @@ class Hex {
         return sprintf("%s %s %s(%d)", $this->type->value, $this->rc, $this->piece->value, $this->player_id);
     }
 
-    public function __construct(public HexType $type,
+    public function __construct(public readonly HexType $type,
                                 public readonly RowCol $rc,
                                 public Piece $piece = Piece::EMPTY,
                                 public int $player_id = 0,
                                 public bool $scored = false,
-                                public Landmass $landmass = Landmass::UNKNOWN) {
+                                public readonly Landmass $landmass = Landmass::UNKNOWN) {
     }
 
     public function captureCity(): Piece {
