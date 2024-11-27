@@ -299,7 +299,7 @@ class PersistentStore {
         return $this->playerInfoFromData($player_id, $player_data);
     }
 
-    const string SQL_PLAYER_INFO =
+    const SQL_PLAYER_INFO =
         "SELECT P.player_id id, P.player_id, P.player_score score,
                 P.player_color player_color,
                 P.captured_city_count captured_city_count, P.player_no player_number,

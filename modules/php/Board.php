@@ -191,7 +191,7 @@ class Board {
         return $board;
     }
 
-    const string ACTUAL_MAP =<<<'END'
+    const ACTUAL_MAP =<<<'END'
 XXX   XXX   XXX   XXX   ≈≈≈   ---
    ---   XXX   XXX   ---   CCC   ---
 ---   ≈≈≈   ---   ---   ≈≈≈   ---   CCC

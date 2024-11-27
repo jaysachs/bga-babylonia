@@ -33,8 +33,10 @@ class Game extends \Table
     //  means another player needs to choose a card; this global holds
     //  the ID of the "primary" player, i.e. who should become active
     //  once the ziggurat card is selected.
-    private const string GLOBAL_PLAYER_ON_TURN = 'player_on_turn';
-    private const string GLOBAL_NEXT_PLAYER_TO_BE_ACTIVE = 'next_player_to_be_active';
+    /** @var string */
+    private const GLOBAL_PLAYER_ON_TURN = 'player_on_turn';
+    /** @var string */
+    private const GLOBAL_NEXT_PLAYER_TO_BE_ACTIVE = 'next_player_to_be_active';
 
     private PersistentStore $ps;
 
