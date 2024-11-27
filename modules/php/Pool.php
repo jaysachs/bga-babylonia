@@ -28,11 +28,7 @@ namespace Bga\Games\babylonia;
 
 class Pool {
 
-    // straight list of IDs taken
-    /** @var int[] */
-    private array $taken = [];
-
-    /** @param array<int,Piece> $pieces */
+    /** @param Piece[] $pieces */
     public function __construct(private array $pieces) { }
 
     public static function new(): Pool {
@@ -47,8 +43,7 @@ class Pool {
         return new Pool($pieces);
     }
 
-    /** TODO: no need to keep whole array; splice it */
-    /** @return array<?Piece> */
+    /** @return array<Piece> */
     public function pieces(): array {
         return $this->pieces;
     }
@@ -61,23 +56,12 @@ class Pool {
         return count($this->pieces);
     }
 
-    public function piecesTaken(): array /* int */ {
-        return $this->taken;
-    }
-
-    public function take(bool $random = true): Piece {
-        $ids = array_keys($this->pieces);
-        if ($random) {
-            $id = $ids[array_rand($ids)];
-        } else {
-            $id = array_shift($ids);
-        }
-        $this->taken[] = $id;
-        $result = $this->pieces[$id];
-        unset($this->pieces[$id]);
+    public function take(): Piece {
+        $ix = random_int(0, count($this->pieces)-1);
+        $result = $this->pieces[$ix];
+        array_splice($this->pieces, $ix, 1);
         return $result;
     }
 }
-
 
 ?>

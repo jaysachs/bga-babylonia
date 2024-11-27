@@ -91,10 +91,8 @@ class PersistentStore {
 
         $sql_values = [];
         foreach ($pool->pieces() as $i => $p) {
-            if ($p != null) {
-                $x = $p->value;
-                $sql_values[] = "($player_id, $i, '$x')";
-            }
+            $x = $p->value;
+            $sql_values[] = "($player_id, $i, '$x')";
         }
         if (count($sql_values) > 0) {
             $sql = "INSERT INTO handpools (player_id, seq_id, piece) VALUES "
@@ -108,15 +106,8 @@ class PersistentStore {
                 FROM handpools
                 WHERE player_id = $player_id";
         /** @var array $pooldata */
-        $pooldata = $this->db->getObjectListFromDB2( $sql );
+        $data = $this->db->getObjectListFromDB2( $sql, true );
 
-        /** @var array<int,string> $data */
-        $data = $this->db->getCollectionFromDB(
-            "SELECT seq_id, piece
-             FROM handpools
-             WHERE player_id = $player_id",
-            true
-        );
         return new Pool(
             array_map(function (string $p): Piece { return Piece::from($p); }, $data)
         );
