@@ -216,7 +216,7 @@ CCC   ---   ---   CCC   ZZZ   ≈≈≈   ---   ---   CCC
 XXX   ---   CCC   ---   CCC   ≈≈≈   CCC   CCC
 END;
 
-    public static function forPlayerCount(int $numPlayers, bool $random = true): Board {
+    public static function forPlayerCount(int $numPlayers): Board {
         if ($numPlayers < 2 || $numPlayers > 4) {
             throw new \InvalidArgumentException(sprintf("invalid number of players: %s", $numPlayers));
         }
@@ -237,7 +237,7 @@ END;
             $board->removeLandmass(Landmass::EAST, $development_locations);
         }
 
-        $available_developments = self::initializePool($numPlayers, $random);
+        $available_developments = self::initializePool($numPlayers);
         $board->placeDevelopments($available_developments, $development_locations);
         if (count($available_developments) != 0) {
             throw new \LogicException("placed all cities and fields but developments leftover");
@@ -362,7 +362,7 @@ END;
     }
 
     /** @return Piece[] */
-    private static function initializePool(int $numPlayers, bool $random): array {
+    private static function initializePool(int $numPlayers): array {
         $available_developments = array();
         for ($i = 0; $i < 2; $i++) {
             $available_developments[] = Piece::CITY_P;
@@ -396,9 +396,7 @@ END;
                 $available_developments[] = Piece::FIELD_CITIES;
             }
         }
-        if ($random) {
-            shuffle($available_developments);
-        }
+        shuffle($available_developments);
         return $available_developments;
     }
 }
