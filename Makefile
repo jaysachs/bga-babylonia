@@ -15,13 +15,15 @@ $(STUBS): $(WORK) _ide_helper.php Makefile
 $(STATS): $(GENSTATS) stats.json
 	php $(GENSTATS) babylonia > modules/php/Stats.php
 
-test: $(STATS) $(STUBS)
+build: $(STATS)
+
+test: build $(STUBS)
 	phpunit --bootstrap misc/autoload.php misc --testdox --display-warnings --display-deprecations --display-notices
 
 deploy: test
 	./local/bgasync.sh
 
-psalm: $(STATS) $(STUBS) $(PSALM_CONFIG)
+psalm: build $(STUBS) $(PSALM_CONFIG)
 	psalm --show-info=true -c $(PSALM_CONFIG) modules/php
 
 stubs: $(STUBS)
