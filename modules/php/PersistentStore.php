@@ -45,6 +45,10 @@ class PersistentStore {
                 "SELECT board_row row, board_col col, hextype, piece, scored,
                         player_id board_player, landmass
                  FROM board");
+        /**
+         * @var array $hex
+         * @var array[] $data
+         */
         foreach ($data as &$hex) {
             $hexes[] = new Hex(HexType::from($hex['hextype']),
                                intval($hex['row']),
@@ -102,8 +106,10 @@ class PersistentStore {
         $sql = "SELECT piece
                 FROM handpools
                 WHERE player_id = $player_id";
+        /** @var array $pooldata */
         $pooldata = $this->db->getObjectListFromDB2( $sql );
 
+        /** @var array $data */
         $data = $this->db->getCollectionFromDB(
             "SELECT seq_id, piece
              FROM handpools
@@ -150,6 +156,7 @@ class PersistentStore {
         );
     }
 
+    /** @param array<int,PlayerInfo> $player_infos */
     public function updatePlayers(array $player_infos): void {
         foreach ($player_infos as $player_id => $pi) {
             $this->updatePlayer($pi);
@@ -257,7 +264,8 @@ class PersistentStore {
         return new TurnProgress($moves);
     }
 
-    public function updateAuxScores(array /* int->int */ $aux_scores): void {
+    /** @param array<int,int> $aux_scores */
+    public function updateAuxScores(array $aux_scores): void {
         if (count($aux_scores) == 0) {
             return;
         }

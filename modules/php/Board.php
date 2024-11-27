@@ -110,7 +110,7 @@ class Board {
         return self::fromMap($map, $dev_locs);
     }
 
-    /** @param array[] $dev_locs */
+    /** @param array{0:int,1:int}[] $dev_locs */
     private static function fromMap(string $map, array &$dev_locs): Board {
         $board = new Board();
         $lines = explode("\n", trim($map));
@@ -220,6 +220,7 @@ END;
         if ($numPlayers < 2 || $numPlayers > 4) {
             throw new \InvalidArgumentException(sprintf("invalid number of players: %s", $numPlayers));
         }
+        /** @var array{0:int,1:int}[] $development_locations */
         $development_locations = [];
         $board = Board::fromMap(Board::ACTUAL_MAP, $development_locations);
         $board->markLandmass(Landmass::WEST, 18, 16);
@@ -242,7 +243,10 @@ END;
         return $board;
     }
 
-    /** @param Piece[] $available_developments */
+    /**
+     * @param Piece[] $available_developments
+     * @param array{0:int,1:int}[] $development_locations
+     */
     private function placeDevelopments(array &$available_developments,
                                        array &$development_locations): void {
         foreach ($development_locations as $rc) {

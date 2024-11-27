@@ -49,7 +49,8 @@ class Hand {
         }
     }
 
-    public function pieces(): array /* int => Piece */ {
+    /** @return Piece[] */
+    public function pieces(): array {
         return $this->pieces;
     }
 
