@@ -47,7 +47,8 @@ class Pool {
         return new Pool($pieces);
     }
 
-    /** @return Piece[] */
+    /** TODO: no need to keep whole array; splice it */
+    /** @return array<?Piece> */
     public function pieces(): array {
         return $this->pieces;
     }

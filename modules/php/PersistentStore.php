@@ -41,6 +41,7 @@ class PersistentStore {
 
     public function retrieveBoard(): Board {
         $hexes = [];
+        /** @var array $data */
         $data = $this->db->getObjectListFromDB2(
                 "SELECT board_row row, board_col col, hextype, piece, scored,
                         player_id board_player, landmass
@@ -109,7 +110,7 @@ class PersistentStore {
         /** @var array $pooldata */
         $pooldata = $this->db->getObjectListFromDB2( $sql );
 
-        /** @var array $data */
+        /** @var array<int,string> $data */
         $data = $this->db->getCollectionFromDB(
             "SELECT seq_id, piece
              FROM handpools
@@ -138,6 +139,7 @@ class PersistentStore {
     }
 
     public function retrieveHand(int $player_id): Hand {
+        /** @var string[] $data */
         $data = $this->db->getObjectListFromDB2(
             "SELECT piece from hands WHERE player_id = $player_id ORDER BY pos",
             true
@@ -243,6 +245,7 @@ class PersistentStore {
     }
 
     public function retrieveTurnProgress(int $player_id): TurnProgress {
+        /** @var array<int,array> $dbresults */
         $dbresults = $this->db->getCollectionFromDb(
             "SELECT seq_id, player_id, handpos, piece, original_piece, board_row, board_col, captured_piece, field_points, ziggurat_points
              FROM turn_progress
@@ -282,6 +285,7 @@ class PersistentStore {
     public function retrieveAllPlayerInfo(): array {
         // TODO: retrieve zig cards? or remove from PlayerInfo?
         $result = [];
+        /** @var array<int,array> $data */
         $data = $this->db->getCollectionFromDB( PersistentStore::SQL_PLAYER_INFO );
         foreach ($data as $pid => $pd) {
             $result[$pid] = $this->playerInfoFromData($pid, $pd);
@@ -291,6 +295,7 @@ class PersistentStore {
 
     public function retrievePlayerInfo(int $player_id): PlayerInfo {
         $sql = PersistentStore::SQL_PLAYER_INFO . " WHERE P.player_id = $player_id";
+        /** @var array $player_data */
         $player_data = $this->db->getNonEmptyObjectFromDB2( $sql );
         return $this->playerInfoFromData($player_id, $player_data);
     }
