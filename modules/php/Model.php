@@ -189,14 +189,14 @@ class Model {
         return $result;
     }
 
-    public function playPiece(int $handpos, int $row, int $col): Move {
+    public function playPiece(int $handpos, RowCol $rc): Move {
         // also retrieve ziggurat cards held
 
         $piece = $this->hand()->play($handpos);
-        $hex = $this->board()->hexAt($row, $col);
+        $hex = $this->board()->hexAt($rc);
         if (!$this->isPlayAllowed($piece, $hex)) {
             $pv = $piece->value;
-            throw new \InvalidArgumentException("Illegal to play $pv to $row, $col by $this->player_id");
+            throw new \InvalidArgumentException("Illegal to play $pv to $rc by $this->player_id");
         }
 
         $originalPiece = $piece;
@@ -226,8 +226,7 @@ class Model {
             $ziggurat_points = $this->board()->adjacentZiggurats($this->player_id);
         }
         $move = new Move($this->player_id, $piece, $originalPiece, $handpos,
-                         $row, $col, $hexPiece,
-                         $field_points, $ziggurat_points);
+                         $rc, $hexPiece, $field_points, $ziggurat_points);
         $this->turnProgress()->addMove($move);
 
         // update the database
@@ -289,8 +288,8 @@ class Model {
         $this->ps->updateAuxScores($aux_scores);
     }
 
-    public function scoreZiggurat(Hex $hexrc): ScoredZiggurat {
-        $hex = $this->board()->hexAt($hexrc->row, $hexrc->col);
+    public function scoreZiggurat(RowCol $rc): ScoredZiggurat {
+        $hex = $this->board()->hexAt($rc);
         if (!$hex->piece->isZiggurat()) {
             throw new \InvalidArgumentException("Attempt to score non-ziggurat {$hex} as a ziggurat");
         }
@@ -307,7 +306,8 @@ class Model {
         return new ScoredZiggurat($this->scorer()->computeHexWinner($hex));
     }
 
-    public function scoreCity(Hex $hex): ScoredCity {
+    public function scoreCity(RowCol $rc): ScoredCity {
+        $hex = $this->board()->hexAt($rc);
         if (!$hex->piece->isCity()) {
             throw new \InvalidArgumentException("Attempt to score non-city {$hex} as a city");
         }
@@ -327,13 +327,9 @@ class Model {
             $pi->score += $scoredCity->pointsForPlayer($pid);
         }
 
-        // Mark the hex captured
-        // TODO: this is defensive, since we use the incoming hex
-        //  only as coordinates.
-        $captured_hex = $this->board()->hexAt($hex->row, $hex->col);
-        $_unused = $captured_hex->captureCity();
+        $_unused = $hex->captureCity();
 
-        $this->ps->updateHex($captured_hex);
+        $this->ps->updateHex($hex);
         $this->ps->updatePlayers($playerInfos);
 
         return $scoredCity;

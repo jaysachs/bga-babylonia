@@ -61,7 +61,7 @@ class TurnProgress {
             if ($move->piece != Piece::FARMER) {
                 return false;
             }
-            $hex = $board->hexAt($move->row, $move->col);
+            $hex = $board->hexAt($move->rc);
             if ($hex->isWater()) {
                 return false;
             }

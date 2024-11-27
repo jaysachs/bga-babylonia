@@ -81,8 +81,7 @@ class Scorer {
 
     private function computeNetwork(ScoredCity $result, int $pid): void {
         $this->board->bfs(
-            $result->scoredHex->row,
-            $result->scoredHex->col,
+            $result->scoredHex->rc,
             function (Hex $h) use (&$result, $pid): bool {
                 if ($h == $result->scoredHex) {
                     return true;

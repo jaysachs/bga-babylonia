@@ -33,12 +33,11 @@ namespace Bga\Games\babylonia;
 class Hex {
 
     public function __toString(): string {
-        return sprintf("%s %d:%d %s(%d)", $this->type->value, $this->row, $this->col, $this->piece->value, $this->player_id);
+        return sprintf("%s %s %s(%d)", $this->type->value, $this->rc, $this->piece->value, $this->player_id);
     }
 
     public function __construct(public HexType $type,
-                                public int $row,
-                                public int $col,
+                                public readonly RowCol $rc,
                                 public Piece $piece = Piece::EMPTY,
                                 public int $player_id = 0,
                                 public bool $scored = false,
@@ -98,21 +97,19 @@ class Hex {
     }
 
     public function isNeighbor(Hex $hex): bool {
-        $cd = abs($this->col - $hex->col);
-        $rd = abs($this->row - $hex->row);
-        return $cd == 1 && $rd == 1 || $cd == 0 && $rd == 2;
+        return $this->rc->isNeighbor($hex->rc);
     }
 
-    public static function land(int $row, int $col):Hex {
-        return new Hex(HexType::LAND, $row, $col);
+    public static function land(RowCol $rc):Hex {
+        return new Hex(HexType::LAND, $rc);
     }
 
-    public static function water(int $row, int $col): Hex {
-        return new Hex(HexType::WATER, $row, $col);
+    public static function water(RowCol $rc): Hex {
+        return new Hex(HexType::WATER, $rc);
     }
 
-    public static function ziggurat(int $row, int $col): Hex {
-        return new Hex(HexType::LAND, $row, $col, Piece::ZIGGURAT);
+    public static function ziggurat(RowCol $rc): Hex {
+        return new Hex(HexType::LAND, $rc, Piece::ZIGGURAT);
     }
 }
 

@@ -7,6 +7,7 @@ use Bga\Games\babylonia\ {
         Board,
         Components,
         PlayerInfo,
+        RowCol,
         Scorer,
         ScoredCity,
 };
@@ -42,7 +43,7 @@ END;
         $board = Board::fromTestMap(ScorerTest::MAP1);
         $scorer = new Scorer($board, $this->playerInfos(), new Components([]));
 
-        $hex = function(int $r, int $c) use(&$board) { return $board->hexAt($r, $c); };
+        $hex = function(int $r, int $c) use(&$board) { return $board->hexAt(new RowCol($r, $c)); };
         $expected = new ScoredCity(
             $hex(6, 0),
             3,
@@ -95,7 +96,7 @@ END;
         $board = Board::fromTestMap(ScorerTest::MAP4);
         $scorer = new Scorer($board, $this->playerInfos(), new Components([]));
 
-        $hex = function(int $r, int $c) use(&$board) { return $board->hexAt($r, $c); };
+        $hex = function(int $r, int $c) use(&$board) { return $board->hexAt(new RowCol($r, $c)); };
         $expected = new ScoredCity(
             $hex(6, 0),
             3,
@@ -131,10 +132,13 @@ END;
         $board = Board::fromTestMap(ScorerTest::MAP2);
         $scorer = new Scorer($board, $this->playerInfos(), new Components([]));
 
-        $this->assertEquals(3, $scorer->computeHexWinner($board->hexAt(6, 0)));
-        $this->assertEquals(3, $scorer->computeHexWinner($board->hexAt(3, 3)));
+        $this->assertEquals(3, $scorer->computeHexWinner(
+            $board->hexAt(new RowCol(6, 0))));
+        $this->assertEquals(3, $scorer->computeHexWinner(
+            $board->hexAt(new RowCol(3, 3))));
         // 3 has 2, 1 and 2 each have 1, so 3 wins
-        $this->assertEquals(3, $scorer->computeHexWinner($board->hexAt(3, 1)));
+        $this->assertEquals(3, $scorer->computeHexWinner(
+            $board->hexAt(new RowCol(3, 1))));
     }
 
 const MAP3 = <<<'END'
@@ -152,7 +156,8 @@ END;
         $board = Board::fromTestMap(ScorerTest::MAP3);
         $scorer = new Scorer($board, $this->playerInfos(), new Components([]));
 
-        $this->assertEquals(0, $scorer->computeHexWinner($board->hexAt(3, 1)));
+        $this->assertEquals(0, $scorer->computeHexWinner(
+            $board->hexAt(new RowCol(3, 1))));
     }
 
 
@@ -169,7 +174,7 @@ END;
         $board = Board::fromTestMap(ScorerTest::MAP8);
         $scorer = new Scorer($board, $this->playerInfos(), new Components([]));
 
-        $hex = function(int $r, int $c) use(&$board) { return $board->hexAt($r, $c); };
+        $hex = function(int $r, int $c) use(&$board) { return $board->hexAt(new RowCol($r, $c)); };
         $expected = new ScoredCity(
             $hex(0, 2),
             1,
@@ -200,7 +205,7 @@ END;
         $board = Board::fromTestMap(ScorerTest::MAP9);
         $scorer = new Scorer($board, $this->playerInfos(), new Components([]));
 
-        $hex = function(int $r, int $c) use(&$board) { return $board->hexAt($r, $c); };
+        $hex = function(int $r, int $c) use(&$board) { return $board->hexAt(new RowCol($r, $c)); };
         $expected = new ScoredCity(
             $hex(1, 3),
             1,
@@ -232,7 +237,7 @@ END;
         $board = Board::fromTestMap(ScorerTest::MAP7);
         $scorer = new Scorer($board, $this->playerInfos(), new Components([]));
 
-        $hex = function(int $r, int $c) use(&$board) { return $board->hexAt($r, $c); };
+        $hex = function(int $r, int $c) use(&$board) { return $board->hexAt(new RowCol($r, $c)); };
         $expected = new ScoredCity(
             $hex(2, 2),
             0,

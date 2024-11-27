@@ -8,6 +8,7 @@ use Bga\Games\babylonia\ {
         Hex,
         HexType,
         Piece,
+        RowCol,
 };
 
 final class BoardTest extends TestCase
@@ -15,7 +16,7 @@ final class BoardTest extends TestCase
     public function testBfsRiver(): void {
         $board = Board::forPlayerCount(2, false);
         $visited = [];
-        $board->bfs(7, 3, function ($h) use (&$visited) {
+        $board->bfs(new RowCol(7, 3), function ($h) use (&$visited) {
             if ($h->isWater()) {
                 $visited[] = $h;
                 return true;
@@ -31,7 +32,7 @@ final class BoardTest extends TestCase
     public function testBfsClump(): void {
         $board = Board::forPlayerCount(2, false);
         $visited = [];
-        $board->bfs(8, 0, function ($h) use (&$visited) {
+        $board->bfs(new RowCol(8, 0), function ($h) use (&$visited) {
             if ($h->isLand() && $h->piece->isEmpty()) {
                 $visited[] = $h;
                 return true;

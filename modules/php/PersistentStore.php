@@ -52,8 +52,8 @@ class PersistentStore {
          */
         foreach ($data as &$hex) {
             $hexes[] = new Hex(HexType::from($hex['hextype']),
-                               intval($hex['row']),
-                               intval($hex['col']),
+                               new RowCol(intval($hex['row']),
+                                          intval($hex['col'])),
                                Piece::from($hex['piece']),
                                intval($hex['board_player']),
                                boolval($hex['scored']),
@@ -71,7 +71,7 @@ class PersistentStore {
             $scored = $this->boolValue($hex->scored);
             $t = $hex->type->value;
             $lm = $hex->landmass->value;
-            $sql_values[] = "($hex->row, $hex->col, '$t', $piece, $scored, $hex->player_id, '$lm')";
+            $sql_values[] = "($hex->rc->row, $hex->rc->col, '$t', $piece, $scored, $hex->player_id, '$lm')";
         });
         $sql .= implode(',', $sql_values);
         $this->db->DbQuery( $sql );
@@ -82,7 +82,7 @@ class PersistentStore {
         $scored = $this->boolValue($hex->scored);
         $this->db->DbQuery("UPDATE board
                      SET piece='$piece', player_id=$hex->player_id, scored=$scored
-                     WHERE board_row=$hex->row AND board_col=$hex->col");
+                     WHERE board_row=$hex->rc->row AND board_col=$hex->rc->col");
     }
 
     public function upsertPool(int $player_id, Pool $pool): void {
@@ -170,7 +170,7 @@ class PersistentStore {
         $captured_piece =  $move->captured_piece->value;
         $this->db->DbQuery("UPDATE board
                      SET piece='$captured_piece', player_id=0
-                     WHERE board_row=$move->row AND board_col=$move->col");
+                     WHERE board_row=$move->rc->row AND board_col=$move->rc->col");
 
         // update player scores
         $points = $move->points();
@@ -207,13 +207,13 @@ class PersistentStore {
                        board_row, board_col,
                        captured_piece, field_points, ziggurat_points)
                       VALUES($move->player_id, NULL, '$opiece', '$piece',
-                             $move->handpos, $move->row, $move->col,
+                             $move->handpos, $move->rc->row, $move->rc->col,
                              '$captured_piece', $move->field_points,
                              $move->ziggurat_points)");
         // update board state
         $this->db->DbQuery("UPDATE board
-                     SET piece='$piece', player_id=$move->player_id
-                     WHERE board_row=$move->row AND board_col=$move->col");
+                 SET piece='$piece', player_id=$move->player_id
+                 WHERE board_row=$move->rc->row AND board_col=$move->rc->col");
 
         // update player scores
         $points = $move->points();
@@ -248,8 +248,8 @@ class PersistentStore {
                                 Piece::from($move['piece']),
                                 Piece::from($move['original_piece']),
                                 intval($move['handpos']),
-                                intval($move['board_row']),
-                                intval($move['board_col']),
+                                new RowCol(intval($move['board_row']),
+                                           intval($move['board_col'])),
                                 Piece::from($move['captured_piece']),
                                 intval($move['field_points']),
                                 intval($move['ziggurat_points']),

@@ -14,6 +14,7 @@ use Bga\Games\babylonia\ {
         PersistentStore,
         Piece,
         PlayerInfo,
+        RowCol,
         ScoredCity,
         TurnProgress,
         ZigguratCard,
@@ -70,7 +71,7 @@ class TestStore extends PersistentStore {
 
     /* test utility methods */
     public function hex(int $r, int $c) {
-        return $this->board->hexAt($r, $c);
+        return $this->board->hexAt(new RowCol($r, $c));
     }
     public function setHand(array /* Piece */ $pieces) {
         foreach ($pieces as $piece) {
@@ -226,10 +227,10 @@ END;
         $ps = new TestStore($board = Board::fromTestMap(ModelTest::MAP5));
         $model = new Model($ps, 1);
         $ps->setHand([Piece::FARMER, Piece::SERVANT, Piece::FARMER, Piece::FARMER, Piece::FARMER]);
-        $m1 = $model->playPiece(0, 2, 0);
-        $m2 = $model->playPiece(3, 4, 0);
-        $m3 = $model->playPiece(2, 7, 1);
-        $m4 = $model->playPiece(4, 6, 2);
+        $m1 = $model->playPiece(0, new RowCol(2, 0));
+        $m2 = $model->playPiece(3, new RowCol(4, 0));
+        $m3 = $model->playPiece(2, new RowCol(7, 1));
+        $m4 = $model->playPiece(4, new RowCol(6, 2));
         // if we had another farmer, it would be allowed
         $this->assertTrue($model->isPlayAllowed(Piece::FARMER, $ps->hex(2, 4)));
         // but only a farmer
@@ -262,7 +263,7 @@ END;
         $model = new Model($ps, 1);
         $ps->setHand([Piece::FARMER]);
         // An adjacent farmer doesn't help
-        $m1 = $model->playPiece(0, 2, 0);
+        $m1 = $model->playPiece(0, new RowCol(2, 0));
         $this->assertFalse($model->isPlayAllowed(Piece::FARMER, $ps->hex(1,1)));
     }
 
@@ -270,7 +271,7 @@ END;
         $ps = new TestStore($board = Board::fromTestMap(ModelTest::MAP6));
         $model = new Model($ps, 1);
         $ps->setHand([Piece::SERVANT]);
-        $m2 = $model->playPiece(0, 2, 2);
+        $m2 = $model->playPiece(0, new RowCol(2, 2));
         $this->assertFalse($model->isPlayAllowed(Piece::FARMER, $ps->hex(1,1)));
     }
 
@@ -278,7 +279,7 @@ END;
         $ps = new TestStore($board = Board::fromTestMap(ModelTest::MAP6));
         $model = new Model($ps, 1);
         $ps->setHand([Piece::SERVANT]);
-        $m3 = $model->playPiece(0, 0, 2);
+        $m3 = $model->playPiece(0, new RowCol(0, 2));
         $this->assertTrue($model->isPlayAllowed(Piece::FARMER, $ps->hex(1,1)));
     }
 
@@ -294,12 +295,12 @@ END;
         $model = new Model($ps, 1);
         $model->selectZigguratCard(ZigguratCardType::NOBLES_3_KINDS);
         $ps->setHand([Piece::SERVANT, Piece::MERCHANT, Piece::PRIEST, Piece::FARMER, Piece::MERCHANT]);
-        $model->playPiece(0, 0, 0);
-        $model->playPiece(1, 2, 0);
+        $model->playPiece(0, new RowCol(0, 0));
+        $model->playPiece(1, new RowCol(2, 0));
         $this->assertTrue($model->isPlayAllowed(Piece::PRIEST, $ps->hex(0, 2)));
         $this->assertFalse($model->isPlayAllowed(Piece::SERVANT, $ps->hex(0, 2)));
         $this->assertFalse($model->isPlayAllowed(Piece::FARMER, $ps->hex(0, 2)));
-        $model->playPiece(2, 0, 2);
+        $model->playPiece(2, new RowCol(0, 2));
         $this->assertFalse($model->isPlayAllowed(PIECE::PRIEST, $ps->hex(1,3)));
     }
 
@@ -308,8 +309,8 @@ END;
         $model = new Model($ps, 1);
         $model->selectZigguratCard(ZigguratCardType::NOBLES_3_KINDS);
         $ps->setHand([Piece::SERVANT, Piece::MERCHANT, Piece::PRIEST, Piece::FARMER, Piece::MERCHANT]);
-        $model->playPiece(0, 0, 0);
-        $model->playPiece(1, 2, 2);
+        $model->playPiece(0, new RowCol(0, 0));
+        $model->playPiece(1, new RowCol(2, 2));
         $this->assertFalse($model->isPlayAllowed(Piece::PRIEST, $ps->hex(0, 2)));
         $this->assertFalse($model->isPlayAllowed(Piece::SERVANT, $ps->hex(0, 2)));
         $this->assertFalse($model->isPlayAllowed(Piece::FARMER, $ps->hex(0, 2)));

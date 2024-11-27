@@ -60,7 +60,7 @@ class Game extends \Table
     {
         $player_id = $this->activePlayerId();
         $model = new Model($this->ps, $player_id);
-        $move = $model->playPiece($handpos, $row, $col);
+        $move = $model->playPiece($handpos, new RowCol($row, $col));
         $points = $move->points();
         $piece = $move->piece->value;
         if ($move->captured_piece->isField()) {
@@ -126,14 +126,15 @@ class Game extends \Table
     public function argPlayPieces(): array
     {
         $model = new Model($this->ps, $this->activePlayerId());
-        // [ ["farmer" => [hex1, hex2, ...] ];
+
+        /** @var array<string,Hex[]> */
         $allowed_moves = $model->getAllowedMoves();
 
         $am = [];
         foreach ($allowed_moves as $piece => &$hexlist) {
             $m = [];
             foreach ($hexlist as &$hex) {
-                $m[] = [ 'row'=> $hex->row, 'col' => $hex->col ];
+                $m[] = [ 'row'=> $hex->rc->row, 'col' => $hex->rc->col ];
             }
             $am[$piece] = $m;
         }
@@ -164,7 +165,7 @@ class Game extends \Table
     }
 
     private function scoreZiggurat(Model $model, Hex $zighex): int {
-        $scored_zig = $model->scoreZiggurat($zighex);
+        $scored_zig = $model->scoreZiggurat($zighex->rc);
         $winner = $scored_zig->winning_player_id;
         if ($winner == 0) {
             $winner_name = 'noone';
@@ -178,8 +179,8 @@ class Game extends \Table
         $this->notifyAllPlayers(
             "zigguratScored",
             clienttranslate($msg), [
-                "row" => $zighex->row,
-                "col" => $zighex->col,
+                "row" => $zighex->rc->row,
+                "col" => $zighex->rc->col,
                 $pnk => $winner_name,
                 "city" => "ziggurat",
             ]
@@ -195,7 +196,7 @@ class Game extends \Table
     private function scoreCity(Model $model, Hex $cityhex): void {
         // grab this, as it will change underneath when the model scores it.
         $city = $cityhex->piece->value;
-        $scored_city = $model->scoreCity($cityhex);
+        $scored_city = $model->scoreCity($cityhex->rc);
         $captured_by = $scored_city->captured_by;
         if ($captured_by > 0) {
             Stats::PLAYER_CITIES_CAPTURED->inc($captured_by);
@@ -240,8 +241,8 @@ class Game extends \Table
             "cityScored",
             clienttranslate($msg), [
                 "city" => $city,
-                "row" => $cityhex->row,
-                "col" => $cityhex->col,
+                "row" => $cityhex->rc->row,
+                "col" => $cityhex->rc->col,
                 $pnk => $capturer_name,
                 "captured_by" => $captured_by,
                 "details" => $details,
@@ -256,7 +257,7 @@ class Game extends \Table
             $this->gamestate->nextState("done");
             return;
         }
-        $this->actSelectHexToScore($hexes[0]->row, $hexes[0]->col);
+        $this->actSelectHexToScore($hexes[0]->rc->row, $hexes[0]->rc->col);
     }
 
     public function argZigguratScoring(): array {
@@ -332,7 +333,7 @@ class Game extends \Table
         return [
             "hexes" => array_map(
                 function ($hex) {
-                    return ["row" => $hex->row, "col" => $hex->col ];
+                    return ["row" => $hex->rc->row, "col" => $rc->hex->col ];
                 },
                 $hexes
             ),
@@ -342,13 +343,14 @@ class Game extends \Table
     public function actSelectHexToScore(int $row, int $col): void {
         $player_id = $this->activePlayerId();
         $model = new Model($this->ps, $player_id);
-        $hex = $model->board()->hexAt($row, $col);
+        $rc = new RowCol($row, $col);
+        $hex = $model->board()->hexAt($rc);
         if ($hex == null) {
-            throw new \InvalidArgumentException("Hex at ({$row},{$col}) can't be scored");
+            throw new \InvalidArgumentException("Hex at ({$rc}) can't be scored");
         }
         $msg = $this->optionEnabled(Option::AUTOMATED_SCORING_SELECTION)
             ? 'hex (${row},${col}) is scored'
-            : '${player_name} chose hex (${row},${col}) to score';
+            : '${player_name} chose hex (${row},${col}}) to score';
         $this->notifyAllPlayers(
             "scoringSelection",
             clienttranslate($msg),
@@ -520,8 +522,8 @@ class Game extends \Table
                     "player_number",
                 ],
                 "player_id" => $this->activePlayerId(),
-                "row" => $move->row,
-                "col" => $move->col,
+                "row" => $move->rc->row,
+                "col" => $move->rc->col,
                 "piece" => $move->piece->value,
                 "captured_piece" => $move->captured_piece->value,
                 "points" => $move->points(),
@@ -658,8 +660,8 @@ class Game extends \Table
         $model->board()->visitAll(
             function (&$hex) use (&$board_data) {
                 $board_data[] = [
-                    "row" => $hex->row,
-                    "col" => $hex->col,
+                    "row" => $hex->rc->row,
+                    "col" => $hex->rc->col,
                     "hextype" => $hex->type->value,
                     "piece" => $hex->piece->value,
                     "board_player" => $hex->player_id,
@@ -784,7 +786,7 @@ class Game extends \Table
                     $hexes = $model->hexesRequiringScoring();
                     if (count($hexes) > 0) {
                         $hex = array_shift($hexes);
-                        $this->actSelectHexToScore($hex->row, $hex->col);
+                        $this->actSelectHexToScore($hex->rc->row, $hex->rc->col);
                     }
                     break;
                 }
