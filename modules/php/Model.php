@@ -335,6 +335,7 @@ class Model {
         return $scoredCity;
     }
 
+    /** @return Hex[] */
     public function hexesRequiringScoring(): array {
         $result = [];
         $this->board()->visitAll(

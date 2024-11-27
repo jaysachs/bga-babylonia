@@ -905,7 +905,7 @@ function (dojo, declare, fx, hexloc, bblfx, on) {
                 return  bblfx.empty();
             }
             return dojo.fx.combine(
-                hexes.map(h => fx.fadeOut({ node: this.hexDiv(h.row, h.col) }))
+                hexes.map(h => fx.fadeOut({ node: this.hexDiv(h.rc.row, h.rc.col) }))
             );
         },
         fadeIn: function(hexes) {
@@ -913,7 +913,7 @@ function (dojo, declare, fx, hexloc, bblfx, on) {
                 return  bblfx.empty();
             }
             return dojo.fx.combine(
-                hexes.map(h => fx.fadeIn({ node: this.hexDiv(h.row, h.col) }))
+                hexes.map(h => fx.fadeIn({ node: this.hexDiv(h.rc.row, h.rc.col) }))
             );
         },
 
@@ -931,7 +931,7 @@ function (dojo, declare, fx, hexloc, bblfx, on) {
                              'onBegin',
                              () => {
                                  for (const hex of details.scored_hexes) {
-                                     this.hexDiv(hex.row, hex.col).classList.add(CSS.SELECTED);
+                                     this.hexDiv(hex.rc.row, hex.rc.col).classList.add(CSS.SELECTED);
                                  }
                              });
 
@@ -940,7 +940,7 @@ function (dojo, declare, fx, hexloc, bblfx, on) {
                 anim.push(this.fadeIn(details.network_hexes));
 
                 let eq = function(h1, h2) {
-                    return h1.row == h2.row && h1.col == h2.col;
+                    return h1.rc == h2.rc;
                 }
 
                 var nonscoringHexes = [];
@@ -966,7 +966,7 @@ function (dojo, declare, fx, hexloc, bblfx, on) {
                              'onEnd',
                              () => {
                                  details.scored_hexes.forEach(
-                                     hex => this.hexDiv(hex.row, hex.col).classList.remove(CSS.SELECTED));
+                                     hex => this.hexDiv(hex.rc.row, hex.rc.col).classList.remove(CSS.SELECTED));
                                  this.scoreCtrl[playerId].incValue(details.network_points);
                                  this.updateCapturedCityCount(details);
                              });

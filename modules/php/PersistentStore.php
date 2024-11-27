@@ -71,7 +71,8 @@ class PersistentStore {
             $scored = $this->boolValue($hex->scored);
             $t = $hex->type->value;
             $lm = $hex->landmass->value;
-            $sql_values[] = "($hex->rc->row, $hex->rc->col, '$t', $piece, $scored, $hex->player_id, '$lm')";
+            $rc = $hex->rc;
+            $sql_values[] = "($rc->row, $rc->col, '$t', $piece, $scored, $hex->player_id, '$lm')";
         });
         $sql .= implode(',', $sql_values);
         $this->db->DbQuery( $sql );
@@ -80,9 +81,10 @@ class PersistentStore {
     public function updateHex(Hex $hex): void {
         $piece = $hex->piece->value;
         $scored = $this->boolValue($hex->scored);
+        $rc = $hex->rc;
         $this->db->DbQuery("UPDATE board
                      SET piece='$piece', player_id=$hex->player_id, scored=$scored
-                     WHERE board_row=$hex->rc->row AND board_col=$hex->rc->col");
+                     WHERE board_row=$rc->row AND board_col=$rc->col");
     }
 
     public function upsertPool(int $player_id, Pool $pool): void {
@@ -168,9 +170,10 @@ class PersistentStore {
 
         // update board state
         $captured_piece =  $move->captured_piece->value;
+        $rc = $move->rc;
         $this->db->DbQuery("UPDATE board
                      SET piece='$captured_piece', player_id=0
-                     WHERE board_row=$move->rc->row AND board_col=$move->rc->col");
+                     WHERE board_row=$rc->row AND board_col=$rc->col");
 
         // update player scores
         $points = $move->points();
@@ -201,19 +204,20 @@ class PersistentStore {
         $captured_piece = $move->captured_piece->value;
         $piece = $move->piece->value;
         $opiece = $move->original_piece->value;
+        $rc = $move->rc;
         $this->db->DbQuery( "INSERT INTO turn_progress
                       (player_id, seq_id,
                        original_piece, piece, handpos,
                        board_row, board_col,
                        captured_piece, field_points, ziggurat_points)
                       VALUES($move->player_id, NULL, '$opiece', '$piece',
-                             $move->handpos, $move->rc->row, $move->rc->col,
+                             $move->handpos, $rc->row, $rc->col,
                              '$captured_piece', $move->field_points,
                              $move->ziggurat_points)");
         // update board state
         $this->db->DbQuery("UPDATE board
                  SET piece='$piece', player_id=$move->player_id
-                 WHERE board_row=$move->rc->row AND board_col=$move->rc->col");
+                 WHERE board_row=$rc->row AND board_col=$rc->col");
 
         // update player scores
         $points = $move->points();

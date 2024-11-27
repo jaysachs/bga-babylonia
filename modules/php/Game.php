@@ -333,7 +333,7 @@ class Game extends \Table
         return [
             "hexes" => array_map(
                 function ($hex) {
-                    return ["row" => $hex->rc->row, "col" => $rc->hex->col ];
+                    return ["row" => $hex->rc->row, "col" => $hex->rc->col ];
                 },
                 $hexes
             ),
@@ -357,8 +357,8 @@ class Game extends \Table
             [
                 "player_id" => $player_id,
                 "player_name" => $this->getActivePlayerName(),
-                "row" => $row,
-                "col" => $col,
+                "row" => $rc->row,
+                "col" => $rc->col,
             ]
         );
 
