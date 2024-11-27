@@ -376,8 +376,7 @@ class Model {
                 }
                 return 4;
             }
-            // TODO: throw exception?
-            return 10;
+            throw new \InvalidArgumentException("hex should be a city or ziggurat but is $hex");
         };
         usort($result,
               function (Hex $a, Hex $b) use($val): int {
