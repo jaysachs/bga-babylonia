@@ -40,16 +40,13 @@ class PersistentStore {
     }
 
     public function retrieveBoard(): Board {
+        /** @var Hex[] */
         $hexes = [];
-        /** @var array $data */
+        /** @var string[][] $data */
         $data = $this->db->getObjectListFromDB2(
                 "SELECT board_row row, board_col col, hextype, piece, scored,
                         player_id board_player, landmass
                  FROM board");
-        /**
-         * @var array $hex
-         * @var array[] $data
-         */
         foreach ($data as &$hex) {
             $hexes[] = new Hex(HexType::from($hex['hextype']),
                                new RowCol(intval($hex['row']),
@@ -107,7 +104,7 @@ class PersistentStore {
         $sql = "SELECT piece
                 FROM handpools
                 WHERE player_id = $player_id";
-        /** @var array $pooldata */
+        /** @var string[] $data */
         $data = $this->db->getObjectListFromDB2( $sql, true );
 
         return new Pool(
@@ -240,7 +237,7 @@ class PersistentStore {
     }
 
     public function retrieveTurnProgress(int $player_id): TurnProgress {
-        /** @var array<int,array> $dbresults */
+        /** @var array<int,string[]> $dbresults */
         $dbresults = $this->db->getCollectionFromDb(
             "SELECT seq_id, player_id, handpos, piece, original_piece, board_row, board_col, captured_piece, field_points, ziggurat_points
              FROM turn_progress
@@ -279,7 +276,7 @@ class PersistentStore {
     /** @return array<int,PlayerInfo> */
     public function retrieveAllPlayerInfo(): array {
         $result = [];
-        /** @var array<int,array> $data */
+        /** @var array<int,string[]> $data */
         $data = $this->db->getCollectionFromDB( PersistentStore::SQL_PLAYER_INFO );
         foreach ($data as $pid => $pd) {
             $result[$pid] = $this->playerInfoFromData($pid, $pd);
@@ -289,7 +286,7 @@ class PersistentStore {
 
     public function retrievePlayerInfo(int $player_id): PlayerInfo {
         $sql = PersistentStore::SQL_PLAYER_INFO . " WHERE P.player_id = $player_id";
-        /** @var array $player_data */
+        /** @var string[] $player_data */
         $player_data = $this->db->getNonEmptyObjectFromDB2( $sql );
         return $this->playerInfoFromData($player_id, $player_data);
     }
@@ -315,6 +312,7 @@ class PersistentStore {
     //  INNER JOIN ziggurat_cards Z ON P.player_id = Z.player_id"
 
 
+    /** @param string[] $pd */
     private function playerInfoFromData(int $player_id, array $pd): PlayerInfo {
         return new PlayerInfo($player_id,
                               $pd["player_name"],
@@ -341,6 +339,7 @@ class PersistentStore {
 
     public function retrieveComponents(): Components {
         return new Components(array_map(
+            /** @param string[] $d */
             function (array $d) {
                 return new ZigguratCard(ZigguratCardType::from($d["card_type"]),
                                         intval($d["player_id"]),
