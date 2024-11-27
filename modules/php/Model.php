@@ -338,16 +338,9 @@ class Model {
         return $scoredCity;
     }
 
-    /** @return Hex[] */
-    public function hexesRequiringScoring(): array {
+    /** @return RowCol[] */
+    public function locationsRequiringScoring(): array {
         $result = [];
-        $this->board()->visitAll(
-            function (Hex $hex) use (&$result) {
-                if ($this->hexRequiresScoring($hex)) {
-                    $result[] = $hex;
-                }
-            }
-        );
         $val = function (Hex $hex): int {
             // order is:
             // 0: ziggurats that player on turn is winning
@@ -378,11 +371,21 @@ class Model {
             }
             throw new \InvalidArgumentException("hex should be a city or ziggurat but is $hex");
         };
+        $this->board()->visitAll(
+            function (Hex $hex) use (&$result, $val) {
+                if ($this->hexRequiresScoring($hex)) {
+                    $result[$hex->rc->asKey()] = [$hex->rc, $val($hex)];
+                }
+            }
+        );
         usort($result,
-              function (Hex $a, Hex $b) use($val): int {
-                  return $val($a) - $val($b);
+              /** @param array{0:RowCol,1:int} $a */
+              /** @param array{0:RowCol,1:int} $b */
+              function (array $a, array $b): int {
+                  return $a[1] - $b[1];
               });
-        return $result;
+        /** @param array{0:RowCol,1:int} $a */
+        return array_map(function (array $a): RowCol { return $a[0]; }, $result);
     }
 
     private function hexRequiresScoring(Hex $hex): bool {

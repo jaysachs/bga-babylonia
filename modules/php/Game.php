@@ -239,12 +239,13 @@ class Game extends \Table
 
     public function stAutoScoringHexSelection(): void {
         $model = new Model($this->ps, $this->playerOnTurn());
-        $hexes = $model->hexesRequiringScoring();
-        if (count($hexes) == 0) {
+        $rcs = $model->locationsRequiringScoring();
+        if (count($rcs) == 0) {
             $this->gamestate->nextState("done");
             return;
         }
-        $this->actSelectHexToScore($hexes[0]->rc->row, $hexes[0]->rc->col);
+        $rc = array_shift($rcs);
+        $this->actSelectHexToScore($rc->row, $rc->col);
     }
 
     public function argZigguratScoring(): array {
@@ -313,18 +314,9 @@ class Game extends \Table
     }
 
     public function argSelectHexToScore(): array {
-        $player_id = $this->activePlayerId();
-        $model = new Model($this->ps, $player_id);
-        $hexes = $model->hexesRequiringScoring();
-
-        return [
-            "hexes" => array_map(
-                function ($hex) {
-                    return ["row" => $hex->rc->row, "col" => $hex->rc->col ];
-                },
-                $hexes
-            ),
-        ];
+        $model = new Model($this->ps, $this->activePlayerId());
+        $rcs = $model->locationsRequiringScoring();
+        return ["hexes" => $rcs];
     }
 
     public function actSelectHexToScore(int $row, int $col): void {
@@ -373,11 +365,11 @@ class Game extends \Table
             $player_id = $player_on_turn;
         }
         $model = new Model($this->ps, $player_id);
-        $hexes = $model->hexesRequiringScoring();
+        $rcs = $model->locationsRequiringScoring();
 
         $this->setNextPlayerToBeActive(0);
 
-        if (count($hexes) == 0) {
+        if (count($rcs) == 0) {
             $this->gamestate->nextState("done");
             return;
         }
@@ -770,10 +762,10 @@ class Game extends \Table
                     // randomly.
                     $player_id = $this->activePlayerId();
                     $model = new Model($this->ps, $player_id);
-                    $hexes = $model->hexesRequiringScoring();
-                    if (count($hexes) > 0) {
-                        $hex = array_shift($hexes);
-                        $this->actSelectHexToScore($hex->rc->row, $hex->rc->col);
+                    $rcs = $model->locationsRequiringScoring();
+                    if (count($rcs) > 0) {
+                        $rc = array_shift($rcs);
+                        $this->actSelectHexToScore($rc->row, $rc->col);
                     }
                     break;
                 }

@@ -88,7 +88,7 @@ final class ModelTest extends TestCase
         $ps = new TestStore(Board::forPlayerCount(2));
         $model = new Model($ps, 0);
 
-        $this->assertEquals([], $model->hexesRequiringScoring());
+        $this->assertEquals([], $model->locationsRequiringScoring());
     }
     const MAP1 = <<<'END'
 XXX   XXX  XXX
@@ -105,7 +105,7 @@ END;
     public function testCitiesRequiringScoringNotSurrounded(): void {
         $ps = TestStore::fromMap(ModelTest::MAP1);
         $model = new Model($ps, 0);
-        $this->assertEquals([], $model->hexesRequiringScoring());
+        $this->assertEquals([], $model->locationsRequiringScoring());
     }
 
     const MAP2 = <<<'END'
@@ -123,8 +123,8 @@ END;
     public function testCitiesRequiringScoringOneSurrounded(): void {
         $ps = TestStore::fromMap(ModelTest::MAP2);
         $model = new Model($ps, 0);
-        $this->assertEquals([$ps->hex(6, 0)],
-                            $model->hexesRequiringScoring());
+        $this->assertEquals([new RowCol(6, 0)],
+                            $model->locationsRequiringScoring());
     }
 
     const MAP3 = <<<'END'
@@ -143,8 +143,8 @@ END;
         $ps = TestStore::fromMap(ModelTest::MAP3);
         $model = new Model($ps, 0);
         $this->assertEqualsCanonicalizing(
-            [$ps->hex(6, 0), $ps->hex(3,3)],
-            $model->hexesRequiringScoring());
+            [new RowCol(6, 0), new RowCol(3,3)],
+            $model->locationsRequiringScoring());
     }
 
 
@@ -165,14 +165,14 @@ END;
         $ps = TestStore::fromMap(ModelTest::MAP7);
         $model = new Model($ps, 0);
 
-        $this->assertEquals([], $model->hexesRequiringScoring());
+        $this->assertEquals([], $model->locationsRequiringScoring());
 
         $ps->hex(2, 0)->playPiece(Piece::PRIEST, 1);
-        $this->assertEquals([$ps->hex(3, 1)],
-                            $model->hexesRequiringScoring());
+        $this->assertEquals([new RowCol(3, 1)],
+                            $model->locationsRequiringScoring());
 
         $ps->hex(3, 1)->scored = true;
-        $this->assertEquals([], $model->hexesRequiringScoring());
+        $this->assertEquals([], $model->locationsRequiringScoring());
     }
 
     const MAP4 = <<<'END'
