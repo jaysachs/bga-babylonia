@@ -41,7 +41,7 @@ class Hex {
                                 public Piece $piece = Piece::EMPTY,
                                 public int $player_id = 0,
                                 public bool $scored = false,
-                                public readonly Landmass $landmass = Landmass::UNKNOWN) {
+                                public Landmass $landmass = Landmass::UNKNOWN) {
     }
 
     public function captureCity(): Piece {
