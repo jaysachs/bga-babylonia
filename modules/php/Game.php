@@ -79,7 +79,6 @@ class Game extends \Table
         } else {
             $msg = '${player_name} plays ${piece} to (${row},${col})';
         }
-        $player_info = $model->allPlayerInfo()[$player_id];
         $this->notifyAllPlayers(
             "piecePlayed",
             clienttranslate($msg),
@@ -95,7 +94,6 @@ class Game extends \Table
                 "row" => $row,
                 "col" => $col,
                 "points" => $points,
-                "score" => $player_info->score,
                 "hand_size" => $model->hand()->size(),
             ]
         );

@@ -1071,7 +1071,7 @@ function (dojo, declare, fx, hexloc, bblfx, on) {
                                            args.piece,
                                            args.player_number);
                     this.updateHandCount(args);
-                    this.scoreCtrl[args.player_id].toValue(args.score);
+                    this.scoreCtrl[args.player_id].incValue(args.points);
                 }
             );
 
