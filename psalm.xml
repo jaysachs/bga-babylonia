@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<psalm autoloader="misc/autoload.php">
+<psalm autoloader="misc/autoload.php" phpVersion="8.2">
     <projectFiles>
         <directory name="modules/php" />
     </projectFiles>
