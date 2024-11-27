@@ -30,7 +30,7 @@ class Board {
 
     // TODO: switch to a single associative array approach.
     private function addHex(Hex $hex): void {
-        @ $hexrow = $this->hexes[$hex->row];
+        @ $hexrow = & $this->hexes[$hex->row];
         if ($hexrow == null) {
             $this->hexes[$hex->row] = [];
         }
