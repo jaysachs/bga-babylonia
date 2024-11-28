@@ -216,11 +216,11 @@ class Game extends \Table
                 "score" => $pi->score,
             ];
             if ($points > 0) {
-                // TODO: figure out what to do here.
-                $pnk2 = $this->playerNameKey($pid);
-                $details[$pid]["message"] =
-                    clienttranslate('${' . $pnk2 . '} scored ${points}');
-                $details[$pid][$pnk] = $this->getPlayerNameById($pid);
+                // TODO: should we notify/log each player's point change?
+                // $pnk2 = $this->playerNameKey($pid);
+                // $details[$pid]["message"] =
+                //     clienttranslate('${' . $pnk2 . '} scored ${points}');
+                // $details[$pid][$pnk] = $this->getPlayerNameById($pid);
             }
         }
 
@@ -421,10 +421,6 @@ class Game extends \Table
             $this->gamestate->nextState("endGame");
             return;
         }
-
-        // TODO: this doesn't have to return the whole hand, just the
-        // refilled parts.  Could capture the delta and return
-        // *that*. Then it can be animated on the client.
 
         $this->notifyPlayer(
             $player_id,
