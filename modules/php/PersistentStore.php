@@ -284,13 +284,6 @@ class PersistentStore {
         return $result;
     }
 
-    public function retrievePlayerInfo(int $player_id): PlayerInfo {
-        $sql = PersistentStore::SQL_PLAYER_INFO . " WHERE P.player_id = $player_id";
-        /** @var string[] $player_data */
-        $player_data = $this->db->getNonEmptyObjectFromDB2( $sql );
-        return $this->playerInfoFromData($player_id, $player_data);
-    }
-
     const SQL_PLAYER_INFO =
         "SELECT P.player_id id, P.player_id, P.player_score score,
                 P.player_color player_color,
