@@ -169,7 +169,7 @@ class PersistentStore {
             $bs = $this->boolValue($scored);
             $updates[] = "scored='$bs'";
         }
-        $this->db->DbQuery("UPDATE board SET"
+        $this->db->DbQuery("UPDATE board SET "
                            . implode(',', $updates)
                            . " WHERE board_row=$rc->row AND board_col=$rc->col");
     }
