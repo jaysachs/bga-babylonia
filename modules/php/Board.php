@@ -220,7 +220,6 @@ END;
         if ($numPlayers < 2 || $numPlayers > 4) {
             throw new \InvalidArgumentException(sprintf("invalid number of players: %s", $numPlayers));
         }
-        /** TODO: define an actual Location class to hold row,col */
 
         /** @var RowCol[] */
         $development_locations = [];
