@@ -75,15 +75,6 @@ class PersistentStore {
         $this->db->DbQuery( $sql );
     }
 
-    public function updateHex(Hex $hex): void {
-        $piece = $hex->piece->value;
-        $scored = $this->boolValue($hex->scored);
-        $rc = $hex->rc;
-        $this->db->DbQuery("UPDATE board
-                     SET piece='$piece', player_id=$hex->player_id, scored=$scored
-                     WHERE board_row=$rc->row AND board_col=$rc->col");
-    }
-
     public function upsertPool(int $player_id, Pool $pool): void {
         $sql = "DELETE FROM handpools WHERE player_id = $player_id";
         $this->db->DbQuery( $sql );
@@ -112,7 +103,7 @@ class PersistentStore {
         );
     }
 
-    // TODO: this is inefficient, improve it.
+    // Not efficient, but there are at most seven rows involed here.
     public function upsertHand(int $player_id, Hand $hand): void {
         $sql = "DELETE FROM hands WHERE player_id = $player_id";
         $this->db->DbQuery( $sql );
@@ -155,48 +146,54 @@ class PersistentStore {
         }
     }
 
-    public function removeTurnProgress(int $player_id): void {
+    public function deleteAllMoves(int $player_id): void {
         $sql = "DELETE FROM turn_progress WHERE player_id=$player_id";
         $this->db->DbQuery( $sql );
     }
 
-    public function undoMove(Move $move): void {
+    public function deleteSingleMove(Move $move): void {
         $this->db->DbQuery( "DELETE FROM turn_progress
                              WHERE player_id = $move->player_id
                              AND seq_id = $move->seq_id" );
+    }
 
-        // update board state
-        $captured_piece =  $move->captured_piece->value;
-        $rc = $move->rc;
-        $this->db->DbQuery("UPDATE board
-                     SET piece='$captured_piece', player_id=0
-                     WHERE board_row=$rc->row AND board_col=$rc->col");
+    public function updateHex(RowCol $rc,
+                              ?Piece $piece = null,
+                              ?bool $scored = null): void {
+        $sql = "UPDATE board SET ";
+        $updates = [];
+        if ($piece !== null) {
+            $updates[] = "piece='$piece->value'";
+        }
+        if ($scored !== null) {
+            $bs = $this->boolValue($scored);
+            $updates[] = "scored='$bs'";
+        }
+        $this->db->DbQuery("UPDATE board SET"
+                           . implode(',', $updates)
+                           . " WHERE board_row=$rc->row AND board_col=$rc->col");
+    }
 
-        // update player scores
-        $points = $move->points();
+    public function updateHand(int $player_id, int $handpos, Piece $piece): void {
+        $this->db->DbQuery(
+            "UPDATE hands
+             SET piece = '$piece->value'
+             WHERE player_id=$player_id AND pos=$handpos");
+    }
+
+    public function incPlayerScore(int $player_id, int $points): void {
         if ($points > 0) {
             $this->db->DbQuery(
                 "UPDATE player q
                  SET q.player_score = (
-                     SELECT p.sc - $points
+                     SELECT p.sc + $points
                      FROM (SELECT player_score sc
                            FROM player
-                           WHERE player_id = $move->player_id) p)
-                     WHERE q.player_id = $move->player_id" );
+                           WHERE player_id = $player_id) p)
+                     WHERE q.player_id = $player_id" );
         }
-        // update hands
-        $opiece = $move->original_piece->value;
-        $this->db->DbQuery(
-            "UPDATE hands
-             SET piece = '$opiece'
-             WHERE player_id=$move->player_id AND pos=$move->handpos");
     }
 
-    // TODO: this logic maybe doesn't belong here at the data layer.
-    // Instead, move it to the model?
-    // Right now, this updates the score but the model doesn't get
-    // updated, so it can't be used in Game::actPlayPiece to return the score
-    // which is a bit of a smell.
     public function insertMove(Move $move): void {
         $captured_piece = $move->captured_piece->value;
         $piece = $move->piece->value;
@@ -211,29 +208,6 @@ class PersistentStore {
                              $move->handpos, $rc->row, $rc->col,
                              '$captured_piece', $move->field_points,
                              $move->ziggurat_points)");
-        // update board state
-        $this->db->DbQuery("UPDATE board
-                 SET piece='$piece', player_id=$move->player_id
-                 WHERE board_row=$rc->row AND board_col=$rc->col");
-
-        // update player scores
-        $points = $move->points();
-        if ($points > 0) {
-            $this->db->DbQuery(
-                "UPDATE player q
-                 SET q.player_score = (
-                     SELECT p.sc + $points
-                     FROM (SELECT player_score sc
-                           FROM player
-                           WHERE player_id = $move->player_id) p)
-                     WHERE q.player_id = $move->player_id" );
-        }
-        // update hands
-        $empty = Piece::EMPTY->value;
-        $this->db->DbQuery(
-            "UPDATE hands
-             SET piece = '$empty'
-             WHERE player_id=$move->player_id AND pos=$move->handpos");
     }
 
     public function retrieveTurnProgress(int $player_id): TurnProgress {

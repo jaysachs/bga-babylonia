@@ -234,6 +234,16 @@ class Model {
 
         // update the database
         $this->ps->insertMove($move);
+        $this->ps->updateHex($move->rc, $move->piece);
+        // NOTE: we update the DB but not the player info
+        // This is OK at present because this is a top-level entry point
+        //  and we haven't retrieved player_infos.
+        // Could do:
+        //   if ($this->_player_infos != null) {
+        //      update the right one
+        //   }
+        $this->ps->incPlayerScore($move->player_id, $move->points());
+        $this->ps->updateHand($move->player_id, $move->handpos, Piece::EMPTY);
 
         return $move;
     }
@@ -270,7 +280,7 @@ class Model {
             return $result;
         }
 
-        $this->ps->removeTurnProgress($this->player_id);
+        $this->ps->deleteAllMoves($this->player_id);
         return $result;
     }
 
@@ -304,7 +314,7 @@ class Model {
             throw new \InvalidArgumentException("{$hex} is not ready to be scored");
         }
         $hex->scored = true;
-        $this->ps->updateHex($hex);
+        $this->ps->updateHex($hex->rc, null, true);
 
         return new ScoredZiggurat($this->scorer()->computeHexWinner($hex));
     }
@@ -332,7 +342,7 @@ class Model {
 
         $_unused = $hex->captureCity();
 
-        $this->ps->updateHex($hex);
+        $this->ps->updateHex($hex->rc, $hex->piece, true);
         $this->ps->updatePlayers($playerInfos);
 
         return $scoredCity;
@@ -444,7 +454,13 @@ class Model {
             throw new \InvalidArgumentException(
                 "Move $move is not for player $this->player_id");
         }
-        $this->ps->undoMove($move);
+        $this->ps->deleteSingleMove($move);
+        $this->ps->updateHex($move->rc, $move->captured_piece);
+        $this->ps->updateHand($move->player_id, $move->handpos, $move->original_piece);
+        // NOTE: we update the DB but not the player info
+        // This seems OK since this is the main entry point and we
+        // haven't retrieve the player info yet.
+        $this->ps->incPlayerScore($move->player_id, -$move->points());
         return $move;
     }
 }
