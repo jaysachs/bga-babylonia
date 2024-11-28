@@ -54,7 +54,7 @@ class TestStore extends PersistentStore {
     public function updateHand(int $player_id, int $handpos, Piece $piece): void { }
     public function incPlayerScore(int $player_id, int $points): void { }
 
-  public function updateHex(RowCol $rc, Piece $piece = null, bool $scored = null): void { }
+    public function updateHex(RowCol $rc, ?Piece $piece = null, ?int $player_id = null, ?bool $scored = null): void { }
     public function updatePlayers(array /* PlayerInfo */ $pis): void {
     }
     public function retrieveComponents(): Components {

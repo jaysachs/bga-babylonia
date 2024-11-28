@@ -234,7 +234,7 @@ class Model {
 
         // update the database
         $this->ps->insertMove($move);
-        $this->ps->updateHex($move->rc, $move->piece);
+        $this->ps->updateHex($move->rc, $move->piece, $move->player_id);
         // NOTE: we update the DB but not the player info
         // This is OK at present because this is a top-level entry point
         //  and we haven't retrieved player_infos.
@@ -314,7 +314,7 @@ class Model {
             throw new \InvalidArgumentException("{$hex} is not ready to be scored");
         }
         $hex->scored = true;
-        $this->ps->updateHex($hex->rc, null, true);
+        $this->ps->updateHex($hex->rc, null, null, true);
 
         return new ScoredZiggurat($this->scorer()->computeHexWinner($hex));
     }
@@ -342,7 +342,7 @@ class Model {
 
         $_unused = $hex->captureCity();
 
-        $this->ps->updateHex($hex->rc, $hex->piece, true);
+        $this->ps->updateHex($hex->rc, $hex->piece, null, true);
         $this->ps->updatePlayers($playerInfos);
 
         return $scoredCity;
@@ -455,7 +455,7 @@ class Model {
                 "Move $move is not for player $this->player_id");
         }
         $this->ps->deleteSingleMove($move);
-        $this->ps->updateHex($move->rc, $move->captured_piece);
+        $this->ps->updateHex($move->rc, $move->captured_piece, 0);
         $this->ps->updateHand($move->player_id, $move->handpos, $move->original_piece);
         // NOTE: we update the DB but not the player info
         // This seems OK since this is the main entry point and we

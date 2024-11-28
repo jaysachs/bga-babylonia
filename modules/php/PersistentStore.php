@@ -159,15 +159,19 @@ class PersistentStore {
 
     public function updateHex(RowCol $rc,
                               ?Piece $piece = null,
+                              ?int $player_id = null,
                               ?bool $scored = null): void {
         $sql = "UPDATE board SET ";
         $updates = [];
         if ($piece !== null) {
             $updates[] = "piece='$piece->value'";
         }
+        if ($player_id !== null) {
+            $updates[] = "player_id=$player_id";
+        }
         if ($scored !== null) {
             $bs = $this->boolValue($scored);
-            $updates[] = "scored='$bs'";
+            $updates[] = "scored=$bs";
         }
         $this->db->DbQuery("UPDATE board SET "
                            . implode(',', $updates)
