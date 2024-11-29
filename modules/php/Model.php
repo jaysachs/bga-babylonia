@@ -389,8 +389,10 @@ class Model {
             }
         );
         usort($result,
-              /** @param array{0:RowCol,1:int} $a */
-              /** @param array{0:RowCol,1:int} $b */
+              /**
+               * @param array{0:RowCol,1:int} $a
+               * @param array{0:RowCol,1:int} $b
+               */
               function (array $a, array $b): int {
                   return $a[1] - $b[1];
               });
