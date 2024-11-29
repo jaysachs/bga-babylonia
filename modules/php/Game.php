@@ -53,7 +53,7 @@ class Game extends \Table
 
         Logging::init($this);
         Stats::init($this);
-        $this->ps = new PersistentStore($this);
+        $this->ps = new PersistentStore(new DefaultDb($this));
     }
 
     public function actPlayPiece(int $handpos, int $row, int $col): void

@@ -27,7 +27,7 @@ declare(strict_types=1);
 namespace Bga\Games\babylonia;
 
 class PersistentStore {
-    public function __construct(private mixed $db) {
+    public function __construct(private Db $db) {
         Logging::debug("PersistentStore initialized");
     }
 
@@ -43,8 +43,7 @@ class PersistentStore {
         $sql = "SELECT board_row row, board_col col, hextype, piece, scored,
                        player_id board_player, landmass
                 FROM board";
-        /** @var string[][] $data */
-        $data = $this->db->getObjectListFromDB2($sql);
+        $data = $this->db->getObjectList($sql);
 
         /** @var Hex[] */
         $hexes = [];
@@ -76,12 +75,12 @@ class PersistentStore {
         $sql = "INSERT INTO board (board_row, board_col, hextype, piece,
                                    scored, player_id, landmass)
                 VALUES $values";
-        $this->db->DbQuery($sql);
+        $this->db->execute($sql);
     }
 
     public function upsertPool(int $player_id, Pool $pool): void {
         $sql = "DELETE FROM handpools WHERE player_id = $player_id";
-        $this->db->DbQuery($sql);
+        $this->db->execute($sql);
 
         $sql_values = [];
         foreach ($pool->pieces() as $i => $p) {
@@ -94,15 +93,14 @@ class PersistentStore {
         $values = implode(',', $sql_values);
         $sql = "INSERT INTO handpools (player_id, seq_id, piece)
                 VALUES $values";
-        $this->db->DbQuery($sql);
+        $this->db->execute($sql);
     }
 
     public function retrievePool(int $player_id): Pool {
         $sql = "SELECT piece
                 FROM handpools
                 WHERE player_id = $player_id";
-        /** @var string[] $data */
-        $data = $this->db->getObjectListFromDB2($sql, true);
+        $data = $this->db->getSingleFieldList($sql);
 
         $pieces = [];
         foreach ($data as $pd) {
@@ -115,7 +113,7 @@ class PersistentStore {
     public function upsertHand(int $player_id, Hand $hand): void {
         $sql = "DELETE FROM hands
                 WHERE player_id = $player_id";
-        $this->db->DbQuery($sql);
+        $this->db->execute($sql);
 
         $sql_values = [];
         foreach ($hand->pieces() as $i => $p) {
@@ -127,7 +125,7 @@ class PersistentStore {
         $values = implode(',', $sql_values);
         $sql = "INSERT INTO hands (player_id, pos, piece)
                 VALUES $values";
-        $this->db->DbQuery($sql);
+        $this->db->execute($sql);
     }
 
     public function retrieveHand(int $player_id): Hand {
@@ -135,8 +133,7 @@ class PersistentStore {
                 FROM hands
                 WHERE player_id = $player_id
                 ORDER BY pos";
-        /** @var string[] $data */
-        $data = $this->db->getObjectListFromDB2($sql, true);
+        $data = $this->db->getSingleFieldList($sql);
         $pieces = [];
         foreach ($data as $pd) {
             $pieces[] = Piece::from($pd);
@@ -150,7 +147,7 @@ class PersistentStore {
                     q.captured_city_count=$player_info->captured_city_count
                 WHERE q.player_id = $player_info->player_id";
 
-        $this->db->DbQuery($sql);
+        $this->db->execute($sql);
     }
 
     /** @param array<int,PlayerInfo> $player_infos */
@@ -163,14 +160,14 @@ class PersistentStore {
     public function deleteAllMoves(int $player_id): void {
         $sql = "DELETE FROM turn_progress
                 WHERE player_id=$player_id";
-        $this->db->DbQuery($sql);
+        $this->db->execute($sql);
     }
 
     public function deleteSingleMove(Move $move): void {
         $sql = "DELETE FROM turn_progress
                 WHERE player_id = $move->player_id
                 AND seq_id = $move->seq_id";
-        $this->db->DbQuery($sql);
+        $this->db->execute($sql);
     }
 
     public function updateHex(RowCol $rc,
@@ -192,14 +189,14 @@ class PersistentStore {
         $sql = "UPDATE board
                 SET $updates
                 WHERE board_row=$rc->row AND board_col=$rc->col";
-        $this->db->DbQuery($sql);
+        $this->db->execute($sql);
     }
 
     public function updateHand(int $player_id, int $handpos, Piece $piece): void {
         $sql = "UPDATE hands
                 SET piece = '$piece->value'
                 WHERE player_id=$player_id AND pos=$handpos";
-        $this->db->DbQuery($sql);
+        $this->db->execute($sql);
     }
 
     public function incPlayerScore(int $player_id, int $points): void {
@@ -213,7 +210,7 @@ class PersistentStore {
                           FROM player
                           WHERE player_id = $player_id) p)
                     WHERE q.player_id = $player_id";
-        $this->db->DbQuery($sql);
+        $this->db->execute($sql);
     }
 
     public function insertMove(Move $move): void {
@@ -230,7 +227,7 @@ class PersistentStore {
                        $move->handpos, $rc->row, $rc->col,
                        '$captured_piece', $move->field_points,
                        $move->ziggurat_points)";
-        $this->db->DbQuery($sql);
+        $this->db->execute($sql);
     }
 
     public function retrieveTurnProgress(int $player_id): TurnProgress {
@@ -241,7 +238,7 @@ class PersistentStore {
                 WHERE player_id = $player_id
                 ORDER BY seq_id";
         /** @var array<int,string[]> $data */
-        $data = $this->db->getCollectionFromDb($sql);
+        $data = $this->db->getCollection($sql);
         $moves = [];
         foreach ($data as &$md) {
             $moves[] = new Move(intval($md['player_id']),
@@ -275,7 +272,7 @@ class PersistentStore {
                     ELSE 0
                   END
                 WHERE player_id IN ($keys)";
-        $this->db->DbQuery($sql);
+        $this->db->execute($sql);
     }
 
     /** @return array<int,PlayerInfo> */
@@ -301,7 +298,7 @@ class PersistentStore {
         //  INNER JOIN ziggurat_cards Z ON P.player_id = Z.player_id"
 
         /** @var array<int,string[]> $data */
-        $data = $this->db->getCollectionFromDB($sql);
+        $data = $this->db->getCollection($sql);
         $result = [];
         foreach ($data as $pid => $pd) {
             $result[$pid] = $this->playerInfoFromData($pid, $pd);
@@ -331,14 +328,13 @@ class PersistentStore {
         $values = implode(',', $sql_values);
         $sql = "INSERT INTO ziggurat_cards (card_type, used, player_id)
                 VALUES $values";
-        $this->db->DbQuery($sql);
+        $this->db->execute($sql);
     }
 
     public function retrieveComponents(): Components {
         $sql = "SELECT card_type, player_id, used
                 FROM ziggurat_cards";
-        /** @var string[][] */
-        $data = $this->db->getObjectListFromDB2($sql);
+        $data = $this->db->getObjectList($sql);
 
         $cards = [];
         foreach ($data as $zd) {
@@ -358,7 +354,7 @@ class PersistentStore {
         $sql = "UPDATE ziggurat_cards
                 SET player_id = $player_id, used = $used
                 WHERE card_type = '$type'";
-        $this->db->DbQuery($sql);
+        $this->db->execute($sql);
     }
 }
 

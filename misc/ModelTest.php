@@ -6,6 +6,7 @@ use PHPUnit\Framework\TestCase;
 use Bga\Games\babylonia\ {
         Board,
         Components,
+        Db,
         Hand,
         Hex,
         HexType,
@@ -19,6 +20,25 @@ use Bga\Games\babylonia\ {
         TurnProgress,
         ZigguratCard,
         ZigguratCardType,
+};
+
+class TestDb implements Db {
+    /** @return string[][] */
+    public function getObjectList(string $sql): array {
+        return [];
+    }
+
+    /** @return string[] */
+    public function getSingleFieldList(string $sql): array {
+        return [];
+    }
+
+    /** @return array<int,string[]> $data */
+    public function getCollection($sql): array {
+        return [];
+    }
+
+    public function execute(string $sql): void { }
 };
 
 class TestStore extends PersistentStore {
@@ -35,7 +55,7 @@ class TestStore extends PersistentStore {
     public function __construct(Board $board) {
         $this->board = $board;
         $this->hand = Hand::new();
-        PersistentStore::__construct(null);
+        PersistentStore::__construct(new TestDb());
         for ($i = 1; $i <= 3; $i++) {
             $this->player_infos[$i] = new PlayerInfo($i, "", "black", 0, 0, 0, 5, 25);
         }
