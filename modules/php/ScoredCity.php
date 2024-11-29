@@ -86,10 +86,12 @@ class ScoredCity {
         return $this->captured_city_points[$player_id];
     }
 
+    /** @return Hex[] */
     public function scoringHexesForPlayer(int $player_id): array {
         return $this->scoringHexes[$player_id];
     }
 
+    /** @return Hex[] */
     public function networkHexesForPlayer(int $player_id): array {
         return $this->networkHexes[$player_id];
     }
