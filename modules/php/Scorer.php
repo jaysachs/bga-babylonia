@@ -33,24 +33,16 @@ class Scorer {
                                 private array $player_infos,
                                 private Components $components) { }
 
-    /**
-     * @return array<int,int>
-     */
-    private function newEmptyPlayerMap(): array {
-        $result = [];
-        foreach ($this->player_infos as $pi) {
-            $result[$pi->player_id] = 0;
-        }
-        return $result;
-    }
-
     public function computeHexWinner(Hex $hex): int {
         // first compute who will win the city / ziggurat, if anyone.
         $neighbors = $this->board->neighbors(
             $hex,
             function (Hex $h): bool { return $h->piece->isPlayerPiece(); }
         );
-        $adjacent = $this->newEmptyPlayerMap();
+        $adjacent = [];
+        foreach ($this->player_infos as $pi) {
+            $adjacent[$pi->player_id] = 0;
+        }
         foreach ($neighbors as $h) {
             $adjacent[$h->player_id]++;
         }
