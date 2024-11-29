@@ -48,7 +48,7 @@ class TestStore extends PersistentStore {
     public function insertPlayerInfos(array $pis): void { }
     public function insertZigguratCards(array $zs): void { }
     public function retrieveBoard(): Board { return $this->board; }
-    public function retrieveAllPlayerInfo(): array {
+    public function &retrieveAllPlayerInfo(): array {
         return $this->player_infos;
     }
     public function updateHand(int $player_id, int $handpos, Piece $piece): void { }
