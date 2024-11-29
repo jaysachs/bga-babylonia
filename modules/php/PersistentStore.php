@@ -27,9 +27,7 @@ declare(strict_types=1);
 namespace Bga\Games\babylonia;
 
 class PersistentStore {
-    public function __construct(private Db $db) {
-        Logging::debug("PersistentStore initialized");
-    }
+    public function __construct(private Db $db) { }
 
     private function boolValue(bool $b): string {
         return $b ? 'TRUE' : 'FALSE';
