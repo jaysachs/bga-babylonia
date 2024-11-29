@@ -24,6 +24,9 @@ deploy: test
 	./local/bgasync.sh
 
 psalm: build $(STUBS) $(PSALM_CONFIG)
+	psalm -c $(PSALM_CONFIG) modules/php
+
+psalm-info: build $(STUBS) $(PSALM_CONFIG)
 	psalm --show-info=true -c $(PSALM_CONFIG) modules/php
 
 stubs: $(STUBS)
