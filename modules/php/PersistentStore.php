@@ -88,12 +88,13 @@ class PersistentStore {
             $x = $p->value;
             $sql_values[] = "($player_id, $i, '$x')";
         }
-        if (count($sql_values) > 0) {
-            $values = implode(',', $sql_values);
-            $sql = "INSERT INTO handpools (player_id, seq_id, piece)
-                    VALUES $values";
-            $this->db->DbQuery($sql);
+        if (count($sql_values) == 0) {
+            return;
         }
+        $values = implode(',', $sql_values);
+        $sql = "INSERT INTO handpools (player_id, seq_id, piece)
+                VALUES $values";
+        $this->db->DbQuery($sql);
     }
 
     public function retrievePool(int $player_id): Pool {
@@ -120,12 +121,13 @@ class PersistentStore {
         foreach ($hand->pieces() as $i => $p) {
             $sql_values[] = "($player_id, $i, '$p->value')";
         }
-        if (count($sql_values) > 0) {
-            $values = implode(',', $sql_values);
-            $sql = "INSERT INTO hands (player_id, pos, piece)
-                    VALUES $values";
-            $this->db->DbQuery($sql);
+        if (count($sql_values) == 0) {
+            return;
         }
+        $values = implode(',', $sql_values);
+        $sql = "INSERT INTO hands (player_id, pos, piece)
+                VALUES $values";
+        $this->db->DbQuery($sql);
     }
 
     public function retrieveHand(int $player_id): Hand {
@@ -201,16 +203,17 @@ class PersistentStore {
     }
 
     public function incPlayerScore(int $player_id, int $points): void {
-        if ($points > 0) {
-            $sql = "UPDATE player q
-                    SET q.player_score = (
-                         SELECT p.sc + $points
-                         FROM (SELECT player_score sc
-                               FROM player
-                               WHERE player_id = $player_id) p)
-                         WHERE q.player_id = $player_id";
-            $this->db->DbQuery($sql);
+        if ($points == 0) {
+            return;
         }
+        $sql = "UPDATE player q
+                SET q.player_score = (
+                    SELECT p.sc + $points
+                    FROM (SELECT player_score sc
+                          FROM player
+                          WHERE player_id = $player_id) p)
+                    WHERE q.player_id = $player_id";
+        $this->db->DbQuery($sql);
     }
 
     public function insertMove(Move $move): void {
