@@ -416,8 +416,9 @@ class Model {
     }
 
     public function canEndTurn(): bool {
-        return count($this->turnProgress()->moves) >= 2
-            || count($this->getAllowedMoves()) == 0;
+        // NOTE: could check that there allowed moves but given the
+        // board size and piece count, there are always allowed moves.
+        return count($this->turnProgress()->moves) >= 2;
     }
 
     public function selectZigguratCard(ZigguratCardType $card_type): ZigguratCardSelection {
