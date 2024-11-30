@@ -63,7 +63,7 @@ class PersistentStore {
             $lm = $hex->landmass->value;
             $rc = $hex->rc;
             $sql_values[] =
-                "($rc->row, $rc->col, '$t', $piece, $sc, $player_id, '$lm')";
+                "($rc->row, $rc->col, '$t', '$piece', $sc, $player_id, '$lm')";
         });
         $values = implode(',', $sql_values);
         $sql = "INSERT INTO board (board_row, board_col, hextype, piece,
