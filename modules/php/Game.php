@@ -51,7 +51,6 @@ class Game extends \Table
             Option::AUTOMATED_SCORING_SELECTION->value => 101
         ]);
 
-        Logging::init($this);
         Stats::init($this);
         $this->ps = new PersistentStore(new DefaultDb($this));
     }
