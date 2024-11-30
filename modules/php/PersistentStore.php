@@ -33,10 +33,6 @@ class PersistentStore {
         return $b ? 'TRUE' : 'FALSE';
     }
 
-    private function enumValue(mixed $e): string {
-        return $e == null ? 'NULL' : "'$e->value'";
-    }
-
     public function retrieveBoard(): Board {
         $sql = "SELECT board_row row, board_col col, hextype, piece, scored,
                        player_id board_player, landmass
@@ -60,7 +56,7 @@ class PersistentStore {
     public function insertBoard(Board $board): void {
         $sql_values = [];
         $board->visitAll(function (Hex $hex) use (&$sql_values) {
-            $piece = $this->enumValue($hex->piece);
+            $piece = $hex->piece->value;
             $player_id = $hex->player_id;
             $sc = $this->boolValue($hex->scored);
             $t = $hex->type->value;
