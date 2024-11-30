@@ -85,7 +85,7 @@ const CSS = {
 
 
 
-const jstpl_log_piece = '<span class="log-element bbl_${piece}"></span>';
+const jstpl_log_piece = '<span class="log-element bbl_${piece}_${player_number}"></span>';
 const jstpl_log_city = '<span class="log-element bbl_${city}"></span>';
 const jstpl_log_zcard = '<span class="log-element bbl_${zcard}"></span>';
 
@@ -768,24 +768,50 @@ function (dojo, declare, fx, hexloc, bblfx, on) {
             });
         },
 
+        special_log_args: {
+            zcard: {
+                tmpl: 'jstpl_log_zcard',
+            },
+            city: {
+                tmpl: 'jstpl_log_city',
+            },
+            piece: {
+                tmpl: 'jstpl_log_piece',
+            },
+            original_piece: {
+                tmpl: 'jstpl_log_piece',
+                modify: (args) => {
+                    return Object.assign(
+                        Object.assign({}, Object.assign(args)),
+                        {
+                            piece: args['original_piece'],
+                            player_number: args['player_number']
+                        });
+                }
+            }
+        },
+
         /* @Override */
         format_string_recursive : function format_string_recursive(log, args) {
+            const defargs = key => { return { [key]: args[key] } };
             let saved = [];
+            const defModify = x => x;
             try {
                 if (log && args && !args.processed) {
                     args.processed = true;
-
-                    // list of special keys we want to replace with images
-                    var keys = ['piece', 'city', 'zcard', 'original_piece'];
-                    for (const key of keys) {
+                    for (const key of Object.keys(this.special_log_args)) {
                         if (key in args) {
                             saved[key] = args[key];
-                            args[key] = this.richFormat(key, args);
+                            const s = this.special_log_args[key];
+                            args[key] = this.format_block(
+                                s.tmpl,
+                                (s.modify || defModify)(args)
+                            );
                         }
                     }
                 }
             } catch (e) {
-//                console.error(log,args,'Exception thrown', e.stack);
+                console.error(log,args,'Exception thrown', e.stack);
             }
             try {
                 return this.inherited({callee: format_string_recursive}, arguments);
@@ -794,33 +820,6 @@ function (dojo, declare, fx, hexloc, bblfx, on) {
                     args[i] = saved[i];
                 }
             }
-        },
-
-        richFormat: function(key, args) {
-            switch (key) {
-                case 'zcard':
-                    return this.format_block(
-                        'jstpl_log_zcard',
-                        {
-                            'zcard': args[key],
-                        });
-                case 'city':
-                    return this.format_block(
-                        'jstpl_log_city',
-                        {
-                            'city': args[key],
-                        });
-                case 'piece':
-                case 'original_piece':
-                    return this.format_block(
-                        'jstpl_log_piece',
-                        {
-                            'piece': args[key] + '_' + args['player_number']
-                        });
-                default:
-                    break;
-            }
-            return 'NOT SURE WHAT HAPPENED';
         },
 
         notif_extraTurnUsed: async function (args) {
