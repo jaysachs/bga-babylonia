@@ -768,33 +768,39 @@ function (dojo, declare, fx, hexloc, bblfx, on) {
             });
         },
 
+        extend: function(o1, o2) {
+            return Object.assign(Object.assign({}, o1), o2);
+        },
+
         special_log_args: {
             zcard: {
                 tmpl: 'jstpl_log_zcard',
+                tmplargs: a => a
             },
             city: {
                 tmpl: 'jstpl_log_city',
+                tmplargs: a => a
             },
             piece: {
                 tmpl: 'jstpl_log_piece',
+                tmplargs: a => a
             },
             original_piece: {
                 tmpl: 'jstpl_log_piece',
-                modify: (args) => {
-                    return Object.assign(
-                        Object.assign({}, Object.assign(args)),
-                        {
-                            piece: args['original_piece'],
-                            player_number: args['player_number']
-                        });
-                }
+                tmplargs: args => Object.assign(
+                    Object.assign({}, args),
+                    {
+                        piece: args['original_piece'],
+                        player_number: args['player_number']
+                    }
+                )
             }
         },
 
         /* @Override */
         format_string_recursive : function format_string_recursive(log, args) {
             const defargs = key => { return { [key]: args[key] } };
-            let saved = [];
+            let saved = {};
             const defModify = x => x;
             try {
                 if (log && args && !args.processed) {
@@ -805,7 +811,7 @@ function (dojo, declare, fx, hexloc, bblfx, on) {
                             const s = this.special_log_args[key];
                             args[key] = this.format_block(
                                 s.tmpl,
-                                (s.modify || defModify)(args)
+                                s.tmplargs(args)
                             );
                         }
                     }
