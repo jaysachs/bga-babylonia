@@ -37,8 +37,8 @@ const IDS = {
         return 'bbl_citycount_' + playerId;
     },
 
-    hexDiv: function(row, col) {
-        return `bbl_hex_${row}_${col}`;
+    hexDiv: function(rc) {
+        return `bbl_hex_${rc.row}_${rc.col}`;
     },
 
     playerBoardZcards: function(playerId) {
@@ -262,7 +262,7 @@ function (dojo, declare, fx, hexloc, bblfx, on) {
                     let n = (hex.board_player == 0)
                         ? null
                         : playersData[hex.board_player].player_number;
-                    this.renderPlayedPiece(hex.row, hex.col, hex.piece, n);
+                    this.renderPlayedPiece(hex, hex.piece, n);
                 }
             }
         },
@@ -371,13 +371,11 @@ function (dojo, declare, fx, hexloc, bblfx, on) {
         },
 
         markHexPlayable: function (rc) {
-            this.hexDiv(rc.row, rc.col)
-                .classList.add(CSS.PLAYABLE);
+            this.hexDiv(rc).classList.add(CSS.PLAYABLE);
         },
 
         unmarkHexPlayable: function (rc) {
-            this.hexDiv(rc.row, rc.col)
-                .classList.remove(CSS.PLAYABLE);
+            this.hexDiv(rc).classList.remove(CSS.PLAYABLE);
         },
 
         markScoreableHexesPlayable: function(hexes) {
@@ -668,8 +666,8 @@ function (dojo, declare, fx, hexloc, bblfx, on) {
             $('pagemaintitletext').innerHTML = _(message);
         },
 
-        hexDiv: function (row, col) {
-            return $(IDS.hexDiv(row,col));
+        hexDiv: function (rc) {
+            return $(IDS.hexDiv(rc));
         },
 
         handPosDiv: function (i) {
@@ -695,8 +693,8 @@ function (dojo, declare, fx, hexloc, bblfx, on) {
             return $(id);
         },
 
-        renderPlayedPiece: function (row, col, piece, playerNumber) {
-            this.hexDiv(row, col).className = CSS.piece(piece, playerNumber);
+        renderPlayedPiece: function (rc, piece, playerNumber) {
+            this.hexDiv(rc).className = CSS.piece(piece, playerNumber);
         },
 
         updateCounter: function(counter, value, animate) {
@@ -905,7 +903,7 @@ function (dojo, declare, fx, hexloc, bblfx, on) {
                 return  bblfx.empty();
             }
             return dojo.fx.combine(
-                rcs.map(rc => fx.fadeOut({ node: this.hexDiv(rc.row, rc.col) }))
+                rcs.map(rc => fx.fadeOut({ node: this.hexDiv(rc) }))
             );
         },
         fadeIn: function(rcs) {
@@ -913,7 +911,7 @@ function (dojo, declare, fx, hexloc, bblfx, on) {
                 return  bblfx.empty();
             }
             return dojo.fx.combine(
-                rcs.map(rc => fx.fadeIn({ node: this.hexDiv(rc.row, rc.col) }))
+                rcs.map(rc => fx.fadeIn({ node: this.hexDiv(rc) }))
             );
         },
 
@@ -931,7 +929,7 @@ function (dojo, declare, fx, hexloc, bblfx, on) {
                              'onBegin',
                              () => {
                                  for (const rc of details.scored_locations) {
-                                     this.hexDiv(rc.row, rc.col).classList.add(CSS.SELECTED);
+                                     this.hexDiv(rc).classList.add(CSS.SELECTED);
                                  }
                              });
 
@@ -952,7 +950,7 @@ function (dojo, declare, fx, hexloc, bblfx, on) {
                     anim.push(bblfx.spinGrowText({
                         text: `+${details.network_points}`,
                         parent: IDS.BOARD,
-                        centeredOn: IDS.hexDiv(args.row, args.col),
+                        centeredOn: IDS.hexDiv(args),
                         color: '#' + this.gamedatas.players[playerId].player_color
                     }));
                 }
@@ -962,13 +960,13 @@ function (dojo, declare, fx, hexloc, bblfx, on) {
                              'onEnd',
                              () => {
                                  details.scored_locations.forEach(
-                                     rc => this.hexDiv(rc.row, rc.col).classList.remove(CSS.SELECTED));
+                                     rc => this.hexDiv(rc).classList.remove(CSS.SELECTED));
                                  this.scoreCtrl[playerId].incValue(details.network_points);
                                  this.updateCapturedCityCount(details);
                              });
             }
 
-            const hexDivId = IDS.hexDiv(args.row, args.col);
+            const hexDivId = IDS.hexDiv(args);
             let a = (args.captured_by != 0)
                 ? this.slideTemporaryDiv(
                     CSS.piece(args.city),
@@ -984,7 +982,7 @@ function (dojo, declare, fx, hexloc, bblfx, on) {
             dojo.connect(a,
                          'onBegin',
                          () => {
-                             this.renderPlayedPiece(args.row, args.col, null, null);
+                             this.renderPlayedPiece(args, null, null);
                          });
             dojo.connect(a,
                          'onEnd',
@@ -1022,13 +1020,12 @@ function (dojo, declare, fx, hexloc, bblfx, on) {
 
             // Put any piece (field) captured in the move back on the board
             // TODO: animate this? (and animate the capture too?)
-            this.renderPlayedPiece(args.row,
-                                   args.col,
+            this.renderPlayedPiece(args,
                                    args.captured_piece,
                                    null);
             let anim = this.slideTemporaryDiv(
                 CSS.handPiece(args.piece, args.player_number),
-                IDS.hexDiv(args.row, args.col),
+                IDS.hexDiv(args),
                 targetDivId,
                 () => {
                     if (isActive) {
@@ -1060,10 +1057,9 @@ function (dojo, declare, fx, hexloc, bblfx, on) {
             anim = this.slideTemporaryDiv(
                 hpc,
                 sourceDivId,
-                this.hexDiv(args.row, args.col).id,
+                this.hexDiv(args).id,
                 () => {
-                    this.renderPlayedPiece(args.row,
-                                           args.col,
+                    this.renderPlayedPiece(args,
                                            args.piece,
                                            args.player_number);
                     this.updateHandCount(args);
