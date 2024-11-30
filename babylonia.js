@@ -225,8 +225,8 @@ function (dojo, declare, fx, hexloc, bblfx, on) {
             let player_board_div = this.getPlayerPanelElement(playerId);
             dojo.place(this.format_block('jstpl_player_board_ext',
                                           {
-                                              'player_id': playerId,
-                                              'player_number': player.player_number
+                                              player_id: playerId,
+                                              player_number: player.player_number
                                           }),
                         player_board_div);
             // create counters per player
@@ -250,11 +250,11 @@ function (dojo, declare, fx, hexloc, bblfx, on) {
 
                 dojo.place(this.format_block('jstpl_hex',
                                               {
-                                                  'row': hex.row,
-                                                  'col': hex.col,
+                                                  row: hex.row,
+                                                  col: hex.col,
                                                   // or ... row / 2 * 63 + 6;
-                                                  'top': tl.top,
-                                                  'left': tl.left,
+                                                  top: tl.top,
+                                                  left: tl.left,
                                               }),
                             boardDiv);
 
@@ -434,7 +434,7 @@ function (dojo, declare, fx, hexloc, bblfx, on) {
                 return false;
             }
             var playable = false;
-            if (!c.contains(CSS.SELECTED)) {
+            if (!selectedDiv.classList.contains(CSS.SELECTED)) {
                 this.unselectAllHandPieces();
                 this.markHexesPlayableForPiece(handpos);
                 playable = true;
