@@ -86,14 +86,27 @@ class ScoredCity {
         return $this->captured_city_points[$player_id];
     }
 
-    /** @return Hex[] */
-    public function scoringHexesForPlayer(int $player_id): array {
-        return $this->scoringHexes[$player_id];
+    /** @return RowCol[] */
+    public function scoringLocationsForPlayer(int $player_id): array {
+        return $this->toRowCol($this->scoringHexes[$player_id]);
     }
 
-    /** @return Hex[] */
-    public function networkHexesForPlayer(int $player_id): array {
-        return $this->networkHexes[$player_id];
+    /** @return RowCol[] */
+    public function networkLocationsForPlayer(int $player_id): array {
+        return $this->toRowCol($this->networkHexes[$player_id]);
+    }
+
+    /**
+     * @param Hex[] $hexes
+     * @return RowCol[]
+     */
+    private function toRowCol(array &$hexes): array {
+        return array_map(
+            function (Hex $hex): RowCol {
+                return $hex->rc;
+            },
+            $hexes
+        );
     }
 }
 
