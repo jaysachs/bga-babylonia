@@ -324,9 +324,6 @@ class Game extends \Table
         $model = new Model($this->ps, $player_id);
         $rc = new RowCol($row, $col);
         $hex = $model->board()->hexAt($rc);
-        if ($hex == null) {
-            throw new \InvalidArgumentException("Hex at ({$rc}) can't be scored");
-        }
         $msg = $this->optionEnabled(Option::AUTOMATED_SCORING_SELECTION)
             ? 'hex (${row},${col}) is scored'
             : '${player_name} chose hex (${row},${col}}) to score';
