@@ -352,16 +352,6 @@ function (dojo, declare, fx, hexloc, bblfx, on) {
                 .forEach(div => div.classList.remove(CSS.PLAYABLE));
         },
 
-        pieceForHandDivClassList: function(cl) {
-            // console.log('pieceFor: ' + cl);
-            for (const pc of this.pieceClasses) {
-                if (cl.contains(CSS.handPiece(pc, this.playerNumber))) {
-                    return pc;
-                }
-            }
-            return null;
-        },
-
         allowedMovesFor: function(pos) {
             const piece = this.hand[pos];
             if (piece == null) {
@@ -444,7 +434,6 @@ function (dojo, declare, fx, hexloc, bblfx, on) {
                 return false;
             }
             var playable = false;
-            let c = selectedDiv.classList;
             if (!c.contains(CSS.SELECTED)) {
                 this.unselectAllHandPieces();
                 this.markHexesPlayableForPiece(handpos);
@@ -452,7 +441,7 @@ function (dojo, declare, fx, hexloc, bblfx, on) {
             } else {
                 this.unmarkHexesPlayableForPiece(handpos);
             }
-            c.toggle(CSS.SELECTED);
+            selectedDiv.classList.toggle(CSS.SELECTED);
             if (playable) {
                 this.selectedHandPos = handpos;
                 if (this.stateName != 'client_pickHexToPlay') {
