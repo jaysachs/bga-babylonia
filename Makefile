@@ -1,4 +1,8 @@
+
 #
+ROOT=$(HOME)/projects/bga
+SYNC=$(ROOT)/bgautil/sync/bgasync.sh
+
 STATS=modules/php/Stats.php
 GENSTATS=../bgautil/genstats/genstats.php
 WORK=work
@@ -21,7 +25,7 @@ test: build $(STUBS)
 	phpunit --bootstrap misc/autoload.php misc --testdox --display-warnings --display-deprecations --display-notices
 
 deploy: test
-	./local/bgasync.sh
+	$(SYNC) -u vagabond -g babylonia -s $(ROOT)/babylonia
 
 psalm: build $(STUBS) $(PSALM_CONFIG)
 	psalm -c $(PSALM_CONFIG) modules/php
