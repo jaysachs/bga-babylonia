@@ -127,16 +127,19 @@ define([
     'dojo','dojo/_base/declare', 'dojo/_base/fx',
     g_gamethemeurl + "modules/js/hexloc.js",
     g_gamethemeurl + "modules/js/fx.js",
+    g_gamethemeurl + "modules/js/bga-animations.js",
     "dojo/on", "dojo/query",
     'ebg/core/gamegui',
     'ebg/counter',
 ],
-function (dojo, declare, fx, hexloc, bblfx, on) {
+function (dojo, declare, fx, hexloc, bblfx, bgaAnim, on) {
     return declare('bgagame.babylonia', ebg.core.gamegui, {
         constructor: function(){
             console.log('babylonia constructor');
+            this.animationManager = new AnimationManager(this);
         },
 
+        animationManager: null,
         selectedHandPos: null,
         pieceClasses: [ 'priest', 'servant', 'farmer', 'merchant' ],
         stateName: '',
@@ -1000,10 +1003,7 @@ function (dojo, declare, fx, hexloc, bblfx, on) {
             this.renderPlayedPiece(args,
                                    args.captured_piece,
                                    null);
-            let anim = this.slideTemporaryDiv(
-                CSS.handPiece(args.piece, args.player_number),
-                IDS.hexDiv(args),
-                targetDivId,
+            onEnd =
                 () => {
                     if (isActive) {
                         cl = handPosDiv.classList;
@@ -1013,8 +1013,15 @@ function (dojo, declare, fx, hexloc, bblfx, on) {
                     }
                     this.handCounters[args.player_id].incValue(1);
                     this.scoreCtrl[args.player_id].incValue(-args.points);
-                });
-            await this.playAnimation(anim);
+                };
+            await bblfx.slideTemporaryDiv3(
+                this.animationManager,
+                {
+                    className: CSS.handPiece(args.piece, args.player_number),
+                    from: IDS.hexDiv(args),
+                    to: targetDivId,
+                    parent: IDS.BOARD
+                }).then(onEnd, onEnd);
         },
 
         notif_piecePlayed: async function(args) {
