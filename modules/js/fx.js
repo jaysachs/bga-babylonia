@@ -25,6 +25,38 @@ define([
     };
 
     return {
+        slideTemporaryDiv2: function(params = defaultSlideTemporaryDivParams) {
+            let p = Object.assign(Object.assign({}, defaultSlideTemporaryDivParams), params);
+            console.log(p);
+            let id = `bbl_tmp_slideTmpDiv${this.lastId++}`;
+            let prect = document.getElementById(p.parent).getBoundingClientRect();
+            let frect = document.getElementById(p.from).getBoundingClientRect();
+            let top = frect.top - prect.top;
+            let left = frect.left - prect.left;
+            // TODO: unclear why including "display:none" here befeore
+            // the slideToObject call messes things up
+            let temp = document.createElement('div');
+            temp.innerHTML = `<div id="${id}" class='${p.className}' style='position:absolute; top: ${top}px; left: ${left}px; z-index: 100'></div>`;
+            div = temp.firstChild;
+            document.getElementById(p.parent).appendChild(div);
+            temp.remove();
+
+            let drect = div.getBoundingClientRect();
+            let trect = document.getElementById(p.to).getBoundingClientRect();
+            let toTop = trect.top - prect.top + (trect.height - drect.height)/2;
+            let toLeft = trect.left - prect.left + (trect.width - drect.width)/2
+
+            let deltaX = toLeft - left;
+            let deltaY = toTop - top;
+
+            let a = div.animate(
+                { transform: `translate(${deltaX}px, ${deltaY}px)` },
+                { duration: p.duration, iterations: 1 });
+            onDone = () => { div.remove(); if (p.onEnd !== null) { p.onEnd(); } };
+            a.finished.then(onDone, onDone);
+            return a;
+        },
+
         slideTemporaryDiv: function(params = defaultSlideTemporaryDivParams) {
             let p = Object.assign(Object.assign({}, defaultSlideTemporaryDivParams), params);
             console.log(p);
@@ -147,6 +179,40 @@ define([
                     }
                 }),
             ]);
+        },
+
+        slideTemporaryDiv3: function(animationManager,
+                                     params = defaultSlideTemporaryDivParams) {
+            let p = Object.assign(Object.assign({}, defaultSlideTemporaryDivParams), params);
+            console.log(p);
+            let id = `bbl_tmp_slideTmpDiv${this.lastId++}`;
+            let prect = document.getElementById(p.parent).getBoundingClientRect();
+            let frect = document.getElementById(p.from).getBoundingClientRect();
+            let top = frect.top - prect.top;
+            let left = frect.left - prect.left;
+            // TODO: unclear why including "display:none" here befeore
+            // the slideToObject call messes things up
+            let temp = document.createElement('div');
+            temp.innerHTML = `<div id="${id}" class='${p.className}' style='position:absolute; top: ${top}px; left: ${left}px; z-index: 100'></div>`;
+            div = temp.firstChild;
+            document.getElementById(p.parent).appendChild(div);
+            temp.remove();
+
+            let drect = div.getBoundingClientRect();
+            let trect = document.getElementById(p.to).getBoundingClientRect();
+            let toTop = trect.top - prect.top + (trect.height - drect.height)/2;
+            let toLeft = trect.left - prect.left + (trect.width - drect.width)/2
+
+            let delta = {
+                x: left - toLeft,
+                y: top - toTop
+            };
+
+            let a = animationManager.play(
+                new BgaSlideToAnimation({ element: div, fromDelta: delta },
+                                        p.to ));
+            onDone = () => { div.remove(); } ; // if (p.onEnd !== null) { p.onEnd(); } };
+            return a.then(onDone, onDone);
         }
     };
 });
