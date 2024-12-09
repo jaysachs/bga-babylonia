@@ -155,7 +155,7 @@ function (dojo, declare, fx, hexloc, bblfx, bgaAnim, on) {
 
         handlers: [],
         playAnimation: async function(anim) {
-            let p = this.bgaPlayDojoAnimation(anim);
+            const p = this.bgaPlayDojoAnimation(anim);
             this.pauseHandlers();
             p.then(() => this.resumeHandlers());
             return p;
@@ -223,9 +223,9 @@ function (dojo, declare, fx, hexloc, bblfx, bgaAnim, on) {
         },
 
         setupPlayerBoard: function(player) {
-            let playerId = player.player_id;
+            const playerId = player.player_id;
             console.log('Setting up board for player ' + playerId);
-            let player_board_div = this.getPlayerPanelElement(playerId);
+            const player_board_div = this.getPlayerPanelElement(playerId);
             dojo.place(this.format_block('jstpl_player_board_ext',
                                           {
                                               player_id: playerId,
@@ -245,11 +245,11 @@ function (dojo, declare, fx, hexloc, bblfx, bgaAnim, on) {
         },
 
         setupGameBoard: function(boardData, playersData) {
-            let boardDiv = $(IDS.BOARD);
+            const boardDiv = $(IDS.BOARD);
             // console.log(gamedatas.board);
 
             for (const hex of boardData) {
-                let tl = hexloc.hexLocation(hex);
+                const tl = hexloc.hexLocation(hex);
 
                 dojo.place(this.format_block('jstpl_hex',
                                               {
@@ -262,7 +262,7 @@ function (dojo, declare, fx, hexloc, bblfx, bgaAnim, on) {
                             boardDiv);
 
                 if (hex.piece != null) {
-                    let n = (hex.board_player == 0)
+                    const n = (hex.board_player == 0)
                         ? null
                         : playersData[hex.board_player].player_number;
                     this.renderPlayedPiece(hex, hex.piece, n);
@@ -299,12 +299,12 @@ function (dojo, declare, fx, hexloc, bblfx, bgaAnim, on) {
                 return null;
             }
             // now check if it's allowed
-            let ae = e;
+            const ae = e;
             if (!ae.classList.contains(CSS.PLAYABLE)) {
                 // console.log('not playable');
                 return null;
             }
-            let id = e.id.split('_');
+            const id = e.id.split('_');
             return {
                 row: id[2],
                 col: id[3],
@@ -312,12 +312,12 @@ function (dojo, declare, fx, hexloc, bblfx, bgaAnim, on) {
         },
 
         selectHexToScore: function(event) {
-            let hex = this.selectedHex(event.target);
+            const hex = this.selectedHex(event.target);
             if (hex == null) {
                 return;
             }
             // console.log('selected hex ' + hex.row + ',' + hex.col);
-            let rc = {
+            const rc = {
                 row: hex.row,
                 col: hex.col
             };
@@ -331,7 +331,7 @@ function (dojo, declare, fx, hexloc, bblfx, bgaAnim, on) {
                 console.error('no piece selected!');
             }
 
-            let hex = this.selectedHex(event.target);
+            const hex = this.selectedHex(event.target);
             if (hex == null) {
                 return;
             }
@@ -395,7 +395,7 @@ function (dojo, declare, fx, hexloc, bblfx, bgaAnim, on) {
             }
             const tid = event.target.id;
 
-            var z = -1;
+            let z = -1;
             for (const i in this.zcards) {
                 if (tid == IDS.availableZcard(i)) {
                     z = i;
@@ -408,7 +408,7 @@ function (dojo, declare, fx, hexloc, bblfx, bgaAnim, on) {
             }
             this.bgaPerformAction('actSelectZigguratCard',
                                   { zctype: this.zcards[z].type });
-            let div = $(IDS.AVAILABLE_ZCARDS);
+            const div = $(IDS.AVAILABLE_ZCARDS);
             div.classList.remove(CSS.SELECTING);
             return false;
         },
@@ -428,7 +428,7 @@ function (dojo, declare, fx, hexloc, bblfx, bgaAnim, on) {
                 && this.stateName != 'client_mustSelectPiece') {
                 return false;
             }
-            let selectedDiv = event.target;
+            const selectedDiv = event.target;
             if (selectedDiv.parentElement.id != IDS.HAND) {
                 return false;
             }
@@ -436,7 +436,7 @@ function (dojo, declare, fx, hexloc, bblfx, bgaAnim, on) {
             if (this.allowedMovesFor(handpos).length == 0) {
                 return false;
             }
-            var playable = false;
+            let playable = false;
             if (!selectedDiv.classList.contains(CSS.SELECTED)) {
                 this.unselectAllHandPieces();
                 this.markHexesPlayableForPiece(handpos);
@@ -467,7 +467,7 @@ function (dojo, declare, fx, hexloc, bblfx, bgaAnim, on) {
 
         unselectAllHandPieces: function() {
             for (const p in this.hand) {
-                let cl = $(IDS.handPos(p)).classList;
+                const cl = $(IDS.handPos(p)).classList;
                 if (cl.contains(CSS.SELECTED)) {
                     this.unmarkHexesPlayableForPiece(p);
                 }
@@ -480,7 +480,7 @@ function (dojo, declare, fx, hexloc, bblfx, bgaAnim, on) {
 
         setPlayablePieces: function() {
             for (const p in this.hand) {
-                let cl = $(IDS.handPos(p)).classList;
+                const cl = $(IDS.handPos(p)).classList;
                 if (this.allowedMovesFor(p).length > 0) {
                     cl.add(CSS.PLAYABLE);
                     cl.remove(CSS.UNPLAYABLE);
@@ -619,7 +619,7 @@ function (dojo, declare, fx, hexloc, bblfx, bgaAnim, on) {
                         break;
 
                     case 'selectZigguratCard':
-                        let div = $(IDS.AVAILABLE_ZCARDS);
+                        const div = $(IDS.AVAILABLE_ZCARDS);
                         div.scrollIntoView(false);
                         div.classList.add(CSS.SELECTING);
                         this.updateStatusBar(_('You must select a ziggurat card'));
@@ -646,17 +646,16 @@ function (dojo, declare, fx, hexloc, bblfx, bgaAnim, on) {
         },
 
         handPosDiv: function (i) {
-            let id = IDS.handPos(i);
-            let div = $(id);
+            const id = IDS.handPos(i);
+            const div = $(id);
             if (div != null) {
                 return div;
             }
             // dynamically extend hand as needed.
             const hand = $(IDS.HAND);
             for (let j = 0; j <= i; ++j) {
-                let id = IDS.handPos(j);
-                let d = $(id);
-                if (d == null) {
+                const id = IDS.handPos(j);
+                if ($(id) == null) {
                     dojo.create('div',
                                 {
                                     id: id,
@@ -756,7 +755,7 @@ function (dojo, declare, fx, hexloc, bblfx, bgaAnim, on) {
                                     onEnd = null,
                                     parent = IDS.BOARD) {
             if (!this.shouldAnimate()) {
-                let a = bblfx.empty();
+                const a = bblfx.empty();
                 if (onEnd != null) {
                     dojo.connect(a, 'onEnd', onEnd);
                 }
@@ -803,7 +802,7 @@ function (dojo, declare, fx, hexloc, bblfx, bgaAnim, on) {
         /* @Override */
         format_string_recursive : function format_string_recursive(log, args) {
             const defargs = key => { return { [key]: args[key] } };
-            let saved = {};
+            const saved = {};
             const defModify = x => x;
             try {
                 if (log && args && !args.processed) {
@@ -898,7 +897,7 @@ function (dojo, declare, fx, hexloc, bblfx, bgaAnim, on) {
         notif_cityScored: async function(args) {
             console.log('notif_cityScored', args);
 
-            let anim = [];
+            const anim = [];
 
             for (const playerId in args.details) {
                 const details = args.details[playerId];
@@ -917,7 +916,7 @@ function (dojo, declare, fx, hexloc, bblfx, bgaAnim, on) {
                 anim.push(this.fadeOut(details.network_locations));
                 anim.push(this.fadeIn(details.network_locations));
 
-                var nonscoringLocations = [];
+                const nonscoringLocations = [];
                 for (const nh of details.network_locations) {
                     if (!details.scored_locations.some(sh => nh == sh)) {
                         nonscoringLocations.push(nh);
@@ -947,7 +946,7 @@ function (dojo, declare, fx, hexloc, bblfx, bgaAnim, on) {
             }
 
             const hexDivId = IDS.hexDiv(args);
-            let a = (args.captured_by != 0)
+            const a = (args.captured_by != 0)
                 ? this.slideTemporaryDiv(
                     CSS.piece(args.city),
                     hexDivId,
@@ -990,8 +989,8 @@ function (dojo, declare, fx, hexloc, bblfx, bgaAnim, on) {
             console.log('notif_undoMove', args);
 
             const isActive = this.playerNumber == args.player_number;
-            var targetDivId = IDS.handcount(args.player_id);
-            var handPosDiv = null;
+            let targetDivId = IDS.handcount(args.player_id);
+            let handPosDiv = null;
             if (isActive) {
                 this.hand[args.handpos] = args.original_piece;
                 handPosDiv = this.handPosDiv(args.handpos);
@@ -1027,14 +1026,14 @@ function (dojo, declare, fx, hexloc, bblfx, bgaAnim, on) {
         notif_piecePlayed: async function(args) {
             console.log('notif_piecePlayed', args);
             const isActive = this.playerNumber == args.player_number;
-            var sourceDivId = IDS.handcount(args.player_id);
-            let hpc = CSS.handPiece(args.piece, args.player_number);
+            let sourceDivId = IDS.handcount(args.player_id);
+            const hpc = CSS.handPiece(args.piece, args.player_number);
             if (isActive) {
                 this.hand[args.handpos] = null;
                 const handPosDiv = this.handPosDiv(args.handpos);
                 sourceDivId = handPosDiv.id;
                 // Active player hand piece 'removed' from hand.
-                let cl = handPosDiv.classList;
+                const cl = handPosDiv.classList;
                 cl.remove(hpc);
                 cl.add(CSS.EMPTY);
             }
@@ -1056,14 +1055,14 @@ function (dojo, declare, fx, hexloc, bblfx, bgaAnim, on) {
 
         notif_handRefilled: async function(args) {
             console.log('notif_handRefilled', args);
-            let anim = [];
-            let pid = this.player_id;
+            const anim = [];
+            const pid = this.player_id;
             for (const i in args.hand) {
                 if (this.hand[i] == null) {
                     this.hand[i] = args.hand[i];
                 }
                 const div = this.handPosDiv(i);
-                let hc = CSS.handPiece(this.hand[i], this.playerNumber);
+                const hc = CSS.handPiece(this.hand[i], this.playerNumber);
                 if (hc != CSS.EMPTY
                     && div.classList.contains(CSS.EMPTY)) {
                     const a = this.slideTemporaryDiv(

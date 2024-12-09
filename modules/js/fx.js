@@ -26,24 +26,23 @@ define([
 
     return {
         slideTemporaryDiv: function(params = defaultSlideTemporaryDivParams) {
-            let p = Object.assign(Object.assign({}, defaultSlideTemporaryDivParams), params);
-            console.log(p);
-            let id = `bbl_tmp_slideTmpDiv${this.lastId++}`;
+            const p = Object.assign(Object.assign({}, defaultSlideTemporaryDivParams), params);
+            const id = `bbl_tmp_slideTmpDiv${this.lastId++}`;
 
-            let prect = $(p.parent).getBoundingClientRect();
-            let frect = $(p.from).getBoundingClientRect();
-            let top = frect.top - prect.top;
-            let left = frect.left - prect.left;
+            const prect = $(p.parent).getBoundingClientRect();
+            const frect = $(p.from).getBoundingClientRect();
+            const top = frect.top - prect.top;
+            const left = frect.left - prect.left;
             // TODO: unclear why including "display:none" here befeore
             // the slideToObject call messes things up
-            let div = dojo.place(`<div id="${id}" class='${p.className}' style='position:absolute; top: ${top}px; left: ${left}px; z-index: 100'></div>`,
+            const div = dojo.place(`<div id="${id}" class='${p.className}' style='position:absolute; top: ${top}px; left: ${left}px; z-index: 100'></div>`,
                                  p.parent);
 
-            let drect = div.getBoundingClientRect();
-            let trect = $(p.to).getBoundingClientRect();
-            let toTop = trect.top - prect.top + (trect.height - drect.height)/2;
+            const drect = div.getBoundingClientRect();
+            const trect = $(p.to).getBoundingClientRect();
+            const toTop = trect.top - prect.top + (trect.height - drect.height)/2;
             let toLeft = trect.left - prect.left + (trect.width - drect.width)/2;
-            let a = fx.slideTo({
+            const a = fx.slideTo({
                 node: div,
                 top: toTop,
                 left: toLeft,
@@ -72,12 +71,12 @@ define([
         },
 
         spinGrowText : function(params = defaultSpinGrowTextParams) {
-            let p = Object.assign(Object.assign({}, defaultSpinGrowTextParams), params);
-            let id = `bbl_tmp_spinGrowFx-${lastId++}`;
+            const p = Object.assign(Object.assign({}, defaultSpinGrowTextParams), params);
+            const id = `bbl_tmp_spinGrowFx-${lastId++}`;
             // We use a container node to hold the final size.
             //   something in BGA's CSS and structure gets in the way
             //   and shrinks the node down to its minimum.
-            let outer = dojo.place(`<span id="${id}">${p.text}</span>`, p.parent, 'last');
+            const outer = dojo.place(`<span id="${id}">${p.text}</span>`, p.parent, 'last');
             outer.style.color = "transparent";
             outer.style.position = "absolute";
             outer.style.fontSize = p.fontSize + "pt";
@@ -90,21 +89,21 @@ define([
             outer.style.fontStyle = "bold";
 
             // get the ultimate dimensions of the container span
-            let nrect = outer.getBoundingClientRect();
+            const nrect = outer.getBoundingClientRect();
             outer.style.width = nrect.width;
             outer.style.height = nrect.height;
 
             // center the container on the center of the appropriate node
-            let centerNode = dom.byId(p.centeredOn || p.parent);
-            let prect = dom.byId(p.parent).getBoundingClientRect();
-            let crect = centerNode.getBoundingClientRect();
-            let left = (crect.left + crect.width/2 - nrect.width/2 - prect.left);
-            let top = (crect.top + crect.height/2 - nrect.height/2 - prect.top);
+            const centerNode = dom.byId(p.centeredOn || p.parent);
+            const prect = dom.byId(p.parent).getBoundingClientRect();
+            const crect = centerNode.getBoundingClientRect();
+            const left = (crect.left + crect.width/2 - nrect.width/2 - prect.left);
+            const top = (crect.top + crect.height/2 - nrect.height/2 - prect.top);
             outer.style.left = left + "px";
             outer.style.top = top + "px";
 
             // now create the node we're animating
-            let node = dojo.place(`<span>${p.text}</span>`, id);
+            const node = dojo.place(`<span>${p.text}</span>`, id);
             node.style.position = "absolute";
             node.style.display = "inline-block";
             node.style.justifyContent = "center";
@@ -151,32 +150,32 @@ define([
 
         slideTemporaryDiv3: function(animationManager,
                                      params = defaultSlideTemporaryDivParams) {
-            let p = Object.assign(Object.assign({}, defaultSlideTemporaryDivParams), params);
+            const p = Object.assign(Object.assign({}, defaultSlideTemporaryDivParams), params);
             console.log(p);
-            let id = `bbl_tmp_slideTmpDiv${this.lastId++}`;
-            let prect = document.getElementById(p.parent).getBoundingClientRect();
-            let frect = document.getElementById(p.from).getBoundingClientRect();
-            let top = frect.top - prect.top;
-            let left = frect.left - prect.left;
+            const id = `bbl_tmp_slideTmpDiv${this.lastId++}`;
+            const prect = document.getElementById(p.parent).getBoundingClientRect();
+            const frect = document.getElementById(p.from).getBoundingClientRect();
+            const top = frect.top - prect.top;
+            const left = frect.left - prect.left;
             // TODO: unclear why including "display:none" here befeore
             // the slideToObject call messes things up
-            let temp = document.createElement('div');
+            const temp = document.createElement('div');
             temp.innerHTML = `<div id="${id}" class='${p.className}' style='position:absolute; top: ${top}px; left: ${left}px; z-index: 100'></div>`;
             div = temp.firstChild;
             document.getElementById(p.parent).appendChild(div);
             temp.remove();
 
-            let drect = div.getBoundingClientRect();
-            let trect = document.getElementById(p.to).getBoundingClientRect();
-            let toTop = trect.top - prect.top + (trect.height - drect.height)/2;
-            let toLeft = trect.left - prect.left + (trect.width - drect.width)/2
+            const drect = div.getBoundingClientRect();
+            const trect = document.getElementById(p.to).getBoundingClientRect();
+            const toTop = trect.top - prect.top + (trect.height - drect.height)/2;
+            const toLeft = trect.left - prect.left + (trect.width - drect.width)/2
 
-            let delta = {
+            const delta = {
                 x: left - toLeft,
                 y: top - toTop
             };
 
-            let a = animationManager.play(
+            const a = animationManager.play(
                 new BgaSlideToAnimation({ element: div, fromDelta: delta },
                                         p.to ));
             onDone = () => { div.remove(); } ; // if (p.onEnd !== null) { p.onEnd(); } };

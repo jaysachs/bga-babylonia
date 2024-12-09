@@ -4,7 +4,7 @@ define([
     'dojo/domReady!'
 ], function (dom) {
 
-    let calcrm = function (s) {
+    const calcrm = function (s) {
         if (s.startsWith('calc(')) {
             s = s.substring(5);
         }
@@ -14,16 +14,16 @@ define([
         return s;
     };
 
-    let computeHexDimensions = function() {
+    const computeHexDimensions = function() {
         // Extract the hex dimension from CSS:
-        let boardDiv = document.getElementById('bbl_board');
-        var style = getComputedStyle(boardDiv);
-        let hexheight = style.getPropertyValue('--hex-height');
-        let hexwidth = style.getPropertyValue('--hex-width');
+        const boardDiv = document.getElementById('bbl_board');
+        const style = getComputedStyle(boardDiv);
+        const hexheight = style.getPropertyValue('--hex-height');
+        const hexwidth = style.getPropertyValue('--hex-width');
         // console.log(hexwidth, hexheight);
 
         // Now set it on a div so we can resolve the computed values
-        let s = document.getElementById('bbl_vars').style;
+        const s = document.getElementById('bbl_vars').style;
         s.setProperty('width', hexwidth);
         s.setProperty('height', hexheight);
         // console.log(s);
@@ -37,12 +37,12 @@ define([
     // console.log(hexDim);
 
     // Now compute the per-hex deltas in both directions
-    let hdelta = 0.75 * hexDim.width + 2.0;
-    let vdelta = 1.0 * hexDim.height + 2.0;
+    const hdelta = 0.75 * hexDim.width + 2.0;
+    const vdelta = 1.0 * hexDim.height + 2.0;
     // console.log(hdelta, vdelta);
 
-    let hstart = 38.0; // this is related to board width but not sure how
-    let vstart = 9.0; // depends on board size too
+    const hstart = 38.0; // this is related to board width but not sure how
+    const vstart = 9.0; // depends on board size too
 
     return {
         hexLocation: function(hex) {
