@@ -139,8 +139,6 @@ class PersistentStore {
     public function initializePlayerData(array $player_ids): void {
         $sql_values = [];
         foreach ($player_ids as $player_id) {
-            $used = $this->boolValue($zc->used);
-            $type = $zc->type->value;
             $sql_values[] = "($player_id, 0)";
         }
         $values = implode(',', $sql_values);
