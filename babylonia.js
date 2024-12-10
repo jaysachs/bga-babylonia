@@ -941,7 +941,6 @@ function (dojo, declare, fx, hexloc, bblfx, bgaAnim, on) {
                                  details.scored_locations.forEach(
                                      rc => this.hexDiv(rc).classList.remove(CSS.SELECTED));
                                  this.scoreCtrl[playerId].incValue(details.network_points);
-                                 this.updateCapturedCityCount(details);
                              });
             }
 
