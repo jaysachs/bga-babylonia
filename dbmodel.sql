@@ -34,7 +34,11 @@
 -- ALTER TABLE `player` ADD `player_my_custom_field` INT UNSIGNED NOT NULL DEFAULT '0';
 
 
-ALTER TABLE `player` ADD `captured_city_count` INT UNSIGNED NOT NULL DEFAULT '0';
+CREATE TABLE IF NOT EXISTS `player_data` (
+  `player_id` int(10) unsigned NOT NULL,
+  `captured_city_count` INT UNSIGNED NOT NULL DEFAULT '0',
+  PRIMARY KEY (`player_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `handpools` (
   `player_id` int(10) unsigned NOT NULL,

@@ -135,10 +135,28 @@ class PersistentStore {
         return new Hand($pieces);
     }
 
+    /** @param int[] $player_ids */
+    public function initializePlayerData(array $player_ids): void {
+        $sql_values = [];
+        foreach ($player_ids as $player_id) {
+            $used = $this->boolValue($zc->used);
+            $type = $zc->type->value;
+            $sql_values[] = "($player_id, 0)";
+        }
+        $values = implode(',', $sql_values);
+        $sql = "INSERT INTO player_data (player_id, captured_city_count)
+                VALUES $values";
+        $this->db->execute($sql);
+    }
+
     public function updatePlayer(PlayerInfo $player_info): void {
         $sql = "UPDATE player q
-                SET q.player_score = $player_info->score,
-                    q.captured_city_count=$player_info->captured_city_count
+                SET q.player_score = $player_info->score
+                WHERE q.player_id = $player_info->player_id";
+        $this->db->execute($sql);
+
+        $sql = "UPDATE player_data q
+                SET q.captured_city_count=$player_info->captured_city_count
                 WHERE q.player_id = $player_info->player_id";
 
         $this->db->execute($sql);
@@ -273,10 +291,12 @@ class PersistentStore {
     public function &retrieveAllPlayerInfo(): array {
         $sql = "SELECT P.player_id id, P.player_id, P.player_score score,
                        P.player_color player_color,
-                       P.captured_city_count captured_city_count,
+                       D.captured_city_count captured_city_count,
                        P.player_no player_number,
                        P.player_name player_name, H.hand_size, Q.pool_size
                 FROM player P
+                LEFT OUTER JOIN player_data D
+                ON P.player_id = D.player_id
                 LEFT JOIN
                     (SELECT player_id, COUNT(*) hand_size
                      FROM hands WHERE piece <> 'empty'
