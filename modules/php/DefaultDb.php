@@ -38,10 +38,10 @@ class DefaultDb implements Db {
 
     /** @return string[] */
     public function getSingleFieldList(string $sql): array {
-        return $this->game->getObjectListFromDB2($sql, true);
+        return $this->game->getSingleFieldListFromDB2($sql);
     }
 
-    /** @return array<int,string[]> $data */
+    /** @return string[][] */
     public function getCollection(string $sql): array {
         return $this->game->getCollectionFromDB($sql);
     }

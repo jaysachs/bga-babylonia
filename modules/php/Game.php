@@ -781,19 +781,18 @@ class Game extends \Table
     }
 
 
-    /*
-     * forwarder method
+    /**
+     * forwarder methods
+     * @return string[][]
      */
-    final static public function getObjectListFromDB2(string $sql, bool $bUniqueValue = false): array
+    final static public function getObjectListFromDB2(string $sql): array
     {
-        return self::getObjectListFromDB($sql, $bUniqueValue);
+        return self::getObjectListFromDB($sql, false);
     }
 
-    /*
-     * forwarder method
-     */
-    final public function getNonEmptyObjectFromDB2(string $sql): array
+    /** @return string[] */
+    final static public function getSingleFieldListFromDB2(string $sql): array
     {
-        return $this->getNonEmptyObjectFromDB($sql);
+        return self::getObjectListFromDB($sql, true);
     }
 }
