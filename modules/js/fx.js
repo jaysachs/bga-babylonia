@@ -26,23 +26,23 @@ define([
 
     return {
         slideTemporaryDiv3: function(animationManager,
-                                     params = defaultSlideTemporaryDivParams) {
-            const p = Object.assign(Object.assign({}, defaultSlideTemporaryDivParams), params);
+                                     a_params = defaultSlideTemporaryDivParams) {
+            const params = Object.assign(Object.assign({}, defaultSlideTemporaryDivParams), a_params);
             const id = `bbl_tmp_slideTmpDiv${this.lastId++}`;
-            const prect = document.getElementById(p.parent).getBoundingClientRect();
-            const frect = document.getElementById(p.to).getBoundingClientRect();
+            const prect = document.getElementById(params.parent).getBoundingClientRect();
+            const frect = document.getElementById(params.to).getBoundingClientRect();
             const top = frect.top - prect.top;
             const left = frect.left - prect.left;
             // TODO: unclear why including "display:none" here befeore
             // the slideToObject call messes things up
             const temp = document.createElement('div');
-            temp.innerHTML = `<div id="${id}" class='${p.className}' style='position:absolute; top: ${top}px; left: ${left}px; z-index: 100'></div>`;
+            temp.innerHTML = `<div id="${id}" class='${params.className}' style='position:absolute; top: ${top}px; left: ${left}px; z-index: 100'></div>`;
             div = temp.firstChild;
-            document.getElementById(p.parent).appendChild(div);
+            document.getElementById(params.parent).appendChild(div);
             temp.remove();
 
             const drect = div.getBoundingClientRect();
-            const trect = document.getElementById(p.from).getBoundingClientRect();
+            const trect = document.getElementById(params.from).getBoundingClientRect();
             const toTop = trect.top - prect.top + (trect.height - drect.height)/2;
             const toLeft = trect.left - prect.left + (trect.width - drect.width)/2
 
@@ -53,8 +53,8 @@ define([
 
             const a = animationManager.play(
                 new BgaSlideAnimation({ element: div, fromDelta: delta },
-                                      p.to ));
-            onDone = () => { div.remove(); if (p.onEnd !== null) { p.onEnd(); } };
+                                      params.to ));
+            onDone = () => { div.remove(); if (params.onEnd !== null) { params.onEnd(); } };
             return a.then(onDone, onDone);
         },
 
