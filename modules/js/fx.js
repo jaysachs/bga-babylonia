@@ -29,10 +29,13 @@ define([
                                      a_params = defaultSlideTemporaryDivParams) {
             const params = Object.assign(Object.assign({}, defaultSlideTemporaryDivParams), a_params);
             const parent = document.getElementById(params.parent);
+
             const parentRect = parent.getBoundingClientRect();
             const toRect = document.getElementById(params.to).getBoundingClientRect();
-            const top = toRect.top - parentRect.top;
-            const left = toRect.left - parentRect.left;
+            const fromRect = document.getElementById(params.from).getBoundingClientRect();
+
+            const top = fromRect.top - parentRect.top;
+            const left = fromRect.left - parentRect.left;
 
             const div = document.createElement('div');
             div.id = `bbl_tmp_slideTmpDiv${lastId++}`;
@@ -45,9 +48,8 @@ define([
             parent.appendChild(div);
 
             const divRect = div.getBoundingClientRect();
-            const fromRect = document.getElementById(params.from).getBoundingClientRect();
-            const toTop = fromRect.top - parentRect.top + (fromRect.height - divRect.height)/2;
-            const toLeft = fromRect.left - parentRect.left + (fromRect.width - divRect.width)/2
+            const toTop = toRect.top - parentRect.top + (toRect.height - divRect.height)/2;
+            const toLeft = toRect.left - parentRect.left + (toRect.width - divRect.width)/2
 
             const delta = {
                 x: left - toLeft,

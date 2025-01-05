@@ -257,9 +257,11 @@ var BgaSlideAnimation = /** @class */ (function (_super) {
             // this gets saved/restored in wireUp
             element.style.zIndex = "".concat((_e = (_d = _this.settings) === null || _d === void 0 ? void 0 : _d.zIndex) !== null && _e !== void 0 ? _e : 10);
             var a = element.animate([
-                { transform: "translate3D(".concat(-x, "px, ").concat(-y, "px, 0)") },
-                { transform: "translate3D(0, 0, 0)" }
+                { transform: "translate3D(0, 0, 0)" },
+                { transform: "translate3D(".concat(-x, "px, ").concat(-y, "px, 0)") }
             ], {
+                iterations: _this.settings.iterations,
+                direction: _this.settings.direction,
                 duration: duration,
                 easing: transitionTimingFunction,
                 fill: "forwards"
@@ -300,7 +302,7 @@ var BgaShowScreenCenterAnimation = /** @class */ (function (_super) {
             element.style.zIndex = "".concat((_e = (_d = _this.settings) === null || _d === void 0 ? void 0 : _d.zIndex) !== null && _e !== void 0 ? _e : 10);
             // element.offsetHeight;
             var a = element.animate([
-                // { transform: `translate3D(0, 0, 0)` },
+                { transform: "translate3D(0, 0, 0)" },
                 { transform: "translate3D(".concat(-x, "px, ").concat(-y, "px, 0)") }
                 // { transform: `translate3D(0, 0, 0)` }
             ], {
