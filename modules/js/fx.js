@@ -28,26 +28,26 @@ define([
         slideTemporaryDiv3: function(animationManager,
                                      a_params = defaultSlideTemporaryDivParams) {
             const params = Object.assign(Object.assign({}, defaultSlideTemporaryDivParams), a_params);
-            const id = `bbl_tmp_slideTmpDiv${lastId++}`;
-            const prect = document.getElementById(params.parent).getBoundingClientRect();
-            const frect = document.getElementById(params.to).getBoundingClientRect();
-            const top = frect.top - prect.top;
-            const left = frect.left - prect.left;
+            const parent = document.getElementById(params.parent);
+            const parentRect = parent.getBoundingClientRect();
+            const toRect = document.getElementById(params.to).getBoundingClientRect();
+            const top = toRect.top - parentRect.top;
+            const left = toRect.left - parentRect.left;
 
             const div = document.createElement('div');
-            div.id = id;
+            div.id = `bbl_tmp_slideTmpDiv${lastId++}`;
             div.className = params.className;
             // Unclear why setting `style` attribute directly doesn't work.
             div.style.position = 'absolute';
             div.style.top = `${top}px`;
             div.style.left = `${left}px`;
             div.style.zindex = 100;
-            document.getElementById(params.parent).appendChild(div);
+            parent.appendChild(div);
 
-            const drect = div.getBoundingClientRect();
-            const trect = document.getElementById(params.from).getBoundingClientRect();
-            const toTop = trect.top - prect.top + (trect.height - drect.height)/2;
-            const toLeft = trect.left - prect.left + (trect.width - drect.width)/2
+            const divRect = div.getBoundingClientRect();
+            const fromRect = document.getElementById(params.from).getBoundingClientRect();
+            const toTop = fromRect.top - parentRect.top + (fromRect.height - divRect.height)/2;
+            const toLeft = fromRect.left - parentRect.left + (fromRect.width - divRect.width)/2
 
             const delta = {
                 x: left - toLeft,
