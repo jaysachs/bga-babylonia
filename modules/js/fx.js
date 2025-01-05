@@ -54,9 +54,7 @@ define([
                 y: top - toTop
             };
 
-            const a = animationManager.play(
-                new BgaSlideAnimation({ element: div, fromDelta: delta },
-                                      params.to ));
+            const a = animationManager.play( new BgaSlideAnimation({ element: div, fromDelta: delta }));
             onDone = () => { div.remove(); if (params.onEnd !== null) { params.onEnd(); } };
             return a.then(onDone, onDone);
         },
