@@ -866,14 +866,15 @@ function (dojo, declare, fx, hexloc, bblfx, bgaAnim, on) {
                 $(id).className = "";
                 this.removeTooltip(id);
 
-                anim = this.slideTemporaryDiv(
-                    CSS.zcard(this.zcards[z].type, false),
-                    id,
-                    IDS.playerBoardZcards(args.player_id),
-                    () => this.addZcardDivInPlayerBoard(z),
-                    IDS.AVAILABLE_ZCARDS
-                );
-                await this.playAnimation(anim);
+                await bblfx.slideTemporaryDiv3(
+                    this.animationManager,
+                    {
+                        className: CSS.zcard(this.zcards[z].type, false),
+                        from: id,
+                        to: IDS.playerBoardZcards(args.player_id),
+                        onEnd: () => this.addZcardDivInPlayerBoard(z),
+                        parent: IDS.AVAILABLE_ZCARDS,
+                    });
             }
         },
 
@@ -1036,20 +1037,22 @@ function (dojo, declare, fx, hexloc, bblfx, bgaAnim, on) {
                 cl.remove(hpc);
                 cl.add(CSS.EMPTY);
             }
-            anim = this.slideTemporaryDiv(
-                hpc,
-                sourceDivId,
-                this.hexDiv(args).id,
+            const onEnd =
                 () => {
                     this.renderPlayedPiece(args,
                                            args.piece,
                                            args.player_number);
                     this.updateHandCount(args);
                     this.scoreCtrl[args.player_id].incValue(args.points);
-                }
-            );
-
-            await this.playAnimation(anim);
+                };
+            await bblfx.slideTemporaryDiv3(
+                this.animationManager,
+                {
+                    className: hpc,
+                    from: sourceDivId,
+                    to: this.hexDiv(args).id,
+                    parent: IDS.BOARD,
+                }).then(onEnd, onEnd);
         },
 
         notif_handRefilled: async function(args) {

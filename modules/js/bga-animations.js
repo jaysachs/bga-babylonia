@@ -34,8 +34,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 var __generator = (this && this.__generator) || function (thisArg, body) {
-    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g = Object.create((typeof Iterator === "function" ? Iterator : Object).prototype);
-    return g.next = verb(0), g["throw"] = verb(1), g["return"] = verb(2), typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
+    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
+    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
     function verb(n) { return function (v) { return step([n, v]); }; }
     function step(op) {
         if (f) throw new TypeError("Generator is already executing.");
@@ -69,22 +69,21 @@ var BgaAnimation = /** @class */ (function () {
     BgaAnimation.prototype.preAnimate = function (animationManager) { };
     BgaAnimation.prototype.postAnimate = function (animationManager) { };
     BgaAnimation.prototype.play = function (animationManager) {
+        var _a, _b, _c, _d, _e, _f, _g, _h;
         return __awaiter(this, void 0, void 0, function () {
-            var shouldPlay, settings, _a;
-            var _b, _c, _d, _e, _f, _g, _h;
-            return __generator(this, function (_j) {
-                switch (_j.label) {
+            var shouldPlay, _j;
+            return __generator(this, function (_k) {
+                switch (_k.label) {
                     case 0:
                         shouldPlay = this.playWhenNoAnimation || animationManager.animationsActive();
                         if (!shouldPlay) return [3 /*break*/, 2];
-                        settings = this.settings;
-                        (_b = settings.animationStart) === null || _b === void 0 ? void 0 : _b.call(settings, this);
+                        (_b = (_a = this.settings).animationStart) === null || _b === void 0 ? void 0 : _b.call(_a, this);
                         this.settings = __assign({ duration: (_f = (_d = (_c = this.settings) === null || _c === void 0 ? void 0 : _c.duration) !== null && _d !== void 0 ? _d : (_e = animationManager.getSettings()) === null || _e === void 0 ? void 0 : _e.duration) !== null && _f !== void 0 ? _f : 500 }, this.settings);
                         this.preAnimate(animationManager);
-                        _a = this;
+                        _j = this;
                         return [4 /*yield*/, this.doAnimate(animationManager)];
                     case 1:
-                        _a.result = _j.sent();
+                        _j.result = _k.sent();
                         this.postAnimate(animationManager);
                         (_h = (_g = this.settings).animationEnd) === null || _h === void 0 ? void 0 : _h.call(_g, this);
                         return [3 /*break*/, 3];
@@ -120,6 +119,7 @@ var BgaElementAnimation = /** @class */ (function (_super) {
             success();
             element.removeEventListener('transitioncancel', cleanOnTransitionEnd);
             element.removeEventListener('transitionend', cleanOnTransitionEnd);
+            element.removeEventListener("animationend", cleanOnTransitionEnd);
             document.removeEventListener('visibilitychange', cleanOnTransitionEnd);
             if (_this.timeoutId) {
                 clearTimeout(_this.timeoutId);
@@ -133,6 +133,7 @@ var BgaElementAnimation = /** @class */ (function (_super) {
             element.offsetHeight;
             cleanOnTransitionEnd();
         };
+        element.addEventListener("animationend", cleanOnTransitionEnd, false);
         element.addEventListener('transitioncancel', cleanOnTransitionEnd);
         element.addEventListener('transitionend', cleanOnTransitionEnd);
         document.addEventListener('visibilitychange', cleanOnTransitionCancel);
@@ -190,6 +191,53 @@ function logAnimation(animationManager, animation) {
     return Promise.resolve(false);
 }
 /**
+ * Fade the element.
+ */
+var BgaFadeAnimation = /** @class */ (function (_super) {
+    __extends(BgaFadeAnimation, _super);
+    function BgaFadeAnimation(settings) {
+        return _super.call(this, settings) || this;
+    }
+    BgaFadeAnimation.prototype.doAnimate = function (animationManager) {
+        var _this = this;
+        return new Promise(function (success) {
+            var _a, _b, _c, _d, _e;
+            var element = _this.settings.element;
+            var duration = (_b = (_a = _this.settings) === null || _a === void 0 ? void 0 : _a.duration) !== null && _b !== void 0 ? _b : 500;
+            _this.wireUp(element, duration, success);
+            // this gets saved/restored in wireUp
+            element.style.zIndex = "".concat((_d = (_c = _this.settings) === null || _c === void 0 ? void 0 : _c.zIndex) !== null && _d !== void 0 ? _d : 10);
+            var direction = "normal";
+            var iterations = 1;
+            if (_this.settings.kind == "in") {
+                direction = "reverse";
+            }
+            else if (_this.settings.kind == "outin") {
+                direction = "alternate";
+                iterations = 2;
+            }
+            var a = element.animate([
+                { opacity: 1 },
+                { opacity: 0 }
+            ], {
+                duration: duration,
+                easing: (_e = _this.settings.transitionTimingFunction) !== null && _e !== void 0 ? _e : 'linear',
+                direction: direction,
+                iterations: iterations,
+            });
+            a.pause();
+            a.onfinish = function (e) {
+                // a.commitStyles();
+                // a.cancel();
+                //    element.style.transform = this.settings?.finalTransform ?? null;
+                // success();
+            };
+            a.play();
+        });
+    };
+    return BgaFadeAnimation;
+}(BgaElementAnimation));
+/**
  * Slide of the element from origin to destination.
  */
 var BgaSlideAnimation = /** @class */ (function (_super) {
@@ -200,21 +248,30 @@ var BgaSlideAnimation = /** @class */ (function (_super) {
     BgaSlideAnimation.prototype.doAnimate = function (animationManager) {
         var _this = this;
         return new Promise(function (success) {
-            var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k;
+            var _a, _b, _c, _d, _e;
             var element = _this.settings.element;
             var transitionTimingFunction = (_a = _this.settings.transitionTimingFunction) !== null && _a !== void 0 ? _a : 'linear';
             var duration = (_c = (_b = _this.settings) === null || _b === void 0 ? void 0 : _b.duration) !== null && _c !== void 0 ? _c : 500;
-            var _l = getDeltaCoordinates(element, _this.settings, animationManager), x = _l.x, y = _l.y;
-            element.style.zIndex = "".concat((_e = (_d = _this.settings) === null || _d === void 0 ? void 0 : _d.zIndex) !== null && _e !== void 0 ? _e : 10);
-            element.offsetHeight;
-            element.style.transition = null;
-            element.offsetHeight;
-            element.style.transform = "translate(".concat(-x, "px, ").concat(-y, "px) rotate(").concat((_g = (_f = _this.settings) === null || _f === void 0 ? void 0 : _f.rotationDelta) !== null && _g !== void 0 ? _g : 0, "deg) scale(").concat((_h = _this.settings.scale) !== null && _h !== void 0 ? _h : 1, ")");
+            var _f = getDeltaCoordinates(element, _this.settings, animationManager), x = _f.x, y = _f.y;
             _this.wireUp(element, duration, success);
-            element.offsetHeight;
-            element.style.transition = "transform ".concat(duration, "ms ").concat(transitionTimingFunction);
-            element.offsetHeight;
-            element.style.transform = (_k = (_j = _this.settings) === null || _j === void 0 ? void 0 : _j.finalTransform) !== null && _k !== void 0 ? _k : null;
+            // this gets saved/restored in wireUp
+            element.style.zIndex = "".concat((_e = (_d = _this.settings) === null || _d === void 0 ? void 0 : _d.zIndex) !== null && _e !== void 0 ? _e : 10);
+            var a = element.animate([
+                { transform: "translate3D(".concat(-x, "px, ").concat(-y, "px, 0)") },
+                { transform: "translate3D(0, 0, 0)" }
+            ], {
+                duration: duration,
+                easing: transitionTimingFunction,
+                fill: "forwards"
+            });
+            a.pause();
+            a.onfinish = function (e) {
+                a.commitStyles();
+                a.cancel();
+                //    element.style.transform = this.settings?.finalTransform ?? null;
+                // success();
+            };
+            a.play();
         });
     };
     return BgaSlideAnimation;
@@ -230,17 +287,30 @@ var BgaSlideToAnimation = /** @class */ (function (_super) {
     BgaSlideToAnimation.prototype.doAnimate = function (animationManager) {
         var _this = this;
         return new Promise(function (success) {
-            var _a, _b, _c, _d, _e, _f, _g, _h;
+            var _a, _b, _c, _d, _e;
             var element = _this.settings.element;
             var transitionTimingFunction = (_a = _this.settings.transitionTimingFunction) !== null && _a !== void 0 ? _a : 'linear';
             var duration = (_c = (_b = _this.settings) === null || _b === void 0 ? void 0 : _b.duration) !== null && _c !== void 0 ? _c : 500;
+            var _f = getDeltaCoordinates(element, _this.settings, animationManager), x = _f.x, y = _f.y;
             _this.wireUp(element, duration, success);
-            var _j = getDeltaCoordinates(element, _this.settings, animationManager), x = _j.x, y = _j.y;
+            // this gets saved/restored in wireUp
             element.style.zIndex = "".concat((_e = (_d = _this.settings) === null || _d === void 0 ? void 0 : _d.zIndex) !== null && _e !== void 0 ? _e : 10);
-            element.offsetHeight;
-            element.style.transition = "transform ".concat(duration, "ms ").concat(transitionTimingFunction);
-            element.offsetHeight;
-            element.style.transform = "translate(".concat(-x, "px, ").concat(-y, "px) rotate(").concat((_g = (_f = _this.settings) === null || _f === void 0 ? void 0 : _f.rotationDelta) !== null && _g !== void 0 ? _g : 0, "deg) scale(").concat((_h = _this.settings.scale) !== null && _h !== void 0 ? _h : 1, ")");
+            var a = element.animate([
+                { transform: "translate3D(".concat(-x, "px, ").concat(-y, "px, 0)") },
+                { transform: "translate3D(0, 0, 0)" }
+            ], {
+                duration: duration,
+                easing: transitionTimingFunction,
+                fill: "forwards"
+            });
+            a.pause();
+            a.onfinish = function (e) {
+                a.commitStyles();
+                a.cancel();
+                //    element.style.transform = this.settings?.finalTransform ?? null;
+                // success();
+            };
+            a.play();
         });
     };
     return BgaSlideToAnimation;
@@ -256,7 +326,7 @@ var BgaShowScreenCenterAnimation = /** @class */ (function (_super) {
     BgaShowScreenCenterAnimation.prototype.doAnimate = function (animationManager) {
         var _this = this;
         return new Promise(function (success) {
-            var _a, _b, _c, _d, _e, _f, _g, _h;
+            var _a, _b, _c, _d, _e;
             var element = _this.settings.element;
             var elementBR = animationManager.game.getBoundingClientRectIgnoreZoom(element);
             var xCenter = (elementBR.left + elementBR.right) / 2;
@@ -267,10 +337,24 @@ var BgaShowScreenCenterAnimation = /** @class */ (function (_super) {
             var duration = (_c = (_b = _this.settings) === null || _b === void 0 ? void 0 : _b.duration) !== null && _c !== void 0 ? _c : 500;
             _this.wireUp(element, duration, success);
             element.style.zIndex = "".concat((_e = (_d = _this.settings) === null || _d === void 0 ? void 0 : _d.zIndex) !== null && _e !== void 0 ? _e : 10);
-            element.offsetHeight;
-            element.style.transition = "transform ".concat(duration, "ms ").concat(transitionTimingFunction);
-            element.offsetHeight;
-            element.style.transform = "translate(".concat(-x, "px, ").concat(-y, "px) rotate(").concat((_g = (_f = _this.settings) === null || _f === void 0 ? void 0 : _f.rotationDelta) !== null && _g !== void 0 ? _g : 0, "deg) scale(").concat((_h = _this.settings.scale) !== null && _h !== void 0 ? _h : 1, ")");
+            // element.offsetHeight;
+            var a = element.animate([
+                // { transform: `translate3D(0, 0, 0)` },
+                { transform: "translate3D(".concat(-x, "px, ").concat(-y, "px, 0)") }
+                // { transform: `translate3D(0, 0, 0)` }
+            ], {
+                duration: duration,
+                fill: "forwards",
+                easing: transitionTimingFunction
+            });
+            a.pause();
+            // element.offsetHeight;
+            a.onfinish = function (e) {
+                a.commitStyles();
+                a.cancel();
+                // element.style.transform = this.settings?.finalTransform ?? null;
+            };
+            a.play();
         });
     };
     return BgaShowScreenCenterAnimation;
@@ -307,12 +391,12 @@ var BgaAttachWithAnimation = /** @class */ (function (_super) {
         var _a;
         var settings = this.settings;
         var element = settings.animation.settings.element;
+        element.offsetHeight;
         var fromRect = animationManager.game.getBoundingClientRectIgnoreZoom(element);
         settings.animation.settings.fromRect = fromRect;
         settings.attachElement.appendChild(element);
         (_a = settings.afterAttach) === null || _a === void 0 ? void 0 : _a.call(settings, element, settings.attachElement);
         return animationManager.play(settings.animation);
-        // return settings.animation.play(animationManager);
     };
     return BgaAttachWithAnimation;
 }(BgaAnimation));
