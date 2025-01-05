@@ -3,7 +3,7 @@ define([
     'dojo/dom',
     'dojox/fx'
 ], function (dojo, dom, fx) {
-    let lastId = 0;
+    var lastId = 0;
 
     const defaultSpinGrowTextParams = {
         text: "",
@@ -28,18 +28,21 @@ define([
         slideTemporaryDiv3: function(animationManager,
                                      a_params = defaultSlideTemporaryDivParams) {
             const params = Object.assign(Object.assign({}, defaultSlideTemporaryDivParams), a_params);
-            const id = `bbl_tmp_slideTmpDiv${this.lastId++}`;
+            const id = `bbl_tmp_slideTmpDiv${lastId++}`;
             const prect = document.getElementById(params.parent).getBoundingClientRect();
             const frect = document.getElementById(params.to).getBoundingClientRect();
             const top = frect.top - prect.top;
             const left = frect.left - prect.left;
-            // TODO: unclear why including "display:none" here befeore
-            // the slideToObject call messes things up
-            const temp = document.createElement('div');
-            temp.innerHTML = `<div id="${id}" class='${params.className}' style='position:absolute; top: ${top}px; left: ${left}px; z-index: 100'></div>`;
-            div = temp.firstChild;
+
+            const div = document.createElement('div');
+            div.id = id;
+            div.className = params.className;
+            // Unclear why setting `style` attribute directly doesn't work.
+            div.style.position = 'absolute';
+            div.style.top = `${top}px`;
+            div.style.left = `${left}px`;
+            div.style.zindex = 100;
             document.getElementById(params.parent).appendChild(div);
-            temp.remove();
 
             const drect = div.getBoundingClientRect();
             const trect = document.getElementById(params.from).getBoundingClientRect();
