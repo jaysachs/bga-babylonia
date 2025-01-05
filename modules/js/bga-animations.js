@@ -277,45 +277,6 @@ var BgaSlideAnimation = /** @class */ (function (_super) {
     return BgaSlideAnimation;
 }(BgaElementAnimation));
 /**
- * Slide of the element from destination to origin.
- */
-var BgaSlideToAnimation = /** @class */ (function (_super) {
-    __extends(BgaSlideToAnimation, _super);
-    function BgaSlideToAnimation(settings) {
-        return _super.call(this, settings) || this;
-    }
-    BgaSlideToAnimation.prototype.doAnimate = function (animationManager) {
-        var _this = this;
-        return new Promise(function (success) {
-            var _a, _b, _c, _d, _e;
-            var element = _this.settings.element;
-            var transitionTimingFunction = (_a = _this.settings.transitionTimingFunction) !== null && _a !== void 0 ? _a : 'linear';
-            var duration = (_c = (_b = _this.settings) === null || _b === void 0 ? void 0 : _b.duration) !== null && _c !== void 0 ? _c : 500;
-            var _f = getDeltaCoordinates(element, _this.settings, animationManager), x = _f.x, y = _f.y;
-            _this.wireUp(element, duration, success);
-            // this gets saved/restored in wireUp
-            element.style.zIndex = "".concat((_e = (_d = _this.settings) === null || _d === void 0 ? void 0 : _d.zIndex) !== null && _e !== void 0 ? _e : 10);
-            var a = element.animate([
-                { transform: "translate3D(".concat(-x, "px, ").concat(-y, "px, 0)") },
-                { transform: "translate3D(0, 0, 0)" }
-            ], {
-                duration: duration,
-                easing: transitionTimingFunction,
-                fill: "forwards"
-            });
-            a.pause();
-            a.onfinish = function (e) {
-                a.commitStyles();
-                a.cancel();
-                //    element.style.transform = this.settings?.finalTransform ?? null;
-                // success();
-            };
-            a.play();
-        });
-    };
-    return BgaSlideToAnimation;
-}(BgaElementAnimation));
-/**
  * Show the element at the center of the screen
  */
 var BgaShowScreenCenterAnimation = /** @class */ (function (_super) {

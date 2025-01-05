@@ -28,7 +28,6 @@ define([
         slideTemporaryDiv3: function(animationManager,
                                      params = defaultSlideTemporaryDivParams) {
             const p = Object.assign(Object.assign({}, defaultSlideTemporaryDivParams), params);
-            console.log(p);
             const id = `bbl_tmp_slideTmpDiv${this.lastId++}`;
             const prect = document.getElementById(p.parent).getBoundingClientRect();
             const frect = document.getElementById(p.to).getBoundingClientRect();
@@ -53,8 +52,8 @@ define([
             };
 
             const a = animationManager.play(
-                new BgaSlideToAnimation({ element: div, fromDelta: delta },
-                                        p.to ));
+                new BgaSlideAnimation({ element: div, fromDelta: delta },
+                                      p.to ));
             onDone = () => { div.remove(); if (p.onEnd !== null) { p.onEnd(); } };
             return a.then(onDone, onDone);
         },
