@@ -746,7 +746,7 @@ function (dojo, declare, fx, hexloc, bblfx, bgaAnim, on) {
 
         shouldAnimate: function() {
             return document.visibilityState !== 'hidden'
-                && !this.instantaeousMode;
+                && !this.instantaneousMode;
         },
 
         slideTemporaryDiv: function(className,
