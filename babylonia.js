@@ -866,39 +866,14 @@ function (dojo, declare, fx, hexloc, bblfx, bgaAnim, on) {
                 $(id).className = "";
                 this.removeTooltip(id);
 
-                await this.slideTemporaryDiv3(
-                    {
-                        className: CSS.zcard(this.zcards[z].type, false),
-                        from: id,
-                        to: IDS.playerBoardZcards(args.player_id),
-                        onEnd: () => this.addZcardDivInPlayerBoard(z),
-                        parent: IDS.AVAILABLE_ZCARDS,
-                    });
+                await this.animationManager.play( new BgaSlideTempAnimation({
+                    className: CSS.zcard(this.zcards[z].type, false),
+                    fromId: id,
+                    toId: IDS.playerBoardZcards(args.player_id),
+                    parentId: IDS.AVAILABE_ZCARDS,
+                })).then(() => this.addZcardDivInPlayerBoard(z));
             }
         },
-
-
-        defaultSlideTemporaryDivParams: {
-            from: null,
-            to: null,
-            parent: null,
-            onEnd: null,
-            duration: 500,
-        },
-
-        slideTemporaryDiv3: function(a_params = this.defaultSlideTemporaryDivParams) {
-            const params = Object.assign(Object.assign({}, this.defaultSlideTemporaryDivParams), a_params);
-
-            const onDone = () => { if (params.onEnd !== null) { params.onEnd(); } };
-            return this.animationManager.play( new BgaSlideTempAnimation({
-                className: params.className,
-                parentId: params.parent,
-                fromId: params.from,
-                toId: params.to,
-                duration: params.duration,
-            })).then(onDone);
-        },
-
 
         fadeOut: function(rcs) {
             if (!this.shouldAnimate()) {
@@ -1024,7 +999,7 @@ function (dojo, declare, fx, hexloc, bblfx, bgaAnim, on) {
             this.renderPlayedPiece(args,
                                    args.captured_piece,
                                    null);
-            const onEnd =
+            const onDone =
                 () => {
                     if (isActive) {
                         const cl = handPosDiv.classList;
@@ -1035,13 +1010,12 @@ function (dojo, declare, fx, hexloc, bblfx, bgaAnim, on) {
                     this.handCounters[args.player_id].incValue(1);
                     this.scoreCtrl[args.player_id].incValue(-args.points);
                 };
-            await this.slideTemporaryDiv3(
-                {
-                    className: CSS.handPiece(args.piece, args.player_number),
-                    from: IDS.hexDiv(args),
-                    to: targetDivId,
-                    parent: IDS.BOARD
-                }).then(onEnd);
+            await this.animationManager.play( new BgaSlideTempAnimation({
+                className: CSS.handPiece(args.piece, args.player_number),
+                fromId: IDS.hexDiv(args),
+                toId: targetDivId,
+                parentId: IDS.BOARD
+            })).then(onDone);
         },
 
         notif_piecePlayed: async function(args) {
@@ -1058,21 +1032,20 @@ function (dojo, declare, fx, hexloc, bblfx, bgaAnim, on) {
                 cl.remove(hpc);
                 cl.add(CSS.EMPTY);
             }
-            const onEnd =
-                () => {
-                    this.renderPlayedPiece(args,
-                                           args.piece,
-                                           args.player_number);
-                    this.updateHandCount(args);
-                    this.scoreCtrl[args.player_id].incValue(args.points);
-                };
-            await this.slideTemporaryDiv3(
-                {
-                    className: hpc,
-                    from: sourceDivId,
-                    to: this.hexDiv(args).id,
-                    parent: IDS.BOARD,
-                }).then(onEnd);
+            const onDone =
+                  () => {
+                      this.renderPlayedPiece(args,
+                                             args.piece,
+                                             args.player_number);
+                      this.updateHandCount(args);
+                      this.scoreCtrl[args.player_id].incValue(args.points);
+                  };
+            await this.animationManager.play( new BgaSlideTempAnimation({
+                className: hpc,
+                fromId: sourceDivId,
+                toId: this.hexDiv(args).id,
+                parentId: IDS.BOARD
+            })).then(onDone);
         },
 
         notif_handRefilled: async function(args) {
@@ -1085,21 +1058,18 @@ function (dojo, declare, fx, hexloc, bblfx, bgaAnim, on) {
                 }
                 const div = this.handPosDiv(i);
                 const hc = CSS.handPiece(this.hand[i], this.playerNumber);
-                if (hc != CSS.EMPTY
-                    && div.classList.contains(CSS.EMPTY)) {
-                    const a = this.slideTemporaryDiv(
-                        hc,
-                        IDS.handcount(pid),
-                        div.id,
-                        () => { div.className = hc; }
-                    );
+                if (hc != CSS.EMPTY && div.classList.contains(CSS.EMPTY)) {
+                    const a = new BgaSlideTempAnimation({
+                        className: hc,
+                        fromId: IDS.handcount(pid),
+                        toId: div.id,
+                        parentId: IDS.BOARD,
+                        animationEnd: () => { div.className = hc; },
+                    });
                     anim.push(a);
                 }
             }
-            if (anim.length == 0) {
-                return Promise.resolve();
-            }
-            await this.playAnimation(dojo.fx.chain(anim));
+            await this.animationManager.playSequence(anim);
         },
     });
 });
