@@ -14,7 +14,7 @@
  * In this file, you are describing the logic of your user interface, in Javascript language.
  *
  */
-
+"use strict";
 const IDS = {
     AVAILABLE_ZCARDS: 'bbl_available_zcards',
     BOARD: 'bbl_board',
@@ -866,8 +866,7 @@ function (dojo, declare, fx, hexloc, bblfx, bgaAnim, on) {
                 $(id).className = "";
                 this.removeTooltip(id);
 
-                await bblfx.slideTemporaryDiv3(
-                    this.animationManager,
+                await this.slideTemporaryDiv3(
                     {
                         className: CSS.zcard(this.zcards[z].type, false),
                         from: id,
@@ -877,6 +876,29 @@ function (dojo, declare, fx, hexloc, bblfx, bgaAnim, on) {
                     });
             }
         },
+
+
+        defaultSlideTemporaryDivParams: {
+            from: null,
+            to: null,
+            parent: null,
+            onEnd: null,
+            duration: 500,
+        },
+
+        slideTemporaryDiv3: function(a_params = this.defaultSlideTemporaryDivParams) {
+            const params = Object.assign(Object.assign({}, this.defaultSlideTemporaryDivParams), a_params);
+
+            const onDone = () => { if (params.onEnd !== null) { params.onEnd(); } };
+            return this.animationManager.play( new BgaSlideTempAnimation({
+                className: params.className,
+                parentId: params.parent,
+                fromId: params.from,
+                toId: params.to,
+                duration: params.duration,
+            })).then(onDone);
+        },
+
 
         fadeOut: function(rcs) {
             if (!this.shouldAnimate()) {
@@ -1002,10 +1024,10 @@ function (dojo, declare, fx, hexloc, bblfx, bgaAnim, on) {
             this.renderPlayedPiece(args,
                                    args.captured_piece,
                                    null);
-            onEnd =
+            const onEnd =
                 () => {
                     if (isActive) {
-                        cl = handPosDiv.classList;
+                        const cl = handPosDiv.classList;
                         cl.remove(CSS.EMPTY);
                         cl.add(CSS.PLAYABLE);
                         cl.add(CSS.handPiece(args.original_piece, this.playerNumber));
@@ -1013,14 +1035,13 @@ function (dojo, declare, fx, hexloc, bblfx, bgaAnim, on) {
                     this.handCounters[args.player_id].incValue(1);
                     this.scoreCtrl[args.player_id].incValue(-args.points);
                 };
-            await bblfx.slideTemporaryDiv3(
-                this.animationManager,
+            await this.slideTemporaryDiv3(
                 {
                     className: CSS.handPiece(args.piece, args.player_number),
                     from: IDS.hexDiv(args),
                     to: targetDivId,
                     parent: IDS.BOARD
-                }).then(onEnd, onEnd);
+                }).then(onEnd);
         },
 
         notif_piecePlayed: async function(args) {
@@ -1045,14 +1066,13 @@ function (dojo, declare, fx, hexloc, bblfx, bgaAnim, on) {
                     this.updateHandCount(args);
                     this.scoreCtrl[args.player_id].incValue(args.points);
                 };
-            await bblfx.slideTemporaryDiv3(
-                this.animationManager,
+            await this.slideTemporaryDiv3(
                 {
                     className: hpc,
                     from: sourceDivId,
                     to: this.hexDiv(args).id,
                     parent: IDS.BOARD,
-                }).then(onEnd, onEnd);
+                }).then(onEnd);
         },
 
         notif_handRefilled: async function(args) {

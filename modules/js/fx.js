@@ -1,3 +1,4 @@
+"use strict";
 define([
     "dojo",
     'dojo/dom',
@@ -25,20 +26,6 @@ define([
     };
 
     return {
-        slideTemporaryDiv3: function(animationManager,
-                                     a_params = defaultSlideTemporaryDivParams) {
-            const params = Object.assign(Object.assign({}, defaultSlideTemporaryDivParams), a_params);
-
-            onDone = () => { if (params.onEnd !== null) { params.onEnd(); } };
-            return animationManager.play( new BgaSlideTempAnimation({
-                className: params.className,
-                parentId: params.parent,
-                fromId: params.from,
-                toId: params.to,
-                duration: params.duration,
-            })).then(onDone);
-        },
-
         slideTemporaryDiv: function(params = defaultSlideTemporaryDivParams) {
             const p = Object.assign(Object.assign({}, defaultSlideTemporaryDivParams), params);
             const id = `bbl_tmp_slideTmpDiv${this.lastId++}`;
