@@ -28,37 +28,15 @@ define([
         slideTemporaryDiv3: function(animationManager,
                                      a_params = defaultSlideTemporaryDivParams) {
             const params = Object.assign(Object.assign({}, defaultSlideTemporaryDivParams), a_params);
-            const parent = document.getElementById(params.parent);
 
-            const parentRect = parent.getBoundingClientRect();
-            const toRect = document.getElementById(params.to).getBoundingClientRect();
-            const fromRect = document.getElementById(params.from).getBoundingClientRect();
-
-            const top = fromRect.top - parentRect.top;
-            const left = fromRect.left - parentRect.left;
-
-            const div = document.createElement('div');
-            div.id = `bbl_tmp_slideTmpDiv${lastId++}`;
-            div.className = params.className;
-            // Unclear why setting `style` attribute directly doesn't work.
-            div.style.position = 'absolute';
-            div.style.top = `${top}px`;
-            div.style.left = `${left}px`;
-            div.style.zindex = 100;
-            parent.appendChild(div);
-
-            const divRect = div.getBoundingClientRect();
-            const toTop = toRect.top - parentRect.top + (toRect.height - divRect.height)/2;
-            const toLeft = toRect.left - parentRect.left + (toRect.width - divRect.width)/2
-
-            const delta = {
-                x: left - toLeft,
-                y: top - toTop
-            };
-
-            const a = animationManager.play( new BgaSlideAnimation({ element: div, fromDelta: delta }));
-            onDone = () => { div.remove(); if (params.onEnd !== null) { params.onEnd(); } };
-            return a.then(onDone, onDone);
+            onDone = () => { if (params.onEnd !== null) { params.onEnd(); } };
+            return animationManager.play( new BgaSlideTempAnimation({
+                className: params.className,
+                parentId: params.parent,
+                fromId: params.from,
+                toId: params.to,
+                duration: params.duration,
+            })).then(onDone);
         },
 
         slideTemporaryDiv: function(params = defaultSlideTemporaryDivParams) {
