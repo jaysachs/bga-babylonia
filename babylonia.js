@@ -1,3 +1,4 @@
+"use strict";
 /**
  *------
  * BGA framework: Gregory Isabelli & Emmanuel Colin & BoardGameArena
@@ -848,7 +849,7 @@ function (dojo, declare, hexloc, bgaAnim, on) {
                     className: CSS.zcard(this.zcards[z].type, false),
                     fromId: id,
                     toId: IDS.playerBoardZcards(args.player_id),
-                    parentId: IDS.AVAILABE_ZCARDS,
+                    parentId: IDS.AVAILABLE_ZCARDS,
                 })).then(() => this.addZcardDivInPlayerBoard(z));
             }
         },
