@@ -202,7 +202,7 @@ var BgaFadeAnimation = /** @class */ (function (_super) {
     BgaFadeAnimation.prototype.doAnimate = function (animationManager) {
         var _this = this;
         return new Promise(function (success) {
-            var _a, _b;
+            var _a, _b, _c, _d;
             var element = _this.settings.element;
             var duration = (_b = (_a = _this.settings) === null || _a === void 0 ? void 0 : _a.duration) !== null && _b !== void 0 ? _b : 500;
             _this.wireUp(element, duration, success);
@@ -211,29 +211,24 @@ var BgaFadeAnimation = /** @class */ (function (_super) {
             var frames = [];
             switch (_this.settings.kind) {
                 case "in":
-                    frames.push({ opacity: 1 });
+                    frames.push({ opacity: 0 }, { opacity: 1 });
                     break;
                 case "out":
-                    frames.push({ opacity: 0 });
+                    frames.push({ opacity: 1 }, { opacity: 0 });
                     break;
                 case "outin":
                     frames.push({ opacity: 1 }, { opacity: 0 }, { opacity: 1 });
                     break;
             }
-            //            var direction: "reverse" | "normal" | "alternate"  = "normal";
-            //            var iterations = 1;
-            //            if (this.settings.kind == "in") { direction = "reverse"; }
-            //            else if (this.settings.kind == "outin") { direction = "alternate"; iterations = 2 }
             var a = new Animation(new KeyframeEffect(element, frames, {
                 duration: duration,
-                //             easing: this.settings.transitionTimingFunction ?? 'linear',
-                //               direction: direction,
+                easing: (_c = _this.settings.transitionTimingFunction) !== null && _c !== void 0 ? _c : 'linear',
                 fill: "forwards",
-                iterations: 1,
+                iterations: (_d = _this.settings.iterations) !== null && _d !== void 0 ? _d : 1,
             }));
             a.onfinish = function (e) {
                 a.commitStyles();
-                //    element.style.transform = this.settings?.finalTransform ?? null;
+                // element.style.transform = this.settings?.finalTransform ?? null;
             };
             a.play();
         });
@@ -426,7 +421,7 @@ var BgaSpinGrowAnimation = /** @class */ (function (_super) {
             // node.style.textShadow = "-2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000, 2px 2px 0 #000";
             var duration = (_b = (_a = _this.settings) === null || _a === void 0 ? void 0 : _a.duration) !== null && _b !== void 0 ? _b : 1000;
             var fontSize = _this.settings.fontSize || 90;
-            var degrees = 360; // (this.settings.spinCount || 2) * 360;
+            var degrees = (_this.settings.spinCount || 2) * 360;
             _this.wireUp(node, duration, success);
             node.style.fontSize = "1pt";
             var a = new Animation(new KeyframeEffect(node, [

@@ -860,8 +860,14 @@ function (dojo, declare, hexloc, bgaAnim, on) {
 
             for (const playerId in args.details) {
                 const details = args.details[playerId];
-
-                const fio = new BgaCompoundAnimation({
+                const nonscoringLocations = [];
+                for (const nh of details.network_locations) {
+                    if (!details.scored_locations.some(
+                        sh => (nh.row == sh.row && nh.col == sh.col))) {
+                        nonscoringLocations.push(nh);
+                    }
+                }
+                anim.push(new BgaCompoundAnimation({
                     mode: 'parallel',
                     animationStart: () => {
                         for (const rc of details.scored_locations) {
@@ -873,34 +879,17 @@ function (dojo, declare, hexloc, bgaAnim, on) {
                             element: this.hexDiv(rc),
                             duration: 1400,
                             kind: 'outin',
-                        })
-                    ),
-                });
-                anim.push(fio);
-                anim.push(new BgaCompoundAnimation({
-                    mode: 'parallel',
-                    animations: details.network_locations.map(
-                        rc => new BgaFadeAnimation({
-                            element: this.hexDiv(rc),
-                            duration: 1400,
-                            kind: 'outin',
+                            iterations: 2,
                         })
                     ),
                 }));
-
-                const nonscoringLocations = [];
-                for (const nh of details.network_locations) {
-                    if (!details.scored_locations.some(sh => nh == sh)) {
-                        nonscoringLocations.push(nh);
-                    }
-                }
 
                 anim.push(new BgaCompoundAnimation({
                     mode: 'parallel',
                     animations: nonscoringLocations.map(
                         rc => new BgaFadeAnimation({
                             element: this.hexDiv(rc),
-                            duration: 700,
+                            duration: 500,
                             kind: 'out',
                         })
                     ),
@@ -912,7 +901,8 @@ function (dojo, declare, hexloc, bgaAnim, on) {
                     text: `+${details.network_points}`,
                     centeredOnId: IDS.hexDiv(args),
                     parentId: IDS.BOARD,
-                    color: '#' + this.gamedatas.players[playerId].player_color
+                    color: '#' + this.gamedatas.players[playerId].player_color,
+                    duration: 2500,
                 }));
 
                 anim.push(new BgaCompoundAnimation({
@@ -920,7 +910,7 @@ function (dojo, declare, hexloc, bgaAnim, on) {
                     animations: nonscoringLocations.map(
                         rc => new BgaFadeAnimation({
                             element: this.hexDiv(rc),
-                            durtion: 700,
+                            durtion: 500,
                             kind: 'in',
                         })
                     ),
