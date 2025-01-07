@@ -127,7 +127,7 @@ define([
     'dojo','dojo/_base/declare',
     g_gamethemeurl + "modules/js/hexloc.js",
     g_gamethemeurl + "modules/js/bga-animations.js",
-    "dojo/on", "dojo/query",
+    "dojo/on",
     'ebg/core/gamegui',
     'ebg/counter',
 ],
