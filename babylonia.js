@@ -15,7 +15,6 @@
  * In this file, you are describing the logic of your user interface, in Javascript language.
  *
  */
-"use strict";
 const IDS = {
     AVAILABLE_ZCARDS: 'bbl_available_zcards',
     BOARD: 'bbl_board',
