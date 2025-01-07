@@ -153,8 +153,8 @@ function (dojo, declare, hexloc, bgaAnim, on) {
         gamedatas: null,
 
         handlers: [],
-        playAnimation: async function(anim) {
-            const p = this.bgaPlayDojoAnimation(anim);
+        play: async function(anim) {
+            const p = this.animationManager.play(anim);
             this.pauseHandlers();
             p.then(() => this.resumeHandlers());
             return p;
@@ -844,7 +844,7 @@ function (dojo, declare, hexloc, bgaAnim, on) {
                 $(id).className = "";
                 this.removeTooltip(id);
 
-                await this.animationManager.play( new BgaSlideTempAnimation({
+                await this.play( new BgaSlideTempAnimation({
                     className: CSS.zcard(this.zcards[z].type, false),
                     fromId: id,
                     toId: IDS.playerBoardZcards(args.player_id),
@@ -944,7 +944,7 @@ function (dojo, declare, hexloc, bgaAnim, on) {
                     : IDS.AVAILABLE_ZCARDS,
                 parentId: IDS.BOARD,
             }));
-            await this.animationManager.play(new BgaCompoundAnimation({
+            await this.play(new BgaCompoundAnimation({
                 mode: 'sequential',
                 animations: anim,
                 mode: 'sequential',
@@ -988,7 +988,7 @@ function (dojo, declare, hexloc, bgaAnim, on) {
                     this.handCounters[args.player_id].incValue(1);
                     this.scoreCtrl[args.player_id].incValue(-args.points);
                 };
-            await this.animationManager.play( new BgaSlideTempAnimation({
+            await this.play( new BgaSlideTempAnimation({
                 className: CSS.handPiece(args.piece, args.player_number),
                 fromId: IDS.hexDiv(args),
                 toId: targetDivId,
@@ -1018,7 +1018,7 @@ function (dojo, declare, hexloc, bgaAnim, on) {
                       this.updateHandCount(args);
                       this.scoreCtrl[args.player_id].incValue(args.points);
                   };
-            await this.animationManager.play( new BgaSlideTempAnimation({
+            await this.play( new BgaSlideTempAnimation({
                 className: hpc,
                 fromId: sourceDivId,
                 toId: this.hexDiv(args).id,
@@ -1047,7 +1047,10 @@ function (dojo, declare, hexloc, bgaAnim, on) {
                     anim.push(a);
                 }
             }
-            await this.animationManager.playSequence(anim);
+            await this.play(new BgaCompoundAnimation({
+                animations: anim,
+                mode: 'sequential',
+            }));
         },
     });
 });
