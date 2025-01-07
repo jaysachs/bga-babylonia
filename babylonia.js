@@ -124,15 +124,14 @@ document.getElementById('game_play_area').insertAdjacentHTML('beforeend', `
 
 
 define([
-    'dojo','dojo/_base/declare', 'dojo/_base/fx',
+    'dojo','dojo/_base/declare',
     g_gamethemeurl + "modules/js/hexloc.js",
-    g_gamethemeurl + "modules/js/fx.js",
     g_gamethemeurl + "modules/js/bga-animations.js",
     "dojo/on", "dojo/query",
     'ebg/core/gamegui',
     'ebg/counter',
 ],
-function (dojo, declare, fx, hexloc, bblfx, bgaAnim, on) {
+function (dojo, declare, hexloc, bgaAnim, on) {
     return declare('bgagame.babylonia', ebg.core.gamegui, {
         constructor: function(){
             console.log('babylonia constructor');
@@ -749,27 +748,6 @@ function (dojo, declare, fx, hexloc, bblfx, bgaAnim, on) {
                 && !this.instantaneousMode;
         },
 
-        slideTemporaryDiv: function(className,
-                                    from,
-                                    to,
-                                    onEnd = null,
-                                    parent = IDS.BOARD) {
-            if (!this.shouldAnimate()) {
-                const a = bblfx.empty();
-                if (onEnd != null) {
-                    dojo.connect(a, 'onEnd', onEnd);
-                }
-                return a;
-            }
-            return bblfx.slideTemporaryDiv({
-                className: className,
-                from: from,
-                to: to,
-                onEnd: onEnd,
-                parent: parent,
-            });
-        },
-
         extend: function(o1, o2) {
             return Object.assign(Object.assign({}, o1), o2);
         },
@@ -875,23 +853,6 @@ function (dojo, declare, fx, hexloc, bblfx, bgaAnim, on) {
             }
         },
 
-        fadeOut: function(rcs) {
-            if (!this.shouldAnimate()) {
-                return  bblfx.empty();
-            }
-            return dojo.fx.combine(
-                rcs.map(rc => fx.fadeOut({ node: this.hexDiv(rc) }))
-            );
-        },
-        fadeIn: function(rcs) {
-            if (!this.shouldAnimate()) {
-                return  bblfx.empty();
-            }
-            return dojo.fx.combine(
-                rcs.map(rc => fx.fadeIn({ node: this.hexDiv(rc) }))
-            );
-        },
-
         notif_cityScored: async function(args) {
             console.log('notif_cityScored', args);
 
@@ -900,19 +861,32 @@ function (dojo, declare, fx, hexloc, bblfx, bgaAnim, on) {
             for (const playerId in args.details) {
                 const details = args.details[playerId];
 
-                anim.push(this.fadeOut(details.network_locations));
-
-                dojo.connect(anim[anim.length-1],
-                             'onBegin',
-                             () => {
-                                 for (const rc of details.scored_locations) {
-                                     this.hexDiv(rc).classList.add(CSS.SELECTED);
-                                 }
-                             });
-
-                anim.push(this.fadeIn(details.network_locations));
-                anim.push(this.fadeOut(details.network_locations));
-                anim.push(this.fadeIn(details.network_locations));
+                const fio = new BgaCompoundAnimation({
+                    mode: 'parallel',
+                    animationStart: () => {
+                        for (const rc of details.scored_locations) {
+                            this.hexDiv(rc).classList.add(CSS.SELECTED);
+                        }
+                    },
+                    animations: details.network_locations.map(
+                        rc => new BgaFadeAnimation({
+                            element: this.hexDiv(rc),
+                            duration: 1400,
+                            kind: 'outin',
+                        })
+                    ),
+                });
+                anim.push(fio);
+                anim.push(new BgaCompoundAnimation({
+                    mode: 'parallel',
+                    animations: details.network_locations.map(
+                        rc => new BgaFadeAnimation({
+                            element: this.hexDiv(rc),
+                            duration: 1400,
+                            kind: 'outin',
+                        })
+                    ),
+                }));
 
                 const nonscoringLocations = [];
                 for (const nh of details.network_locations) {
@@ -921,56 +895,70 @@ function (dojo, declare, fx, hexloc, bblfx, bgaAnim, on) {
                     }
                 }
 
-                anim.push(this.fadeOut(nonscoringLocations));
+                anim.push(new BgaCompoundAnimation({
+                    mode: 'parallel',
+                    animations: nonscoringLocations.map(
+                        rc => new BgaFadeAnimation({
+                            element: this.hexDiv(rc),
+                            duration: 700,
+                            kind: 'out',
+                        })
+                    ),
+                }));
 
-                if (this.shouldAnimate()) {
-                    anim.push(bblfx.spinGrowText({
-                        text: `+${details.network_points}`,
-                        parent: IDS.BOARD,
-                        centeredOn: IDS.hexDiv(args),
-                        color: '#' + this.gamedatas.players[playerId].player_color
-                    }));
-                }
-                anim.push(this.fadeIn(nonscoringLocations));
+                // TODO: should be spin/grow with score
+                anim.push(new BgaSpinGrowAnimation({
+                    className: '',
+                    text: `+${details.network_points}`,
+                    centeredOnId: IDS.hexDiv(args),
+                    parentId: IDS.BOARD,
+                    color: '#' + this.gamedatas.players[playerId].player_color
+                }));
 
-                dojo.connect(anim[anim.length-1],
-                             'onEnd',
-                             () => {
-                                 details.scored_locations.forEach(
-                                     rc => this.hexDiv(rc).classList.remove(CSS.SELECTED));
-                                 this.scoreCtrl[playerId].incValue(details.network_points);
-                             });
+                anim.push(new BgaCompoundAnimation({
+                    mode: 'parallel',
+                    animations: nonscoringLocations.map(
+                        rc => new BgaFadeAnimation({
+                            element: this.hexDiv(rc),
+                            durtion: 700,
+                            kind: 'in',
+                        })
+                    ),
+                    animationEnd: () => {
+                        details.scored_locations.forEach(
+                            rc => this.hexDiv(rc).classList.remove(CSS.SELECTED));
+                        this.scoreCtrl[playerId].incValue(details.network_points);
+                    },
+                }));
             }
 
-            const hexDivId = IDS.hexDiv(args);
-            const a = (args.captured_by != 0)
-                ? this.slideTemporaryDiv(
-                    CSS.piece(args.city),
-                    hexDivId,
-                    IDS.citycount(args.captured_by)
-                )
-                : this.slideTemporaryDiv(
-                    CSS.piece(args.city),
-                    hexDivId,
-                    // TODO: find a better location for 'off the board'
-                    IDS.AVAILABLE_ZCARDS
-                );
-            dojo.connect(a,
-                         'onBegin',
+            anim.push(new BgaSlideTempAnimation({
+                animationStart:
                          () => {
                              this.renderPlayedPiece(args, null, null);
-                         });
-            dojo.connect(a,
-                         'onEnd',
+                         },
+                animationEnd:
                          () => {
+                             this.renderPlayedPiece(args, null, null);
                              for (const playerId in args.details) {
                                  const details = args.details[playerId];
                                  this.scoreCtrl[playerId].incValue(details.capture_points);
                                  this.updateCapturedCityCount(details);
                              }
-                         });
-            anim.push(a);
-            await this.playAnimation(dojo.fx.chain(anim));
+                         },
+                className: CSS.piece(args.city),
+                fromId: IDS.hexDiv(args),
+                toId: (args.captured_by != 0)
+                    ? IDS.citycount(args.captured_by)
+                    // TODO: find a better location for 'off the board'
+                    : IDS.AVAILABLE_ZCARDS,
+                parentId: IDS.BOARD,
+            }));
+            await this.animationManager.play(new BgaCompoundAnimation({
+                mode: 'sequential',
+                animations: anim,
+                mode: 'sequential',
+            }));
         },
 
         notif_turnFinished: async function(args) {

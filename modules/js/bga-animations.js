@@ -69,25 +69,27 @@ var BgaAnimation = /** @class */ (function () {
     BgaAnimation.prototype.preAnimate = function (animationManager) { };
     BgaAnimation.prototype.postAnimate = function (animationManager) { };
     BgaAnimation.prototype.play = function (animationManager) {
-        var _a, _b, _c, _d, _e, _f, _g, _h;
+        var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k;
         return __awaiter(this, void 0, void 0, function () {
-            var shouldPlay, _j;
-            return __generator(this, function (_k) {
-                switch (_k.label) {
+            var shouldPlay, _l;
+            return __generator(this, function (_m) {
+                switch (_m.label) {
                     case 0:
                         shouldPlay = this.playWhenNoAnimation || animationManager.animationsActive();
                         if (!shouldPlay) return [3 /*break*/, 2];
                         (_b = (_a = this.settings).animationStart) === null || _b === void 0 ? void 0 : _b.call(_a, this);
                         this.settings = __assign({ duration: (_f = (_d = (_c = this.settings) === null || _c === void 0 ? void 0 : _c.duration) !== null && _d !== void 0 ? _d : (_e = animationManager.getSettings()) === null || _e === void 0 ? void 0 : _e.duration) !== null && _f !== void 0 ? _f : 500 }, this.settings);
                         this.preAnimate(animationManager);
-                        _j = this;
+                        _l = this;
                         return [4 /*yield*/, this.doAnimate(animationManager)];
                     case 1:
-                        _j.result = _k.sent();
+                        _l.result = _m.sent();
                         this.postAnimate(animationManager);
                         (_h = (_g = this.settings).animationEnd) === null || _h === void 0 ? void 0 : _h.call(_g, this);
                         return [3 /*break*/, 3];
-                    case 2: return [2 /*return*/, Promise.resolve(this)];
+                    case 2:
+                        (_k = (_j = this.settings).animationEnd) === null || _k === void 0 ? void 0 : _k.call(_j, this);
+                        return [2 /*return*/, Promise.resolve(this)];
                     case 3: return [2 /*return*/];
                 }
             });
@@ -200,36 +202,38 @@ var BgaFadeAnimation = /** @class */ (function (_super) {
     BgaFadeAnimation.prototype.doAnimate = function (animationManager) {
         var _this = this;
         return new Promise(function (success) {
-            var _a, _b, _c, _d, _e;
+            var _a, _b;
             var element = _this.settings.element;
             var duration = (_b = (_a = _this.settings) === null || _a === void 0 ? void 0 : _a.duration) !== null && _b !== void 0 ? _b : 500;
             _this.wireUp(element, duration, success);
             // this gets saved/restored in wireUp
-            element.style.zIndex = "".concat((_d = (_c = _this.settings) === null || _c === void 0 ? void 0 : _c.zIndex) !== null && _d !== void 0 ? _d : 10);
-            var direction = "normal";
-            var iterations = 1;
-            if (_this.settings.kind == "in") {
-                direction = "reverse";
+            // element.style.zIndex = `${this.settings?.zIndex ?? 10}`;
+            var frames = [];
+            switch (_this.settings.kind) {
+                case "in":
+                    frames.push({ opacity: 1 });
+                    break;
+                case "out":
+                    frames.push({ opacity: 0 });
+                    break;
+                case "outin":
+                    frames.push({ opacity: 1 }, { opacity: 0 }, { opacity: 1 });
+                    break;
             }
-            else if (_this.settings.kind == "outin") {
-                direction = "alternate";
-                iterations = 2;
-            }
-            var a = element.animate([
-                { opacity: 1 },
-                { opacity: 0 }
-            ], {
+            //            var direction: "reverse" | "normal" | "alternate"  = "normal";
+            //            var iterations = 1;
+            //            if (this.settings.kind == "in") { direction = "reverse"; }
+            //            else if (this.settings.kind == "outin") { direction = "alternate"; iterations = 2 }
+            var a = new Animation(new KeyframeEffect(element, frames, {
                 duration: duration,
-                easing: (_e = _this.settings.transitionTimingFunction) !== null && _e !== void 0 ? _e : 'linear',
-                direction: direction,
-                iterations: iterations,
-            });
-            a.pause();
+                //             easing: this.settings.transitionTimingFunction ?? 'linear',
+                //               direction: direction,
+                fill: "forwards",
+                iterations: 1,
+            }));
             a.onfinish = function (e) {
-                // a.commitStyles();
-                // a.cancel();
+                a.commitStyles();
                 //    element.style.transform = this.settings?.finalTransform ?? null;
-                // success();
             };
             a.play();
         });
@@ -255,7 +259,7 @@ var BgaSlideAnimation = /** @class */ (function (_super) {
             _this.wireUp(element, duration, success);
             // this gets saved/restored in wireUp
             element.style.zIndex = "".concat((_e = (_d = _this.settings) === null || _d === void 0 ? void 0 : _d.zIndex) !== null && _e !== void 0 ? _e : 10);
-            var a = element.animate([
+            var a = new Animation(new KeyframeEffect(element, [
                 { transform: "translate3D(0, 0, 0)" },
                 { transform: "translate3D(".concat(-x, "px, ").concat(-y, "px, 0)") }
             ], {
@@ -264,13 +268,10 @@ var BgaSlideAnimation = /** @class */ (function (_super) {
                 duration: duration,
                 easing: transitionTimingFunction,
                 fill: "forwards"
-            });
-            a.pause();
+            }));
             a.onfinish = function (e) {
                 a.commitStyles();
-                a.cancel();
                 //    element.style.transform = this.settings?.finalTransform ?? null;
-                // success();
             };
             a.play();
         });
@@ -344,7 +345,7 @@ var BgaShowScreenCenterAnimation = /** @class */ (function (_super) {
             _this.wireUp(element, duration, success);
             element.style.zIndex = "".concat((_e = (_d = _this.settings) === null || _d === void 0 ? void 0 : _d.zIndex) !== null && _e !== void 0 ? _e : 10);
             // element.offsetHeight;
-            var a = element.animate([
+            var a = new Animation(new KeyframeEffect(element, [
                 { transform: "translate3D(0, 0, 0)" },
                 { transform: "translate3D(".concat(-x, "px, ").concat(-y, "px, 0)") }
                 // { transform: `translate3D(0, 0, 0)` }
@@ -352,12 +353,10 @@ var BgaShowScreenCenterAnimation = /** @class */ (function (_super) {
                 duration: duration,
                 fill: "forwards",
                 easing: transitionTimingFunction
-            });
-            a.pause();
+            }));
             // element.offsetHeight;
             a.onfinish = function (e) {
                 a.commitStyles();
-                a.cancel();
                 // element.style.transform = this.settings?.finalTransform ?? null;
             };
             a.play();
@@ -365,6 +364,89 @@ var BgaShowScreenCenterAnimation = /** @class */ (function (_super) {
     };
     return BgaShowScreenCenterAnimation;
 }(BgaElementAnimation));
+/**
+ * spin/grow temp text.
+ */
+var BgaSpinGrowAnimation = /** @class */ (function (_super) {
+    __extends(BgaSpinGrowAnimation, _super);
+    function BgaSpinGrowAnimation(settings) {
+        return _super.call(this, settings) || this;
+    }
+    BgaSpinGrowAnimation.prototype.doAnimate = function (animationManager) {
+        var _this = this;
+        var delta = { x: 0, y: 0 };
+        var div;
+        return new Promise(function (success) {
+            var _a, _b;
+            var parent = document.getElementById(_this.settings.parentId);
+            var id = "bbl_tmp_spinGrowFx-".concat(BgaSpinGrowAnimation.lastId++);
+            var outer = document.createElement('span');
+            outer.id = id;
+            outer.append(_this.settings.text);
+            parent.appendChild(outer);
+            outer.style.color = "blue";
+            outer.style.color = "transparent";
+            outer.style.position = "absolute";
+            outer.style.fontSize = (_this.settings.fontSize || 128) + "pt";
+            outer.style.display = "inline-block";
+            outer.style.justifyContent = "center";
+            outer.style.alignItems = "center";
+            outer.style.display = "flex";
+            // probably should allow a class to be passed in and used for these two
+            outer.style.fontFamily = "Helvetica";
+            outer.style.fontStyle = "bold";
+            // get the ultimate dimensions of the container span
+            var nrect = outer.getBoundingClientRect();
+            outer.style.width = "".concat(nrect.width);
+            outer.style.height = "".concat(nrect.height);
+            // center the container on the center of the appropriate node
+            var centerNode = document.getElementById(_this.settings.centeredOnId || _this.settings.parentId);
+            var prect = parent.getBoundingClientRect();
+            var crect = centerNode.getBoundingClientRect();
+            var left = (crect.left + crect.width / 2 - nrect.width / 2 - prect.left);
+            var top = (crect.top + crect.height / 2 - nrect.height / 2 - prect.top);
+            outer.style.left = left + "px";
+            outer.style.top = top + "px";
+            // now create the node we're animating
+            var node = document.createElement('span');
+            node.append(_this.settings.text);
+            outer.append(node);
+            node.style.position = "absolute";
+            node.style.display = "inline-block";
+            node.style.justifyContent = "center";
+            node.style.alignItems = "center";
+            node.style.display = "flex";
+            node.style.color = _this.settings.color || 'black';
+            // text not viewable
+            // node.style.fontSize = "0pt";
+            // keep on top
+            // node.style.zIndex = "100";
+            // this maybe ought to be a parameter, or part of the incoming class.
+            // it also causes multiples of the text to show up!?!?
+            // node.style.textShadow = "-2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000, 2px 2px 0 #000";
+            var duration = (_b = (_a = _this.settings) === null || _a === void 0 ? void 0 : _a.duration) !== null && _b !== void 0 ? _b : 1000;
+            var fontSize = _this.settings.fontSize || 90;
+            var degrees = 360; // (this.settings.spinCount || 2) * 360;
+            _this.wireUp(node, duration, success);
+            node.style.fontSize = "1pt";
+            var a = new Animation(new KeyframeEffect(node, [
+                { transform: "rotate(0deg) scale(0.01)" },
+                { opacity: 1, transform: "rotate(".concat(degrees, "deg) scale(").concat(fontSize, ")") },
+                { opacity: 0, transform: "rotate(".concat(degrees, "deg) scale(").concat(fontSize, ")") },
+            ], {
+                duration: duration,
+                //                iterations: 1,
+            }));
+            a.onfinish = function (e) {
+                //    element.style.transform = this.settings?.finalTransform ?? null;
+                outer.remove();
+            };
+            a.play();
+        });
+    };
+    BgaSpinGrowAnimation.lastId = 0;
+    return BgaSpinGrowAnimation;
+}(BgaAnimation));
 /**
  * Just does nothing for the duration
  */
@@ -409,17 +491,22 @@ var BgaAttachWithAnimation = /** @class */ (function (_super) {
 /**
  * Just use playSequence from animationManager
  */
-var BgaCumulatedAnimation = /** @class */ (function (_super) {
-    __extends(BgaCumulatedAnimation, _super);
-    function BgaCumulatedAnimation(settings) {
+var BgaCompoundAnimation = /** @class */ (function (_super) {
+    __extends(BgaCompoundAnimation, _super);
+    function BgaCompoundAnimation(settings) {
         var _this = _super.call(this, settings) || this;
         _this.playWhenNoAnimation = true;
         return _this;
     }
-    BgaCumulatedAnimation.prototype.doAnimate = function (animationManager) {
-        return animationManager.playSequence(this.settings.animations);
+    BgaCompoundAnimation.prototype.doAnimate = function (animationManager) {
+        if (this.settings.mode == "parallel") {
+            return animationManager.playParallel(this.settings.animations);
+        }
+        else {
+            return animationManager.playSequence(this.settings.animations);
+        }
     };
-    return BgaCumulatedAnimation;
+    return BgaCompoundAnimation;
 }(BgaAnimation));
 var AnimationManager = /** @class */ (function () {
     /**
@@ -571,6 +658,7 @@ define({
     BgaSlideAnimation: BgaSlideAnimation,
     BgaShowScreenCenterAnimation: BgaShowScreenCenterAnimation,
     BgaPauseAnimation: BgaPauseAnimation,
-    BgaCumulatedAnimation: BgaCumulatedAnimation,
+    BgaCompoundAnimation: BgaCompoundAnimation,
     BgaAttachWithAnimation: BgaAttachWithAnimation,
+    BgaFadeAnimation: BgaFadeAnimation,
 });
