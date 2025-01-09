@@ -1,7 +1,16 @@
-declare const on: any;
-
 interface RowCol { row: number, col: number };
 interface TopLeft { top: number, left: number };
+interface Player {
+  player_id: number;
+  hand_size: number;
+  pool_size: number;
+  captured_city_count: number;
+  score: number;
+  player_name: string;
+  player_color: string;
+  player_number: number;
+}
+
 class IDS {
   static readonly AVAILABLE_ZCARDS: string = 'bbl_available_zcards';
   static readonly BOARD = 'bbl_board';
@@ -97,19 +106,19 @@ const jstpl_player_board_ext =
 const special_log_args = {
   zcard: {
     tmpl: 'jstpl_log_zcard',
-    tmplargs: a => a
+    tmplargs: (a:any) => a
   },
   city: {
     tmpl: 'jstpl_log_city',
-    tmplargs: a => a
+    tmplargs: (a:any) => a
   },
   piece: {
     tmpl: 'jstpl_log_piece',
-    tmplargs: a => a
+    tmplargs: (a:any) => a
   },
   original_piece: {
     tmpl: 'jstpl_log_piece',
-    tmplargs: args => Object.assign(
+    tmplargs: (args:any) => Object.assign(
       Object.assign({}, args),
       {
         piece: args['original_piece'],
@@ -119,6 +128,12 @@ const special_log_args = {
   }
 };
 
+interface Zcard {
+  type: string;
+  used: boolean;
+  tooltip: string;
+  owning_player_id: number;
+}
 
 /** Game class */
 class GameBody extends GameBasics {
@@ -127,12 +142,11 @@ class GameBody extends GameBasics {
   private handCounters: Counter[] = [];
   private poolCounters: Counter[] = [];
   private cityCounters: Counter[] = [];
-  private zcards: any = [];
+  private zcards: Zcard[] = [];
   private animationManager: AnimationManager;
   private selectedHandPos: number | null;
   private readonly pieceClasses = ['priest', 'servant', 'farmer', 'merchant'];
   private lastId: number;
-  private handlers: any[] = [];
 
   private animating = false;
 
@@ -232,7 +246,7 @@ class GameBody extends GameBasics {
     }
   }
 
-  private setupAvailableZcards(zcards: any): void {
+  private setupAvailableZcards(zcards: Zcard[]): void {
     console.log('Setting up available ziggurat cards', zcards);
     this.zcards = zcards;
     for (let z = 0; z < zcards.length; ++z) {
@@ -288,7 +302,7 @@ class GameBody extends GameBasics {
 `  )
   }
 
-  private updateCounter(counter: any, value: number, animate: boolean) {
+  private updateCounter(counter: Counter, value: number, animate: boolean) {
     if (animate) {
       counter.toValue(value);
     } else {
@@ -296,19 +310,19 @@ class GameBody extends GameBasics {
     }
   }
 
-  private updateHandCount(player: any, animate: boolean = true) {
+  private updateHandCount(player: Player, animate: boolean = true) {
     this.updateCounter(this.handCounters[player.player_id],
       player.hand_size,
       animate);
   }
 
-  private updatePoolCount(player: any, animate: boolean = true) {
+  private updatePoolCount(player: Player, animate: boolean = true) {
     this.updateCounter(this.poolCounters[player.player_id],
       player.pool_size,
       animate);
   }
 
-  private updateCapturedCityCount(player: any, animate: boolean = true) {
+  private updateCapturedCityCount(player: Player, animate: boolean = true) {
     this.updateCounter(this.cityCounters[player.player_id],
       player.captured_city_count,
       animate);
@@ -455,7 +469,7 @@ class GameBody extends GameBasics {
     return false;
   }
 
-  private allowedMovesFor(pos: number): any {
+  private allowedMovesFor(pos: number): RowCol[] {
     const piece = this.hand[pos];
     if (piece == null) {
       return [];
@@ -682,7 +696,7 @@ class GameBody extends GameBasics {
   }
 
 
-  private async notif_turnFinished(args: any): Promise<any> {
+  private async notif_turnFinished(args: any): Promise<void> {
     console.log('notif_turnFinished', args);
 
     this.updateHandCount(args);
@@ -691,7 +705,7 @@ class GameBody extends GameBasics {
     return Promise.resolve();
   }
 
-  private async notif_undoMove(args: any): Promise<any> {
+  private async notif_undoMove(args: any): Promise<void> {
     console.log('notif_undoMove', args);
 
     const isActive = this.playerNumber == args.player_number;
@@ -727,7 +741,7 @@ class GameBody extends GameBasics {
     })).then(onDone);
   }
 
-  private async notif_piecePlayed(args: any): Promise<any> {
+  private async notif_piecePlayed(args: any): Promise<void> {
     console.log('notif_piecePlayed', args);
     const isActive = this.playerNumber == args.player_number;
     let sourceDivId = IDS.handcount(args.player_id);
@@ -757,7 +771,7 @@ class GameBody extends GameBasics {
     })).then(onDone);
   }
 
-  private async notif_handRefilled(args: { hand: string[] }): Promise<any> {
+  private async notif_handRefilled(args: { hand: string[] }): Promise<void> {
     console.log('notif_handRefilled', args);
     const anim = [];
     const pid = this.player_id;
@@ -785,7 +799,7 @@ class GameBody extends GameBasics {
   }
 
 
-  private async notif_extraTurnUsed(args: any): Promise<any> {
+  private async notif_extraTurnUsed(args: any): Promise<void> {
     console.log('notif_extraTurnUsed', args);
     const z = this.indexOfZcard(args.card);
     if (z < 0) {
@@ -804,7 +818,7 @@ class GameBody extends GameBasics {
     return Promise.resolve();
   }
 
-  private async notif_zigguratCardSelection(args: any): Promise<any> {
+  private async notif_zigguratCardSelection(args: any): Promise<void> {
     console.log('notif_zigguratCardSelection', args);
     const z = this.indexOfZcard(args.card);
     if (z < 0) {
@@ -830,7 +844,7 @@ class GameBody extends GameBasics {
     }
   }
 
-  private async notif_cityScored(args: any): Promise<any> {
+  private async notif_cityScored(args: any): Promise<void> {
     console.log('notif_cityScored', args);
 
     const anim = [];
@@ -932,9 +946,9 @@ class GameBody extends GameBasics {
 
   /* @Override */
   protected override format_string_recursive(log: string, args: any): string {
-    const defargs = key => { return { [key]: args[key] } };
+    const defargs = (key:string) => { return { [key]: args[key] } };
     const saved = {};
-    const defModify = x => x;
+    const defModify = (x:any) => x;
     try {
       if (log && args && !args.processed) {
         args.processed = true;
