@@ -22,15 +22,15 @@ class IDS {
   }
 
   static handcount(playerId: number): string {
-    return 'bbl_handcount_' + playerId;
+    return `bbl_handcount_${playerId}`;
   }
 
   static poolcount(playerId: number): string {
-    return 'bbl_poolcount_' + playerId;
+    return `bbl_poolcount_${playerId}`;
   }
 
   static citycount(playerId: number): string {
-    return 'bbl_citycount_' + playerId;
+    return `bbl_citycount_${playerId}`;
   }
 
   static hexDiv(rc: RowCol): string {
