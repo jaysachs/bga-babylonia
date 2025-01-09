@@ -281,7 +281,7 @@ class GameBody extends GameBasics {
 
   private addZigguratCardDiv(id, parentElem, z): void {
     const cls = CSS.zcard(this.zcards[z].type, this.zcards[z].used);
-    const div = this.appendHtml(`<div id='${id}' class='${cls}'></div>`,
+    this.appendHtml(`<div id='${id}' class='${cls}'></div>`,
       parentElem);
     this.addTooltip(id, this.zcards[z].tooltip, '');
     // div.title = this.zcards[z].tooltip;
@@ -627,7 +627,7 @@ class GameBody extends GameBasics {
     // }
   }
 
-  private setupPlayerBoard(player): void {
+  private setupPlayerBoard(player: Player): void {
     const playerId = player.player_id;
     console.log('Setting up board for player ' + playerId);
     this.appendHtml(this.format_block('jstpl_player_board_ext',
@@ -647,7 +647,7 @@ class GameBody extends GameBasics {
     this.updateCapturedCityCount(player, false);
   }
 
-  private onUpdateActionButtons_chooseExtraTurn(args: any): void {
+  private onUpdateActionButtons_chooseExtraTurn(): void {
     this.addActionButton(
       'extra-turn-btn',
       'Take your one-time extra turn',
@@ -661,11 +661,11 @@ class GameBody extends GameBasics {
         take_extra_turn: false
       }));
   }
-  private onUpdateActionButtons_endOfTurnScoring(args: any): void {
+  private onUpdateActionButtons_endOfTurnScoring(): void {
     this.markAllHexesUnplayable();
   }
 
-  private onUpdateActionButtons_selectZigguratCard(args: any): void {
+  private onUpdateActionButtons_selectZigguratCard(): void {
     const div = $(IDS.AVAILABLE_ZCARDS);
     div.scrollIntoView(false);
     div.classList.add(CSS.SELECTING);
@@ -673,7 +673,7 @@ class GameBody extends GameBasics {
   }
 
 
-  private onUpdateActionButtons_playPieces(args: any): void {
+  private onUpdateActionButtons_playPieces(): void {
     this.setStatusBarForPlayState();
     this.markAllHexesUnplayable();
   }
@@ -696,11 +696,11 @@ class GameBody extends GameBasics {
   }
 
 
-  private async notif_turnFinished(args: any): Promise<void> {
-    console.log('notif_turnFinished', args);
+  private async notif_turnFinished(player: Player): Promise<void> {
+    console.log('notif_turnFinished', player);
 
-    this.updateHandCount(args);
-    this.updatePoolCount(args);
+    this.updateHandCount(player);
+    this.updatePoolCount(player);
 
     return Promise.resolve();
   }
@@ -710,7 +710,7 @@ class GameBody extends GameBasics {
 
     const isActive = this.playerNumber == args.player_number;
     let targetDivId = IDS.handcount(args.player_id);
-    let handPosDiv = null;
+    let handPosDiv: HTMLElement | null;
     if (isActive) {
       this.hand[args.handpos] = args.original_piece;
       handPosDiv = this.handPosDiv(args.handpos);
@@ -773,7 +773,7 @@ class GameBody extends GameBasics {
 
   private async notif_handRefilled(args: { hand: string[] }): Promise<void> {
     console.log('notif_handRefilled', args);
-    const anim = [];
+    const anim: BgaAnimation<any>[] = [];
     const pid = this.player_id;
     for (var i = 0; i < args.hand.length; ++i) {
       if (this.hand[i] == null) {
@@ -847,9 +847,9 @@ class GameBody extends GameBasics {
   private async notif_cityScored(args: any): Promise<void> {
     console.log('notif_cityScored', args);
 
-    const anim = [];
+    const anim: BgaAnimation<any>[] = [];
 
-    this.markHexPlayable(args)
+    this.markHexPlayable(args);
     for (const playerId in args.details) {
       const details = args.details[playerId];
       const nonscoringLocations = [];
