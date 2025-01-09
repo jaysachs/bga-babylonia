@@ -10,6 +10,10 @@ interface Player {
   player_color: string;
   player_number: number;
 }
+interface Hex extends RowCol {
+  board_player: number;
+  piece: string;
+}
 
 class IDS {
   static readonly AVAILABLE_ZCARDS: string = 'bbl_available_zcards';
@@ -102,6 +106,18 @@ const jstpl_player_board_ext =
    <span class="bbl_pb_zcard_label"></span>\
  </div>';
 
+const jstpl_base_html =`
+      <div id="bbl_main">
+        <div id="bbl_hand_container">
+          <div id="${IDS.HAND}"></div>
+        </div>
+        <div id="${IDS.BOARD_CONTAINER}">
+          <div id="${IDS.BOARD}"></div>
+          <span id="bbl_vars"></span>
+        </div>
+        <div id="${IDS.AVAILABLE_ZCARDS}"></div>
+     </div>
+`;
 
 const special_log_args = {
   zcard: {
@@ -220,7 +236,7 @@ class GameBody extends GameBasics {
     };
   }
 
-  private setupGameBoard(boardData: any, playersData: Player[]): void {
+  private setupGameBoard(boardData: Hex[], playersData: Player[]): void {
     const boardDiv = $(IDS.BOARD);
     // console.log(gamedatas.board);
 
@@ -288,18 +304,7 @@ class GameBody extends GameBasics {
   }
 
   private setupGameHtml(): void {
-    document.getElementById('game_play_area').insertAdjacentHTML('beforeend', `
-      <div id="bbl_main">
-        <div id="bbl_hand_container">
-          <div id="${IDS.HAND}"></div>
-        </div>
-        <div id="${IDS.BOARD_CONTAINER}">
-          <div id="${IDS.BOARD}"></div>
-          <span id="bbl_vars"></span>
-        </div>
-        <div id="${IDS.AVAILABLE_ZCARDS}"></div>
-     </div>
-`  )
+    document.getElementById('game_play_area').insertAdjacentHTML('beforeend', jstpl_base_html);
   }
 
   private updateCounter(counter: Counter, value: number, animate: boolean) {
