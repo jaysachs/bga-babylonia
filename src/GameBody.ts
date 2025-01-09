@@ -149,8 +149,21 @@ interface Zcard {
   owning_player_id: number;
 }
 
+interface Gamedatas {
+  players: Player[];
+  board: Hex[];
+  hand: string[];
+  ziggurat_cards: Zcard[];
+}
+
+interface PlayState {
+  canEndTurn: boolean;
+  canUndo: boolean;
+  allowedMoves: RowCol[];
+}
+
 /** Game class */
-class GameBody extends GameBasics<any> {
+class GameBody extends GameBasics<Gamedatas> {
   private playerNumber: number;
   private hand: string[] = [];
   private handCounters: Counter[] = [];
@@ -161,7 +174,7 @@ class GameBody extends GameBasics<any> {
   private selectedHandPos: number | null;
   private readonly pieceClasses = ['priest', 'servant', 'farmer', 'merchant'];
   private lastId: number;
-
+  private playStateArgs: PlayState;
   private animating = false;
 
   constructor() {
@@ -193,7 +206,7 @@ class GameBody extends GameBasics<any> {
     this.addPausableHandler($(IDS.AVAILABLE_ZCARDS), 'click', this.onZcardClicked.bind(this));
   }
 
-  protected override setup(gamedatas) {
+  protected override setup(gamedatas: Gamedatas) {
     super.setup(gamedatas);
 
     this.playerNumber = gamedatas.players[this.player_id].player_number;
@@ -466,7 +479,7 @@ class GameBody extends GameBasics<any> {
     if (piece == null) {
       return [];
     }
-    return this.stateArgs.allowedMoves[piece] || [];
+    return this.playStateArgs.allowedMoves[piece] || [];
   }
 
   private markHexPlayable(rc: RowCol): void {
@@ -520,8 +533,8 @@ class GameBody extends GameBasics<any> {
       return;
     }
     this.selectedHandPos = null;
-    if (this.stateArgs.canEndTurn) {
-      if (this.stateArgs.allowedMoves.length == 0) {
+    if (this.playStateArgs.canEndTurn) {
+      if (this.playStateArgs.allowedMoves.length == 0) {
         this.setClientState('client_noPlaysLeft', {
           descriptionmyturn: _('${you} must end your turn'),
         });
@@ -544,7 +557,7 @@ class GameBody extends GameBasics<any> {
       });
       this.setPlayablePieces();
     }
-    if (this.stateArgs.canUndo) {
+    if (this.playStateArgs.canUndo) {
       this.addActionButton(
         'undo-btn',
         'Undo',
@@ -660,8 +673,8 @@ class GameBody extends GameBasics<any> {
     this.updateStatusBar(_('You must select a ziggurat card'));
   }
 
-
-  private onUpdateActionButtons_playPieces(): void {
+  private onUpdateActionButtons_playPieces(args: any): void {
+    this.playStateArgs = args;
     this.setStatusBarForPlayState();
     this.markAllHexesUnplayable();
   }
