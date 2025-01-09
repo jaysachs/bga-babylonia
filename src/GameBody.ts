@@ -394,13 +394,9 @@ class GameBody extends GameBasics<Gamedatas> {
       return;
     }
     // console.log('selected hex ' + hex.row + ',' + hex.col);
-    const rc = {
-      row: hex.row,
-      col: hex.col
-    };
-    this.bgaPerformAction('actSelectHexToScore', rc).then(() => {
+    this.bgaPerformAction('actSelectHexToScore', hex).then(() => {
     });
-    this.unmarkHexPlayable(rc);
+    this.unmarkHexPlayable(hex);
   }
 
   private playSelectedPiece(event: PointerEvent): void {
@@ -419,10 +415,7 @@ class GameBody extends GameBasics<Gamedatas> {
       row: hex.row,
       col: hex.col
     }).then(() => {
-      this.unmarkHexPlayable({
-        row: hex.row,
-        col: hex.col
-      });
+      this.unmarkHexPlayable(hex);
     });
     this.unselectAllHandPieces();
   }
