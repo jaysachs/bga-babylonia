@@ -82,10 +82,6 @@ class CSS {
   }
 }
 
-const jstpl_log_piece = '<span class="log-element bbl_${piece}_${player_number}"></span>';
-const jstpl_log_city = '<span class="log-element bbl_${city}"></span>';
-const jstpl_log_zcard = '<span class="log-element bbl_${zcard}"></span>';
-
 class Html {
   static log_piece(piece: string, player_number: number): string {
     return `<span class="log-element bbl_${piece}_${player_number}"></span>`;
@@ -134,29 +130,16 @@ class Html {
   }
 }
 
+const jstpl_log_piece = '<span class="log-element bbl_${piece}_${player_number}"></span>';
+const jstpl_log_original_piece = '<span class="log-element bbl_${original_piece}_${player_number}"></span>';
+const jstpl_log_city = '<span class="log-element bbl_${city}"></span>';
+const jstpl_log_zcard = '<span class="log-element bbl_${zcard}"></span>';
+
 const special_log_args = {
-  zcard: {
-    tmpl: 'jstpl_log_zcard',
-    tmplargs: (a:any) => a
-  },
-  city: {
-    tmpl: 'jstpl_log_city',
-    tmplargs: (a:any) => a
-  },
-  piece: {
-    tmpl: 'jstpl_log_piece',
-    tmplargs: (a:any) => a
-  },
-  original_piece: {
-    tmpl: 'jstpl_log_piece',
-    tmplargs: (args:any) => Object.assign(
-      Object.assign({}, args),
-      {
-        piece: args['original_piece'],
-        player_number: args['player_number']
-      }
-    )
-  }
+  zcard: 'jstpl_log_zcard',
+  city: 'jstpl_log_city',
+  piece: 'jstpl_log_piece',
+  original_piece: 'jstpl_log_original_piece',
 };
 
 interface Zcard {
@@ -167,7 +150,7 @@ interface Zcard {
 }
 
 /** Game class */
-class GameBody extends GameBasics {
+class GameBody extends GameBasics<any> {
   private playerNumber: number;
   private hand: string[] = [];
   private handCounters: Counter[] = [];
@@ -292,7 +275,7 @@ class GameBody extends GameBasics {
   }
 
   private indexOfZcard(cardType: string): number {
-    for (var z = 0; z < this.zcards.length; ++z) {
+    for (let z = 0; z < this.zcards.length; ++z) {
       if (this.zcards[z].type == cardType) {
         return z;
       }
@@ -380,8 +363,7 @@ class GameBody extends GameBasics {
       return null;
     }
     // now check if it's allowed
-    const ae = e;
-    if (!ae.classList.contains(CSS.PLAYABLE)) {
+    if (!e.classList.contains(CSS.PLAYABLE)) {
       // console.log('not playable');
       return null;
     }
@@ -462,7 +444,7 @@ class GameBody extends GameBasics {
     const tid = (event.target as Element).id;
 
     let z = -1;
-    for (var i = 0; i < this.zcards.length; ++i) {
+    for (let i = 0; i < this.zcards.length; ++i) {
       if (tid == IDS.availableZcard(i)) {
         z = i;
         break;
@@ -508,7 +490,7 @@ class GameBody extends GameBasics {
   }
 
   private unselectAllHandPieces(): void {
-    for (var p = 0; p < this.hand.length; ++p) {
+    for (let p = 0; p < this.hand.length; ++p) {
       const cl = $(IDS.handPos(p)).classList;
       if (cl.contains(CSS.SELECTED)) {
         this.unmarkHexesPlayableForPiece(p);
@@ -521,7 +503,7 @@ class GameBody extends GameBasics {
   }
 
   private setPlayablePieces(): void {
-    for (var p = 0; p < this.hand.length; ++p) {
+    for (let p = 0; p < this.hand.length; ++p) {
       const cl = $(IDS.handPos(p)).classList;
       if (this.allowedMovesFor(p).length > 0) {
         cl.add(CSS.PLAYABLE);
@@ -772,7 +754,7 @@ class GameBody extends GameBasics {
     console.log('notif_handRefilled', args);
     const anim: BgaAnimation<any>[] = [];
     const pid = this.player_id;
-    for (var i = 0; i < args.hand.length; ++i) {
+    for (let i = 0; i < args.hand.length; ++i) {
       if (this.hand[i] == null) {
         this.hand[i] = args.hand[i];
       }
@@ -944,20 +926,14 @@ class GameBody extends GameBasics {
 
   /* @Override */
   protected override format_string_recursive(log: string, args: any): string {
-    const defargs = (key:string) => { return { [key]: args[key] } };
     const saved = {};
-    const defModify = (x:any) => x;
     try {
       if (log && args && !args.processed) {
         args.processed = true;
         for (const key of Object.keys(special_log_args)) {
           if (key in args) {
             saved[key] = args[key];
-            const s = special_log_args[key];
-            args[key] = this.format_block(
-              s.tmpl,
-              s.tmplargs(args)
-            );
+            args[key] = this.format_block(special_log_args[key], args);
           }
         }
       }
