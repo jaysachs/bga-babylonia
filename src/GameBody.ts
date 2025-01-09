@@ -849,12 +849,13 @@ class GameBody extends GameBasics {
 
     const anim = [];
 
+    this.markHexPlayable(args)
     for (const playerId in args.details) {
       const details = args.details[playerId];
       const nonscoringLocations = [];
       for (const nh of details.network_locations) {
         if (!details.scored_locations.some(
-          sh => (nh.row == sh.row && nh.col == sh.col))) {
+          (sh: RowCol) => (nh.row == sh.row && nh.col == sh.col))) {
           nonscoringLocations.push(nh);
         }
       }
