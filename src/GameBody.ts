@@ -673,7 +673,7 @@ class GameBody extends GameBasics<Gamedatas> {
     this.updateStatusBar(_('You must select a ziggurat card'));
   }
 
-  private onUpdateActionButtons_playPieces(args: any): void {
+  private onUpdateActionButtons_playPieces(args: PlayState): void {
     this.playStateArgs = args;
     this.setStatusBarForPlayState();
     this.markAllHexesUnplayable();
@@ -711,9 +711,7 @@ class GameBody extends GameBasics<Gamedatas> {
 
     // Put any piece (field) captured in the move back on the board
     // TODO: animate this? (and animate the capture too?)
-    this.renderPlayedPiece(args,
-      args.captured_piece,
-      null);
+    this.renderPlayedPiece(args, args.captured_piece, null);
     const onDone =
       () => {
         if (isActive) {
