@@ -7,6 +7,7 @@
         "lib": ["dom", "esnext"],
         "sourceMap": false,
         "outFile": "babylonia.js",
+        "noImplicitOverride": true,
         "typeRoots": [
             "src/types",
             "./types",

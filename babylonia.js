@@ -701,16 +701,23 @@ var GameBasics = /** @class */ (function (_super) {
         };
         return res;
     };
-    GameBasics.prototype.ajaxcallwrapper = function (action, args, handler) {
-        if (!args) {
-            args = {};
-        }
-        args.lock = true;
-        if (gameui.checkAction(action)) {
-            gameui.ajaxcall("/" + gameui.game_name + "/" + gameui.game_name + "/" + action + ".html", args, //
-            gameui, function (result) { }, handler);
-        }
-    };
+    /*
+    ajaxcallwrapper(action: string, args?: any, handler?) {
+      if (!args) {
+        args = {};
+      }
+      args.lock = true;
+      if (gameui.checkAction(action)) {
+        gameui.ajaxcall(
+          "/" + gameui.game_name + "/" + gameui.game_name + "/" + action + ".html",
+          args, //
+          gameui,
+          (result) => {},
+          handler
+        );
+      }
+    }
+  */
     GameBasics.prototype.createHtml = function (divstr, location) {
         var tempHolder = document.createElement("div");
         tempHolder.innerHTML = divstr;
@@ -1627,6 +1634,41 @@ var GameBody = /** @class */ (function (_super) {
                 }
             });
         });
+    };
+    ///////
+    /* @Override */
+    GameBody.prototype.format_string_recursive = function (log, args) {
+        var defargs = function (key) {
+            var _a;
+            return _a = {}, _a[key] = args[key], _a;
+        };
+        var saved = {};
+        var defModify = function (x) { return x; };
+        try {
+            if (log && args && !args.processed) {
+                args.processed = true;
+                for (var _i = 0, _a = Object.keys(special_log_args); _i < _a.length; _i++) {
+                    var key = _a[_i];
+                    if (key in args) {
+                        saved[key] = args[key];
+                        var s = special_log_args[key];
+                        args[key] = this.format_block(s.tmpl, s.tmplargs(args));
+                    }
+                }
+            }
+        }
+        catch (e) {
+            console.error(log, args, 'Exception thrown', e.stack);
+        }
+        try {
+            return this.inherited(arguments);
+            //                return super.format_string_recursive(log, args);
+        }
+        finally {
+            for (var i in saved) {
+                args[i] = saved[i];
+            }
+        }
     };
     return GameBody;
 }(GameBasics));

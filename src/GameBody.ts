@@ -165,7 +165,7 @@ private addPausableHandler(e: EventTarget, type: string, handler: (a: any) => vo
   this.addPausableHandler($(IDS.AVAILABLE_ZCARDS), 'click', this.onZcardClicked.bind(this));
   }
 
-  protected setup(gamedatas) {
+  protected override setup(gamedatas) {
     super.setup(gamedatas);
 
     this.playerNumber = gamedatas.players[this.player_id].player_number;
@@ -673,7 +673,7 @@ private  markAllHexesUnplayable(): void {
                 .forEach(div => div.classList.remove(CSS.PLAYABLE));
         }
 
-  setupNotifications(): void {
+  protected override setupNotifications(): void {
     for (var m in this) {
       if (typeof this[m] == "function" && m.startsWith("notif_")) {
         dojo.subscribe(m.substring(6), this, m);
@@ -931,8 +931,7 @@ private  markAllHexesUnplayable(): void {
 ///////
 
         /* @Override */
-        /*
-        protected format_string_recursive(log: string, args: any): string {
+        protected override format_string_recursive(log: string, args: any): string {
             const defargs = key => { return { [key]: args[key] } };
             const saved = {};
             const defModify = x => x;
@@ -954,13 +953,11 @@ private  markAllHexesUnplayable(): void {
                 console.error(log,args,'Exception thrown', e.stack);
             }
             try {
-                return super.format_string_recursive(log, args);
+                return this.inherited(arguments);
             } finally {
                 for (const i in saved) {
                     args[i] = saved[i];
                 }
             }
         }
-        */
-
 }
