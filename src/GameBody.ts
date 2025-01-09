@@ -161,15 +161,15 @@ class GameBody extends GameBasics {
       .then(() => { this.animating = false; });
   }
 
-  private pausable(f: (a: any) => void): any {
-    return (e: any) => {
+  private pausable<T>(f: (a: T) => void): (e: T) => void {
+    return (e: T) => {
       if (!this.animating) {
         f(e);
       }
     };
   }
 
-  private addPausableHandler(e: EventTarget, type: string, handler: (a: any) => void): void {
+  private addPausableHandler<T extends Event>(e: EventTarget, type: string, handler: (a: T) => void): void {
     e.addEventListener(type, this.pausable(handler));
   }
 
