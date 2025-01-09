@@ -20,10 +20,8 @@ $(STUBS): $(WORK) _ide_helper.php Makefile
 $(STATS): $(GENSTATS) stats.json
 	php $(GENSTATS) babylonia > modules/php/Stats.php
 
-$(JS): tsconfig.json src/*.ts ../bga-ts-framework/src/*.ts ../bga-animations/src/**/*.ts
+build: $(STATS)
 	npm run build:ts
-
-build: $(STATS) $(JS)
 
 test: build $(STUBS)
 	phpunit --bootstrap misc/autoload.php misc --testdox --display-warnings --display-deprecations --display-notices
