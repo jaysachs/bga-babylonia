@@ -1662,7 +1662,6 @@ var GameBody = /** @class */ (function (_super) {
         }
         try {
             return this.inherited(arguments);
-            //                return super.format_string_recursive(log, args);
         }
         finally {
             for (var i in saved) {
