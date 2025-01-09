@@ -143,54 +143,6 @@ var BgaElementAnimation = /** @class */ (function (_super) {
     };
     return BgaElementAnimation;
 }(BgaAnimation));
-function shouldAnimate(settings) {
-    var _a;
-    return document.visibilityState !== 'hidden' && !((_a = settings === null || settings === void 0 ? void 0 : settings.game) === null || _a === void 0 ? void 0 : _a.instantaneousMode);
-}
-/**
- * Return the x and y delta, based on the animation settings;
- *
- * @param settings an `AnimationSettings` object
- * @returns a promise when animation ends
- */
-function getDeltaCoordinates(element, settings, animationManager) {
-    var _a;
-    if (!settings.fromDelta && !settings.fromRect && !settings.fromElement) {
-        throw new Error("[bga-animation] fromDelta, fromRect or fromElement need to be set");
-    }
-    var x = 0;
-    var y = 0;
-    if (settings.fromDelta) {
-        x = settings.fromDelta.x;
-        y = settings.fromDelta.y;
-    }
-    else {
-        var originBR = (_a = settings.fromRect) !== null && _a !== void 0 ? _a : animationManager.game.getBoundingClientRectIgnoreZoom(settings.fromElement);
-        // TODO make it an option ?
-        var originalTransform = element.style.transform;
-        element.style.transform = '';
-        var destinationBR = animationManager.game.getBoundingClientRectIgnoreZoom(element);
-        element.style.transform = originalTransform;
-        x = (destinationBR.left + destinationBR.right) / 2 - (originBR.left + originBR.right) / 2;
-        y = (destinationBR.top + destinationBR.bottom) / 2 - (originBR.top + originBR.bottom) / 2;
-    }
-    if (settings.scale) {
-        x /= settings.scale;
-        y /= settings.scale;
-    }
-    return { x: x, y: y };
-}
-function logAnimation(animationManager, animation) {
-    var settings = animation.settings;
-    var element = settings.element;
-    if (element) {
-        console.log(animation, settings, element, element.getBoundingClientRect(), animationManager.game.getBoundingClientRectIgnoreZoom(element), element.style.transform);
-    }
-    else {
-        console.log(animation, settings);
-    }
-    return Promise.resolve(false);
-}
 /**
  * Fade the element.
  */
@@ -250,7 +202,7 @@ var BgaSlideAnimation = /** @class */ (function (_super) {
             var element = _this.settings.element;
             var transitionTimingFunction = (_a = _this.settings.transitionTimingFunction) !== null && _a !== void 0 ? _a : 'linear';
             var duration = (_c = (_b = _this.settings) === null || _b === void 0 ? void 0 : _b.duration) !== null && _c !== void 0 ? _c : 500;
-            var _f = getDeltaCoordinates(element, _this.settings, animationManager), x = _f.x, y = _f.y;
+            var _f = animationManager.getDeltaCoordinates(element, _this.settings), x = _f.x, y = _f.y;
             _this.wireUp(element, duration, success);
             // this gets saved/restored in wireUp
             element.style.zIndex = "".concat((_e = (_d = _this.settings) === null || _d === void 0 ? void 0 : _d.zIndex) !== null && _e !== void 0 ? _e : 10);
@@ -638,17 +590,49 @@ var AnimationManager = /** @class */ (function () {
         });
         return this.play(attachWithAnimation);
     };
+    /**
+     * Return the x and y delta, based on the animation settings;
+     *
+     * @param settings an `AnimationSettings` object
+     * @returns a promise when animation ends
+     */
+    AnimationManager.prototype.getDeltaCoordinates = function (element, settings) {
+        var _a;
+        if (!settings.fromDelta && !settings.fromRect && !settings.fromElement) {
+            throw new Error("[bga-animation] fromDelta, fromRect or fromElement need to be set");
+        }
+        var x = 0;
+        var y = 0;
+        if (settings.fromDelta) {
+            x = settings.fromDelta.x;
+            y = settings.fromDelta.y;
+        }
+        else {
+            var originBR = (_a = settings.fromRect) !== null && _a !== void 0 ? _a : this.game.getBoundingClientRectIgnoreZoom(settings.fromElement);
+            // TODO make it an option ?
+            var originalTransform = element.style.transform;
+            element.style.transform = '';
+            var destinationBR = this.game.getBoundingClientRectIgnoreZoom(element);
+            element.style.transform = originalTransform;
+            x = (destinationBR.left + destinationBR.right) / 2 - (originBR.left + originBR.right) / 2;
+            y = (destinationBR.top + destinationBR.bottom) / 2 - (originBR.top + originBR.bottom) / 2;
+        }
+        if (settings.scale) {
+            x /= settings.scale;
+            y /= settings.scale;
+        }
+        return { x: x, y: y };
+    };
     return AnimationManager;
 }());
 define({
-    // utils functions
-    shouldAnimate: shouldAnimate,
-    getDeltaCoordinates: getDeltaCoordinates,
-    // animation functions
+    // animation classes
     BgaSlideAnimation: BgaSlideAnimation,
     BgaShowScreenCenterAnimation: BgaShowScreenCenterAnimation,
     BgaPauseAnimation: BgaPauseAnimation,
     BgaCompoundAnimation: BgaCompoundAnimation,
     BgaAttachWithAnimation: BgaAttachWithAnimation,
     BgaFadeAnimation: BgaFadeAnimation,
+    BgaSpinGrowAnimation: BgaSpinGrowAnimation,
+    BgaSlideTempAnimation: BgaSlideTempAnimation,
 });
