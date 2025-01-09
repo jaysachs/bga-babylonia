@@ -8,6 +8,7 @@ GENSTATS=../bgautil/genstats/genstats.php
 WORK=work
 STUBS=$(WORK)/module/table/table.game.php
 PSALM_CONFIG=psalm.xml
+JS=babylonia.js
 
 $(WORK):
 	mkdir $(WORK)
@@ -19,7 +20,10 @@ $(STUBS): $(WORK) _ide_helper.php Makefile
 $(STATS): $(GENSTATS) stats.json
 	php $(GENSTATS) babylonia > modules/php/Stats.php
 
-build: $(STATS)
+$(JS): tsconfig.json src/*.ts ../bga-framwork-ts/src/*.ts ../bga-animainos/src/**/*.ts
+	npm build:ts
+
+build: $(STATS) $(JS)
 
 test: build $(STUBS)
 	phpunit --bootstrap misc/autoload.php misc --testdox --display-warnings --display-deprecations --display-notices
