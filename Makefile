@@ -20,7 +20,7 @@ $(STUBS): $(WORK) _ide_helper.php Makefile
 $(STATS): $(GENSTATS) stats.json
 	php $(GENSTATS) babylonia > modules/php/Stats.php
 
-$(JS): tsconfig.json src/*.ts ../bga-framework-ts/src/*.ts ../bga-animations/src/**/*.ts
+$(JS): tsconfig.json src/*.ts ../bga-ts-framework/src/*.ts ../bga-animations/src/**/*.ts
 	npm run build:ts
 
 build: $(STATS) $(JS)
