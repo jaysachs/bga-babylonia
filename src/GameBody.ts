@@ -252,7 +252,7 @@ class GameBody extends GameBasics<Gamedatas> {
     // console.log(gamedatas.board);
 
     for (const hex of boardData) {
-      this.appendHtml(Html.hex(hex, this.hexLocation(hex)), boardDiv);
+      boardDiv.insertAdjacentHTML('beforeend', Html.hex(hex, this.hexLocation(hex)));
 
       if (hex.piece != null) {
         const n = (hex.board_player == 0)
@@ -271,7 +271,7 @@ class GameBody extends GameBasics<Gamedatas> {
       if (zcards[z].owning_player_id != 0) {
         this.addZcardDivInPlayerBoard(z);
         // also "shell" in available cards
-        this.appendHtml(`<div id='${id}'></div>`, $(IDS.AVAILABLE_ZCARDS));
+        $(IDS.AVAILABLE_ZCARDS).insertAdjacentHTML('beforeend', `<div id='${id}'></div>`);
       } else {
         // just in available cards
         this.addZigguratCardDiv(id, $(IDS.AVAILABLE_ZCARDS), z);
@@ -298,8 +298,7 @@ class GameBody extends GameBasics<Gamedatas> {
 
   private addZigguratCardDiv(id: string, parentElem: HTMLElement, z: number): void {
     const cls = CSS.zcard(this.zcards[z].type, this.zcards[z].used);
-    this.appendHtml(`<div id='${id}' class='${cls}'></div>`,
-      parentElem);
+    parentElem.insertAdjacentHTML('beforeend', `<div id='${id}' class='${cls}'></div>`);
     this.addTooltip(id, this.zcards[z].tooltip, '');
     // div.title = this.zcards[z].tooltip;
   }
@@ -349,7 +348,7 @@ class GameBody extends GameBasics<Gamedatas> {
     for (let j = 0; j <= i; ++j) {
       const id = IDS.handPos(j);
       if ($(id) == null) {
-        this.appendHtml(`<div id='${id}' class='${CSS.EMPTY}'/>`, hand);
+        hand.insertAdjacentHTML('beforeend', `<div id='${id}' class='${CSS.EMPTY}'/>`);
       }
     }
     return $(id);
@@ -618,24 +617,10 @@ class GameBody extends GameBasics<Gamedatas> {
     return false;
   }
 
-
-  private appendHtml(html: string, parent: HTMLElement): void {
-    dojo.place(html, parent);
-
-    // const div = document.createElement('div');
-    // div.innerHTML = html;
-    // const frag = document.createDocumentFragment();
-    // var fc: Node;
-
-    // while ((fc = div.firstChild)) { // intentional assignment
-    //   parent.append(fc);
-    // }
-  }
-
   private setupPlayerBoard(player: Player): void {
     const playerId = player.player_id;
     console.log('Setting up board for player ' + playerId);
-    this.appendHtml(Html.player_board_ext(player), this.getPlayerPanelElement(playerId));
+    this.getPlayerPanelElement(playerId).insertAdjacentHTML('beforeend', Html.player_board_ext(player));
     //    create counters per player
     this.handCounters[playerId] = new ebg.counter();
     this.handCounters[playerId].create(IDS.handcount(playerId));
