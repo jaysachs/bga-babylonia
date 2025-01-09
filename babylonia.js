@@ -1245,7 +1245,7 @@ var GameBody = /** @class */ (function (_super) {
         if (selectedDiv.parentElement.id != IDS.HAND) {
             return false;
         }
-        var handpos = selectedDiv.id.split('_')[2];
+        var handpos = Number(selectedDiv.id.split('_')[2]);
         if (this.allowedMovesFor(handpos).length == 0) {
             return false;
         }
@@ -1633,9 +1633,8 @@ var GameBody = /** @class */ (function (_super) {
 define([
     "dojo",
     "dojo/_base/declare",
-    "dojo/on",
     "ebg/core/gamegui",
     "ebg/counter"
-], function (dojo, declare, on) {
+], function (dojo, declare) {
     declare("bgagame.babylonia", ebg.core.gamegui, new GameBody());
 });
