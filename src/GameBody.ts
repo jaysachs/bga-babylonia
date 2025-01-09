@@ -165,7 +165,7 @@ private addPausableHandler(e: EventTarget, type: string, handler: (a: any) => vo
   this.addPausableHandler($(IDS.AVAILABLE_ZCARDS), 'click', this.onZcardClicked.bind(this));
   }
 
-  setup(gamedatas) {
+  protected setup(gamedatas) {
     super.setup(gamedatas);
 
     this.playerNumber = gamedatas.players[this.player_id].player_number;
@@ -193,7 +193,7 @@ private addPausableHandler(e: EventTarget, type: string, handler: (a: any) => vo
     console.log('Game setup done');
   }
 
-  hexLocation(hex: RowCol): TopLeft {
+  private hexLocation(hex: RowCol): TopLeft {
     const hstart = 38.0; // this is related to board width but not sure how
     const vstart = 9.0; // depends on board size too
     const height = 768 / 12.59;
@@ -206,7 +206,7 @@ private addPausableHandler(e: EventTarget, type: string, handler: (a: any) => vo
     };
   }
 
-  setupGameBoard(boardData, playersData): void {
+  private setupGameBoard(boardData, playersData): void {
     const boardDiv = $(IDS.BOARD);
     // console.log(gamedatas.board);
 
@@ -232,7 +232,7 @@ private addPausableHandler(e: EventTarget, type: string, handler: (a: any) => vo
     }
   }
 
-  setupAvailableZcards(zcards: any): void {
+  private setupAvailableZcards(zcards: any): void {
     console.log('Setting up available ziggurat cards', zcards);
     this.zcards = zcards;
     for (let z = 0; z < zcards.length; ++z) {
@@ -248,7 +248,7 @@ private addPausableHandler(e: EventTarget, type: string, handler: (a: any) => vo
     }
   }
 
-  addZcardDivInPlayerBoard(z: number) {
+  private addZcardDivInPlayerBoard(z: number) {
     this.addZigguratCardDiv(
       IDS.ownedZcard(z),
       IDS.playerBoardZcards(this.zcards[z].owning_player_id),
@@ -264,7 +264,8 @@ private        indexOfZcard(cardType: string): number {
             }
             return -1;
         }
-  addZigguratCardDiv(id, parentElem, z): void {
+
+  private addZigguratCardDiv(id, parentElem, z): void {
     const cls = CSS.zcard(this.zcards[z].type, this.zcards[z].used);
     const div = this.appendHtml(`<div id='${id}' class='${cls}'></div>`,
       parentElem);
@@ -272,7 +273,7 @@ private        indexOfZcard(cardType: string): number {
     // div.title = this.zcards[z].tooltip;
   }
 
-  setupGameHtml(): void {
+  private setupGameHtml(): void {
     document.getElementById('game_play_area').insertAdjacentHTML('beforeend', `
       <div id="bbl_main">
         <div id="bbl_hand_container">
@@ -287,7 +288,7 @@ private        indexOfZcard(cardType: string): number {
 `  )
   }
 
-  updateCounter(counter: any, value: number, animate: boolean) {
+  private updateCounter(counter: any, value: number, animate: boolean) {
     if (animate) {
       counter.toValue(value);
     } else {
@@ -295,19 +296,19 @@ private        indexOfZcard(cardType: string): number {
     }
   }
 
-  updateHandCount(player: any, animate: boolean = true) {
+  private updateHandCount(player: any, animate: boolean = true) {
     this.updateCounter(this.handCounters[player.player_id],
       player.hand_size,
       animate);
   }
 
-  updatePoolCount(player: any, animate: boolean = true) {
+  private updatePoolCount(player: any, animate: boolean = true) {
     this.updateCounter(this.poolCounters[player.player_id],
       player.pool_size,
       animate);
   }
 
-  updateCapturedCityCount(player: any, animate: boolean = true) {
+  private updateCapturedCityCount(player: any, animate: boolean = true) {
     this.updateCounter(this.cityCounters[player.player_id],
       player.captured_city_count,
       animate);
@@ -317,7 +318,7 @@ private        indexOfZcard(cardType: string): number {
     return $(IDS.hexDiv(rc));
   }
 
-  handPosDiv(i: number): HTMLElement {
+  private handPosDiv(i: number): HTMLElement {
     const id = IDS.handPos(i);
     const div = $(id);
     if (div != null) {
@@ -454,7 +455,7 @@ private        indexOfZcard(cardType: string): number {
             return false;
         }
 
-  allowedMovesFor(pos: number): any {
+  private allowedMovesFor(pos: number): any {
     const piece = this.hand[pos];
     if (piece == null) {
         return [];
@@ -462,27 +463,27 @@ private        indexOfZcard(cardType: string): number {
     return this.stateArgs.allowedMoves[piece] || [];
   }
 
-  markHexPlayable(rc: RowCol): void {
+  private markHexPlayable(rc: RowCol): void {
     this.hexDiv(rc).classList.add(CSS.PLAYABLE);
   }
 
-  unmarkHexPlayable(rc: RowCol): void {
+  private unmarkHexPlayable(rc: RowCol): void {
     this.hexDiv(rc).classList.remove(CSS.PLAYABLE);
   }
 
-  markScoreableHexesPlayable(hexes: RowCol[]): void  {
+  private markScoreableHexesPlayable(hexes: RowCol[]): void  {
     hexes.forEach(rc => this.markHexPlayable(rc));
   }
 
-  markHexesPlayableForPiece(pos: number): void {
+  private markHexesPlayableForPiece(pos: number): void {
     this.allowedMovesFor(pos).forEach(rc => this.markHexPlayable(rc));
   }
 
-  unmarkHexesPlayableForPiece(pos: number): void {
+  private unmarkHexesPlayableForPiece(pos: number): void {
     this.allowedMovesFor(pos).forEach(rc => this.unmarkHexPlayable(rc));
   }
 
-  unselectAllHandPieces(): void {
+  private unselectAllHandPieces(): void {
     for (var p = 0; p < this.hand.length; ++p) {
         const cl = $(IDS.handPos(p)).classList;
         if (cl.contains(CSS.SELECTED)) {
@@ -495,7 +496,7 @@ private        indexOfZcard(cardType: string): number {
     this.selectedHandPos = null;
   }
 
-  setPlayablePieces(): void {
+  private setPlayablePieces(): void {
     for (var p = 0; p < this.hand.length; ++p) {
         const cl = $(IDS.handPos(p)).classList;
         if (this.allowedMovesFor(p).length > 0) {
@@ -508,7 +509,7 @@ private        indexOfZcard(cardType: string): number {
     }
   }
 
-  setStatusBarForPlayState(): void {
+  private setStatusBarForPlayState(): void {
     if (!this.isCurrentPlayerActive()) {
         return;
     }
@@ -546,7 +547,7 @@ private        indexOfZcard(cardType: string): number {
     }
   }
 
-  onHandClicked(ev: any): boolean {
+  private onHandClicked(ev: PointerEvent): boolean {
     console.log('onHandClicked', ev);
     ev.preventDefault();
     ev.stopPropagation();
@@ -561,11 +562,11 @@ private        indexOfZcard(cardType: string): number {
         && this.currentState != 'client_mustSelectPiece') {
         return false;
     }
-    const selectedDiv = ev.target;
+    const selectedDiv = ev.target as HTMLElement;
     if (selectedDiv.parentElement.id != IDS.HAND) {
         return false;
     }
-    const handpos = selectedDiv.id.split('_')[2];
+    const handpos = Number(selectedDiv.id.split('_')[2]);
     if (this.allowedMovesFor(handpos).length == 0) {
         return false;
     }
