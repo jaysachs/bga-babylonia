@@ -641,7 +641,7 @@ class Game extends \Table
         );
 
         return [
-            'players' => $player_data,
+            'player_data' => $player_data,
             'hand' => array_map(function ($p) { return $p->value; },
                                 $model->hand()->pieces()),
             'board' => $board_data,

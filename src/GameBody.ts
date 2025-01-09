@@ -1,6 +1,6 @@
 interface RowCol { row: number, col: number };
 interface TopLeft { top: number, left: number };
-interface Player {
+interface PlayerData {
   player_id: number;
   hand_size: number;
   pool_size: number;
@@ -95,7 +95,7 @@ class Html {
   static hex(rc: RowCol, tl: TopLeft): string {
     return `<div id="bbl_hex_${rc.row}_${rc.col}" style="top:${tl.top}px; left:${tl.left}px;"></div>`;
   }
-  static player_board_ext(player: Player): string {
+  static player_board_ext(player: PlayerData): string {
     return `
       <div>
         <span class="bbl_pb_hand_label_${player.player_number}"></span>
@@ -150,7 +150,7 @@ interface Zcard {
 }
 
 interface Gamedatas {
-  players: Player[];
+  player_data: PlayerData[];
   board: Hex[];
   hand: string[];
   ziggurat_cards: Zcard[];
@@ -207,18 +207,19 @@ class GameBody extends GameBasics<Gamedatas> {
   }
 
   protected override setup(gamedatas: Gamedatas) {
+    console.log(gamedatas);
     super.setup(gamedatas);
 
-    this.playerNumber = gamedatas.players[this.player_id].player_number;
+    this.playerNumber = gamedatas.player_data[this.player_id].player_number;
 
     this.setupGameHtml();
 
     console.log('setting the the game board');
-    this.setupGameBoard(gamedatas.board, gamedatas.players);
+    this.setupGameBoard(gamedatas.board, gamedatas.player_data);
 
-    console.log('setting up player boards');
-    for (const playerId in gamedatas.players) {
-      this.setupPlayerBoard(gamedatas.players[playerId]);
+    console.log('setting up player boards', gamedatas.player_data);
+    for (const playerId in gamedatas.player_data) {
+      this.setupPlayerBoard(gamedatas.player_data[playerId]);
     }
 
     console.log('setting up player hand');
@@ -247,7 +248,7 @@ class GameBody extends GameBasics<Gamedatas> {
     };
   }
 
-  private setupGameBoard(boardData: Hex[], playersData: Player[]): void {
+  private setupGameBoard(boardData: Hex[], playersData: PlayerData[]): void {
     const boardDiv = $(IDS.BOARD);
     // console.log(gamedatas.board);
 
@@ -315,19 +316,20 @@ class GameBody extends GameBasics<Gamedatas> {
     }
   }
 
-  private updateHandCount(player: Player, animate: boolean = true) {
+  private updateHandCount(player: { player_id: number; hand_size: number; }, animate: boolean = true) {
+    console.log("update hand count", player, this.handCounters[player.player_id]);
     this.updateCounter(this.handCounters[player.player_id],
       player.hand_size,
       animate);
   }
 
-  private updatePoolCount(player: Player, animate: boolean = true) {
+  private updatePoolCount(player: { player_id: number; pool_size: number }, animate: boolean = true) {
     this.updateCounter(this.poolCounters[player.player_id],
       player.pool_size,
       animate);
   }
 
-  private updateCapturedCityCount(player: Player, animate: boolean = true) {
+  private updateCapturedCityCount(player: { player_id: number; captured_city_count: number }, animate: boolean = true) {
     this.updateCounter(this.cityCounters[player.player_id],
       player.captured_city_count,
       animate);
@@ -617,7 +619,7 @@ class GameBody extends GameBasics<Gamedatas> {
     return false;
   }
 
-  private setupPlayerBoard(player: Player): void {
+  private setupPlayerBoard(player: PlayerData): void {
     const playerId = player.player_id;
     console.log('Setting up board for player ' + playerId);
     this.getPlayerPanelElement(playerId).insertAdjacentHTML('beforeend', Html.player_board_ext(player));
@@ -664,7 +666,7 @@ class GameBody extends GameBasics<Gamedatas> {
     this.markAllHexesUnplayable();
   }
 
-  private onUpdateActionButtons_selectHexToScore(args: any): void {
+  private onUpdateActionButtons_selectHexToScore(args: {hexes: RowCol[]}): void {
     this.markScoreableHexesPlayable(args.hexes);
   }
 
@@ -673,16 +675,36 @@ class GameBody extends GameBasics<Gamedatas> {
       .forEach(div => div.classList.remove(CSS.PLAYABLE));
   }
 
-  private async notif_turnFinished(player: Player): Promise<void> {
-    console.log('notif_turnFinished', player);
+  private async notif_turnFinished(
+      args: {
+        player_id: number;
+        hand_size: number;
+        pool_size: number;
+        player_name: string;
+        player_number: number;
+      }
+    ): Promise<void> {
+    console.log('notif_turnFinished', args);
 
-    this.updateHandCount(player);
-    this.updatePoolCount(player);
+    this.updateHandCount(args);
+    this.updatePoolCount(args);
 
     return Promise.resolve();
   }
 
-  private async notif_undoMove(args: any): Promise<void> {
+  private async notif_undoMove(
+      args: {
+        player_id: number;
+        player_number: number;
+        points: number;
+        handpos: number;
+        row: number;
+        col: number;
+        original_piece: string;
+        captured_piece: string;
+        piece: string;
+      }
+    ): Promise<void> {
     console.log('notif_undoMove', args);
 
     const isActive = this.playerNumber == args.player_number;
@@ -716,7 +738,18 @@ class GameBody extends GameBasics<Gamedatas> {
     })).then(onDone);
   }
 
-  private async notif_piecePlayed(args: any): Promise<void> {
+  private async notif_piecePlayed(
+      args: {
+        player_number: number;
+        player_id: number;
+        points: number;
+        piece: string;
+        handpos: number;
+        row: number;
+        col: number;
+        hand_size: number;
+      }
+    ): Promise<void> {
     console.log('notif_piecePlayed', args);
     const isActive = this.playerNumber == args.player_number;
     let sourceDivId = IDS.handcount(args.player_id);
@@ -773,8 +806,7 @@ class GameBody extends GameBasics<Gamedatas> {
     }));
   }
 
-
-  private async notif_extraTurnUsed(args: any): Promise<void> {
+  private async notif_extraTurnUsed(args: { card: string; used: boolean; }): Promise<void> {
     console.log('notif_extraTurnUsed', args);
     const z = this.indexOfZcard(args.card);
     if (z < 0) {
@@ -793,7 +825,14 @@ class GameBody extends GameBasics<Gamedatas> {
     return Promise.resolve();
   }
 
-  private async notif_zigguratCardSelection(args: any): Promise<void> {
+  private async notif_zigguratCardSelection(
+      args: {
+        card: string;
+        player_id: number;
+        cardused: boolean;
+        score: number;
+      }
+    ): Promise<void> {
     console.log('notif_zigguratCardSelection', args);
     const z = this.indexOfZcard(args.card);
     if (z < 0) {
@@ -819,7 +858,22 @@ class GameBody extends GameBasics<Gamedatas> {
     }
   }
 
-  private async notif_cityScored(args: any): Promise<void> {
+  private async notif_cityScored(
+    args: {
+      row: number;
+      col: number;
+      city: string;
+      captured_by: number;
+      details: {
+        player_id: number;
+        captured_city_count: number;
+        network_locations: RowCol[];
+        scored_locations: RowCol[];
+        network_points: number;
+        capture_points: number;
+      }[];
+    }
+  ): Promise<void> {
     console.log('notif_cityScored', args);
 
     const anim: BgaAnimation<any>[] = [];
@@ -827,10 +881,10 @@ class GameBody extends GameBasics<Gamedatas> {
     this.markHexPlayable(args);
     for (const playerId in args.details) {
       const details = args.details[playerId];
-      const nonscoringLocations = [];
+      const nonscoringLocations: RowCol[] = [];
       for (const nh of details.network_locations) {
         if (!details.scored_locations.some(
-          (sh: RowCol) => (nh.row == sh.row && nh.col == sh.col))) {
+          sh => (nh.row == sh.row && nh.col == sh.col))) {
           nonscoringLocations.push(nh);
         }
       }
@@ -868,7 +922,7 @@ class GameBody extends GameBasics<Gamedatas> {
         text: `+${details.network_points}`,
         centeredOnId: IDS.hexDiv(args),
         parentId: IDS.BOARD,
-        color: '#' + this.gamedatas.players[playerId].player_color,
+        color: '#' + this.gamedatas.player_data[details.player_id].player_color,
         duration: 2500,
       }));
 
@@ -883,8 +937,8 @@ class GameBody extends GameBasics<Gamedatas> {
         ),
         animationEnd: () => {
           details.scored_locations.forEach(
-            rc => this.hexDiv(rc).classList.remove(CSS.SELECTED));
-          this.scoreCtrl[playerId].incValue(details.network_points);
+            (rc: RowCol) => this.hexDiv(rc).classList.remove(CSS.SELECTED));
+          this.scoreCtrl[details.player_id].incValue(details.network_points);
         },
       }));
     }
