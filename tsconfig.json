@@ -1,0 +1,26 @@
+{
+    "rootDir": ".",
+    "compilerOptions": {
+        "pretty": false,
+        "target": "es5",
+        "module": "none",
+        "lib": ["dom", "esnext"],
+        "sourceMap": false,
+        "outFile": "babylonia.js",
+        "typeRoots": [
+            "src/types",
+            "./types",
+            "./node_modules/@types"
+        ]
+    },
+
+    "include": [
+        "../bga-animations/src/**/*.ts",
+        "../bga-framework-ts/src/*.ts",
+        "src/GameBody.ts",
+        "src/define.ts"
+    ],
+    "exclude": [
+        "../bga-animations/src/define.ts",
+    ]
+}
