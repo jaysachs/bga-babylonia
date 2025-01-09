@@ -618,8 +618,6 @@ class Game extends \Table
         foreach ($model->allPlayerInfo() as $pid => $pi) {
             $player_data[$pid] = [
                 "player_id" => $pid,
-                "player_name" => $pi->player_name,
-                "player_color" => $pi->player_color,
                 "player_number" => $pi->player_number,
                 "score" => $pi->score,
                 "captured_city_count" => $pi->captured_city_count,

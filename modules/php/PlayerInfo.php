@@ -29,8 +29,6 @@ namespace Bga\Games\babylonia;
 class PlayerInfo {
 
     public function __construct(public int $player_id,
-                                public string $player_name,
-                                public string $player_color,
                                 public int $player_number,
                                 public int $score,
                                 public int $captured_city_count,

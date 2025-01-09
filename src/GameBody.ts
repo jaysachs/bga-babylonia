@@ -6,8 +6,6 @@ interface PlayerData {
   pool_size: number;
   captured_city_count: number;
   score: number;
-  player_name: string;
-  player_color: string;
   player_number: number;
 }
 interface Hex extends RowCol {
@@ -151,6 +149,7 @@ interface Zcard {
 
 interface Gamedatas {
   player_data: PlayerData[];
+  players: Player[];
   board: Hex[];
   hand: string[];
   ziggurat_cards: Zcard[];
@@ -673,7 +672,6 @@ class GameBody extends GameBasics<Gamedatas> {
         player_id: number;
         hand_size: number;
         pool_size: number;
-        player_name: string;
         player_number: number;
       }
     ): Promise<void> {
@@ -914,7 +912,7 @@ class GameBody extends GameBasics<Gamedatas> {
         text: `+${details.network_points}`,
         centeredOnId: IDS.hexDiv(args),
         parentId: IDS.BOARD,
-        color: '#' + this.gamedatas.player_data[details.player_id].player_color,
+        color: '#' + this.gamedatas.players[details.player_id].color,
         duration: 2500,
       }));
 

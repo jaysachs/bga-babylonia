@@ -288,10 +288,9 @@ class PersistentStore {
     /** @return array<int,PlayerInfo> */
     public function &retrieveAllPlayerInfo(): array {
         $sql = "SELECT P.player_id id, P.player_id, P.player_score score,
-                       P.player_color player_color,
                        D.captured_city_count captured_city_count,
                        P.player_no player_number,
-                       P.player_name player_name, H.hand_size, Q.pool_size
+                       H.hand_size, Q.pool_size
                 FROM player P
                 LEFT OUTER JOIN player_data D
                 ON P.player_id = D.player_id
@@ -321,8 +320,6 @@ class PersistentStore {
     /** @param string[] $pd */
     private function playerInfoFromData(int $player_id, array $pd): PlayerInfo {
         return new PlayerInfo($player_id,
-                              $pd["player_name"],
-                              $pd["player_color"],
                               intval($pd["player_number"]),
                               intval($pd["score"]),
                               intval($pd["captured_city_count"]),
