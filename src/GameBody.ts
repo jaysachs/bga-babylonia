@@ -86,38 +86,53 @@ const jstpl_log_piece = '<span class="log-element bbl_${piece}_${player_number}"
 const jstpl_log_city = '<span class="log-element bbl_${city}"></span>';
 const jstpl_log_zcard = '<span class="log-element bbl_${zcard}"></span>';
 
-const jstpl_hex =
-  '<div id="bbl_hex_${row}_${col}" style="top:${top}px; left:${left}px;"></div>';
-
-const jstpl_player_board_ext =
-  '<div>\
-   <span class="bbl_pb_hand_label_${player_number}"></span>\
-   <span id="bbl_handcount_${player_id}">5</span>\
- </div>\
- <div>\
-   <span class="bbl_pb_pool_label_${player_number}"></span>\
-   <span id="bbl_poolcount_${player_id}">19</span>\
- </div>\
- <div>\
-   <span class="bbl_pb_citycount_label"></span>\
-   <span id="bbl_citycount_${player_id}">1</span>\
- </div>\
- <div id="bbl_zcards_${player_id}" class="bbl_pb_zcards">\
-   <span class="bbl_pb_zcard_label"></span>\
- </div>';
-
-const jstpl_base_html =`
-      <div id="bbl_main">
-        <div id="bbl_hand_container">
-          <div id="${IDS.HAND}"></div>
-        </div>
-        <div id="${IDS.BOARD_CONTAINER}">
-          <div id="${IDS.BOARD}"></div>
-          <span id="bbl_vars"></span>
-        </div>
-        <div id="${IDS.AVAILABLE_ZCARDS}"></div>
-     </div>
+class Html {
+  static log_piece(piece: string, player_number: number): string {
+    return `<span class="log-element bbl_${piece}_${player_number}"></span>`;
+  }
+  static log_city(city: string): string {
+    return `<span class="log-element bbl_${city}"></span>`;
+  }
+  static log_zcard(zcard: string): string {
+    return `<span class="log-element bbl_${zcard}"></span>`;
+  }
+  static hex(rc: RowCol, tl: TopLeft): string {
+    return `<div id="bbl_hex_${rc.row}_${rc.col}" style="top:${tl.top}px; left:${tl.left}px;"></div>`;
+  }
+  static player_board_ext(player: Player): string {
+    return `
+      <div>
+        <span class="bbl_pb_hand_label_${player.player_number}"></span>
+        <span id="bbl_handcount_${player.player_id}">5</span>
+      </div>
+      <div>
+        <span class="bbl_pb_pool_label_${player.player_number}"></span>
+        <span id="bbl_poolcount_${player.player_id}">19</span>
+      </div>
+      <div>
+        <span class="bbl_pb_citycount_label"></span>
+        <span id="bbl_citycount_${player.player_id}">1</span>
+      </div>
+      <div id="bbl_zcards_${player.player_id}" class="bbl_pb_zcards">
+        <span class="bbl_pb_zcard_label"></span>
+      </div>
 `;
+  }
+  static base_html(): string {
+    return `
+    <div id="bbl_main">
+      <div id="bbl_hand_container">
+        <div id="${IDS.HAND}"></div>
+      </div>
+      <div id="${IDS.BOARD_CONTAINER}">
+        <div id="${IDS.BOARD}"></div>
+        <span id="bbl_vars"></span>
+      </div>
+      <div id="${IDS.AVAILABLE_ZCARDS}"></div>
+   </div>
+`;
+  }
+}
 
 const special_log_args = {
   zcard: {
@@ -241,17 +256,7 @@ class GameBody extends GameBasics {
     // console.log(gamedatas.board);
 
     for (const hex of boardData) {
-      const tl = this.hexLocation(hex);
-
-      this.appendHtml(this.format_block('jstpl_hex',
-        {
-          row: hex.row,
-          col: hex.col,
-          // or ... row / 2 * 63 + 6;
-          top: tl.top,
-          left: tl.left,
-        }),
-        boardDiv);
+      this.appendHtml(Html.hex(hex, this.hexLocation(hex)), boardDiv);
 
       if (hex.piece != null) {
         const n = (hex.board_player == 0)
@@ -270,10 +275,10 @@ class GameBody extends GameBasics {
       if (zcards[z].owning_player_id != 0) {
         this.addZcardDivInPlayerBoard(z);
         // also "shell" in available cards
-        this.appendHtml(`<div id='${id}'></div>`, document.getElementById(IDS.AVAILABLE_ZCARDS));
+        this.appendHtml(`<div id='${id}'></div>`, $(IDS.AVAILABLE_ZCARDS));
       } else {
         // just in available cards
-        this.addZigguratCardDiv(id, document.getElementById(IDS.AVAILABLE_ZCARDS), z);
+        this.addZigguratCardDiv(id, $(IDS.AVAILABLE_ZCARDS), z);
       }
     }
   }
@@ -304,7 +309,7 @@ class GameBody extends GameBasics {
   }
 
   private setupGameHtml(): void {
-    document.getElementById('game_play_area').insertAdjacentHTML('beforeend', jstpl_base_html);
+    $('game_play_area').insertAdjacentHTML('beforeend', Html.base_html());
   }
 
   private updateCounter(counter: Counter, value: number, animate: boolean) {
@@ -635,11 +640,7 @@ class GameBody extends GameBasics {
   private setupPlayerBoard(player: Player): void {
     const playerId = player.player_id;
     console.log('Setting up board for player ' + playerId);
-    this.appendHtml(this.format_block('jstpl_player_board_ext',
-      {
-        player_id: playerId,
-        player_number: player.player_number
-      }), this.getPlayerPanelElement(playerId));
+    this.appendHtml(Html.player_board_ext(player), this.getPlayerPanelElement(playerId));
     //    create counters per player
     this.handCounters[playerId] = new ebg.counter();
     this.handCounters[playerId].create(IDS.handcount(playerId));
