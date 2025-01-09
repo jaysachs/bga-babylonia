@@ -692,15 +692,6 @@ class GameBody extends GameBasics {
       .forEach(div => div.classList.remove(CSS.PLAYABLE));
   }
 
-  protected override setupNotifications(): void {
-    for (var m in this) {
-      if (typeof this[m] == "function" && m.startsWith("notif_")) {
-        dojo.subscribe(m.substring(6), this, m);
-      }
-    }
-  }
-
-
   private async notif_turnFinished(player: Player): Promise<void> {
     console.log('notif_turnFinished', player);
 
