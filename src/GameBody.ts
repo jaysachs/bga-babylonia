@@ -916,7 +916,6 @@ class GameBody extends GameBasics<Gamedatas> {
         ),
       }));
 
-      // TODO: should be spin/grow with score
       anim.push(new BgaSpinGrowAnimation({
         className: '',
         text: `+${details.network_points}`,
