@@ -1,3 +1,5 @@
+declare const on: any;
+
 interface RowCol { row: number, col: number };
 interface TopLeft { top: number, left: number };
 class IDS {
@@ -92,6 +94,32 @@ const jstpl_player_board_ext =
  </div>';
 
 
+const special_log_args = {
+            zcard: {
+                tmpl: 'jstpl_log_zcard',
+                tmplargs: a => a
+            },
+            city: {
+                tmpl: 'jstpl_log_city',
+                tmplargs: a => a
+            },
+            piece: {
+                tmpl: 'jstpl_log_piece',
+                tmplargs: a => a
+            },
+            original_piece: {
+                tmpl: 'jstpl_log_piece',
+                tmplargs: args => Object.assign(
+                    Object.assign({}, args),
+                    {
+                        piece: args['original_piece'],
+                        player_number: args['player_number']
+                    }
+                )
+            }
+        };
+
+
 /** Game class */
 class GameBody extends GameBasics {
   private playerNumber: number;
@@ -103,16 +131,39 @@ class GameBody extends GameBasics {
   private animationManager: AnimationManager;
   private selectedHandPos: number | null;
   private readonly pieceClasses = [ 'priest', 'servant', 'farmer', 'merchant' ];
-  private stateName: string;
-  private stateArgs: any;
   private lastId: number;
-  private handlers: any[];
+  private handlers: any[] = [];
+
+  private animating = false;
 
   constructor() {
     super();
     this.animationManager = new AnimationManager(this);
   }
 
+  private async play(anim: BgaAnimation<any>): Promise<void> {
+     this.animating = true;
+     return this.animationManager.play(anim)
+                .then(() => { this.animating = false; });
+  }
+
+private pausable(f: (a: any) => void ): any {
+  return (e: any) => {
+    if (!this.animating) {
+      f(e);
+    }
+  };
+}
+
+private addPausableHandler(e: EventTarget, type: string, handler: (a: any) => void): void {
+  e.addEventListener(type, this.pausable(handler));
+}
+
+  private setupHandlers(): void {
+    this.addPausableHandler($(IDS.HAND), 'click', this.onHandClicked.bind(this));
+  this.addPausableHandler($(IDS.BOARD), 'click', this.onBoardClicked.bind(this));
+  this.addPausableHandler($(IDS.AVAILABLE_ZCARDS), 'click', this.onZcardClicked.bind(this));
+  }
 
   setup(gamedatas) {
     super.setup(gamedatas);
@@ -135,9 +186,11 @@ class GameBody extends GameBasics {
 
     this.setupAvailableZcards(gamedatas.ziggurat_cards);
 
-    this.createDiv(undefined, "whiteblock cow", "thething").innerHTML = _("Should we eat the cow?");
-    this.setupNotifications();
-    console.log("Ending game setup");
+    console.log("setting up handlers");
+    this.setupHandlers();
+
+    this.bgaSetupPromiseNotifications();
+    console.log('Game setup done');
   }
 
   hexLocation(hex: RowCol): TopLeft {
@@ -179,11 +232,6 @@ class GameBody extends GameBasics {
     }
   }
 
-  renderPlayedPiece(rc: RowCol, piece: string, playerNumber: number) {
-    this.hexDiv(rc).className = CSS.piece(piece, playerNumber);
-  }
-
-
   setupAvailableZcards(zcards: any): void {
     console.log('Setting up available ziggurat cards', zcards);
     this.zcards = zcards;
@@ -208,6 +256,14 @@ class GameBody extends GameBasics {
     );
   }
 
+private        indexOfZcard(cardType: string): number {
+            for (var z = 0; z < this.zcards.length; ++z) {
+                if (this.zcards[z].type == cardType) {
+                    return z;
+                }
+            }
+            return -1;
+        }
   addZigguratCardDiv(id, parentElem, z): void {
     const cls = CSS.zcard(this.zcards[z].type, this.zcards[z].used);
     const div = this.appendHtml(`<div id='${id}' class='${cls}'></div>`,
@@ -257,11 +313,11 @@ class GameBody extends GameBasics {
       animate);
   }
 
-  hexDiv(rc: RowCol) {
+  private hexDiv(rc: RowCol): HTMLElement {
     return $(IDS.hexDiv(rc));
   }
 
-  handPosDiv(i: number): Element {
+  handPosDiv(i: number): HTMLElement {
     const id = IDS.handPos(i);
     const div = $(id);
     if (div != null) {
@@ -278,14 +334,126 @@ class GameBody extends GameBasics {
     return $(id);
   }
 
-  renderHand(): void {
+  private renderPlayedPiece(rc: RowCol, piece: string, playerNumber: number) {
+    this.hexDiv(rc).className = CSS.piece(piece, playerNumber);
+  }
+
+  private renderHand(): void {
     for (let i = 0; i < this.hand.length; ++i) {
       this.handPosDiv(i).className = CSS.handPiece(this.hand[i], this.playerNumber);
     }
   }
 
-  private onBoardClicked(e: any): void { }
-  private onZcardClicked(e: any): void { }
+        // Returns the hex (row,col) clicked on, or null if not a playable hex
+        private        selectedHex(target: EventTarget): RowCol|null {
+            let e = target as Element;
+            while (e.parentElement != null && e.parentElement.id != IDS.BOARD) {
+                e = e.parentElement;
+            }
+            if (e.parentElement == null) {
+                console.warn('no hex');
+                return null;
+            }
+            // now check if it's allowed
+            const ae = e;
+            if (!ae.classList.contains(CSS.PLAYABLE)) {
+                // console.log('not playable');
+                return null;
+            }
+            const id = e.id.split('_');
+            return {
+                row: Number(id[2]),
+                col: Number(id[3]),
+            };
+        }
+
+        private selectHexToScore(event: PointerEvent ) {
+            const hex = this.selectedHex(event.target);
+            if (hex == null) {
+                return;
+            }
+            // console.log('selected hex ' + hex.row + ',' + hex.col);
+            const rc = {
+                row: hex.row,
+                col: hex.col
+            };
+            this.bgaPerformAction('actSelectHexToScore', rc).then(() =>  {
+            });
+            this.unmarkHexPlayable(rc);
+        }
+
+  private playSelectedPiece(event: PointerEvent): void {
+            if (this.selectedHandPos == null) {
+                console.error('no piece selected!');
+            }
+
+            const hex = this.selectedHex(event.target);
+            if (hex == null) {
+                return;
+            }
+            // console.log('selected hex ' + hex.row + ',' + hex.col);
+
+            this.bgaPerformAction('actPlayPiece', {
+                handpos: this.selectedHandPos,
+                row: hex.row,
+                col: hex.col
+            }).then(() =>  {
+                this.unmarkHexPlayable({
+                    row: hex.row,
+                    col: hex.col
+                });
+            });
+            this.unselectAllHandPieces();
+        }
+
+  private onBoardClicked(event: PointerEvent): boolean {
+            console.log('onBoardClicked:' + (event.target as Element).id);
+            event.preventDefault();
+            event.stopPropagation();
+            if (! this.isCurrentPlayerActive()) {
+                 return false;
+            }
+            switch (this.currentState) {
+                case 'client_pickHexToPlay':
+                    this.playSelectedPiece(event);
+                    break;
+                case 'selectHexToScore':
+                    // this.selectHexToScore(event);
+                    break;
+            }
+            return false;
+        }
+
+  private onZcardClicked (event: PointerEvent): boolean {
+            console.log('onZcardClicked', event);
+            event.preventDefault();
+            event.stopPropagation();
+            if (! this.isCurrentPlayerActive()) {
+                 return false;
+            }
+            if (this.currentState != 'selectZigguratCard') {
+                return false;
+            }
+            const tid = (event.target as Element).id;
+
+            let z = -1;
+            for (var i = 0; i < this.zcards.length; ++i) {
+                if (tid == IDS.availableZcard(i)) {
+                    z = i;
+                    break;
+                }
+            }
+            if (z < 0) {
+                console.error("couldn't determine zcard from ", tid);
+                return false;
+            }
+            this.bgaPerformAction('actSelectZigguratCard',
+                                  { zctype: this.zcards[z].type });
+            const div = $(IDS.AVAILABLE_ZCARDS);
+            div.classList.remove(CSS.SELECTING);
+            return false;
+        }
+
   allowedMovesFor(pos: number): any {
     const piece = this.hand[pos];
     if (piece == null) {
@@ -388,9 +556,9 @@ class GameBody extends GameBasics {
     if (! this.isCurrentPlayerActive()) {
          return false;
     }
-    if (this.stateName != 'client_selectPieceOrEndTurn'
-        && this.stateName != 'client_pickHexToPlay'
-        && this.stateName != 'client_mustSelectPiece') {
+    if (this.currentState != 'client_selectPieceOrEndTurn'
+        && this.currentState != 'client_pickHexToPlay'
+        && this.currentState != 'client_mustSelectPiece') {
         return false;
     }
     const selectedDiv = ev.target;
@@ -412,7 +580,7 @@ class GameBody extends GameBasics {
     selectedDiv.classList.toggle(CSS.SELECTED);
     if (playable) {
         this.selectedHandPos = handpos;
-        if (this.stateName != 'client_pickHexToPlay') {
+        if (this.currentState != 'client_pickHexToPlay') {
             this.setClientState('client_pickHexToPlay', {
                 descriptionmyturn : _('${you} must select a hex to play to'),
             });
@@ -432,14 +600,16 @@ class GameBody extends GameBasics {
 
 
   private appendHtml(html: string, parent: Element): void {
-    const div = document.createElement('div');
-    div.innerHTML = html;
-    const frag = document.createDocumentFragment();
-    var fc: Node;
+    dojo.place(html, parent);
 
-    while ((fc = div.firstChild)) { // intentional assignment
-      parent.append(fc);
-    }
+    // const div = document.createElement('div');
+    // div.innerHTML = html;
+    // const frag = document.createDocumentFragment();
+    // var fc: Node;
+
+    // while ((fc = div.firstChild)) { // intentional assignment
+    //   parent.append(fc);
+    // }
   }
 
   private setupPlayerBoard(player): void {
@@ -462,16 +632,45 @@ class GameBody extends GameBasics {
     this.updateCapturedCityCount(player, false);
   }
 
-  onUpdateActionButtons_playerTurnA(args) {
-    this.addActionButton("b1", _("Play Card"), () => this.ajaxcallwrapper("playCard"));
-    this.addActionButton("b2", _("Vote"), () => this.ajaxcallwrapper("playVote"));
-    this.addActionButton("b3", _("Pass"), () => this.ajaxcallwrapper("pass"));
+private onUpdateActionButtons_chooseExtraTurn(args: any): void {
+                        this.addActionButton(
+                            'extra-turn-btn',
+                            'Take your one-time extra turn',
+                            () => this.bgaPerformAction('actChooseExtraTurn', {
+                                take_extra_turn: true
+                            }));
+                        this.addActionButton(
+                            'noextra-turn-btn',
+                            'Just finish your turn',
+                            () => this.bgaPerformAction('actChooseExtraTurn', {
+                                take_extra_turn: false
+                            }));
+                            }
+  private onUpdateActionButtons_endOfTurnScoring(args: any): void {
+                        this.markAllHexesUnplayable();
+                        }
+
+private onUpdateActionButtons_selectZigguratCard(args: any): void {
+                        const div = $(IDS.AVAILABLE_ZCARDS);
+                        div.scrollIntoView(false);
+                        div.classList.add(CSS.SELECTING);
+                        this.updateStatusBar(_('You must select a ziggurat card'));
+                        }
+
+
+  private onUpdateActionButtons_playPieces(args: any): void {
+                        this.setStatusBarForPlayState();
+                        this.markAllHexesUnplayable();
   }
-  onUpdateActionButtons_playerTurnB(args) {
-    this.addActionButton("b1", _("Support"), () => this.ajaxcallwrapper("playSupport"));
-    this.addActionButton("b2", _("Oppose"), () => this.ajaxcallwrapper("playOppose"));
-    this.addActionButton("b3", _("Wait"), () => this.ajaxcallwrapper("playWait"));
+
+  private onUpdateActionButtons_selectHexToScore(args: any): void {
+                        this.markScoreableHexesPlayable(args.hexes);
   }
+
+private  markAllHexesUnplayable(): void {
+            $(IDS.BOARD).querySelectorAll('.' + CSS.PLAYABLE)
+                .forEach(div => div.classList.remove(CSS.PLAYABLE));
+        }
 
   setupNotifications(): void {
     for (var m in this) {
@@ -481,7 +680,286 @@ class GameBody extends GameBasics {
     }
   }
 
-  notif_message(notif: any): void {
-    console.log("notif", notif);
-  }
+
+  private        async notif_turnFinished(args: any) : Promise<any> {
+            console.log('notif_turnFinished', args);
+
+            this.updateHandCount(args);
+            this.updatePoolCount(args);
+
+            return Promise.resolve();
+        }
+
+        private async notif_undoMove(args: any): Promise<any> {
+            console.log('notif_undoMove', args);
+
+            const isActive = this.playerNumber == args.player_number;
+            let targetDivId = IDS.handcount(args.player_id);
+            let handPosDiv = null;
+            if (isActive) {
+                this.hand[args.handpos] = args.original_piece;
+                handPosDiv = this.handPosDiv(args.handpos);
+                targetDivId = handPosDiv.id;
+            }
+
+            // Put any piece (field) captured in the move back on the board
+            // TODO: animate this? (and animate the capture too?)
+            this.renderPlayedPiece(args,
+                                   args.captured_piece,
+                                   null);
+            const onDone =
+                () => {
+                    if (isActive) {
+                        const cl = handPosDiv.classList;
+                        cl.remove(CSS.EMPTY);
+                        cl.add(CSS.PLAYABLE);
+                        cl.add(CSS.handPiece(args.original_piece, this.playerNumber));
+                    }
+                    this.handCounters[args.player_id].incValue(1);
+                    this.scoreCtrl[args.player_id].incValue(-args.points);
+                };
+            await this.play( new BgaSlideTempAnimation({
+                className: CSS.handPiece(args.piece, args.player_number),
+                fromId: IDS.hexDiv(args),
+                toId: targetDivId,
+                parentId: IDS.BOARD
+            })).then(onDone);
+        }
+
+        private async notif_piecePlayed(args: any): Promise<any> {
+            console.log('notif_piecePlayed', args);
+            const isActive = this.playerNumber == args.player_number;
+            let sourceDivId = IDS.handcount(args.player_id);
+            const hpc = CSS.handPiece(args.piece, args.player_number);
+            if (isActive) {
+                this.hand[args.handpos] = null;
+                const handPosDiv = this.handPosDiv(args.handpos);
+                sourceDivId = handPosDiv.id;
+                // Active player hand piece 'removed' from hand.
+                const cl = handPosDiv.classList;
+                cl.remove(hpc);
+                cl.add(CSS.EMPTY);
+            }
+            const onDone =
+                  () => {
+                      this.renderPlayedPiece(args,
+                                             args.piece,
+                                             args.player_number);
+                      this.updateHandCount(args);
+                      this.scoreCtrl[args.player_id].incValue(args.points);
+                  };
+            await this.play( new BgaSlideTempAnimation({
+                className: hpc,
+                fromId: sourceDivId,
+                toId: this.hexDiv(args).id,
+                parentId: IDS.BOARD
+            })).then(onDone);
+        }
+
+        private async notif_handRefilled(args: { hand: string[] }): Promise<any> {
+            console.log('notif_handRefilled', args);
+            const anim = [];
+            const pid = this.player_id;
+            for (var i = 0; i < args.hand.length; ++i) {
+                if (this.hand[i] == null) {
+                    this.hand[i] = args.hand[i];
+                }
+                const div = this.handPosDiv(i);
+                const hc = CSS.handPiece(this.hand[i], this.playerNumber);
+                if (hc != CSS.EMPTY && div.classList.contains(CSS.EMPTY)) {
+                    const a = new BgaSlideTempAnimation({
+                        className: hc,
+                        fromId: IDS.handcount(pid),
+                        toId: div.id,
+                        parentId: IDS.BOARD,
+                        animationEnd: () => { div.className = hc; },
+                    });
+                    anim.push(a);
+                }
+            }
+            await this.play(new BgaCompoundAnimation({
+                animations: anim,
+                mode: 'sequential',
+            }));
+        }
+
+
+        private async notif_extraTurnUsed (args: any): Promise<any> {
+            console.log('notif_extraTurnUsed', args);
+            const z = this.indexOfZcard(args.card);
+            if (z < 0) {
+                console.error("Couldn't find ${args.card} zcard");
+            } else {
+                this.zcards[z].used = args.used;
+                const carddiv = $(IDS.ownedZcard(z));
+                if (carddiv == undefined) {
+                    console.error(`Could not find div for owned ${args.card} card`,
+                                  z,
+                                  this.zcards[z]);
+                } else {
+                    carddiv.className = CSS.zcard(null, true);
+                }
+            }
+            return Promise.resolve();
+        }
+
+        private async notif_zigguratCardSelection(args: any): Promise<any> {
+            console.log('notif_zigguratCardSelection', args);
+            const z = this.indexOfZcard(args.card);
+            if (z < 0) {
+                console.error("Couldn't find ${args.card} zcard");
+                return Promise.resolve();
+            } else {
+                this.zcards[z].owning_player_id = args.player_id;
+                this.zcards[z].used = args.cardused;
+                this.scoreCtrl[args.player_id].toValue(args.score);
+
+                const id = IDS.availableZcard(z);
+
+                // mark the available zig card spot as 'taken'
+                $(id).className = "";
+                this.removeTooltip(id);
+
+                await this.play( new BgaSlideTempAnimation({
+                    className: CSS.zcard(this.zcards[z].type, false),
+                    fromId: id,
+                    toId: IDS.playerBoardZcards(args.player_id),
+                    parentId: IDS.AVAILABLE_ZCARDS,
+                })).then(() => this.addZcardDivInPlayerBoard(z));
+            }
+        }
+
+        private async notif_cityScored(args: any): Promise<any> {
+            console.log('notif_cityScored', args);
+
+            const anim = [];
+
+            for (const playerId in args.details) {
+                const details = args.details[playerId];
+                const nonscoringLocations = [];
+                for (const nh of details.network_locations) {
+                    if (!details.scored_locations.some(
+                        sh => (nh.row == sh.row && nh.col == sh.col))) {
+                        nonscoringLocations.push(nh);
+                    }
+                }
+                anim.push(new BgaCompoundAnimation({
+                    mode: 'parallel',
+                    animationStart: () => {
+                        for (const rc of details.scored_locations) {
+                            this.hexDiv(rc).classList.add(CSS.SELECTED);
+                        }
+                    },
+                    animations: details.network_locations.map(
+                        rc => new BgaFadeAnimation({
+                            element: this.hexDiv(rc),
+                            duration: 1400,
+                            kind: 'outin',
+                            iterations: 2,
+                        })
+                    ),
+                }));
+
+                anim.push(new BgaCompoundAnimation({
+                    mode: 'parallel',
+                    animations: nonscoringLocations.map(
+                        rc => new BgaFadeAnimation({
+                            element: this.hexDiv(rc),
+                            duration: 500,
+                            kind: 'out',
+                        })
+                    ),
+                }));
+
+                // TODO: should be spin/grow with score
+                anim.push(new BgaSpinGrowAnimation({
+                    className: '',
+                    text: `+${details.network_points}`,
+                    centeredOnId: IDS.hexDiv(args),
+                    parentId: IDS.BOARD,
+                    color: '#' + this.gamedatas.players[playerId].player_color,
+                    duration: 2500,
+                }));
+
+                anim.push(new BgaCompoundAnimation({
+                    mode: 'parallel',
+                    animations: nonscoringLocations.map(
+                        rc => new BgaFadeAnimation({
+                            element: this.hexDiv(rc),
+                            duration: 500,
+                            kind: 'in',
+                        })
+                    ),
+                    animationEnd: () => {
+                        details.scored_locations.forEach(
+                            rc => this.hexDiv(rc).classList.remove(CSS.SELECTED));
+                        this.scoreCtrl[playerId].incValue(details.network_points);
+                    },
+                }));
+            }
+
+            anim.push(new BgaSlideTempAnimation({
+                animationStart:
+                         () => {
+                             this.renderPlayedPiece(args, null, null);
+                         },
+                animationEnd:
+                         () => {
+                             this.renderPlayedPiece(args, null, null);
+                             for (const playerId in args.details) {
+                                 const details = args.details[playerId];
+                                 this.scoreCtrl[playerId].incValue(details.capture_points);
+                                 this.updateCapturedCityCount(details);
+                             }
+                         },
+                className: CSS.piece(args.city),
+                fromId: IDS.hexDiv(args),
+                toId: (args.captured_by != 0)
+                    ? IDS.citycount(args.captured_by)
+                    // TODO: find a better location for 'off the board'
+                    : IDS.AVAILABLE_ZCARDS,
+                parentId: IDS.BOARD,
+            }));
+            await this.play(new BgaCompoundAnimation({
+                mode: 'sequential',
+                animations: anim,
+            }));
+        }
+
+
+///////
+
+        /* @Override */
+        /*
+        protected format_string_recursive(log: string, args: any): string {
+            const defargs = key => { return { [key]: args[key] } };
+            const saved = {};
+            const defModify = x => x;
+            try {
+                if (log && args && !args.processed) {
+                    args.processed = true;
+                    for (const key of Object.keys(special_log_args)) {
+                        if (key in args) {
+                            saved[key] = args[key];
+                            const s = special_log_args[key];
+                            args[key] = this.format_block(
+                                s.tmpl,
+                                s.tmplargs(args)
+                            );
+                        }
+                    }
+                }
+            } catch (e) {
+                console.error(log,args,'Exception thrown', e.stack);
+            }
+            try {
+                return super.format_string_recursive(log, args);
+            } finally {
+                for (const i in saved) {
+                    args[i] = saved[i];
+                }
+            }
+        }
+        */
+
 }
