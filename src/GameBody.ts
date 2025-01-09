@@ -220,7 +220,7 @@ class GameBody extends GameBasics {
     };
   }
 
-  private setupGameBoard(boardData, playersData): void {
+  private setupGameBoard(boardData: any, playersData: Player[]): void {
     const boardDiv = $(IDS.BOARD);
     // console.log(gamedatas.board);
 
@@ -265,7 +265,7 @@ class GameBody extends GameBasics {
   private addZcardDivInPlayerBoard(z: number) {
     this.addZigguratCardDiv(
       IDS.ownedZcard(z),
-      IDS.playerBoardZcards(this.zcards[z].owning_player_id),
+      $(IDS.playerBoardZcards(this.zcards[z].owning_player_id)),
       z
     );
   }
@@ -279,7 +279,7 @@ class GameBody extends GameBasics {
     return -1;
   }
 
-  private addZigguratCardDiv(id, parentElem, z): void {
+  private addZigguratCardDiv(id: string, parentElem: HTMLElement, z: number): void {
     const cls = CSS.zcard(this.zcards[z].type, this.zcards[z].used);
     this.appendHtml(`<div id='${id}' class='${cls}'></div>`,
       parentElem);
@@ -614,7 +614,7 @@ class GameBody extends GameBasics {
   }
 
 
-  private appendHtml(html: string, parent: Element): void {
+  private appendHtml(html: string, parent: HTMLElement): void {
     dojo.place(html, parent);
 
     // const div = document.createElement('div');
