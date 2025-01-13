@@ -2,6 +2,11 @@
     "rootDir": ".",
     "compilerOptions": {
         "pretty": false,
+        "strict": true,
+        "noImplicitReturns": true,
+        "noPropertyAccessFromIndexSignature": true,
+        "noFallthroughCasesInSwitch": true,
+        "noUncheckedIndexedAccess": true,
         "downlevelIteration": true,
         "target": "es5",
         "module": "none",

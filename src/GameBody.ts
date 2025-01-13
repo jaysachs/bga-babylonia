@@ -43,12 +43,12 @@ class IDS {
     return `bbl_zcards_${playerId}`;
   }
 
-  static ownedZcard(z: number): string {
-    return `bbl_ozig_${z}`;
+  static ownedZcard(type: string): string {
+    return `bbl_ozig_${type}`;
   }
 
-  static availableZcard(z: number): string {
-    return `bbl_zig_${z}`;
+  static availableZcard(type: string): string {
+    return `bbl_zig_${type}`;
   }
 }
 
@@ -60,7 +60,7 @@ class CSS {
   static readonly UNPLAYABLE = 'bbl_unplayable';
   static readonly EMPTY = 'bbl_empty';
 
-  static piece(piece: string, playerNumber: number = null): string {
+  static piece(piece: string, playerNumber: number | null = null): string {
     if (playerNumber == null) {
       return 'bbl_' + piece;
     } else {
@@ -69,7 +69,7 @@ class CSS {
   }
 
   static handPiece(piece: string, playerNumber: number): string {
-    if (piece == null || piece == "empty") {
+    if (piece == "empty" || piece == '') {
       return CSS.EMPTY;
     }
     return CSS.piece(piece, playerNumber);
@@ -133,7 +133,9 @@ const jstpl_log_original_piece = '<span class="log-element bbl_${original_piece}
 const jstpl_log_city = '<span class="log-element bbl_${city}"></span>';
 const jstpl_log_zcard = '<span class="log-element bbl_${zcard}"></span>';
 
-const special_log_args = {
+type SpecialLogArgs = 'zcard' | 'city' | 'piece' | 'original_piece';
+
+const special_log_args: Record<SpecialLogArgs, string> = {
   zcard: 'jstpl_log_zcard',
   city: 'jstpl_log_city',
   piece: 'jstpl_log_piece',
@@ -163,22 +165,23 @@ interface PlayState {
 
 /** Game class */
 class GameBody extends GameBasics<Gamedatas> {
-  private playerNumber: number;
+  private playerNumber: number = -1;
   private hand: string[] = [];
   private handCounters: Counter[] = [];
   private poolCounters: Counter[] = [];
   private cityCounters: Counter[] = [];
   private zcards: Zcard[] = [];
   private animationManager: AnimationManager;
-  private selectedHandPos: number | null;
+  private selectedHandPos: number | null = null;
   private readonly pieceClasses = ['priest', 'servant', 'farmer', 'merchant'];
-  private lastId: number;
-  private playStateArgs: PlayState;
+  private playStateArgs: PlayState | null = null;
   private animating = false;
 
   constructor() {
     super();
     this.animationManager = new AnimationManager(this);
+    this.handCounters = [];
+    this.hand = [];
   }
 
   private async play(anim: BgaAnimation<any>): Promise<void> {
@@ -187,16 +190,8 @@ class GameBody extends GameBasics<Gamedatas> {
       .then(() => { this.animating = false; });
   }
 
-  private pausable<T>(f: (a: T) => void): (e: T) => void {
-    return (e: T) => {
-      if (!this.animating) {
-        f(e);
-      }
-    };
-  }
-
-  private addPausableHandler<T extends Event>(e: EventTarget, type: string, handler: (a: T) => void): void {
-    e.addEventListener(type, this.pausable(handler));
+  private addPausableHandler(et: EventTarget, type: string, handler: (a: Event) => boolean): void {
+    et.addEventListener(type, (e: Event) => { if (this.animating) return true; return handler(e); });
   }
 
   private setupHandlers(): void {
@@ -209,7 +204,7 @@ class GameBody extends GameBasics<Gamedatas> {
     console.log(gamedatas);
     super.setup(gamedatas);
 
-    this.playerNumber = gamedatas.player_data[this.player_id].player_number;
+    this.playerNumber = gamedatas.player_data[this.player_id]!.player_number;
 
     this.setupGameHtml();
 
@@ -218,7 +213,7 @@ class GameBody extends GameBasics<Gamedatas> {
 
     console.log('setting up player boards', gamedatas.player_data);
     for (const playerId in gamedatas.player_data) {
-      this.setupPlayerBoard(gamedatas.player_data[playerId]);
+      this.setupPlayerBoard(gamedatas.player_data[playerId]!);
     }
 
     console.log('setting up player hand');
@@ -256,8 +251,8 @@ class GameBody extends GameBasics<Gamedatas> {
 
       if (hex.piece != null) {
         const n = (hex.board_player == 0)
-          ? null
-          : playersData[hex.board_player].player_number;
+          ? undefined
+          : playersData[hex.board_player]!.player_number;
         this.renderPlayedPiece(hex, hex.piece, n);
       }
     }
@@ -266,41 +261,43 @@ class GameBody extends GameBasics<Gamedatas> {
   private setupAvailableZcards(zcards: Zcard[]): void {
     console.log('Setting up available ziggurat cards', zcards);
     this.zcards = zcards;
-    for (let z = 0; z < zcards.length; ++z) {
-      const id = IDS.availableZcard(z);
-      if (zcards[z].owning_player_id != 0) {
-        this.addZcardDivInPlayerBoard(z);
+    for (let zcard of this.zcards) {
+      const id = IDS.availableZcard(zcard.type);
+      // TODO: make and use a "createDiv" method
+      if (zcard.owning_player_id != 0) {
+        this.addZcardDivInPlayerBoard(zcard);
         // also "shell" in available cards
-        $(IDS.AVAILABLE_ZCARDS).insertAdjacentHTML('beforeend', `<div id='${id}'></div>`);
+        $(IDS.AVAILABLE_ZCARDS).insertAdjacentHTML('beforeend', `<div id='${id}' bbl_zctype='${zcard.type}'></div>`);
       } else {
         // just in available cards
-        this.addZigguratCardDiv(id, $(IDS.AVAILABLE_ZCARDS), z);
+        const cls = CSS.zcard(zcard.type, zcard.used);
+        $(IDS.AVAILABLE_ZCARDS).insertAdjacentHTML('beforeend', `<div id='${id}' class='${cls}' bbl_ztype='${zcard.type}'></div>`);
+        this.addTooltip(id, zcard.tooltip, '');
       }
     }
   }
 
-  private addZcardDivInPlayerBoard(z: number) {
-    this.addZigguratCardDiv(
-      IDS.ownedZcard(z),
-      $(IDS.playerBoardZcards(this.zcards[z].owning_player_id)),
-      z
-    );
+  private addZcardDivInPlayerBoard(zcard: Zcard) {
+    const id = IDS.ownedZcard(zcard.type);
+    const cls = CSS.zcard(zcard.type, zcard.used);
+    $(IDS.playerBoardZcards(zcard.owning_player_id)).insertAdjacentHTML('beforeend', `<div id='${id}' bbl_ztype='${zcard.type}' class='${cls}'></div>`);
+    this.addTooltip(id, zcard.tooltip, '');
   }
 
-  private indexOfZcard(cardType: string): number {
-    for (let z = 0; z < this.zcards.length; ++z) {
-      if (this.zcards[z].type == cardType) {
+  private zcardForType(cardType: string): Zcard {
+    for (let z of this.zcards) {
+      if (z.type == cardType) {
         return z;
       }
     }
-    return -1;
+    throw new Error(`Zcard type ${cardType} not found`);
   }
 
-  private addZigguratCardDiv(id: string, parentElem: HTMLElement, z: number): void {
-    const cls = CSS.zcard(this.zcards[z].type, this.zcards[z].used);
+  private addZigguratCardDiv(id: string, parentElem: HTMLElement, zcard: Zcard): void {
+    const cls = CSS.zcard(zcard.type, zcard.used);
     parentElem.insertAdjacentHTML('beforeend', `<div id='${id}' class='${cls}'></div>`);
-    this.addTooltip(id, this.zcards[z].tooltip, '');
-    // div.title = this.zcards[z].tooltip;
+    this.addTooltip(id, zcard.tooltip, '');
+    // div.title = zcard.tooltip;
   }
 
   private setupGameHtml(): void {
@@ -317,19 +314,19 @@ class GameBody extends GameBasics<Gamedatas> {
 
   private updateHandCount(player: { player_id: number; hand_size: number; }, animate: boolean = true) {
     console.log("update hand count", player, this.handCounters[player.player_id]);
-    this.updateCounter(this.handCounters[player.player_id],
+    this.updateCounter(this.handCounters[player.player_id]!,
       player.hand_size,
       animate);
   }
 
   private updatePoolCount(player: { player_id: number; pool_size: number }, animate: boolean = true) {
-    this.updateCounter(this.poolCounters[player.player_id],
+    this.updateCounter(this.poolCounters[player.player_id]!,
       player.pool_size,
       animate);
   }
 
   private updateCapturedCityCount(player: { player_id: number; captured_city_count: number }, animate: boolean = true) {
-    this.updateCounter(this.cityCounters[player.player_id],
+    this.updateCounter(this.cityCounters[player.player_id]!,
       player.captured_city_count,
       animate);
   }
@@ -355,13 +352,13 @@ class GameBody extends GameBasics<Gamedatas> {
     return $(id);
   }
 
-  private renderPlayedPiece(rc: RowCol, piece: string, playerNumber: number) {
+  private renderPlayedPiece(rc: RowCol, piece: string, playerNumber?: number) {
     this.hexDiv(rc).className = CSS.piece(piece, playerNumber);
   }
 
   private renderHand(): void {
     for (let i = 0; i < this.hand.length; ++i) {
-      this.handPosDiv(i).className = CSS.handPiece(this.hand[i], this.playerNumber);
+      this.handPosDiv(i).className = CSS.handPiece(this.hand[i]!, this.playerNumber);
     }
   }
 
@@ -387,8 +384,8 @@ class GameBody extends GameBasics<Gamedatas> {
     };
   }
 
-  private selectHexToScore(event: PointerEvent) {
-    const hex = this.selectedHex(event.target);
+  private selectHexToScore(event: Event) {
+    const hex = this.selectedHex(event.target!);
     if (hex == null) {
       return;
     }
@@ -398,12 +395,12 @@ class GameBody extends GameBasics<Gamedatas> {
     this.unmarkHexPlayable(hex);
   }
 
-  private playSelectedPiece(event: PointerEvent): void {
+  private playSelectedPiece(event: Event): void {
     if (this.selectedHandPos == null) {
       console.error('no piece selected!');
     }
 
-    const hex = this.selectedHex(event.target);
+    const hex = this.selectedHex(event.target!);
     if (hex == null) {
       return;
     }
@@ -419,7 +416,7 @@ class GameBody extends GameBasics<Gamedatas> {
     this.unselectAllHandPieces();
   }
 
-  private onBoardClicked(event: PointerEvent): boolean {
+  private onBoardClicked(event: Event): boolean {
     console.log('onBoardClicked:' + (event.target as Element).id);
     event.preventDefault();
     event.stopPropagation();
@@ -437,7 +434,7 @@ class GameBody extends GameBasics<Gamedatas> {
     return false;
   }
 
-  private onZcardClicked(event: PointerEvent): boolean {
+  private onZcardClicked(event: Event): boolean {
     console.log('onZcardClicked', event);
     event.preventDefault();
     event.stopPropagation();
@@ -447,32 +444,31 @@ class GameBody extends GameBasics<Gamedatas> {
     if (this.currentState != 'selectZigguratCard') {
       return false;
     }
-    const tid = (event.target as Element).id;
-
-    let z = -1;
-    for (let i = 0; i < this.zcards.length; ++i) {
-      if (tid == IDS.availableZcard(i)) {
-        z = i;
-        break;
+    const elem = event.target as Element;
+    const tid = elem.id;
+    let type = elem.attributes.getNamedItem('bbl_ztype');
+    if (type == null) {
+      console.error(`Could not find bbl_ztype attribute in clicked card ${elem}`);
+      return true;
+    }
+    for (let zc of this.zcards) {
+      if (zc.type == type.value) {
+        this.bgaPerformAction('actSelectZigguratCard', { zctype: zc.type });
+        const div = $(IDS.AVAILABLE_ZCARDS);
+        div.classList.remove(CSS.SELECTING);
+        return false;
       }
     }
-    if (z < 0) {
-      console.error("couldn't determine zcard from ", tid);
-      return false;
-    }
-    this.bgaPerformAction('actSelectZigguratCard',
-      { zctype: this.zcards[z].type });
-    const div = $(IDS.AVAILABLE_ZCARDS);
-    div.classList.remove(CSS.SELECTING);
-    return false;
+    console.error(`Unknown zcard type ${type.value}`);
+    return true;
   }
 
   private allowedMovesFor(pos: number): RowCol[] {
-    const piece = this.hand[pos];
-    if (piece == null) {
+    const piece = this.hand[pos]!;
+    if (piece == '') {
       return [];
     }
-    return this.playStateArgs.allowedMoves[piece] || [];
+    return (this.playStateArgs!.allowedMoves as any)[piece] || [];
   }
 
   private markHexPlayable(rc: RowCol): void {
@@ -525,6 +521,10 @@ class GameBody extends GameBasics<Gamedatas> {
     if (!this.isCurrentPlayerActive()) {
       return;
     }
+    if (this.playStateArgs == null) {
+      console.error("playStateArgs unexpectedly null");
+      return;
+    }
     this.selectedHandPos = null;
     if (this.playStateArgs.canEndTurn) {
       if (this.playStateArgs.allowedMoves.length == 0) {
@@ -559,7 +559,7 @@ class GameBody extends GameBasics<Gamedatas> {
     }
   }
 
-  private onHandClicked(ev: PointerEvent): boolean {
+  private onHandClicked(ev: Event): boolean {
     console.log('onHandClicked', ev);
     ev.preventDefault();
     ev.stopPropagation();
@@ -575,7 +575,7 @@ class GameBody extends GameBasics<Gamedatas> {
       return false;
     }
     const selectedDiv = ev.target as HTMLElement;
-    if (selectedDiv.parentElement.id != IDS.HAND) {
+    if (selectedDiv.parentElement!.id != IDS.HAND) {
       return false;
     }
     const handpos = Number(selectedDiv.id.split('_')[2]);
@@ -617,11 +617,11 @@ class GameBody extends GameBasics<Gamedatas> {
     this.getPlayerPanelElement(playerId).insertAdjacentHTML('beforeend', Html.player_board_ext(player));
     //    create counters per player
     this.handCounters[playerId] = new ebg.counter();
-    this.handCounters[playerId].create(IDS.handcount(playerId));
+    this.handCounters[playerId]!.create(IDS.handcount(playerId));
     this.poolCounters[playerId] = new ebg.counter();
-    this.poolCounters[playerId].create(IDS.poolcount(playerId));
+    this.poolCounters[playerId]!.create(IDS.poolcount(playerId));
     this.cityCounters[playerId] = new ebg.counter();
-    this.cityCounters[playerId].create(IDS.citycount(playerId));
+    this.cityCounters[playerId]!.create(IDS.citycount(playerId));
     this.updateHandCount(player, false);
     this.updatePoolCount(player, false);
     this.updateCapturedCityCount(player, false);
@@ -709,17 +709,17 @@ class GameBody extends GameBasics<Gamedatas> {
 
     // Put any piece (field) captured in the move back on the board
     // TODO: animate this? (and animate the capture too?)
-    this.renderPlayedPiece(args, args.captured_piece, null);
+    this.renderPlayedPiece(args, args.captured_piece);
     const onDone =
       () => {
         if (isActive) {
-          const cl = handPosDiv.classList;
+          const cl = handPosDiv!.classList;
           cl.remove(CSS.EMPTY);
           cl.add(CSS.PLAYABLE);
           cl.add(CSS.handPiece(args.original_piece, this.playerNumber));
         }
-        this.handCounters[args.player_id].incValue(1);
-        this.scoreCtrl[args.player_id].incValue(-args.points);
+        this.handCounters[args.player_id]!.incValue(1);
+        this.scoreCtrl[args.player_id]!.incValue(-args.points);
       };
     await this.play(new BgaSlideTempAnimation({
       className: CSS.handPiece(args.piece, args.player_number),
@@ -746,7 +746,7 @@ class GameBody extends GameBasics<Gamedatas> {
     let sourceDivId = IDS.handcount(args.player_id);
     const hpc = CSS.handPiece(args.piece, args.player_number);
     if (isActive) {
-      this.hand[args.handpos] = null;
+      this.hand[args.handpos] = '';
       const handPosDiv = this.handPosDiv(args.handpos);
       sourceDivId = handPosDiv.id;
       // Active player hand piece 'removed' from hand.
@@ -760,7 +760,7 @@ class GameBody extends GameBasics<Gamedatas> {
           args.piece,
           args.player_number);
         this.updateHandCount(args);
-        this.scoreCtrl[args.player_id].incValue(args.points);
+        this.scoreCtrl[args.player_id]!.incValue(args.points);
       };
     await this.play(new BgaSlideTempAnimation({
       className: hpc,
@@ -775,11 +775,11 @@ class GameBody extends GameBasics<Gamedatas> {
     const anim: BgaAnimation<any>[] = [];
     const pid = this.player_id;
     for (let i = 0; i < args.hand.length; ++i) {
-      if (this.hand[i] == null) {
-        this.hand[i] = args.hand[i];
+      if (this.hand[i] == '') {
+        this.hand[i] = args.hand[i]!;
       }
       const div = this.handPosDiv(i);
-      const hc = CSS.handPiece(this.hand[i], this.playerNumber);
+      const hc = CSS.handPiece(this.hand[i]!, this.playerNumber);
       if (hc != CSS.EMPTY && div.classList.contains(CSS.EMPTY)) {
         const a = new BgaSlideTempAnimation({
           className: hc,
@@ -799,19 +799,13 @@ class GameBody extends GameBasics<Gamedatas> {
 
   private async notif_extraTurnUsed(args: { card: string; used: boolean; }): Promise<void> {
     console.log('notif_extraTurnUsed', args);
-    const z = this.indexOfZcard(args.card);
-    if (z < 0) {
-      console.error("Couldn't find ${args.card} zcard");
+    const zcard = this.zcardForType(args.card);
+    zcard.used = args.used;
+    const carddiv = $(IDS.ownedZcard(zcard.type));
+    if (carddiv == undefined) {
+      console.error(`Could not find div for owned ${args.card} card`, zcard);
     } else {
-      this.zcards[z].used = args.used;
-      const carddiv = $(IDS.ownedZcard(z));
-      if (carddiv == undefined) {
-        console.error(`Could not find div for owned ${args.card} card`,
-          z,
-          this.zcards[z]);
-      } else {
-        carddiv.className = CSS.zcard(null, true);
-      }
+      carddiv.className = CSS.zcard('', true);
     }
     return Promise.resolve();
   }
@@ -825,28 +819,23 @@ class GameBody extends GameBasics<Gamedatas> {
       }
     ): Promise<void> {
     console.log('notif_zigguratCardSelection', args);
-    const z = this.indexOfZcard(args.card);
-    if (z < 0) {
-      console.error("Couldn't find ${args.card} zcard");
-      return Promise.resolve();
-    } else {
-      this.zcards[z].owning_player_id = args.player_id;
-      this.zcards[z].used = args.cardused;
-      this.scoreCtrl[args.player_id].toValue(args.score);
+    const zcard = this.zcardForType(args.card);
+    zcard.owning_player_id = args.player_id;
+    zcard.used = args.cardused;
+    this.scoreCtrl[args.player_id]!.toValue(args.score);
 
-      const id = IDS.availableZcard(z);
+    const id = IDS.availableZcard(zcard.type);
 
-      // mark the available zig card spot as 'taken'
-      $(id).className = "";
-      this.removeTooltip(id);
+    // mark the available zig card spot as 'taken'
+    $(id).className = "";
+    this.removeTooltip(id);
 
-      await this.play(new BgaSlideTempAnimation({
-        className: CSS.zcard(this.zcards[z].type, false),
-        fromId: id,
-        toId: IDS.playerBoardZcards(args.player_id),
-        parentId: IDS.AVAILABLE_ZCARDS,
-      })).then(() => this.addZcardDivInPlayerBoard(z));
-    }
+    await this.play(new BgaSlideTempAnimation({
+      className: CSS.zcard(zcard.type, false),
+      fromId: id,
+      toId: IDS.playerBoardZcards(args.player_id),
+      parentId: IDS.AVAILABLE_ZCARDS,
+    })).then(() => this.addZcardDivInPlayerBoard(zcard));
   }
 
   private async notif_cityScored(
@@ -871,7 +860,7 @@ class GameBody extends GameBasics<Gamedatas> {
 
     this.markHexPlayable(args);
     for (const playerId in args.details) {
-      const details = args.details[playerId];
+      const details = args.details[playerId]!;
       const nonscoringLocations: RowCol[] = [];
       for (const nh of details.network_locations) {
         if (!details.scored_locations.some(
@@ -912,7 +901,7 @@ class GameBody extends GameBasics<Gamedatas> {
         text: `+${details.network_points}`,
         centeredOnId: IDS.hexDiv(args),
         parentId: IDS.BOARD,
-        color: '#' + this.gamedatas.players[details.player_id].color,
+        color: '#' + this.gamedatas.players[details.player_id]!.color,
         duration: 2500,
       }));
 
@@ -928,7 +917,7 @@ class GameBody extends GameBasics<Gamedatas> {
         animationEnd: () => {
           details.scored_locations.forEach(
             (rc: RowCol) => this.hexDiv(rc).classList.remove(CSS.SELECTED));
-          this.scoreCtrl[details.player_id].incValue(details.network_points);
+          this.scoreCtrl[details.player_id]!.incValue(details.network_points);
         },
       }));
     }
@@ -936,14 +925,14 @@ class GameBody extends GameBasics<Gamedatas> {
     anim.push(new BgaSlideTempAnimation({
       animationStart:
         () => {
-          this.renderPlayedPiece(args, null, null);
+          this.renderPlayedPiece(args, '');
         },
       animationEnd:
         () => {
-          this.renderPlayedPiece(args, null, null);
+          this.renderPlayedPiece(args, '');
           for (const playerId in args.details) {
-            const details = args.details[playerId];
-            this.scoreCtrl[playerId].incValue(details.capture_points);
+            const details = args.details[playerId]!;
+            this.scoreCtrl[playerId]!.incValue(details.capture_points);
             this.updateCapturedCityCount(details);
           }
         },
@@ -964,27 +953,30 @@ class GameBody extends GameBasics<Gamedatas> {
 
   ///////
 
-  /* @Override */
   override format_string_recursive(log: string, args: any): string {
-    const saved = {};
+    type Partial<T> = {
+      [P in keyof T]?: T[P];
+    };
+    const saved: Partial<Record<SpecialLogArgs, any>> = {};
     try {
       if (log && args && !args.processed) {
         args.processed = true;
-        for (const key of Object.keys(special_log_args)) {
+        for (const key in special_log_args) {
           if (key in args) {
-            saved[key] = args[key];
-            args[key] = this.format_block(special_log_args[key], args);
+            const k = key as SpecialLogArgs;
+            saved[k] = args[k];
+            args[k] = this.format_block(special_log_args[k], args);
           }
         }
       }
-    } catch (e) {
+    } catch (e: any) {
       console.error(log, args, 'Exception thrown', e.stack);
     }
     try {
       return this.inherited(arguments);
     } finally {
-      for (const i in saved) {
-        args[i] = saved[i];
+      for (const i in special_log_args) {
+        args[i] = saved[i as SpecialLogArgs];
       }
     }
   }
