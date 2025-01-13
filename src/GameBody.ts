@@ -205,7 +205,7 @@ class GameBody extends GameBasics<Gamedatas> {
     this.addPausableHandler($(IDS.AVAILABLE_ZCARDS), 'click', this.onZcardClicked.bind(this));
   }
 
-  protected override setup(gamedatas: Gamedatas) {
+  override setup(gamedatas: Gamedatas) {
     console.log(gamedatas);
     super.setup(gamedatas);
 
@@ -965,7 +965,7 @@ class GameBody extends GameBasics<Gamedatas> {
   ///////
 
   /* @Override */
-  protected override format_string_recursive(log: string, args: any): string {
+  override format_string_recursive(log: string, args: any): string {
     const saved = {};
     try {
       if (log && args && !args.processed) {

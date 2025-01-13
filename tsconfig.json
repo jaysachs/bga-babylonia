@@ -2,6 +2,7 @@
     "rootDir": ".",
     "compilerOptions": {
         "pretty": false,
+        "downlevelIteration": true,
         "target": "es5",
         "module": "none",
         "lib": ["dom", "esnext"],
