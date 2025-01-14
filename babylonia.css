@@ -365,8 +365,8 @@ div.bbl_selected::before {
 #bbl_available_zcards > div {
     display: inline-block;
     /* TODO: not sure computing these based on hex size is right */
-    height: calc((var(--hex-height) - 4px) * 2.37); // 135px;
-    width: calc((var(--hex-height) - 4px) * 1.58); // 90px;
+    height: calc((var(--hex-height) - 4px) * 2.37); /* 135px; */
+    width: calc((var(--hex-height) - 4px) * 1.58); /* 90px; */
     margin: 10px;
 }
 

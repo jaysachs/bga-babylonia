@@ -267,7 +267,7 @@ class GameBody extends GameBasics<Gamedatas> {
       if (zcard.owning_player_id != 0) {
         this.addZcardDivInPlayerBoard(zcard);
         // also "shell" in available cards
-        $(IDS.AVAILABLE_ZCARDS).insertAdjacentHTML('beforeend', `<div id='${id}' bbl_zctype='${zcard.type}'></div>`);
+        $(IDS.AVAILABLE_ZCARDS).insertAdjacentHTML('beforeend', `<div id='${id}' bbl_ztype='${zcard.type}'></div>`);
       } else {
         // just in available cards
         const cls = CSS.zcard(zcard.type, zcard.used);
