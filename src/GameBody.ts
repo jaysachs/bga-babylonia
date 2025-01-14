@@ -975,7 +975,7 @@ class GameBody extends GameBasics<Gamedatas> {
     try {
       return this.inherited(arguments);
     } finally {
-      for (const i in special_log_args) {
+      for (const i in saved) {
         args[i] = saved[i as SpecialLogArgs];
       }
     }
