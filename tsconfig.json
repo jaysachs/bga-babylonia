@@ -2,7 +2,9 @@
     "rootDir": ".",
     "compilerOptions": {
         "pretty": false,
-        "strict": true,
+        // For some reason, setting true compiles but causing loading issues
+        "strict": false,
+        "strictNullChecks": true,
         "noImplicitReturns": true,
         "exactOptionalPropertyTypes": true,
         "noPropertyAccessFromIndexSignature": true,
