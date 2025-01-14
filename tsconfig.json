@@ -4,6 +4,7 @@
         "pretty": false,
         "strict": true,
         "noImplicitReturns": true,
+        "exactOptionalPropertyTypes": true,
         "noPropertyAccessFromIndexSignature": true,
         "noFallthroughCasesInSwitch": true,
         "noUncheckedIndexedAccess": true,
@@ -22,8 +23,9 @@
     },
 
     "include": [
+        "../bga-ts-framework/src/bga-framework.d.ts",
+        "../bga-ts-framework/src/GameBasics.ts",
         "../bga-animations/src/**/*.ts",
-        "../bga-ts-framework/src/*.ts",
         "src/GameBody.ts",
         "src/define.ts"
     ],
