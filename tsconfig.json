@@ -3,7 +3,7 @@
     "compilerOptions": {
         "pretty": false,
         // For some reason, setting true compiles but causing loading issues
-        "strict": false,
+        "strict": true,
         "strictNullChecks": true,
         "noImplicitReturns": true,
         "exactOptionalPropertyTypes": true,

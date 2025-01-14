@@ -133,14 +133,14 @@ const jstpl_log_original_piece = '<span class="log-element bbl_${original_piece}
 const jstpl_log_city = '<span class="log-element bbl_${city}"></span>';
 const jstpl_log_zcard = '<span class="log-element bbl_${zcard}"></span>';
 
-type SpecialLogArgs = 'zcard' | 'city' | 'piece' | 'original_piece';
-
-const special_log_args: Record<SpecialLogArgs, string> = {
+const special_log_args = {
   zcard: 'jstpl_log_zcard',
   city: 'jstpl_log_city',
   piece: 'jstpl_log_piece',
   original_piece: 'jstpl_log_original_piece',
 };
+
+type SpecialLogArgs = keyof typeof special_log_args;
 
 interface Zcard {
   type: string;
@@ -954,10 +954,7 @@ class GameBody extends GameBasics<Gamedatas> {
   ///////
 
   override format_string_recursive(log: string, args: any): string {
-    type Partial<T> = {
-      [P in keyof T]?: T[P];
-    };
-    const saved: Partial<Record<SpecialLogArgs, any>> = {};
+    const saved: { [k in SpecialLogArgs]?: any } = {};
     try {
       if (log && args && !args.processed) {
         args.processed = true;
@@ -975,8 +972,8 @@ class GameBody extends GameBasics<Gamedatas> {
     try {
       return this.inherited(arguments);
     } finally {
-      for (const i in saved) {
-        args[i] = saved[i as SpecialLogArgs];
+      for (const k in saved) {
+        args[k] = saved[k as SpecialLogArgs];
       }
     }
   }
