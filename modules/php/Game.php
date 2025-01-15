@@ -155,7 +155,7 @@ class Game extends \Table
         $winner = $scored_zig->winning_player_id;
         if ($winner == 0) {
             $winner_name = 'noone';
-            $msg = clienttranslate('Ziggurat at (${row},${col}) scored, no winner');
+            $msg = clienttranslate('${city} at (${row},${col}) scored, no winner');
         } else {
             $winner_name = $this->getPlayerNameById($winner);
             $msg = clienttranslate('${city} at (${row},${col}) scored, winner is ${winner_name}');
@@ -170,11 +170,6 @@ class Game extends \Table
             ]
         );
         return $winner;
-    }
-
-    // returns string key that will render nicely
-    private function playerNameKey(int $player_id): string {
-        return 'player_name' . $this->getPlayerNoById($player_id);
     }
 
     private function scoreCity(Model $model, Hex $cityhex): void {
@@ -212,7 +207,6 @@ class Game extends \Table
             ];
             if ($points > 0) {
                 // TODO: should we notify/log each player's point change?
-                // $pnk2 = $this->playerNameKey($pid);
                 // $details[$pid]["message"] =
                 //     clienttranslate('${' . $pnk2 . '} scored ${points}');
                 // $details[$pid][$pnk] = $this->getPlayerNameById($pid);
