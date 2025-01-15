@@ -68,19 +68,19 @@ class Game extends \Table
         if ($move->piece->isHidden()) {
             Stats::PLAYER_RIVER_SPACES_PLAYED->inc($player_id);
         }
-        $msg = "";
+        $msg = null;
         if ($points > 0) {
-            $msg = '${player_name} plays ${piece} to (${row},${col}) scoring ${points} points';
+            $msg = clienttranslate('${player_name} plays ${piece} to (${row},${col}) scoring ${points} points');
             Stats::PLAYER_POINTS_FROM_FIELDS->
                 inc($player_id, $move->field_points);
             Stats::PLAYER_POINTS_FROM_ZIGGURATS->
                 inc($player_id, $move->ziggurat_points);
         } else {
-            $msg = '${player_name} plays ${piece} to (${row},${col})';
+            $msg = clienttranslate('${player_name} plays ${piece} to (${row},${col})');
         }
-        $this->notifyAllPlayers(
+        $this->notify->all(
             "piecePlayed",
-            clienttranslate($msg),
+            $msg,
             [
                 "player_id" => $player_id,
                 "player_number" => $this->getPlayerNoById($player_id),
@@ -108,7 +108,7 @@ class Game extends \Table
             throw new \BgaUserException("Attempt to end turn but less than 2 pieces played");
         }
 
-        $this->notifyAllPlayers(
+        $this->notify->all(
             "donePlayed",
             clienttranslate('${player_name} finishes playing pieces'),
             [
@@ -155,19 +155,17 @@ class Game extends \Table
         $winner = $scored_zig->winning_player_id;
         if ($winner == 0) {
             $winner_name = 'noone';
-            $pnk = 'unused';
-            $msg = 'Ziggurat at (${row},${col}) scored, no winner';
+            $msg = clienttranslate('Ziggurat at (${row},${col}) scored, no winner');
         } else {
             $winner_name = $this->getPlayerNameById($winner);
-            $pnk = $this->playerNameKey($scored_zig->winning_player_id);
-            $msg = '${city} at (${row},${col}) scored, winner is ${' . $pnk . '}';
+            $msg = clienttranslate('${city} at (${row},${col}) scored, winner is ${winner_name}');
         }
-        $this->notifyAllPlayers(
+        $this->notify->all(
             "zigguratScored",
-            clienttranslate($msg), [
+            $msg, [
                 "row" => $zighex->rc->row,
                 "col" => $zighex->rc->col,
-                $pnk => $winner_name,
+                "winner_name" => $winner_name,
                 "city" => "ziggurat",
             ]
         );
@@ -186,11 +184,9 @@ class Game extends \Table
         $captured_by = $scored_city->captured_by;
         if ($captured_by > 0) {
             Stats::PLAYER_CITIES_CAPTURED->inc($captured_by);
-            $pnk = $this->playerNameKey($captured_by);
-            $msg = '${city} at (${row},${col}) scored, captured by ${' . $pnk . '}';
+            $msg = clienttranslate('${city} at (${row},${col}) scored, captured by ${capturer_name}');
         } else {
-            $pnk = 'noone';
-            $msg = '${city} at (${row},${col}) scored, uncaptured';
+            $msg = clienttranslate('${city} at (${row},${col}) scored, uncaptured');
         }
         $capturer_name =
             $captured_by > 0 ? $this->getPlayerNameById($captured_by) : "noone";
@@ -223,13 +219,13 @@ class Game extends \Table
             }
         }
 
-        $this->notifyAllPlayers(
+        $this->notify->all(
             "cityScored",
-            clienttranslate($msg), [
+            $msg, [
                 "city" => $city,
                 "row" => $cityhex->rc->row,
                 "col" => $cityhex->rc->col,
-                $pnk => $capturer_name,
+                "capturer_name" => $capturer_name,
                 "captured_by" => $captured_by,
                 "details" => $details,
             ]
@@ -296,7 +292,7 @@ class Game extends \Table
             ZigguratCardType::FREE_RIVER_CONNECTS => Stats::PLAYER_ZIGGURAT_CARD_9_CHOSEN,
         };
         $stat->set($player_id, true);
-        $this->notifyAllPlayers(
+        $this->notify->all(
             "zigguratCardSelection",
             clienttranslate('${player_name} chose ziggurat card ${card}'),
             [
@@ -326,7 +322,7 @@ class Game extends \Table
         $msg = $this->optionEnabled(Option::AUTOMATED_SCORING_SELECTION)
             ? 'hex (${row},${col}) is scored'
             : '${player_name} chose hex (${row},${col}}) to score';
-        $this->notifyAllPlayers(
+        $this->notify->all(
             "scoringSelection",
             clienttranslate($msg),
             [
@@ -375,7 +371,7 @@ class Game extends \Table
             return;
         }
 
-        $this->notifyAllPlayers(
+        $this->notify->all(
             "scoringHexChoice",
             clienttranslate('${player_name} must select a hex to score'),
             [
@@ -406,7 +402,7 @@ class Game extends \Table
             if ($result->pieces_exhausted) {
                 Stats::TABLE_GAME_END_BY_POOL_EXHAUSTION->set(true);
             }
-            $this->notifyAllPlayers(
+            $this->notify->all(
                 "gameEnded",
                 clienttranslate('Game has ended'),
                 [
@@ -418,7 +414,7 @@ class Game extends \Table
             return;
         }
 
-        $this->notifyPlayer(
+        $this->notify->player(
             $player_id,
             "handRefilled",
             clienttranslate("You refilled your hand"),
@@ -429,7 +425,7 @@ class Game extends \Table
             ]
         );
 
-        $this->notifyAllPlayers(
+        $this->notify->all(
             "turnFinished",
             clienttranslate('${player_name} finished their turn'),
             [
@@ -503,15 +499,15 @@ class Game extends \Table
             if ($pid == $this->activePlayerId()) {
                 $args["handpos"] = $move->handpos;
                 $args["original_piece"] = $move->original_piece->value;
-                $msg = 'You undid your move and returned ${original_piece} to your hand.';
+                $msg = clienttranslate('You undid your move and returned ${original_piece} to your hand.');
             } else {
-                $msg = '${player_name} undid their move';
+                $msg = clienttranslate('${player_name} undid their move');
             }
-            $this->notifyPlayer($pid, "undoMove", clienttranslate( $msg ), $args );
+            $this->notify->player($pid, "undoMove", $msg, $args );
         }
 
         // final notifyAll required to keep moves and replays in sync
-        $this->notifyAllPlayers('sync', '', []);
+        $this->notify->all('sync', '', []);
 
         $this->gamestate->nextState("playPieces");
     }
@@ -521,7 +517,7 @@ class Game extends \Table
             $player_id = $this->activePlayerId();
             $model = new Model($this->ps, $player_id);
             $model->useExtraTurnCard();
-            $this->notifyAllPlayers(
+            $this->notify->all(
                 "extraTurnUsed",
                 clienttranslate('${player_name} is taking an extra turn'),
                 [
