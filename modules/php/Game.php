@@ -141,13 +141,12 @@ class Game extends \Table
     {
         $model = new Model($this->ps, $this->activePlayerId());
         $player_infos = $model->allPlayerInfo();
-        $total_pieces = 0;
-        $played_pieces = 0;
+        $total_pieces = 30 * count($player_infos);
+        $remaining_pieces = 0;
         foreach ($player_infos as $pid => $pi) {
-            $total_pieces += 30;
-            $played_pieces += 30 - $pi->hand_size - $pi->pool_size;
+            $remaining_pieces += $pi->hand_size + $pi->pool_size;
         }
-        return intval(($played_pieces * 100) / $total_pieces);
+        return intval(100 - ($remaining_pieces * 100) / $total_pieces);
     }
 
     private function scoreZiggurat(Model $model, Hex $zighex): int {
@@ -597,7 +596,7 @@ class Game extends \Table
      * - when the game starts
      * - when a player refreshes the game page (F5)
      */
-    protected function getAllDatas()
+    protected function getAllDatas(): array
     {
         // WARNING: We must only return information visible by the
         // current player.
