@@ -157,14 +157,15 @@ class Game extends \Table
             $msg = clienttranslate('${city} at (${row},${col}) scored, no winner');
         } else {
             $winner_name = $this->getPlayerNameById($winner);
-            $msg = clienttranslate('${city} at (${row},${col}) scored, winner is ${winner_name}');
+            $msg = clienttranslate('${city} at (${row},${col}) scored, winner is ${player_name}');
         }
         $this->notify->all(
             "zigguratScored",
             $msg, [
                 "row" => $zighex->rc->row,
                 "col" => $zighex->rc->col,
-                "winner_name" => $winner_name,
+                "player_name" => $winner_name,
+                "player_id" => $winner,
                 "city" => "ziggurat",
             ]
         );
@@ -178,7 +179,7 @@ class Game extends \Table
         $captured_by = $scored_city->captured_by;
         if ($captured_by > 0) {
             Stats::PLAYER_CITIES_CAPTURED->inc($captured_by);
-            $msg = clienttranslate('${city} at (${row},${col}) scored, captured by ${capturer_name}');
+            $msg = clienttranslate('${city} at (${row},${col}) scored, captured by ${player_name}');
         } else {
             $msg = clienttranslate('${city} at (${row},${col}) scored, uncaptured');
         }
@@ -218,8 +219,8 @@ class Game extends \Table
                 "city" => $city,
                 "row" => $cityhex->rc->row,
                 "col" => $cityhex->rc->col,
-                "capturer_name" => $capturer_name,
-                "captured_by" => $captured_by,
+                "player_name" => $capturer_name,
+                "player_id" => $captured_by,
                 "details" => $details,
             ]
         );

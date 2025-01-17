@@ -834,7 +834,7 @@ class GameBody extends GameBasics<Gamedatas> {
       row: number;
       col: number;
       city: string;
-      captured_by: number;
+      player_id: number;
       details: {
         player_id: number;
         captured_city_count: number;
@@ -929,8 +929,8 @@ class GameBody extends GameBasics<Gamedatas> {
         },
       className: CSS.piece(args.city),
       fromId: IDS.hexDiv(args),
-      toId: (args.captured_by != 0)
-        ? IDS.citycount(args.captured_by)
+      toId: (args.player_id != 0)
+        ? IDS.citycount(args.player_id)
         // TODO: find a better location for 'off the board'
         : IDS.AVAILABLE_ZCARDS,
       parentId: IDS.BOARD,
