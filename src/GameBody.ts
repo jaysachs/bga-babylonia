@@ -133,15 +133,6 @@ const jstpl_log_original_piece = '<span class="log-element bbl_${original_piece}
 const jstpl_log_city = '<span class="log-element bbl_${city}"></span>';
 const jstpl_log_zcard = '<span class="log-element bbl_${zcard}"></span>';
 
-const special_log_args = {
-  zcard: 'jstpl_log_zcard',
-  city: 'jstpl_log_city',
-  piece: 'jstpl_log_piece',
-  original_piece: 'jstpl_log_original_piece',
-};
-
-type SpecialLogArgs = keyof typeof special_log_args;
-
 interface Zcard {
   type: string;
   used: boolean;
@@ -953,16 +944,24 @@ class GameBody extends GameBasics<Gamedatas> {
 
   ///////
 
+  static readonly special_log_args = {
+    zcard: 'jstpl_log_zcard',
+    city: 'jstpl_log_city',
+    piece: 'jstpl_log_piece',
+    original_piece: 'jstpl_log_original_piece',
+  };
+
   override format_string_recursive(log: string, args: any): string {
+    type SpecialLogArgs = keyof typeof GameBody.special_log_args;
     const saved: { [k in SpecialLogArgs]?: any } = {};
     try {
       if (log && args && !args.processed) {
         args.processed = true;
-        for (const key in special_log_args) {
+        for (const key in GameBody.special_log_args) {
           if (key in args) {
             const k = key as SpecialLogArgs;
             saved[k] = args[k];
-            args[k] = this.format_block(special_log_args[k], args);
+            args[k] = this.format_block(GameBody.special_log_args[k], args);
           }
         }
       }
