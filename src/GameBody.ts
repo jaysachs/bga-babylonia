@@ -869,7 +869,7 @@ class GameBody extends GameBasics<Gamedatas> {
         animations: details.network_locations.map(
           rc => new BgaFadeAnimation({
             element: this.hexDiv(rc),
-            duration: 1400,
+            duration: 1000,
             kind: 'outin',
             iterations: 2,
           })
@@ -881,7 +881,7 @@ class GameBody extends GameBasics<Gamedatas> {
         animations: nonscoringLocations.map(
           rc => new BgaFadeAnimation({
             element: this.hexDiv(rc),
-            duration: 500,
+            duration: 400,
             kind: 'out',
           })
         ),
@@ -892,8 +892,9 @@ class GameBody extends GameBasics<Gamedatas> {
         text: `+${details.network_points}`,
         centeredOnId: IDS.hexDiv(args),
         parentId: IDS.BOARD,
+        fontSize: 72,
         color: '#' + this.gamedatas.players[details.player_id]!.color,
-        duration: 2500,
+        duration: 1500,
       }));
 
       anim.push(new BgaCompoundAnimation({
@@ -901,7 +902,7 @@ class GameBody extends GameBasics<Gamedatas> {
         animations: nonscoringLocations.map(
           rc => new BgaFadeAnimation({
             element: this.hexDiv(rc),
-            duration: 500,
+            duration: 400,
             kind: 'in',
           })
         ),
