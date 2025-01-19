@@ -650,6 +650,21 @@ class Game extends \Table
     }
 
     /**
+     * @param $arr string[]
+     */
+    private function shuffle(&$arr): void {
+        $e = sizeof($arr) - 1;
+        for ($i = 0; $i < $e; ++$i) {
+            $j = random_int($i, $e);
+            if ($j <> $i) {
+                $tmp = $arr[$j];
+                $arr[$j] = $arr[$i];
+                $arr[$i] = $tmp;
+            }
+        }
+    }
+
+    /**
      * This method is called only once, when a new game is
      *  launched. In this method, you must setup the game according to
      *  the game rules, so that the game is ready to be played.
@@ -661,7 +676,7 @@ class Game extends \Table
         // maximum number of players allowed for the gams.
         $gameinfos = $this->getGameinfos();
         $default_colors = $gameinfos['player_colors'];
-
+        $this->shuffle($default_colors);
         foreach ($players as $player_id => $player) {
             // Now you can access both $player_id and $player array
             $query_values[] = vsprintf("('%s', '%s', '%s', '%s', '%s')", [
@@ -682,7 +697,7 @@ class Game extends \Table
         );
 
         $this->reattributeColorsBasedOnPreferences($players,
-                                                   $gameinfos["player_colors"]);
+                                                   $default_colors);
         $this->reloadPlayersBasicInfos();
 
         // Init game statistics.
