@@ -81,10 +81,6 @@ class Game extends \Table
             $msg,
             [
                 "player_id" => $player_id,
-                "player_number" => $this->getPlayerNoById($player_id),
-                "preserve" => [
-                    "player_number",
-                ],
                 "player_name" => $this->getActivePlayerName(),
                 "piece" => $piece,
                 "handpos" => $handpos,
@@ -422,7 +418,6 @@ class Game extends \Table
             [
                 "player_id" => $player_id,
                 "player_name" => $this->getActivePlayerName(),
-                "player_number" => $this->getPlayerNoById($player_id),
                 "hand_size" => $model->hand()->size(),
                 "pool_size" => $model->pool()->size(),
             ]
@@ -474,11 +469,6 @@ class Game extends \Table
         foreach ($model->allPlayerIds() as $pid) {
             $args = [
                 "player_name" => $this->getActivePlayerName(),
-                "player_number" =>
-                    $this->getPlayerNoById($this->activePlayerId()),
-                "preserve" => [
-                    "player_number",
-                ],
                 "player_id" => $this->activePlayerId(),
                 "row" => $move->rc->row,
                 "col" => $move->rc->col,
@@ -602,7 +592,6 @@ class Game extends \Table
         foreach ($model->allPlayerInfo() as $pid => $pi) {
             $player_data[$pid] = [
                 "player_id" => $pid,
-                "player_number" => $pi->player_number,
                 "score" => $pi->score,
                 "captured_city_count" => $pi->captured_city_count,
                 "hand_size" => $pi->hand_size,
