@@ -181,14 +181,8 @@ class GameBody extends GameBasics<Gamedatas> {
     console.log(gamedatas);
     super.setup(gamedatas);
 
-    const colorMap: Record<string, number> = {
-      "ffffff": 1,
-      "76a89b": 2,
-      "f9c29a": 3,
-      "9a9a9a": 4
-    };
     for (const playerId in gamedatas.players) {
-      this.playerIdToColorIndex[playerId] = colorMap[gamedatas.players[playerId]!.color]!;
+      this.playerIdToColorIndex[playerId] = colorIndexMap[gamedatas.players[playerId]!.color]!;
     }
     this.css = new CSS(this.playerIdToColorIndex);
 

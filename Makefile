@@ -9,9 +9,13 @@ WORK=work
 STUBS=$(WORK)/module/table/table.game.php
 PSALM_CONFIG=psalm.xml
 JS=babylonia.js
+COLORMAP=src/colormap.ts
 
 $(WORK):
 	mkdir $(WORK)
+
+$(COLORMAP): misc/colormap.php gameinfos.inc.php
+	php misc/colormap.php > $(COLORMAP)
 
 $(STUBS): $(WORK) _ide_helper.php Makefile
 	mkdir -p $(WORK)/module/table
@@ -20,7 +24,7 @@ $(STUBS): $(WORK) _ide_helper.php Makefile
 $(STATS): $(GENSTATS) stats.json
 	php $(GENSTATS) babylonia > modules/php/Stats.php
 
-build: $(STATS)
+build: $(STATS) $(COLORMAP)
 	npm run build:ts
 
 test: build $(STUBS)
