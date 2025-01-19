@@ -6,7 +6,7 @@ interface PlayerData {
   pool_size: number;
   captured_city_count: number;
   score: number;
-  player_number: number;
+  color: string;
 }
 interface Hex extends RowCol {
   board_player: number;
@@ -52,7 +52,6 @@ class IDS {
   }
 }
 
-
 class CSS {
   readonly SELECTING = 'bbl_selecting';
   readonly SELECTED = 'bbl_selected';
@@ -60,19 +59,20 @@ class CSS {
   readonly UNPLAYABLE = 'bbl_unplayable';
   readonly EMPTY = 'bbl_empty';
 
+  /** from player_id to color index */
+  constructor(private colorIndexMap: Record<number, number>) {
+
+  }
+
   cityOrField(piece: string): string {
     return 'bbl_' + piece;
   }
 
-  piece(piece: string, playerNumber: number): string {
-    return 'bbl_' + piece + '_' + playerNumber;
-  }
-
-  handPiece(piece: string, playerNumber: number): string {
+  piece(piece: string, playerId: number): string {
     if (piece == "empty" || piece == '') {
       return this.EMPTY;
     }
-    return this.piece(piece, playerNumber);
+    return 'bbl_' + piece + '_' + this.colorIndexMap[playerId];
   }
 
   zcard(card: string, used: boolean = false): string {
@@ -81,33 +81,24 @@ class CSS {
 }
 
 class Html {
-  static log_piece(piece: string, player_number: number): string {
-    return `<span class="log-element bbl_${piece}_${player_number}"></span>`;
-  }
-  static log_city(city: string): string {
-    return `<span class="log-element bbl_${city}"></span>`;
-  }
-  static log_zcard(zcard: string): string {
-    return `<span class="log-element bbl_${zcard}"></span>`;
-  }
   static hex(rc: RowCol, tl: TopLeft): string {
     return `<div id="bbl_hex_${rc.row}_${rc.col}" style="top:${tl.top}px; left:${tl.left}px;"></div>`;
   }
-  static player_board_ext(player: PlayerData): string {
+  static player_board_ext(player_id: number, color_index: number): string {
     return `
       <div>
-        <span class="bbl_pb_hand_label_${player.player_number}"></span>
-        <span id="bbl_handcount_${player.player_id}">5</span>
+        <span class="bbl_pb_hand_label_${color_index}"></span>
+        <span id="bbl_handcount_${player_id}">5</span>
       </div>
       <div>
-        <span class="bbl_pb_pool_label_${player.player_number}"></span>
-        <span id="bbl_poolcount_${player.player_id}">19</span>
+        <span class="bbl_pb_pool_label_${color_index}"></span>
+        <span id="bbl_poolcount_${player_id}">19</span>
       </div>
       <div>
         <span class="bbl_pb_citycount_label"></span>
-        <span id="bbl_citycount_${player.player_id}">1</span>
+        <span id="bbl_citycount_${player_id}">1</span>
       </div>
-      <div id="bbl_zcards_${player.player_id}" class="bbl_pb_zcards">
+      <div id="bbl_zcards_${player_id}" class="bbl_pb_zcards">
         <span class="bbl_pb_zcard_label"></span>
       </div>
 `;
@@ -127,11 +118,6 @@ class Html {
 `;
   }
 }
-
-const jstpl_log_piece = '<span class="log-element bbl_${piece}_${player_number}"></span>';
-const jstpl_log_original_piece = '<span class="log-element bbl_${original_piece}_${player_number}"></span>';
-const jstpl_log_city = '<span class="log-element bbl_${city}"></span>';
-const jstpl_log_zcard = '<span class="log-element bbl_${zcard}"></span>';
 
 interface Zcard {
   type: string;
@@ -156,7 +142,6 @@ interface PlayState {
 
 /** Game class */
 class GameBody extends GameBasics<Gamedatas> {
-  private playerNumber: number = -1;
   private hand: string[] = [];
   private handCounters: Counter[] = [];
   private poolCounters: Counter[] = [];
@@ -164,10 +149,10 @@ class GameBody extends GameBasics<Gamedatas> {
   private zcards: Zcard[] = [];
   private animationManager: AnimationManager;
   private selectedHandPos: number | null = null;
-  private readonly pieceClasses = ['priest', 'servant', 'farmer', 'merchant'];
   private playStateArgs: PlayState | null = null;
   private animating = false;
-  private css: CSS = new CSS();
+  private css: CSS = new CSS({});
+  private playerIdToColorIndex: Record<number, number> = {};
 
   constructor() {
     super();
@@ -196,7 +181,16 @@ class GameBody extends GameBasics<Gamedatas> {
     console.log(gamedatas);
     super.setup(gamedatas);
 
-    this.playerNumber = gamedatas.player_data[this.player_id]!.player_number;
+    const colorMap: Record<string, number> = {
+      "ffffff": 1,
+      "76a89b": 2,
+      "f9c29a": 3,
+      "9a9a9a": 4
+    };
+    for (const playerId in gamedatas.players) {
+      this.playerIdToColorIndex[playerId] = colorMap[gamedatas.players[playerId]!.color]!;
+    }
+    this.css = new CSS(this.playerIdToColorIndex);
 
     this.setupGameHtml();
 
@@ -245,7 +239,7 @@ class GameBody extends GameBasics<Gamedatas> {
         if (hex.board_player == 0) {
           this.renderCityOrField(hex, hex.piece);
         } else {
-          this.renderPlayedPiece(hex, hex.piece, playersData[hex.board_player]!.player_number);
+          this.renderPlayedPiece(hex, hex.piece, playersData[hex.board_player]!.player_id);
         }
       }
     }
@@ -355,7 +349,7 @@ class GameBody extends GameBasics<Gamedatas> {
 
   private renderHand(): void {
     for (let i = 0; i < this.hand.length; ++i) {
-      this.handPosDiv(i).className = this.css.handPiece(this.hand[i]!, this.playerNumber);
+      this.handPosDiv(i).className = this.css.piece(this.hand[i]!, this.player_id);
     }
   }
 
@@ -611,7 +605,8 @@ class GameBody extends GameBasics<Gamedatas> {
   private setupPlayerBoard(player: PlayerData): void {
     const playerId = player.player_id;
     console.log('Setting up board for player ' + playerId);
-    this.getPlayerPanelElement(playerId).insertAdjacentHTML('beforeend', Html.player_board_ext(player));
+    this.getPlayerPanelElement(playerId)
+        .insertAdjacentHTML('beforeend', Html.player_board_ext(playerId, this.playerIdToColorIndex[playerId]!));
     //    create counters per player
     this.handCounters[playerId] = new ebg.counter();
     this.handCounters[playerId]!.create(IDS.handcount(playerId));
@@ -669,7 +664,6 @@ class GameBody extends GameBasics<Gamedatas> {
         player_id: number;
         hand_size: number;
         pool_size: number;
-        player_number: number;
       }
     ): Promise<void> {
     console.log('notif_turnFinished', args);
@@ -683,7 +677,6 @@ class GameBody extends GameBasics<Gamedatas> {
   private async notif_undoMove(
       args: {
         player_id: number;
-        player_number: number;
         points: number;
         handpos: number;
         row: number;
@@ -695,7 +688,7 @@ class GameBody extends GameBasics<Gamedatas> {
     ): Promise<void> {
     console.log('notif_undoMove', args);
 
-    const isActive = this.playerNumber == args.player_number;
+    const isActive = this.player_id == args.player_id;
     let targetDivId = IDS.handcount(args.player_id);
     let handPosDiv: HTMLElement | null;
     if (isActive) {
@@ -713,13 +706,13 @@ class GameBody extends GameBasics<Gamedatas> {
           const cl = handPosDiv!.classList;
           cl.remove(this.css.EMPTY);
           cl.add(this.css.PLAYABLE);
-          cl.add(this.css.handPiece(args.original_piece, this.playerNumber));
+          cl.add(this.css.piece(args.original_piece, this.player_id));
         }
         this.handCounters[args.player_id]!.incValue(1);
         this.scoreCtrl[args.player_id]!.incValue(-args.points);
       };
     await this.play(new BgaSlideTempAnimation({
-      className: this.css.handPiece(args.piece, args.player_number),
+      className: this.css.piece(args.piece, args.player_id),
       fromId: IDS.hexDiv(args),
       toId: targetDivId,
       parentId: IDS.BOARD
@@ -728,7 +721,6 @@ class GameBody extends GameBasics<Gamedatas> {
 
   private async notif_piecePlayed(
       args: {
-        player_number: number;
         player_id: number;
         points: number;
         piece: string;
@@ -739,9 +731,9 @@ class GameBody extends GameBasics<Gamedatas> {
       }
     ): Promise<void> {
     console.log('notif_piecePlayed', args);
-    const isActive = this.playerNumber == args.player_number;
+    const isActive = this.player_id == args.player_id;
     let sourceDivId = IDS.handcount(args.player_id);
-    const hpc = this.css.handPiece(args.piece, args.player_number);
+    const hpc = this.css.piece(args.piece, args.player_id);
     if (isActive) {
       this.hand[args.handpos] = '';
       const handPosDiv = this.handPosDiv(args.handpos);
@@ -755,7 +747,7 @@ class GameBody extends GameBasics<Gamedatas> {
       () => {
         this.renderPlayedPiece(args,
           args.piece,
-          args.player_number);
+          args.player_id);
         this.updateHandCount(args);
         this.scoreCtrl[args.player_id]!.incValue(args.points);
       };
@@ -776,7 +768,7 @@ class GameBody extends GameBasics<Gamedatas> {
         this.hand[i] = args.hand[i]!;
       }
       const div = this.handPosDiv(i);
-      const hc = this.css.handPiece(this.hand[i]!, this.playerNumber);
+      const hc = this.css.piece(this.hand[i]!, this.player_id);
       if (hc != this.css.EMPTY && div.classList.contains(this.css.EMPTY)) {
         const a = new BgaSlideTempAnimation({
           className: hc,
@@ -948,27 +940,25 @@ class GameBody extends GameBasics<Gamedatas> {
     }));
   }
 
-
   ///////
-
-  static readonly special_log_args = {
-    zcard: 'jstpl_log_zcard',
-    city: 'jstpl_log_city',
-    piece: 'jstpl_log_piece',
-    original_piece: 'jstpl_log_original_piece',
+    readonly special_log_args = {
+    piece: (args) => `<span class="log-element bbl_${args.piece}_${this.playerIdToColorIndex[args.player_id]}"></span>`,
+    city: (args) => `<span class="log-element bbl_${args.city}"></span>`,
+    zcard: (args) => `<span class="log-element bbl_${args.zcard}"></span>`,
+    original_piece: (args) => `<span class="log-element bbl_${args.original_piece}_${this.playerIdToColorIndex[args.player_id]}"></span>`,
   };
 
   override format_string_recursive(log: string, args: any): string {
-    type SpecialLogArgs = keyof typeof GameBody.special_log_args;
+    type SpecialLogArgs = keyof typeof this.special_log_args;
     const saved: { [k in SpecialLogArgs]?: any } = {};
     try {
       if (log && args && !args.processed) {
         args.processed = true;
-        for (const key in GameBody.special_log_args) {
+        for (const key in this.special_log_args) {
           if (key in args) {
             const k = key as SpecialLogArgs;
             saved[k] = args[k];
-            args[k] = this.format_block(GameBody.special_log_args[k], args);
+            args[k] = this.special_log_args[k](args);
           }
         }
       }
