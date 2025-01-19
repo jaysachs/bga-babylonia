@@ -60,12 +60,12 @@ class CSS {
   static readonly UNPLAYABLE = 'bbl_unplayable';
   static readonly EMPTY = 'bbl_empty';
 
-  static piece(piece: string, playerNumber: number | null = null): string {
-    if (playerNumber == null) {
-      return 'bbl_' + piece;
-    } else {
-      return 'bbl_' + piece + '_' + playerNumber;
-    }
+  static cityOrField(piece: string): string {
+    return 'bbl_' + piece;
+  }
+
+  static piece(piece: string, playerNumber: number): string {
+    return 'bbl_' + piece + '_' + playerNumber;
   }
 
   static handPiece(piece: string, playerNumber: number): string {
@@ -241,10 +241,11 @@ class GameBody extends GameBasics<Gamedatas> {
       boardDiv.insertAdjacentHTML('beforeend', Html.hex(hex, this.hexLocation(hex)));
 
       if (hex.piece != null) {
-        const n = (hex.board_player == 0)
-          ? undefined
-          : playersData[hex.board_player]!.player_number;
-        this.renderPlayedPiece(hex, hex.piece, n);
+        if (hex.board_player == 0) {
+          this.renderCityOrField(hex, hex.piece);
+        } else {
+          this.renderPlayedPiece(hex, hex.piece, playersData[hex.board_player]!.player_number);
+        }
       }
     }
   }
@@ -343,7 +344,11 @@ class GameBody extends GameBasics<Gamedatas> {
     return $(id);
   }
 
-  private renderPlayedPiece(rc: RowCol, piece: string, playerNumber?: number) {
+  private renderCityOrField(rc: RowCol, piece: string): void {
+    this.hexDiv(rc).className = CSS.cityOrField(piece);
+  }
+
+  private renderPlayedPiece(rc: RowCol, piece: string, playerNumber: number) {
     this.hexDiv(rc).className = CSS.piece(piece, playerNumber);
   }
 
@@ -700,7 +705,7 @@ class GameBody extends GameBasics<Gamedatas> {
 
     // Put any piece (field) captured in the move back on the board
     // TODO: animate this? (and animate the capture too?)
-    this.renderPlayedPiece(args, args.captured_piece);
+    this.renderCityOrField(args, args.captured_piece);
     const onDone =
       () => {
         if (isActive) {
@@ -917,18 +922,18 @@ class GameBody extends GameBasics<Gamedatas> {
     anim.push(new BgaSlideTempAnimation({
       animationStart:
         () => {
-          this.renderPlayedPiece(args, '');
+          this.renderCityOrField(args, '');
         },
       animationEnd:
         () => {
-          this.renderPlayedPiece(args, '');
+          this.renderCityOrField(args, '');
           for (const playerId in args.details) {
             const details = args.details[playerId]!;
             this.scoreCtrl[playerId]!.incValue(details.capture_points);
             this.updateCapturedCityCount(details);
           }
         },
-      className: CSS.piece(args.city),
+      className: CSS.cityOrField(args.city),
       fromId: IDS.hexDiv(args),
       toId: (args.player_id != 0)
         ? IDS.citycount(args.player_id)
