@@ -70,11 +70,9 @@ class Game extends \Table
         }
         $msg = null;
         if ($points > 0) {
-            $msg = clienttranslate('${player_name} plays ${piece} to (${row},${col}) scoring ${points} points');
-            Stats::PLAYER_POINTS_FROM_FIELDS->
-                inc($player_id, $move->field_points);
-            Stats::PLAYER_POINTS_FROM_ZIGGURATS->
-                inc($player_id, $move->ziggurat_points);
+            $msg = clienttranslate('${player_name} plays ${piece} to (${row},${col}) scoring ${points}');
+            Stats::PLAYER_POINTS_FROM_FIELDS->inc($player_id, $move->field_points);
+            Stats::PLAYER_POINTS_FROM_ZIGGURATS->inc($player_id, $move->ziggurat_points);
         } else {
             $msg = clienttranslate('${player_name} plays ${piece} to (${row},${col})');
         }
@@ -296,7 +294,6 @@ class Game extends \Table
                 "cardused" => $selection->card->used,
                 "points" => $selection->points,
                 "score" => $model->allPlayerInfo()[$player_id]->score,
-                "card_description" => "short description of card"
             ]
         );
         $this->gamestate->nextState("cardSelected");
@@ -314,11 +311,11 @@ class Game extends \Table
         $rc = new RowCol($row, $col);
         $hex = $model->board()->hexAt($rc);
         $msg = $this->optionEnabled(Option::AUTOMATED_SCORING_SELECTION)
-            ? 'hex (${row},${col}) is scored'
-            : '${player_name} chose hex (${row},${col}}) to score';
+            ? clienttranslate('hex (${row},${col}) is scored')
+            : clienttranslate('${player_name} chose hex (${row},${col}}) to score');
         $this->notify->all(
             "scoringSelection",
-            clienttranslate($msg),
+            $msg,
             [
                 "player_id" => $player_id,
                 "player_name" => $this->getActivePlayerName(),
@@ -493,11 +490,8 @@ class Game extends \Table
             if ($pid == $this->activePlayerId()) {
                 $args["handpos"] = $move->handpos;
                 $args["original_piece"] = $move->original_piece->value;
-                $msg = clienttranslate('You undid your move and returned ${original_piece} to your hand.');
-            } else {
-                $msg = clienttranslate('${player_name} undid their move');
             }
-            $this->notify->player($pid, "undoMove", $msg, $args );
+            $this->notify->player($pid, "undoMove", clienttranslate('${player_name} undid their move'), $args );
         }
 
         // final notifyAll required to keep moves and replays in sync
