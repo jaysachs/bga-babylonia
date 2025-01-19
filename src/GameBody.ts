@@ -54,28 +54,28 @@ class IDS {
 
 
 class CSS {
-  static readonly SELECTING = 'bbl_selecting';
-  static readonly SELECTED = 'bbl_selected';
-  static readonly PLAYABLE = 'bbl_playable';
-  static readonly UNPLAYABLE = 'bbl_unplayable';
-  static readonly EMPTY = 'bbl_empty';
+  readonly SELECTING = 'bbl_selecting';
+  readonly SELECTED = 'bbl_selected';
+  readonly PLAYABLE = 'bbl_playable';
+  readonly UNPLAYABLE = 'bbl_unplayable';
+  readonly EMPTY = 'bbl_empty';
 
-  static cityOrField(piece: string): string {
+  cityOrField(piece: string): string {
     return 'bbl_' + piece;
   }
 
-  static piece(piece: string, playerNumber: number): string {
+  piece(piece: string, playerNumber: number): string {
     return 'bbl_' + piece + '_' + playerNumber;
   }
 
-  static handPiece(piece: string, playerNumber: number): string {
+  handPiece(piece: string, playerNumber: number): string {
     if (piece == "empty" || piece == '') {
-      return CSS.EMPTY;
+      return this.EMPTY;
     }
-    return CSS.piece(piece, playerNumber);
+    return this.piece(piece, playerNumber);
   }
 
-  static zcard(card: string, used: boolean = false): string {
+  zcard(card: string, used: boolean = false): string {
     return used ? 'bbl_zc_used' : ('bbl_' + card);
   }
 }
@@ -167,6 +167,7 @@ class GameBody extends GameBasics<Gamedatas> {
   private readonly pieceClasses = ['priest', 'servant', 'farmer', 'merchant'];
   private playStateArgs: PlayState | null = null;
   private animating = false;
+  private css: CSS = new CSS();
 
   constructor() {
     super();
@@ -262,7 +263,7 @@ class GameBody extends GameBasics<Gamedatas> {
         $(IDS.AVAILABLE_ZCARDS).insertAdjacentHTML('beforeend', `<div id='${id}' bbl_ztype='${zcard.type}'></div>`);
       } else {
         // just in available cards
-        const cls = CSS.zcard(zcard.type, zcard.used);
+        const cls = this.css.zcard(zcard.type, zcard.used);
         $(IDS.AVAILABLE_ZCARDS).insertAdjacentHTML('beforeend', `<div id='${id}' class='${cls}' bbl_ztype='${zcard.type}'></div>`);
         this.addTooltip(id, zcard.tooltip, '');
       }
@@ -271,7 +272,7 @@ class GameBody extends GameBasics<Gamedatas> {
 
   private addZcardDivInPlayerBoard(zcard: Zcard) {
     const id = IDS.ownedZcard(zcard.type);
-    const cls = CSS.zcard(zcard.type, zcard.used);
+    const cls = this.css.zcard(zcard.type, zcard.used);
     $(IDS.playerBoardZcards(zcard.owning_player_id)).insertAdjacentHTML('beforeend', `<div id='${id}' bbl_ztype='${zcard.type}' class='${cls}'></div>`);
     this.addTooltip(id, zcard.tooltip, '');
   }
@@ -286,7 +287,7 @@ class GameBody extends GameBasics<Gamedatas> {
   }
 
   private addZigguratCardDiv(id: string, parentElem: HTMLElement, zcard: Zcard): void {
-    const cls = CSS.zcard(zcard.type, zcard.used);
+    const cls = this.css.zcard(zcard.type, zcard.used);
     parentElem.insertAdjacentHTML('beforeend', `<div id='${id}' class='${cls}'></div>`);
     this.addTooltip(id, zcard.tooltip, '');
     // div.title = zcard.tooltip;
@@ -338,23 +339,23 @@ class GameBody extends GameBasics<Gamedatas> {
     for (let j = 0; j <= i; ++j) {
       const id = IDS.handPos(j);
       if ($(id) == null) {
-        hand.insertAdjacentHTML('beforeend', `<div id='${id}' class='${CSS.EMPTY}'/>`);
+        hand.insertAdjacentHTML('beforeend', `<div id='${id}' class='${this.css.EMPTY}'/>`);
       }
     }
     return $(id);
   }
 
   private renderCityOrField(rc: RowCol, piece: string): void {
-    this.hexDiv(rc).className = CSS.cityOrField(piece);
+    this.hexDiv(rc).className = this.css.cityOrField(piece);
   }
 
   private renderPlayedPiece(rc: RowCol, piece: string, playerNumber: number) {
-    this.hexDiv(rc).className = CSS.piece(piece, playerNumber);
+    this.hexDiv(rc).className = this.css.piece(piece, playerNumber);
   }
 
   private renderHand(): void {
     for (let i = 0; i < this.hand.length; ++i) {
-      this.handPosDiv(i).className = CSS.handPiece(this.hand[i]!, this.playerNumber);
+      this.handPosDiv(i).className = this.css.handPiece(this.hand[i]!, this.playerNumber);
     }
   }
 
@@ -369,7 +370,7 @@ class GameBody extends GameBasics<Gamedatas> {
       return null;
     }
     // now check if it's allowed
-    if (!e.classList.contains(CSS.PLAYABLE)) {
+    if (!e.classList.contains(this.css.PLAYABLE)) {
       // console.log('not playable');
       return null;
     }
@@ -451,7 +452,7 @@ class GameBody extends GameBasics<Gamedatas> {
       if (zc.type == type.value) {
         this.bgaPerformAction('actSelectZigguratCard', { zctype: zc.type });
         const div = $(IDS.AVAILABLE_ZCARDS);
-        div.classList.remove(CSS.SELECTING);
+        div.classList.remove(this.css.SELECTING);
         return false;
       }
     }
@@ -468,11 +469,11 @@ class GameBody extends GameBasics<Gamedatas> {
   }
 
   private markHexPlayable(rc: RowCol): void {
-    this.hexDiv(rc).classList.add(CSS.PLAYABLE);
+    this.hexDiv(rc).classList.add(this.css.PLAYABLE);
   }
 
   private unmarkHexPlayable(rc: RowCol): void {
-    this.hexDiv(rc).classList.remove(CSS.PLAYABLE);
+    this.hexDiv(rc).classList.remove(this.css.PLAYABLE);
   }
 
   private markScoreableHexesPlayable(hexes: RowCol[]): void {
@@ -490,12 +491,12 @@ class GameBody extends GameBasics<Gamedatas> {
   private unselectAllHandPieces(): void {
     for (let p = 0; p < this.hand.length; ++p) {
       const cl = $(IDS.handPos(p)).classList;
-      if (cl.contains(CSS.SELECTED)) {
+      if (cl.contains(this.css.SELECTED)) {
         this.unmarkHexesPlayableForPiece(p);
       }
-      cl.remove(CSS.SELECTED);
-      cl.remove(CSS.PLAYABLE);
-      cl.remove(CSS.UNPLAYABLE);
+      cl.remove(this.css.SELECTED);
+      cl.remove(this.css.PLAYABLE);
+      cl.remove(this.css.UNPLAYABLE);
     }
     this.selectedHandPos = null;
   }
@@ -504,11 +505,11 @@ class GameBody extends GameBasics<Gamedatas> {
     for (let p = 0; p < this.hand.length; ++p) {
       const cl = $(IDS.handPos(p)).classList;
       if (this.allowedMovesFor(p).length > 0) {
-        cl.add(CSS.PLAYABLE);
-        cl.remove(CSS.UNPLAYABLE);
+        cl.add(this.css.PLAYABLE);
+        cl.remove(this.css.UNPLAYABLE);
       } else {
-        cl.remove(CSS.PLAYABLE);
-        cl.add(CSS.UNPLAYABLE);
+        cl.remove(this.css.PLAYABLE);
+        cl.add(this.css.UNPLAYABLE);
       }
     }
   }
@@ -579,14 +580,14 @@ class GameBody extends GameBasics<Gamedatas> {
       return false;
     }
     let playable = false;
-    if (!selectedDiv.classList.contains(CSS.SELECTED)) {
+    if (!selectedDiv.classList.contains(this.css.SELECTED)) {
       this.unselectAllHandPieces();
       this.markHexesPlayableForPiece(handpos);
       playable = true;
     } else {
       this.unmarkHexesPlayableForPiece(handpos);
     }
-    selectedDiv.classList.toggle(CSS.SELECTED);
+    selectedDiv.classList.toggle(this.css.SELECTED);
     if (playable) {
       this.selectedHandPos = handpos;
       if (this.currentState != 'client_pickHexToPlay') {
@@ -644,7 +645,7 @@ class GameBody extends GameBasics<Gamedatas> {
   private onUpdateActionButtons_selectZigguratCard(): void {
     const div = $(IDS.AVAILABLE_ZCARDS);
     div.scrollIntoView(false);
-    div.classList.add(CSS.SELECTING);
+    div.classList.add(this.css.SELECTING);
     this.updateStatusBar(_('You must select a ziggurat card'));
   }
 
@@ -659,8 +660,8 @@ class GameBody extends GameBasics<Gamedatas> {
   }
 
   private markAllHexesUnplayable(): void {
-    $(IDS.BOARD).querySelectorAll('.' + CSS.PLAYABLE)
-      .forEach(div => div.classList.remove(CSS.PLAYABLE));
+    $(IDS.BOARD).querySelectorAll('.' + this.css.PLAYABLE)
+      .forEach(div => div.classList.remove(this.css.PLAYABLE));
   }
 
   private async notif_turnFinished(
@@ -710,15 +711,15 @@ class GameBody extends GameBasics<Gamedatas> {
       () => {
         if (isActive) {
           const cl = handPosDiv!.classList;
-          cl.remove(CSS.EMPTY);
-          cl.add(CSS.PLAYABLE);
-          cl.add(CSS.handPiece(args.original_piece, this.playerNumber));
+          cl.remove(this.css.EMPTY);
+          cl.add(this.css.PLAYABLE);
+          cl.add(this.css.handPiece(args.original_piece, this.playerNumber));
         }
         this.handCounters[args.player_id]!.incValue(1);
         this.scoreCtrl[args.player_id]!.incValue(-args.points);
       };
     await this.play(new BgaSlideTempAnimation({
-      className: CSS.handPiece(args.piece, args.player_number),
+      className: this.css.handPiece(args.piece, args.player_number),
       fromId: IDS.hexDiv(args),
       toId: targetDivId,
       parentId: IDS.BOARD
@@ -740,7 +741,7 @@ class GameBody extends GameBasics<Gamedatas> {
     console.log('notif_piecePlayed', args);
     const isActive = this.playerNumber == args.player_number;
     let sourceDivId = IDS.handcount(args.player_id);
-    const hpc = CSS.handPiece(args.piece, args.player_number);
+    const hpc = this.css.handPiece(args.piece, args.player_number);
     if (isActive) {
       this.hand[args.handpos] = '';
       const handPosDiv = this.handPosDiv(args.handpos);
@@ -748,7 +749,7 @@ class GameBody extends GameBasics<Gamedatas> {
       // Active player hand piece 'removed' from hand.
       const cl = handPosDiv.classList;
       cl.remove(hpc);
-      cl.add(CSS.EMPTY);
+      cl.add(this.css.EMPTY);
     }
     const onDone =
       () => {
@@ -775,8 +776,8 @@ class GameBody extends GameBasics<Gamedatas> {
         this.hand[i] = args.hand[i]!;
       }
       const div = this.handPosDiv(i);
-      const hc = CSS.handPiece(this.hand[i]!, this.playerNumber);
-      if (hc != CSS.EMPTY && div.classList.contains(CSS.EMPTY)) {
+      const hc = this.css.handPiece(this.hand[i]!, this.playerNumber);
+      if (hc != this.css.EMPTY && div.classList.contains(this.css.EMPTY)) {
         const a = new BgaSlideTempAnimation({
           className: hc,
           fromId: IDS.handcount(pid),
@@ -801,7 +802,7 @@ class GameBody extends GameBasics<Gamedatas> {
     if (carddiv == undefined) {
       console.error(`Could not find div for owned ${args.card} card`, zcard);
     } else {
-      carddiv.className = CSS.zcard('', true);
+      carddiv.className = this.css.zcard('', true);
     }
     return Promise.resolve();
   }
@@ -827,7 +828,7 @@ class GameBody extends GameBasics<Gamedatas> {
     this.removeTooltip(id);
 
     await this.play(new BgaSlideTempAnimation({
-      className: CSS.zcard(zcard.type, false),
+      className: this.css.zcard(zcard.type, false),
       fromId: id,
       toId: IDS.playerBoardZcards(args.player_id),
       parentId: IDS.AVAILABLE_ZCARDS,
@@ -868,7 +869,7 @@ class GameBody extends GameBasics<Gamedatas> {
         mode: 'parallel',
         animationStart: () => {
           for (const rc of details.scored_locations) {
-            this.hexDiv(rc).classList.add(CSS.SELECTED);
+            this.hexDiv(rc).classList.add(this.css.SELECTED);
           }
         },
         animations: details.network_locations.map(
@@ -913,7 +914,7 @@ class GameBody extends GameBasics<Gamedatas> {
         ),
         animationEnd: () => {
           details.scored_locations.forEach(
-            (rc: RowCol) => this.hexDiv(rc).classList.remove(CSS.SELECTED));
+            (rc: RowCol) => this.hexDiv(rc).classList.remove(this.css.SELECTED));
           this.scoreCtrl[details.player_id]!.incValue(details.network_points);
         },
       }));
@@ -933,7 +934,7 @@ class GameBody extends GameBasics<Gamedatas> {
             this.updateCapturedCityCount(details);
           }
         },
-      className: CSS.cityOrField(args.city),
+      className: this.css.cityOrField(args.city),
       fromId: IDS.hexDiv(args),
       toId: (args.player_id != 0)
         ? IDS.citycount(args.player_id)
