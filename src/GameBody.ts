@@ -80,21 +80,25 @@ class CSS {
 }
 
 class Html {
-  static readonly hstart = 38.0; // this is related to board width but not sure how
-  static readonly vstart = 9.0; // depends on board size too
-  static readonly height = 768 / 12.59;
-  static readonly width = Html.height * 1.155;
-  static readonly hdelta = 0.75 * Html.width + 2.0;
-  static readonly vdelta = 1.0 * Html.height + 2.0;
+  readonly hstart = 38.0; // this is related to board width but not sure how
+  readonly vstart = 9.0; // depends on board size too
+  readonly height = 768 / 12.59;
+  readonly width = this.height * 1.155;
+  readonly hdelta = 0.75 * this.width + 2.0;
+  readonly vdelta = 1.0 * this.height + 2.0;
 
-  static hex(rc: RowCol): string {
-    let top = Html.vstart + rc.row * Html.vdelta / 2;
-    let left = Html.hstart + rc.col * Html.hdelta;
+  constructor(private css: CSS,
+              private colorIndexMap: Record<number, number>) {}
+
+  public hex(rc: RowCol): string {
+    let top = this.vstart + rc.row * this.vdelta / 2;
+    let left = this.hstart + rc.col * this.hdelta;
 
     return `<div id="${IDS.hexDiv(rc)}" style="top:${top}px; left:${left}px;"></div>`;
   }
 
-  static player_board_ext(player_id: number, color_index: number): string {
+  public player_board_ext(player_id: number): string {
+    let color_index = this.colorIndexMap[player_id];
     return `
       <div>
         <span class="bbl_pb_hand_label_${color_index}"></span>
@@ -113,7 +117,8 @@ class Html {
       </div>
 `;
   }
-  static base_html(): string {
+
+  public base_html(): string {
     return `
     <div id="bbl_main">
       <div id="bbl_hand_container">
@@ -162,6 +167,7 @@ class GameBody extends GameBasics<Gamedatas> {
   private playStateArgs: PlayState | null = null;
   private animating = false;
   private css: CSS = new CSS({});
+  private html: Html = new Html(this.css, {});
   private playerIdToColorIndex: Record<number, number> = {};
 
   constructor() {
@@ -195,6 +201,7 @@ class GameBody extends GameBasics<Gamedatas> {
       this.playerIdToColorIndex[playerId] = colorIndexMap[gamedatas.players[playerId]!.color]!;
     }
     this.css = new CSS(this.playerIdToColorIndex);
+    this.html = new Html(this.css, this.playerIdToColorIndex);
 
     this.setupGameHtml();
 
@@ -224,7 +231,7 @@ class GameBody extends GameBasics<Gamedatas> {
     // console.log(gamedatas.board);
 
     for (const hex of boardData) {
-      boardDiv.insertAdjacentHTML('beforeend', Html.hex(hex));
+      boardDiv.insertAdjacentHTML('beforeend', this.html.hex(hex));
 
       if (hex.piece != null) {
         if (hex.board_player == 0) {
@@ -272,7 +279,7 @@ class GameBody extends GameBasics<Gamedatas> {
   }
 
   private setupGameHtml(): void {
-    $('game_play_area').insertAdjacentHTML('beforeend', Html.base_html());
+    $('game_play_area').insertAdjacentHTML('beforeend', this.html.base_html());
   }
 
   private updateCounter(counter: Counter, value: number, animate: boolean) {
@@ -590,7 +597,7 @@ class GameBody extends GameBasics<Gamedatas> {
     const playerId = player.player_id;
     console.log('Setting up board for player ' + playerId);
     this.getPlayerPanelElement(playerId)
-        .insertAdjacentHTML('beforeend', Html.player_board_ext(playerId, this.playerIdToColorIndex[playerId]!));
+        .insertAdjacentHTML('beforeend', this.html.player_board_ext(playerId));
     //    create counters per player
     this.handCounters[playerId] = new ebg.counter();
     this.handCounters[playerId]!.create(IDS.handcount(playerId));
