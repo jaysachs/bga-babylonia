@@ -1,5 +1,4 @@
 interface RowCol { row: number, col: number };
-interface TopLeft { top: number, left: number };
 interface PlayerData {
   player_id: number;
   hand_size: number;
@@ -81,24 +80,35 @@ class CSS {
 }
 
 class Html {
-  static hex(rc: RowCol, tl: TopLeft): string {
-    return `<div id="bbl_hex_${rc.row}_${rc.col}" style="top:${tl.top}px; left:${tl.left}px;"></div>`;
+  static readonly hstart = 38.0; // this is related to board width but not sure how
+  static readonly vstart = 9.0; // depends on board size too
+  static readonly height = 768 / 12.59;
+  static readonly width = Html.height * 1.155;
+  static readonly hdelta = 0.75 * Html.width + 2.0;
+  static readonly vdelta = 1.0 * Html.height + 2.0;
+
+  static hex(rc: RowCol): string {
+    let top = Html.vstart + rc.row * Html.vdelta / 2;
+    let left = Html.hstart + rc.col * Html.hdelta;
+
+    return `<div id="${IDS.hexDiv(rc)}" style="top:${top}px; left:${left}px;"></div>`;
   }
+
   static player_board_ext(player_id: number, color_index: number): string {
     return `
       <div>
         <span class="bbl_pb_hand_label_${color_index}"></span>
-        <span id="bbl_handcount_${player_id}">5</span>
+        <span id="${IDS.handcount(player_id)}">5</span>
       </div>
       <div>
         <span class="bbl_pb_pool_label_${color_index}"></span>
-        <span id="bbl_poolcount_${player_id}">19</span>
+        <span id="${IDS.poolcount(player_id)}">19</span>
       </div>
       <div>
         <span class="bbl_pb_citycount_label"></span>
-        <span id="bbl_citycount_${player_id}">1</span>
+        <span id="${IDS.citycount(player_id)}">1</span>
       </div>
-      <div id="bbl_zcards_${player_id}" class="bbl_pb_zcards">
+      <div id="${IDS.playerBoardZcards(player_id)}" class="bbl_pb_zcards">
         <span class="bbl_pb_zcard_label"></span>
       </div>
 `;
@@ -209,25 +219,12 @@ class GameBody extends GameBasics<Gamedatas> {
     console.log('Game setup done');
   }
 
-  private hexLocation(hex: RowCol): TopLeft {
-    const hstart = 38.0; // this is related to board width but not sure how
-    const vstart = 9.0; // depends on board size too
-    const height = 768 / 12.59;
-    const width = height * 1.155;
-    const hdelta = 0.75 * width + 2.0;
-    const vdelta = 1.0 * height + 2.0;
-    return {
-      top: vstart + hex.row * vdelta / 2,
-      left: hstart + hex.col * hdelta,
-    };
-  }
-
   private setupGameBoard(boardData: Hex[], playersData: PlayerData[]): void {
     const boardDiv = $(IDS.BOARD);
     // console.log(gamedatas.board);
 
     for (const hex of boardData) {
-      boardDiv.insertAdjacentHTML('beforeend', Html.hex(hex, this.hexLocation(hex)));
+      boardDiv.insertAdjacentHTML('beforeend', Html.hex(hex));
 
       if (hex.piece != null) {
         if (hex.board_player == 0) {
@@ -272,13 +269,6 @@ class GameBody extends GameBasics<Gamedatas> {
       }
     }
     throw new Error(`Zcard type ${cardType} not found`);
-  }
-
-  private addZigguratCardDiv(id: string, parentElem: HTMLElement, zcard: Zcard): void {
-    const cls = this.css.zcard(zcard.type, zcard.used);
-    parentElem.insertAdjacentHTML('beforeend', `<div id='${id}' class='${cls}'></div>`);
-    this.addTooltip(id, zcard.tooltip, '');
-    // div.title = zcard.tooltip;
   }
 
   private setupGameHtml(): void {
