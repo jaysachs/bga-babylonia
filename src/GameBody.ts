@@ -97,6 +97,10 @@ class Html {
     return `<div id="${IDS.hexDiv(rc)}" style="top:${top}px; left:${left}px;"></div>`;
   }
 
+  public emptyHandPiece(id: string): string {
+    return `<div id='${id}' class='${this.css.EMPTY}'/>`;
+  }
+
   public player_board_ext(player_id: number): string {
     let color_index = this.colorIndexMap[player_id];
     return `
@@ -324,7 +328,7 @@ class GameBody extends GameBasics<Gamedatas> {
     for (let j = 0; j <= i; ++j) {
       const id = IDS.handPos(j);
       if ($(id) == null) {
-        hand.insertAdjacentHTML('beforeend', `<div id='${id}' class='${this.css.EMPTY}'/>`);
+        hand.insertAdjacentHTML('beforeend', this.html.emptyHandPiece(id));
       }
     }
     return $(id);
