@@ -241,7 +241,7 @@ class GameBody extends GameBasics<Gamedatas> {
         if (hex.board_player == 0) {
           this.renderCityOrField(hex, hex.piece);
         } else {
-          this.renderPlayedPiece(hex, hex.piece, playersData[hex.board_player]!.player_id);
+          this.renderPlayedPiece(hex, hex.piece, hex.board_player);
         }
       }
     }
