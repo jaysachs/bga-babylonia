@@ -759,7 +759,7 @@ class GameBody extends GameBasics<Gamedatas> {
     const anim: BgaAnimation<any>[] = [];
     const pid = this.player_id;
     for (let i = 0; i < args.hand.length; ++i) {
-      if (this.hand[i] == '') {
+      if (this.hand[i] == '' || this.hand[i] == null) {
         this.hand[i] = args.hand[i]!;
       }
       const div = this.handPosDiv(i);
