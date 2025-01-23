@@ -68,7 +68,7 @@ class CSS {
   }
 
   piece(piece: string, playerId: number): string {
-    if (piece == "empty" || piece == '') {
+    if (piece == "empty") {
       return this.EMPTY;
     }
     return 'bbl_' + piece + '_' + this.colorIndexMap[playerId];
@@ -451,9 +451,6 @@ class GameBody extends GameBasics<Gamedatas> {
 
   private allowedMovesFor(pos: number): RowCol[] {
     const piece = this.hand[pos]!;
-    if (piece == '') {
-      return [];
-    }
     return (this.playStateArgs!.allowedMoves as any)[piece] || [];
   }
 
@@ -730,7 +727,7 @@ class GameBody extends GameBasics<Gamedatas> {
     let sourceDivId = IDS.handcount(args.player_id);
     const hpc = this.css.piece(args.piece, args.player_id);
     if (isActive) {
-      this.hand[args.handpos] = '';
+      this.hand[args.handpos] = 'empty';
       const handPosDiv = this.handPosDiv(args.handpos);
       sourceDivId = handPosDiv.id;
       // Active player hand piece 'removed' from hand.
@@ -759,8 +756,11 @@ class GameBody extends GameBasics<Gamedatas> {
     const anim: BgaAnimation<any>[] = [];
     const pid = this.player_id;
     for (let i = 0; i < args.hand.length; ++i) {
-      if (this.hand[i] == '' || this.hand[i] == null) {
+      // extend hand if zig tile just acquired
+      if (i >= this.hand.length || this.hand[i] == 'empty') {
         this.hand[i] = args.hand[i]!;
+      } else if (this.hand[i] != args.hand[i]) {
+        console.error(`hand from args ${args.hand[i]} not matches hand ${this.hand[i]}`)
       }
       const div = this.handPosDiv(i);
       const hc = this.css.piece(this.hand[i]!, this.player_id);
