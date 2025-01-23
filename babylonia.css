@@ -77,25 +77,15 @@
     cursor: pointer;
 }
 
-/*
- * Cities and fields sprites
- */
-[bbl_piece="city_m"],
-[bbl_piece="city_p"],
-[bbl_piece="city_s"],
-[bbl_piece="city_mp"],
-[bbl_piece="city_ms"],
-[bbl_piece="city_sp"],
-[bbl_piece="city_msp"],
-[bbl_piece="field_5"],
-[bbl_piece="field_6"],
-[bbl_piece="field_7"],
-[bbl_piece="field_X"],
-[bbl_piece="ziggurat"] {
+[bbl_piece] {
+    clip-path: none;
     background-image: url(img/sprites.png);
     background-size: 700% 700%;
 }
 
+/*
+ * Cities and fields sprites
+ */
 [bbl_piece="city_m"] {
     background-position: -500% 0%;
 }
@@ -136,32 +126,6 @@
 /*
  * Player piece sprites
  */
- [bbl_piece="farmer_1"],
- [bbl_piece="farmer_2"],
- [bbl_piece="farmer_3"],
- [bbl_piece="farmer_4"],
- [bbl_piece="servant_1"],
- [bbl_piece="servant_2"],
- [bbl_piece="servant_3"],
- [bbl_piece="servant_4"],
- [bbl_piece="priest_1"],
- [bbl_piece="priest_2"],
- [bbl_piece="priest_3"],
- [bbl_piece="priest_4"],
- [bbl_piece="merchant_1"],
- [bbl_piece="merchant_2"],
- [bbl_piece="merchant_3"],
- [bbl_piece="merchant_4"],
- [bbl_piece="hidden_1"],
- [bbl_piece="hidden_2"],
- [bbl_piece="hidden_3"],
- [bbl_piece="hidden_4"],
- [bbl_piece="empty"]
- {
-    clip-path: none;
-    background-image: url(img/sprites.png);
-    background-size: 700% 700%;
-}
 [bbl_piece="hidden_1"] {
     background-position: -100% 0;
 }
@@ -226,16 +190,7 @@
 /*
  * Ziggurat card sprites
  */
-[bbl_ztype="zc_10pts"],
-[bbl_ztype="zc_xturn"],
-[bbl_ztype="zc_hand7"],
-[bbl_ztype="zc_3nobles"],
-[bbl_ztype="zc_3farmers"],
-[bbl_ztype="zc_fields"],
-[bbl_ztype="zc_citypts"],
-[bbl_ztype="zc_land"],
-[bbl_ztype="zc_river"],
-[bbl_ztype="used"]
+[bbl_ztype]
 {
     background-size: 1000% 100%;
     background-image: url(img/zcards.png);
@@ -483,43 +438,7 @@ a.action-button > div.bbl_zcard {
  *   particularly images for pieces
  */
 
-.log-element[bbl_piece="merchant_1"],
-.log-element[bbl_piece="priest_1"],
-.log-element[bbl_piece="farmer_1"],
-.log-element[bbl_piece="servant_1"],
-.log-element[bbl_piece="merchant_2"],
-.log-element[bbl_piece="priest_2"],
-.log-element[bbl_piece="farmer_2"],
-.log-element[bbl_piece="servant_2"],
-.log-element[bbl_piece="merchant_3"],
-.log-element[bbl_piece="priest_3"],
-.log-element[bbl_piece="farmer_3"],
-.log-element[bbl_piece="servant_3"],
-.log-element[bbl_piece="merchant_4"],
-.log-element[bbl_piece="priest_4"],
-.log-element[bbl_piece="farmer_4"],
-.log-element[bbl_piece="servant_4"]
-{
-    display: inline-block;
-    margin: 0;
-    padding: 0;
-    background-color: transparent;
-    height: 1.5em;
-    width: 1.725em;
-}
-
-.log-element[bbl_piece="city_msp"],
-.log-element[bbl_piece="city_m"],
-.log-element[bbl_piece="city_p"],
-.log-element[bbl_piece="city_s"],
-.log-element[bbl_piece="city_mp"],
-.log-element[bbl_piece="city_ms"],
-.log-element[bbl_piece="city_sp"],
-.log-element[bbl_piece="field_5"],
-.log-element[bbl_piece="field_6"],
-.log-element[bbl_piece="field_7"],
-.log-element[bbl_piece="field_X"],
-.log-element[bbl_piece="ziggurat"]
+.log-element[bbl_piece]
 {
     height: 1.5em;
     width: 1.725em;
@@ -529,15 +448,7 @@ a.action-button > div.bbl_zcard {
     background-color: transparent;
 }
 
-.log-element[bbl_ztype="zc_10pts"],
-.log-element[bbl_ztype="zc_xturn"],
-.log-element[bbl_ztype="zc_hand7"],
-.log-element[bbl_ztype="zc_3nobles"],
-.log-element[bbl_ztype="zc_3farmers"],
-.log-element[bbl_ztype="zc_fields"],
-.log-element[bbl_ztype="bbl_zc_citypts"],
-.log-element[bbl_ztype="zc_land"],
-.log-element[bbl_ztype="zc_river"]
+.log-element[bbl_ztype]
 {
     display: inline-block;
     height: 2.1em;
