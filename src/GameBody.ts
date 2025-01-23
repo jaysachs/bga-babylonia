@@ -14,6 +14,7 @@ interface Hex extends RowCol {
 
 class Attrs {
   static readonly ZTYPE = 'bbl_ztype';
+  static readonly PIECE = 'bbl_piece';
 }
 
 class IDS {
@@ -60,22 +61,11 @@ class CSS {
   readonly SELECTED = 'bbl_selected';
   readonly PLAYABLE = 'bbl_playable';
   readonly UNPLAYABLE = 'bbl_unplayable';
-  readonly EMPTY = 'bbl_empty';
+  readonly XXXEMPTY = 'bbl_empty';
 
   /** from player_id to color index */
   constructor(private colorIndexMap: Record<number, number>) {
 
-  }
-
-  cityOrField(piece: string): string {
-    return 'bbl_' + piece;
-  }
-
-  piece(piece: string, playerId: number): string {
-    if (piece == "empty") {
-      return this.EMPTY;
-    }
-    return 'bbl_' + piece + '_' + this.colorIndexMap[playerId];
   }
 }
 
@@ -98,7 +88,7 @@ class Html {
   }
 
   public emptyHandPiece(id: string): string {
-    return `<div id='${id}' class='${this.css.EMPTY}'/>`;
+    return `<div id='${id}'/>`;
   }
 
   public player_board_ext(player_id: number): string {
@@ -335,16 +325,30 @@ class GameBody extends GameBasics<Gamedatas> {
   }
 
   private renderCityOrField(rc: RowCol, piece: string): void {
-    this.hexDiv(rc).className = this.css.cityOrField(piece);
+    this.setPiece(this.hexDiv(rc), piece, 0);
+  }
+
+  private pieceVal(piece: string, playerId: number): string {
+    return playerId > 0 ? piece + "_" + this.playerIdToColorIndex[playerId] : piece;
+  }
+
+  private pieceAttr(piece: string, playerId: number): Record<string, string> {
+    let v = {};
+    v[Attrs.PIECE] = this.pieceVal(piece, playerId);
+    return v;
+  }
+
+  private setPiece(e: Element, piece: string, playerId: number) {
+    e.setAttribute(Attrs.PIECE, this.pieceVal(piece, playerId));
   }
 
   private renderPlayedPiece(rc: RowCol, piece: string, playerId: number) {
-    this.hexDiv(rc).className = this.css.piece(piece, playerId);
+    this.setPiece(this.hexDiv(rc), piece, playerId);
   }
 
   private renderHand(): void {
     for (let i = 0; i < this.hand.length; ++i) {
-      this.handPosDiv(i).className = this.css.piece(this.hand[i]!, this.player_id);
+      this.setPiece(this.handPosDiv(i), this.hand[i]!, this.player_id);
     }
   }
 
@@ -695,16 +699,14 @@ class GameBody extends GameBasics<Gamedatas> {
     const onDone =
       () => {
         if (isActive) {
-          const cl = handPosDiv!.classList;
-          cl.remove(this.css.EMPTY);
-          cl.add(this.css.PLAYABLE);
-          cl.add(this.css.piece(args.original_piece, this.player_id));
+          this.setPiece(handPosDiv!, args.original_piece, this.player_id);
+          handPosDiv!.classList.add(this.css.PLAYABLE);
         }
         this.handCounters[args.player_id]!.incValue(1);
         this.scoreCtrl[args.player_id]!.incValue(-args.points);
       };
     await this.play(new BgaSlideTempAnimation({
-      className: this.css.piece(args.piece, args.player_id),
+      attrs: this.pieceAttr(args.piece, args.player_id),
       fromId: IDS.hexDiv(args),
       toId: targetDivId,
       parentId: IDS.BOARD
@@ -725,15 +727,11 @@ class GameBody extends GameBasics<Gamedatas> {
     console.log('notif_piecePlayed', args);
     const isActive = this.player_id == args.player_id;
     let sourceDivId = IDS.handcount(args.player_id);
-    const hpc = this.css.piece(args.piece, args.player_id);
     if (isActive) {
       this.hand[args.handpos] = 'empty';
       const handPosDiv = this.handPosDiv(args.handpos);
+      this.setPiece(handPosDiv, 'empty', 0);
       sourceDivId = handPosDiv.id;
-      // Active player hand piece 'removed' from hand.
-      const cl = handPosDiv.classList;
-      cl.remove(hpc);
-      cl.add(this.css.EMPTY);
     }
     const onDone =
       () => {
@@ -744,7 +742,7 @@ class GameBody extends GameBasics<Gamedatas> {
         this.scoreCtrl[args.player_id]!.incValue(args.points);
       };
     await this.play(new BgaSlideTempAnimation({
-      className: hpc,
+      attrs: this.pieceAttr(args.piece, args.player_id),
       fromId: sourceDivId,
       toId: this.hexDiv(args).id,
       parentId: IDS.BOARD
@@ -763,14 +761,13 @@ class GameBody extends GameBasics<Gamedatas> {
         console.error(`hand from args ${args.hand[i]} not matches hand ${this.hand[i]}`)
       }
       const div = this.handPosDiv(i);
-      const hc = this.css.piece(this.hand[i]!, this.player_id);
-      if (hc != this.css.EMPTY && div.classList.contains(this.css.EMPTY)) {
+      if (div.getAttribute(Attrs.PIECE) == 'empty') { // && incoming piece is not empty?
         const a = new BgaSlideTempAnimation({
-          className: hc,
+          attrs: this.pieceAttr(this.hand[i]!, this.player_id),
           fromId: IDS.handcount(pid),
           toId: div.id,
           parentId: IDS.BOARD,
-          animationEnd: () => { div.className = hc; },
+          animationEnd: () => { this.setPiece(div, this.hand[i]!, this.player_id); },
         });
         anim.push(a);
       }
@@ -796,14 +793,14 @@ class GameBody extends GameBasics<Gamedatas> {
 
   private async notif_zigguratCardSelection(
       args: {
-        card: string;
+        zcard: string;
         player_id: number;
         cardused: boolean;
         score: number;
       }
     ): Promise<void> {
     console.log('notif_zigguratCardSelection', args);
-    const zcard = this.zcardForType(args.card);
+    const zcard = this.zcardForType(args.zcard);
     zcard.owning_player_id = args.player_id;
     zcard.used = args.cardused;
     this.scoreCtrl[args.player_id]!.toValue(args.score);
@@ -923,7 +920,8 @@ class GameBody extends GameBasics<Gamedatas> {
             this.updateCapturedCityCount(details);
           }
         },
-      className: this.css.cityOrField(args.city),
+      attrs: this.pieceAttr(args.city, 0),
+      // className: this.css.cityOrField(args.city),
       fromId: IDS.hexDiv(args),
       toId: (args.player_id != 0)
         ? IDS.citycount(args.player_id)
@@ -938,11 +936,11 @@ class GameBody extends GameBasics<Gamedatas> {
   }
 
   ///////
-    readonly special_log_args = {
-    piece: (args) => `<span class="log-element bbl_${args.piece}_${this.playerIdToColorIndex[args.player_id]}"></span>`,
-    city: (args) => `<span class="log-element bbl_${args.city}"></span>`,
-    zcard: (args) => `<span class="log-element bbl_${args.zcard}"></span>`,
-    original_piece: (args) => `<span class="log-element bbl_${args.original_piece}_${this.playerIdToColorIndex[args.player_id]}"></span>`,
+  readonly special_log_args = {
+    piece: (args: any) => `<span class="log-element" ${Attrs.PIECE}="${this.pieceVal(args.piece, args.player_id)}"></span>`,
+    city: (args: any) => `<span class="log-element" ${Attrs.PIECE}="${this.pieceVal(args.city,0)}"></span>`,
+    zcard: (args: any) => `<span class="log-element" ${Attrs.ZTYPE}="${args.zcard}"></span>`,
+    original_piece: (args: any) => `<span class="log-element" ${Attrs.PIECE}="${this.pieceVal(args.original_piece,args.player_id)}"></span>`,
   };
 
   override format_string_recursive(log: string, args: any): string {
