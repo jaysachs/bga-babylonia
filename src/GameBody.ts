@@ -914,6 +914,7 @@ class GameBody extends GameBasics<Gamedatas> {
       animationEnd:
         () => {
           this.renderCityOrField(args, '');
+          this.unmarkHexPlayable(args);
           for (const playerId in args.details) {
             const details = args.details[playerId]!;
             this.scoreCtrl[playerId]!.incValue(details.capture_points);
