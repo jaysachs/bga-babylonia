@@ -12,6 +12,10 @@ interface Hex extends RowCol {
   piece: string;
 }
 
+class Attrs {
+  static readonly ZTYPE = 'bbl_ztype';
+}
+
 class IDS {
   static readonly AVAILABLE_ZCARDS: string = 'bbl_available_zcards';
   static readonly BOARD = 'bbl_board';
@@ -72,10 +76,6 @@ class CSS {
       return this.EMPTY;
     }
     return 'bbl_' + piece + '_' + this.colorIndexMap[playerId];
-  }
-
-  zcard(card: string, used: boolean = false): string {
-    return used ? 'bbl_zc_used' : ('bbl_' + card);
   }
 }
 
@@ -252,15 +252,15 @@ class GameBody extends GameBasics<Gamedatas> {
     this.zcards = zcards;
     for (let zcard of this.zcards) {
       const id = IDS.availableZcard(zcard.type);
+      const ztype = zcard.used ? "used" : zcard.type;
       // TODO: make and use a "createDiv" method
       if (zcard.owning_player_id != 0) {
         this.addZcardDivInPlayerBoard(zcard);
         // also "shell" in available cards
-        $(IDS.AVAILABLE_ZCARDS).insertAdjacentHTML('beforeend', `<div id='${id}' bbl_ztype='${zcard.type}'></div>`);
+        $(IDS.AVAILABLE_ZCARDS).insertAdjacentHTML('beforeend', `<div id='${id}'></div>`);
       } else {
         // just in available cards
-        const cls = this.css.zcard(zcard.type, zcard.used);
-        $(IDS.AVAILABLE_ZCARDS).insertAdjacentHTML('beforeend', `<div id='${id}' class='${cls}' bbl_ztype='${zcard.type}'></div>`);
+        $(IDS.AVAILABLE_ZCARDS).insertAdjacentHTML('beforeend', `<div id='${id}' ${Attrs.ZTYPE}='${ztype}'></div>`);
         this.addTooltip(id, zcard.tooltip, '');
       }
     }
@@ -268,8 +268,8 @@ class GameBody extends GameBasics<Gamedatas> {
 
   private addZcardDivInPlayerBoard(zcard: Zcard) {
     const id = IDS.ownedZcard(zcard.type);
-    const cls = this.css.zcard(zcard.type, zcard.used);
-    $(IDS.playerBoardZcards(zcard.owning_player_id)).insertAdjacentHTML('beforeend', `<div id='${id}' bbl_ztype='${zcard.type}' class='${cls}'></div>`);
+    const ztype = zcard.used ? "used" : zcard.type;
+    $(IDS.playerBoardZcards(zcard.owning_player_id)).insertAdjacentHTML('beforeend', `<div id='${id}' ${Attrs.ZTYPE}='${ztype}'></div>`);
     this.addTooltip(id, zcard.tooltip, '');
   }
 
@@ -432,20 +432,20 @@ class GameBody extends GameBasics<Gamedatas> {
     }
     const elem = event.target as Element;
     const tid = elem.id;
-    let type = elem.attributes.getNamedItem('bbl_ztype');
+    let type = elem.getAttribute(Attrs.ZTYPE);
     if (type == null) {
-      console.error(`Could not find bbl_ztype attribute in clicked card ${elem}`);
+      console.error(`Could not find ${Attrs.ZTYPE} attribute in clicked card ${elem}`);
       return true;
     }
     for (let zc of this.zcards) {
-      if (zc.type == type.value) {
+      if (zc.type == type) {
         this.bgaPerformAction('actSelectZigguratCard', { zctype: zc.type });
         const div = $(IDS.AVAILABLE_ZCARDS);
         div.classList.remove(this.css.SELECTING);
         return false;
       }
     }
-    console.error(`Unknown zcard type ${type.value}`);
+    console.error(`Unknown zcard type ${type}`);
     return true;
   }
 
@@ -789,7 +789,7 @@ class GameBody extends GameBasics<Gamedatas> {
     if (carddiv == undefined) {
       console.error(`Could not find div for owned ${args.card} card`, zcard);
     } else {
-      carddiv.className = this.css.zcard('', true);
+      carddiv.setAttribute(Attrs.ZTYPE, "used");
     }
     return Promise.resolve();
   }
@@ -811,11 +811,13 @@ class GameBody extends GameBasics<Gamedatas> {
     const id = IDS.availableZcard(zcard.type);
 
     // mark the available zig card spot as 'taken'
-    $(id).className = "";
+    $(id).removeAttribute(Attrs.ZTYPE);
     this.removeTooltip(id);
 
+    let attrs = {};
+    attrs[Attrs.ZTYPE] = zcard.type;
     await this.play(new BgaSlideTempAnimation({
-      className: this.css.zcard(zcard.type, false),
+      attrs: attrs,
       fromId: id,
       toId: IDS.playerBoardZcards(args.player_id),
       parentId: IDS.AVAILABLE_ZCARDS,
