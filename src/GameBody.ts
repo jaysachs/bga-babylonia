@@ -338,8 +338,8 @@ class GameBody extends GameBasics<Gamedatas> {
     this.hexDiv(rc).className = this.css.cityOrField(piece);
   }
 
-  private renderPlayedPiece(rc: RowCol, piece: string, playerNumber: number) {
-    this.hexDiv(rc).className = this.css.piece(piece, playerNumber);
+  private renderPlayedPiece(rc: RowCol, piece: string, playerId: number) {
+    this.hexDiv(rc).className = this.css.piece(piece, playerId);
   }
 
   private renderHand(): void {
