@@ -48,25 +48,19 @@ class IDS {
   }
 
   static ownedZcard(type: string): string {
-    return `bbl_ozig_${type}`;
+    return `bbl_owned_zig_${type}`;
   }
 
   static availableZcard(type: string): string {
-    return `bbl_zig_${type}`;
+    return `bbl_available_zig_${type}`;
   }
 }
 
 class CSS {
-  readonly SELECTING = 'bbl_selecting';
-  readonly SELECTED = 'bbl_selected';
-  readonly PLAYABLE = 'bbl_playable';
-  readonly UNPLAYABLE = 'bbl_unplayable';
-  readonly XXXEMPTY = 'bbl_empty';
-
-  /** from player_id to color index */
-  constructor(private colorIndexMap: Record<number, number>) {
-
-  }
+  static readonly SELECTING = 'bbl_selecting';
+  static readonly SELECTED = 'bbl_selected';
+  static readonly PLAYABLE = 'bbl_playable';
+  static readonly UNPLAYABLE = 'bbl_unplayable';
 }
 
 class Html {
@@ -77,8 +71,7 @@ class Html {
   readonly hdelta = 0.75 * this.width + 2.0;
   readonly vdelta = 1.0 * this.height + 2.0;
 
-  constructor(private css: CSS,
-              private colorIndexMap: Record<number, number>) {}
+  constructor(private colorIndexMap: Record<number, number>) {}
 
   public hex(rc: RowCol): string {
     let top = this.vstart + rc.row * this.vdelta / 2;
@@ -160,8 +153,7 @@ class GameBody extends GameBasics<Gamedatas> {
   private selectedHandPos: number | null = null;
   private playStateArgs: PlayState | null = null;
   private animating = false;
-  private css: CSS = new CSS({});
-  private html: Html = new Html(this.css, {});
+  private html: Html = new Html({});
   private playerIdToColorIndex: Record<number, number> = {};
 
   constructor() {
@@ -194,8 +186,7 @@ class GameBody extends GameBasics<Gamedatas> {
     for (const playerId in gamedatas.players) {
       this.playerIdToColorIndex[playerId] = colorIndexMap[gamedatas.players[playerId]!.color]!;
     }
-    this.css = new CSS(this.playerIdToColorIndex);
-    this.html = new Html(this.css, this.playerIdToColorIndex);
+    this.html = new Html(this.playerIdToColorIndex);
 
     this.setupGameHtml();
 
@@ -363,7 +354,7 @@ class GameBody extends GameBasics<Gamedatas> {
       return null;
     }
     // now check if it's allowed
-    if (!e.classList.contains(this.css.PLAYABLE)) {
+    if (!e.classList.contains(CSS.PLAYABLE)) {
       // console.log('not playable');
       return null;
     }
@@ -418,7 +409,7 @@ class GameBody extends GameBasics<Gamedatas> {
         this.playSelectedPiece(event);
         break;
       case 'selectHexToScore':
-        // this.selectHexToScore(event);
+        this.selectHexToScore(event);
         break;
     }
     return false;
@@ -445,7 +436,7 @@ class GameBody extends GameBasics<Gamedatas> {
       if (zc.type == type) {
         this.bgaPerformAction('actSelectZigguratCard', { zctype: zc.type });
         const div = $(IDS.AVAILABLE_ZCARDS);
-        div.classList.remove(this.css.SELECTING);
+        div.classList.remove(CSS.SELECTING);
         return false;
       }
     }
@@ -459,11 +450,11 @@ class GameBody extends GameBasics<Gamedatas> {
   }
 
   private markHexPlayable(rc: RowCol): void {
-    this.hexDiv(rc).classList.add(this.css.PLAYABLE);
+    this.hexDiv(rc).classList.add(CSS.PLAYABLE);
   }
 
   private unmarkHexPlayable(rc: RowCol): void {
-    this.hexDiv(rc).classList.remove(this.css.PLAYABLE);
+    this.hexDiv(rc).classList.remove(CSS.PLAYABLE);
   }
 
   private markScoreableHexesPlayable(hexes: RowCol[]): void {
@@ -481,12 +472,12 @@ class GameBody extends GameBasics<Gamedatas> {
   private unselectAllHandPieces(): void {
     for (let p = 0; p < this.hand.length; ++p) {
       const cl = $(IDS.handPos(p)).classList;
-      if (cl.contains(this.css.SELECTED)) {
+      if (cl.contains(CSS.SELECTED)) {
         this.unmarkHexesPlayableForPiece(p);
       }
-      cl.remove(this.css.SELECTED);
-      cl.remove(this.css.PLAYABLE);
-      cl.remove(this.css.UNPLAYABLE);
+      cl.remove(CSS.SELECTED);
+      cl.remove(CSS.PLAYABLE);
+      cl.remove(CSS.UNPLAYABLE);
     }
     this.selectedHandPos = null;
   }
@@ -495,11 +486,11 @@ class GameBody extends GameBasics<Gamedatas> {
     for (let p = 0; p < this.hand.length; ++p) {
       const cl = $(IDS.handPos(p)).classList;
       if (this.allowedMovesFor(p).length > 0) {
-        cl.add(this.css.PLAYABLE);
-        cl.remove(this.css.UNPLAYABLE);
+        cl.add(CSS.PLAYABLE);
+        cl.remove(CSS.UNPLAYABLE);
       } else {
-        cl.remove(this.css.PLAYABLE);
-        cl.add(this.css.UNPLAYABLE);
+        cl.remove(CSS.PLAYABLE);
+        cl.add(CSS.UNPLAYABLE);
       }
     }
   }
@@ -570,14 +561,14 @@ class GameBody extends GameBasics<Gamedatas> {
       return false;
     }
     let playable = false;
-    if (!selectedDiv.classList.contains(this.css.SELECTED)) {
+    if (!selectedDiv.classList.contains(CSS.SELECTED)) {
       this.unselectAllHandPieces();
       this.markHexesPlayableForPiece(handpos);
       playable = true;
     } else {
       this.unmarkHexesPlayableForPiece(handpos);
     }
-    selectedDiv.classList.toggle(this.css.SELECTED);
+    selectedDiv.classList.toggle(CSS.SELECTED);
     if (playable) {
       this.selectedHandPos = handpos;
       if (this.currentState != 'client_pickHexToPlay') {
@@ -636,7 +627,7 @@ class GameBody extends GameBasics<Gamedatas> {
   private onUpdateActionButtons_selectZigguratCard(): void {
     const div = $(IDS.AVAILABLE_ZCARDS);
     div.scrollIntoView(false);
-    div.classList.add(this.css.SELECTING);
+    div.classList.add(CSS.SELECTING);
     this.updateStatusBar(_('You must select a ziggurat card'));
   }
 
@@ -651,8 +642,8 @@ class GameBody extends GameBasics<Gamedatas> {
   }
 
   private markAllHexesUnplayable(): void {
-    $(IDS.BOARD).querySelectorAll('.' + this.css.PLAYABLE)
-      .forEach(div => div.classList.remove(this.css.PLAYABLE));
+    $(IDS.BOARD).querySelectorAll('.' + CSS.PLAYABLE)
+      .forEach(div => div.classList.remove(CSS.PLAYABLE));
   }
 
   private async notif_turnFinished(
@@ -700,7 +691,7 @@ class GameBody extends GameBasics<Gamedatas> {
       () => {
         if (isActive) {
           this.setPiece(handPosDiv!, args.original_piece, this.player_id);
-          handPosDiv!.classList.add(this.css.PLAYABLE);
+          handPosDiv!.classList.add(CSS.PLAYABLE);
         }
         this.handCounters[args.player_id]!.incValue(1);
         this.scoreCtrl[args.player_id]!.incValue(-args.points);
@@ -855,7 +846,7 @@ class GameBody extends GameBasics<Gamedatas> {
         mode: 'parallel',
         animationStart: () => {
           for (const rc of details.scored_locations) {
-            this.hexDiv(rc).classList.add(this.css.SELECTED);
+            this.hexDiv(rc).classList.add(CSS.SELECTED);
           }
         },
         animations: details.network_locations.map(
@@ -900,7 +891,7 @@ class GameBody extends GameBasics<Gamedatas> {
         ),
         animationEnd: () => {
           details.scored_locations.forEach(
-            (rc: RowCol) => this.hexDiv(rc).classList.remove(this.css.SELECTED));
+            (rc: RowCol) => this.hexDiv(rc).classList.remove(CSS.SELECTED));
           this.scoreCtrl[details.player_id]!.incValue(details.network_points);
         },
       }));
