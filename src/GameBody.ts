@@ -845,9 +845,8 @@ class GameBody extends GameBasics<Gamedatas> {
       anim.push(new BgaCompoundAnimation({
         mode: 'parallel',
         animationStart: () => {
-          for (const rc of details.scored_locations) {
-            this.hexDiv(rc).classList.add(CSS.SELECTED);
-          }
+          details.scored_locations.forEach(
+            (rc) => this.hexDiv(rc).classList.add(CSS.SELECTED));
         },
         animations: details.network_locations.map(
           rc => new BgaFadeAnimation({
@@ -891,7 +890,7 @@ class GameBody extends GameBasics<Gamedatas> {
         ),
         animationEnd: () => {
           details.scored_locations.forEach(
-            (rc: RowCol) => this.hexDiv(rc).classList.remove(CSS.SELECTED));
+            (rc) => this.hexDiv(rc).classList.remove(CSS.SELECTED));
           this.scoreCtrl[details.player_id]!.incValue(details.network_points);
         },
       }));
