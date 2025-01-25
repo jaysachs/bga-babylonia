@@ -307,8 +307,8 @@ class Game extends \Table
         $rc = new RowCol($row, $col);
         $hex = $model->board()->hexAt($rc);
         $msg = $this->optionEnabled(Option::AUTOMATED_SCORING_SELECTION)
-            ? clienttranslate('hex (${row},${col}) is scored')
-            : clienttranslate('${player_name} chose hex (${row},${col}}) to score');
+            ? clienttranslate('${city} at (${row},${col}) is selected to be scored')
+            : clienttranslate('${player_name} chose ${city} at (${row},${col}}) to score');
         $this->notify->all(
             "scoringSelection",
             $msg,
@@ -317,6 +317,7 @@ class Game extends \Table
                 "player_name" => $this->getActivePlayerName(),
                 "row" => $rc->row,
                 "col" => $rc->col,
+                "city" => $hex->piece->value,
             ]
         );
 
