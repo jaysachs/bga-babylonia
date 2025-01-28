@@ -870,13 +870,13 @@ class GameBody extends GameBasics<Gamedatas> {
       }));
 
       anim.push(new BgaSpinGrowAnimation({
-        className: '',
+        className: 'bbl_city_scoring',
         text: `+${details.network_points}`,
         centeredOnId: IDS.hexDiv(args),
         parentId: IDS.BOARD,
         fontSize: 72,
         color: '#' + this.gamedatas.players[details.player_id]!.color,
-        duration: 1500,
+        duration: 1200,
       }));
 
       anim.push(new BgaCompoundAnimation({

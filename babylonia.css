@@ -454,3 +454,15 @@ a.action-button > div.bbl_zcard {
     height: 2.1em;
     width: 1.4em;
 }
+
+/*
+ *  cityscoring animation classes
+ */
+.bbl_city_scoring {
+    -webkit-text-stroke: thin black;
+    /* paint-order: stroke fill; */
+    color: black;
+    font-family: Helvetica;
+    font-style: bold;
+    /* text-shadow: '-2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000, 2px 2px 0 #000'; */
+}
