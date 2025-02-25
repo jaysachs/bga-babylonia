@@ -306,7 +306,7 @@ class Game extends \Table
         $model = new Model($this->ps, $player_id);
         $rc = new RowCol($row, $col);
         $hex = $model->board()->hexAt($rc);
-        $msg = $this->optionEnabled(Option::AUTOMATED_SCORING_SELECTION)
+        $msg = $this->optionEnabled(TableOption::AUTOMATED_SCORING_SELECTION)
             ? clienttranslate('${city} at (${row},${col}) is selected to be scored')
             : clienttranslate('${player_name} chose ${city} at (${row},${col}}) to score');
         $this->notify->all(
@@ -354,7 +354,7 @@ class Game extends \Table
             return;
         }
 
-        if ($this->optionEnabled(Option::AUTOMATED_SCORING_SELECTION)) {
+        if ($this->optionEnabled(TableOption::AUTOMATED_SCORING_SELECTION)) {
             $this->gamestate->nextState("automatedHexSelection");
             return;
         }
@@ -697,14 +697,14 @@ class Game extends \Table
         $model = new Model($this->ps, 0);
         $model->createNewGame(
             array_keys($players),
-            $this->optionEnabled(Option::ADVANCED_ZIGGURAT_CARDS));
+            $this->optionEnabled(TableOption::ADVANCED_ZIGGURAT_CARDS));
 
         // Activate first player once everything has been initialized and ready.
         $this->turnToNextPlayer();
     }
 
-    private function optionEnabled(Option $option): bool {
-        return $this->getGameStateValue($option->value) > 0;
+    private function optionEnabled(TableOption $option): bool {
+        return $this->tableOptions->get($option->value) > 0;
     }
 
     /**

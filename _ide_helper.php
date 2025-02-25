@@ -113,6 +113,39 @@ namespace Bga\GameFramework {
             //
         }
     }
+
+    abstract class TableOptions {
+        /**
+         * Get the value of a table option.
+         */
+        public function get(int $optionId): int {
+            return 0;
+        }
+    
+        /**
+         * Indicates if the table is Turn-based.
+         */
+        function isTurnBased(): bool {
+            return false;
+        }
+    
+        /**
+         * Indicates if the table is Real-time.
+         */
+        function isRealTime(): bool {
+            return false;
+        }
+    }
+
+    abstract class UserPreferences {
+        /**
+         * Gets the value of a user preference for a player (cached in game DB). Null if unset.
+         */
+        function get(int $playerId, int $prefId): ?int
+        {
+            return null;
+        }
+    }
 }
 
 namespace Bga\GameFramework\Db {
@@ -120,10 +153,8 @@ namespace Bga\GameFramework\Db {
     {
         /**
          * Delete global variables.
-         *
-         * @param string[] ...$names
          */
-        public function delete(...$names): void
+        public function delete(string ...$names): void
         {
             //
         }
@@ -134,6 +165,14 @@ namespace Bga\GameFramework\Db {
         public function get(string $name, mixed $defaultValue = null): mixed
         {
             return null;
+        }
+        
+        /**
+         * Retrieve all variables stored in DB (or a selected subset, if the function is called with parameters).
+         */
+        public function getAll(string ...$names): array
+        {
+            return [];
         }
 
         /**
@@ -667,6 +706,16 @@ namespace {
         readonly public \Bga\GameFramework\Notify $notify;
 
         /**
+         * Access the underlying TableOptions object.
+         */
+        readonly public \Bga\GameFramework\TableOptions $tableOptions;
+
+        /**
+         * Access the underlying UserPreferences object.
+         */
+        readonly public \Bga\GameFramework\UserPreferences $userPreferences;
+
+        /**
          * Default constructor.
          */
         public function __construct()
@@ -907,6 +956,7 @@ namespace {
         /**
          * Returns the value of a user preference for a player. It will return the value currently selected in the
          * select combo box, in the top-right menu.
+         * @deprecated use $this->userPreferences->get(int $playerId, int $prefId)
          */
         final public function getGameUserPreference(int $playerId, int $prefId): ?int
         {
@@ -1132,6 +1182,7 @@ namespace {
 
         /**
          * Returns true if game is turn based, false if it is realtime
+         * @deprecated use $this->tableOptions->isTurnBased()
          */
         final public function isAsync(): bool
         {
@@ -1140,6 +1191,7 @@ namespace {
 
         /**
          * Returns true if game is realtime, false if it is async.
+         * @deprecated use $this->tableOptions->isRealTime()
          */
         final public function isRealtime(): bool
         {
