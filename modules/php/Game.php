@@ -47,8 +47,6 @@ class Game extends \Table
         $this->initGameStateLabels([
             Game::GLOBAL_PLAYER_ON_TURN => 10,
             Game::GLOBAL_NEXT_PLAYER_TO_BE_ACTIVE => 11,
-            Option::ADVANCED_ZIGGURAT_CARDS->value => 100,
-            Option::AUTOMATED_SCORING_SELECTION->value => 101
         ]);
 
         Stats::init($this);
