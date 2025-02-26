@@ -34,8 +34,5 @@ interface Db {
     /** @return string[] */
     public function getSingleFieldList(string $sql): array;
 
-    /** @return string[][] $data */
-    public function getCollection(string $sql): array;
-
     public function execute(string $sql): void;
 }

@@ -248,7 +248,7 @@ class PersistentStore {
                 WHERE player_id = $player_id
                 ORDER BY seq_id";
         /** @var array<int,string[]> $data */
-        $data = $this->db->getCollection($sql);
+        $data = $this->db->getObjectList($sql);
         $moves = [];
         foreach ($data as &$md) {
             $moves[] = new Move(intval($md['player_id']),
@@ -287,7 +287,7 @@ class PersistentStore {
 
     /** @return array<int,PlayerInfo> */
     public function &retrieveAllPlayerInfo(): array {
-        $sql = "SELECT P.player_id id, P.player_id, P.player_score score,
+        $sql = "SELECT P.player_id player_id, P.player_score score,
                        D.captured_city_count captured_city_count,
                        H.hand_size, Q.pool_size
                 FROM player P
@@ -308,9 +308,10 @@ class PersistentStore {
         //  INNER JOIN ziggurat_cards Z ON P.player_id = Z.player_id"
 
         /** @var array<int,string[]> $data */
-        $data = $this->db->getCollection($sql);
+        $data = $this->db->getObjectList($sql);
         $result = [];
-        foreach ($data as $pid => $pd) {
+        foreach ($data as $pd) {
+            $pid = intval($pd['player_id']);
             $result[$pid] = $this->playerInfoFromData($pid, $pd);
         }
         return $result;

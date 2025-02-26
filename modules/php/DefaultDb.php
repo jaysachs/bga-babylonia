@@ -29,24 +29,19 @@ namespace Bga\Games\babylonia;
 
 class DefaultDb implements Db {
 
-    public function __construct(private Game $game) { }
+    public function __construct() { }
 
     /** @return string[][] */
     public function getObjectList(string $sql): array {
-        return $this->game->getObjectListFromDB2($sql);
+        return Game::getObjectListFromDB2($sql);
     }
 
     /** @return string[] */
     public function getSingleFieldList(string $sql): array {
-        return $this->game->getSingleFieldListFromDB2($sql);
-    }
-
-    /** @return string[][] */
-    public function getCollection(string $sql): array {
-        return $this->game->getCollectionFromDB($sql);
+        return Game::getSingleFieldListFromDB2($sql);
     }
 
     public function execute(string $sql): void {
-        $this->game->DbQuery($sql);
+        Game::DbQuery($sql);
     }
 }

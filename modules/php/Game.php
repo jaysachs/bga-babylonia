@@ -52,7 +52,7 @@ class Game extends \Table
         ]);
 
         Stats::init($this);
-        $this->ps = new PersistentStore(new DefaultDb($this));
+        $this->ps = new PersistentStore(new DefaultDb());
     }
 
     public function actPlayPiece(int $handpos, int $row, int $col): void
