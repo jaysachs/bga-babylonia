@@ -661,27 +661,60 @@ class GameBody extends GameBasics<Gamedatas> {
     return Promise.resolve();
   }
 
-  private async notif_undoMove(
-      args: {
-        player_id: number;
-        points: number;
-        handpos: number;
-        row: number;
-        col: number;
-        original_piece: string;
-        captured_piece: string;
-        piece: string;
-      }
-    ): Promise<void> {
+  private async notif_undoMoveActive(
+    args: {
+      player_id: number;
+      points: number;
+      handpos: number;
+      row: number;
+      col: number;
+      original_piece: string;
+      captured_piece: string;
+      piece: string;
+    }
+  ): Promise<void> {
     console.log('notif_undoMove', args);
+    if (this.player_id != args.player_id) {
+      console.error("Non-active player got the undoMoveActive notification, ignoring");
+      return Promise.resolve();
+    }
 
-    const isActive = this.player_id == args.player_id;
-    let targetDivId = IDS.handcount(args.player_id);
-    let handPosDiv: HTMLElement | null;
-    if (isActive) {
-      this.hand[args.handpos] = args.original_piece;
-      handPosDiv = this.handPosDiv(args.handpos);
-      targetDivId = handPosDiv.id;
+    this.hand[args.handpos] = args.original_piece;
+    let handPosDiv = this.handPosDiv(args.handpos);
+
+    // Put any piece (field) captured in the move back on the board
+    // TODO: animate this? (and animate the capture too?)
+    this.renderCityOrField(args, args.captured_piece);
+    const onDone =
+      () => {
+        this.setPiece(handPosDiv!, args.original_piece, this.player_id);
+        handPosDiv.classList.add(CSS.PLAYABLE);
+        this.handCounters[args.player_id]!.incValue(1);
+        this.scoreCtrl[args.player_id]!.incValue(-args.points);
+      };
+    await this.play(new BgaSlideTempAnimation({
+      attrs: this.pieceAttr(args.piece, args.player_id),
+      fromId: IDS.hexDiv(args),
+      toId: handPosDiv.id,
+      parentId: IDS.BOARD
+    })).then(onDone);
+  }
+
+  private async notif_undoMove(
+    args: {
+      player_id: number;
+      points: number;
+      handpos: number;
+      row: number;
+      col: number;
+      original_piece: string;
+      captured_piece: string;
+      piece: string;
+    }
+  ): Promise<void> {
+    if (this.player_id == args.player_id) {
+      // active player also gets the richer `undoMoveActive` notification, so ignore this.
+      return Promise.resolve();
     }
 
     // Put any piece (field) captured in the move back on the board
@@ -689,20 +722,30 @@ class GameBody extends GameBasics<Gamedatas> {
     this.renderCityOrField(args, args.captured_piece);
     const onDone =
       () => {
-        if (isActive) {
-          this.setPiece(handPosDiv!, args.original_piece, this.player_id);
-          handPosDiv!.classList.add(CSS.PLAYABLE);
-        }
         this.handCounters[args.player_id]!.incValue(1);
         this.scoreCtrl[args.player_id]!.incValue(-args.points);
       };
     await this.play(new BgaSlideTempAnimation({
       attrs: this.pieceAttr(args.piece, args.player_id),
       fromId: IDS.hexDiv(args),
-      toId: targetDivId,
+      toId: IDS.handcount(args.player_id),
       parentId: IDS.BOARD
     })).then(onDone);
   }
+
+  private async handleUndoMove(
+    args: {
+      player_id: number;
+      points: number;
+      handpos: number;
+      row: number;
+      col: number;
+      original_piece: string;
+      captured_piece: string;
+      piece: string;
+    }
+  ): Promise<void> {
+ }
 
   private async notif_piecePlayed(
       args: {

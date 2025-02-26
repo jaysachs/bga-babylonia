@@ -465,25 +465,23 @@ class Game extends \Table
                 $player_id, -$move->ziggurat_points);
         }
 
-        foreach ($model->allPlayerIds() as $pid) {
-            $args = [
-                "player_name" => $this->getActivePlayerName(),
-                "player_id" => $this->activePlayerId(),
-                "row" => $move->rc->row,
-                "col" => $move->rc->col,
-                "piece" => $move->piece->value,
-                "captured_piece" => $move->captured_piece->value,
-                "points" => $move->points(),
-            ];
+        $args = [
+            "player_name" => $this->getActivePlayerName(),
+            "player_id" => $this->activePlayerId(),
+            "row" => $move->rc->row,
+            "col" => $move->rc->col,
+            "piece" => $move->piece->value,
+            "captured_piece" => $move->captured_piece->value,
+            "points" => $move->points(),
+        ];
+        $this->notify->all("undoMove", clienttranslate('${player_name} undid their move'), $args );
 
-            if ($pid == $this->activePlayerId()) {
-                $args["handpos"] = $move->handpos;
-                $args["original_piece"] = $move->original_piece->value;
-            }
-            $this->notify->player($pid, "undoMove", clienttranslate('${player_name} undid their move'), $args );
-        }
+        $args["handpos"] = $move->handpos;
+        $args["original_piece"] = $move->original_piece->value;
+        $this->notify->player($this->activePlayerId(), "undoMoveActive", clienttranslate('${player_name} undid their move'), $args );
 
         // final notifyAll required to keep moves and replays in sync
+        // TODO: is this needed now?
         $this->notify->all('sync', '', []);
 
         $this->gamestate->nextState("playPieces");
