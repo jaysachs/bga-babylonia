@@ -440,8 +440,8 @@ a.action-button > div.bbl_zcard {
 
 .log-element[bbl_piece]
 {
-    height: 1.5em;
-    width: 1.725em;
+    height: 1.0em;
+    width: 1.15em;
     display: inline-block;
     margin: 0;
     padding: 0;
@@ -451,8 +451,8 @@ a.action-button > div.bbl_zcard {
 .log-element[bbl_ztype]
 {
     display: inline-block;
-    height: 2.1em;
-    width: 1.4em;
+    height: 1.0em;
+    width: 0.67em;
 }
 
 /*
