@@ -77,7 +77,7 @@ class Html {
     let top = this.vstart + rc.row * this.vdelta / 2;
     let left = this.hstart + rc.col * this.hdelta;
 
-    return `<div id="${IDS.hexDiv(rc)}" style="top:${top}px; left:${left}px;"></div>`;
+    return `<div id='${IDS.hexDiv(rc)}' style='top:${top}px; left:${left}px;'></div>`;
   }
 
   public emptyHandPiece(id: string): string {
@@ -88,34 +88,34 @@ class Html {
     let color_index = this.colorIndexMap[player_id];
     return `
       <div>
-        <span class="bbl_pb_hand_label_${color_index}"></span>
-        <span id="${IDS.handcount(player_id)}">5</span>
+        <span class='bbl_pb_hand_label_${color_index}'></span>
+        <span id='${IDS.handcount(player_id)}'>5</span>
       </div>
       <div>
-        <span class="bbl_pb_pool_label_${color_index}"></span>
-        <span id="${IDS.poolcount(player_id)}">19</span>
+        <span class='bbl_pb_pool_label_${color_index}'></span>
+        <span id='${IDS.poolcount(player_id)}'>19</span>
       </div>
       <div>
-        <span class="bbl_pb_citycount_label"></span>
-        <span id="${IDS.citycount(player_id)}">1</span>
+        <span class='bbl_pb_citycount_label'></span>
+        <span id='${IDS.citycount(player_id)}'>1</span>
       </div>
-      <div id="${IDS.playerBoardZcards(player_id)}" class="bbl_pb_zcards">
-        <span class="bbl_pb_zcard_label"></span>
+      <div id='${IDS.playerBoardZcards(player_id)}' class='bbl_pb_zcards'>
+        <span class='bbl_pb_zcard_label'></span>
       </div>
 `;
   }
 
   public base_html(): string {
     return `
-    <div id="bbl_main">
-      <div id="bbl_hand_container">
-        <div id="${IDS.HAND}"></div>
+    <div id='bbl_main'>
+      <div id='bbl_hand_container'>
+        <div id='${IDS.HAND}'></div>
       </div>
-      <div id="${IDS.BOARD_CONTAINER}">
-        <div id="${IDS.BOARD}"></div>
-        <span id="bbl_vars"></span>
+      <div id='${IDS.BOARD_CONTAINER}'>
+        <div id='${IDS.BOARD}'></div>
+        <span id='bbl_vars'></span>
       </div>
-      <div id="${IDS.AVAILABLE_ZCARDS}"></div>
+      <div id='${IDS.AVAILABLE_ZCARDS}'></div>
    </div>
 `;
   }
@@ -204,7 +204,7 @@ class GameBody extends GameBasics<Gamedatas> {
 
     this.setupAvailableZcards(gamedatas.ziggurat_cards);
 
-    console.log("setting up handlers");
+    console.log('setting up handlers');
     this.setupHandlers();
 
     this.bgaSetupPromiseNotifications();
@@ -233,11 +233,11 @@ class GameBody extends GameBasics<Gamedatas> {
     this.zcards = zcards;
     for (let zcard of this.zcards) {
       const id = IDS.availableZcard(zcard.type);
-      const ztype = zcard.used ? "used" : zcard.type;
-      // TODO: make and use a "createDiv" method
+      const ztype = zcard.used ? 'used' : zcard.type;
+      // TODO: make and use a 'createDiv' method
       if (zcard.owning_player_id != 0) {
         this.addZcardDivInPlayerBoard(zcard);
-        // also "shell" in available cards
+        // also 'shell' in available cards
         $(IDS.AVAILABLE_ZCARDS).insertAdjacentHTML('beforeend', `<div id='${id}'></div>`);
       } else {
         // just in available cards
@@ -249,7 +249,7 @@ class GameBody extends GameBasics<Gamedatas> {
 
   private addZcardDivInPlayerBoard(zcard: Zcard) {
     const id = IDS.ownedZcard(zcard.type);
-    const ztype = zcard.used ? "used" : zcard.type;
+    const ztype = zcard.used ? 'used' : zcard.type;
     $(IDS.playerBoardZcards(zcard.owning_player_id)).insertAdjacentHTML('beforeend', `<div id='${id}' ${Attrs.ZTYPE}='${ztype}'></div>`);
     this.addTooltip(id, zcard.tooltip, '');
   }
@@ -276,7 +276,7 @@ class GameBody extends GameBasics<Gamedatas> {
   }
 
   private updateHandCount(player: { player_id: number; hand_size: number; }, animate: boolean = true) {
-    console.log("update hand count", player, this.handCounters[player.player_id]);
+    console.log('update hand count', player, this.handCounters[player.player_id]);
     this.updateCounter(this.handCounters[player.player_id]!,
       player.hand_size,
       animate);
@@ -320,7 +320,7 @@ class GameBody extends GameBasics<Gamedatas> {
   }
 
   private pieceVal(piece: string, playerId: number): string {
-    return playerId > 0 ? piece + "_" + this.playerIdToColorIndex[playerId] : piece;
+    return playerId > 0 ? piece + '_' + this.playerIdToColorIndex[playerId] : piece;
   }
 
   private pieceAttr(piece: string, playerId: number): Record<string, string> {
@@ -500,7 +500,7 @@ class GameBody extends GameBasics<Gamedatas> {
       return;
     }
     if (this.playStateArgs == null) {
-      console.error("playStateArgs unexpectedly null");
+      console.error('playStateArgs unexpectedly null');
       return;
     }
     this.selectedHandPos = null;
@@ -675,7 +675,7 @@ class GameBody extends GameBasics<Gamedatas> {
   ): Promise<void> {
     console.log('notif_undoMove', args);
     if (this.player_id != args.player_id) {
-      console.error("Non-active player got the undoMoveActive notification, ignoring");
+      console.error('Non-active player got the undoMoveActive notification, ignoring');
       return Promise.resolve();
     }
 
@@ -820,7 +820,7 @@ class GameBody extends GameBasics<Gamedatas> {
     if (carddiv == undefined) {
       console.error(`Could not find div for owned ${args.card} card`, zcard);
     } else {
-      carddiv.setAttribute(Attrs.ZTYPE, "used");
+      carddiv.setAttribute(Attrs.ZTYPE, 'used');
     }
     return Promise.resolve();
   }
@@ -971,10 +971,10 @@ class GameBody extends GameBasics<Gamedatas> {
 
   ///////
   readonly special_log_args = {
-    piece: (args: any) => `<span class="log-element" ${Attrs.PIECE}="${this.pieceVal(args.piece, args.player_id)}"></span>`,
-    city: (args: any) => `<span class="log-element" ${Attrs.PIECE}="${this.pieceVal(args.city,0)}"></span>`,
-    zcard: (args: any) => `<span class="log-element" ${Attrs.ZTYPE}="${args.zcard}"></span>`,
-    original_piece: (args: any) => `<span class="log-element" ${Attrs.PIECE}="${this.pieceVal(args.original_piece,args.player_id)}"></span>`,
+    piece: (args: any) => `<span class='log-element' ${Attrs.PIECE}='${this.pieceVal(args.piece, args.player_id)}'></span>`,
+    city: (args: any) => `<span class='log-element' ${Attrs.PIECE}='${this.pieceVal(args.city,0)}'></span>`,
+    zcard: (args: any) => `<span class='log-element' ${Attrs.ZTYPE}='${args.zcard}'></span>`,
+    original_piece: (args: any) => `<span class='log-element' ${Attrs.PIECE}='${this.pieceVal(args.original_piece,args.player_id)}'></span>`,
   };
 
   override format_string_recursive(log: string, args: any): string {
