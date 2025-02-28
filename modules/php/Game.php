@@ -682,8 +682,7 @@ class Game extends \Table
             )
         );
 
-        $this->reattributeColorsBasedOnPreferences($players,
-                                                   $default_colors);
+        $this->reattributeColorsBasedOnPreferences($players, $gameinfos['player_colors']);
         $this->reloadPlayersBasicInfos();
 
         // Init game statistics.
