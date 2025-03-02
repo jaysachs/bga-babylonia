@@ -14,155 +14,155 @@
     "player": {
         "number_turns": {
             "id": 20,
-            "name": "Number of turns played",
+            "name": "Turns played",
             "type": "int"
         },
         "ziggurat_cards": {
             "id": 21,
-            "name": "Number of zigurrat cards acquired",
+            "name": "Zigurrat cards acquired",
             "type": "int"
         },
         "cities_captured": {
             "id": 22,
-            "name": "Number of cities captured",
+            "name": "Cities captured",
             "type": "int"
         },
         "city_scoring_triggered": {
             "id": 23,
-            "name": "Number of city scorings triggered",
+            "name": "City scorings triggered",
             "type": "int"
         },
         "ziggurat_scoring_triggered": {
             "id": 24,
-            "name": "Number of ziggurat scorings triggered",
+            "name": "Ziggurat scorings triggered",
             "type": "int"
         },
         "river_spaces_played": {
             "id": 25,
-            "name": "Number of rivers spaces played",
+            "name": "Rivers spaces played",
             "type": "int"
         },
         "points_from_city_networks": {
             "id": 26,
-            "name": "Number of points gained from city networks",
+            "name": "Points gained from city networks",
             "type": "int"
         },
         "points_from_captured_cities": {
             "id": 27,
-            "name": "Number of points gained from captured cities",
+            "name": "Points gained from captured cities",
             "type": "int"
         },
         "points_from_ziggurats": {
             "id": 28,
-            "name": "Number of points gained from ziggurat adjacency",
+            "name": "Points gained from ziggurat adjacency",
             "type": "int"
         },
         "points_from_fields": {
             "id": 29,
-            "name": "Number of points gained from captured fields",
+            "name": "Points gained from captured fields",
             "type": "int"
         },
         "fields_captured": {
             "id": 30,
-            "name": "Number of captured fields",
+            "name": "Captured fields",
             "type": "int"
         },
         "ziggurat_card_1_chosen": {
             "id": 31,
-            "name": "Whether ziggurat card 1 was chosen",
+            "name": "Ziggurat card 1 chosen",
             "type": "bool"
         },
         "ziggurat_card_2_chosen": {
             "id": 32,
-            "name": "Whether ziggurat card 2 was chosen",
+            "name": "Ziggurat card 2 chosen",
             "type": "bool"
         },
         "ziggurat_card_3_chosen": {
             "id": 33,
-            "name": "Whether ziggurat card 3 was chosen",
+            "name": "Ziggurat card 3 chosen",
             "type": "bool"
         },
         "ziggurat_card_4_chosen": {
             "id": 34,
-            "name": "Whether ziggurat card 4 was chosen",
+            "name": "Ziggurat card 4 chosen",
             "type": "bool"
         },
         "ziggurat_card_5_chosen": {
             "id": 35,
-            "name": "Whether ziggurat card 5 was chosen",
+            "name": "Ziggurat card 5 chosen",
             "type": "bool"
         },
         "ziggurat_card_6_chosen": {
             "id": 36,
-            "name": "Whether ziggurat card 6 was chosen",
+            "name": "Ziggurat card 6 chosen",
             "type": "bool"
         },
         "ziggurat_card_7_chosen": {
             "id": 37,
-            "name": "Whether ziggurat card 7 was chosen",
+            "name": "Ziggurat card 7 chosen",
             "type": "bool"
         },
         "ziggurat_card_8_chosen": {
             "id": 38,
-            "name": "Whether ziggurat card 8 was chosen",
+            "name": "Ziggurat card 8 chosen",
             "type": "bool"
         },
         "ziggurat_card_9_chosen": {
             "id": 39,
-            "name": "Whether ziggurat card 9 was chosen",
+            "name": "Ziggurat card 9 chosen",
             "type": "bool"
         },
         "ziggurat_card_1_used": {
             "id": 41,
-            "name": "Number of times ziggurat card 1 was used",
+            "name": "Times ziggurat card 1 was used",
             "type": "int",
             "display": "limited"
         },
         "ziggurat_card_2_used": {
             "id": 42,
-            "name": "Number of times ziggurat card 2 was used",
+            "name": "Times ziggurat card 2 was used",
             "type": "int",
             "display": "limited"
         },
         "ziggurat_card_3_used": {
             "id": 43,
-            "name": "Number of times ziggurat card 3 was used",
+            "name": "Times ziggurat card 3 was used",
             "type": "int",
             "display": "limited"
         },
         "ziggurat_card_4_used": {
             "id": 44,
-            "name": "Number of times ziggurat card 4 was used",
+            "name": "Times ziggurat card 4 was used",
             "type": "int",
             "display": "limited"
         },
         "ziggurat_card_5_used": {
             "id": 45,
-            "name": "Number of times ziggurat card 5 was used",
+            "name": "Times ziggurat card 5 was used",
             "type": "int",
             "display": "limited"
         },
         "ziggurat_card_6_used": {
             "id": 46,
-            "name": "Number of times ziggurat card 6 was used",
+            "name": "Times ziggurat card 6 was used",
             "type": "int",
             "display": "limited"
         },
         "ziggurat_card_7_used": {
             "id": 47,
-            "name": "Number of times ziggurat card 7 was used",
+            "name": "Times ziggurat card 7 was used",
             "type": "int",
             "display": "limited"
         },
         "ziggurat_card_8_used": {
             "id": 48,
-            "name": "Number of times ziggurat card 8 was used",
+            "name": "Times ziggurat card 8 was used",
             "type": "int",
             "display": "limited"
         },
         "ziggurat_card_9_used": {
             "id": 49,
-            "name": "Number of times ziggurat card 9 was used",
+            "name": "Times ziggurat card 9 was used",
             "type": "int",
             "display": "limited"
         }
