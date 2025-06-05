@@ -73,16 +73,16 @@ $machinestates = [
     1 => GameStateBuilder::create()
         ->name('gameSetup')
         ->description('')
-        ->type('manager')
+        ->type(StateType::MANAGER)
         ->action('stGameSetup')
         ->transitions(['' => STATE_PLAYER_PLAY_PIECES])
-        ->build()
+        ->build(),
 
     STATE_PLAYER_PLAY_PIECES => GameStateBuilder::create()
         ->name('playPieces')
         ->description(clienttranslate('${actplayer} is playing pieces'))
         ->descriptionmyturn( clienttranslate('${you} may play a piece or end the turn'))
-        ->type('activeplayer')
+        ->type(StateType::ACTIVE_PLAYER)
         ->args('argPlayPieces')
         ->possibleactions([
             'actPlayPiece',
@@ -94,11 +94,11 @@ $machinestates = [
             'done' => STATE_END_OF_TURN_SCORING,
             'zombiePass' => STATE_END_OF_TURN_SCORING,
         ])
-        ->build()
+        ->build(),
 
     STATE_END_OF_TURN_SCORING => GameStateBuilder::create()
         ->name('endOfTurnScoring')
-        ->type('game')
+        ->type(StateType::GAME)
         ->description('')
         ->action('stEndOfTurnScoring')
         ->args('argSelectHexToScore')
@@ -108,11 +108,11 @@ $machinestates = [
             'automatedHexSelection' => STATE_AUTO_SCORING_HEX_SELECTION,
             'done' => STATE_FINISH_TURN,
         ])
-        ->build()
+        ->build(),
 
     STATE_AUTO_SCORING_HEX_SELECTION => GameStateBuilder::create()
         ->name('autoScoringHexSelection')
-        ->type('game')
+        ->type(StateType::GAME)
         ->description('')
         ->action('stAutoScoringHexSelection')
         ->transitions([
@@ -125,7 +125,7 @@ $machinestates = [
         ->name('selectHexToScore')
         ->description(clienttranslate('${actplayer} must select a hex to score'))
         ->descriptionmyturn( clienttranslate('${you} must select a hex to score'))
-        ->type('activeplayer')
+        ->type(StateType::ACTIVE_PLAYER)
         ->args('argSelectHexToScore')
         ->possibleactions([
             'actSelectHexToScore',
@@ -141,7 +141,7 @@ $machinestates = [
 
     STATE_ZIGGURAT_SCORING => GameStateBuilder::create()
         ->name('zigguratScoring')
-        ->type('game')
+        ->type(StateType::GAME)
         ->description('')
         ->action('stZigguratScoring')
         ->args('argZigguratScoring')
@@ -156,7 +156,7 @@ $machinestates = [
         ->name('selectZigguratCard')
         ->description(clienttranslate('${actplayer} must select a ziggurat card'))
         ->descriptionmyturn( clienttranslate('${you} must select a ziggurat card'))
-        ->type('activeplayer')
+        ->type(StateType::ACTIVE_PLAYER)
         ->args('argSelectZigguratCard')
         ->possibleactions([
             'actSelectZigguratCard',
@@ -172,7 +172,7 @@ $machinestates = [
     STATE_FINISH_TURN => GameStateBuilder::create()
         ->name('finishTurn')
         ->description('')
-        ->type('game')
+        ->type(StateType::GAME)
         ->action('stFinishTurn')
         ->updateGameProgression(true)
         ->transitions([
@@ -185,7 +185,7 @@ $machinestates = [
     STATE_NEXT_PLAYER => GameStateBuilder::create()
         ->name('nextPlayer')
         ->description('')
-        ->type('game')
+        ->type(StateType::GAME)
         ->action('stNextPlayer')
         ->updateGameProgression(true)
         ->transitions([
@@ -197,7 +197,7 @@ $machinestates = [
         ->name('chooseExtraTurn')
         ->description(clienttranslate('${actplayer} may choose to take another turn'))
         ->descriptionmyturn( clienttranslate('${you} must choose whether to take another turn'))
-        ->type('activeplayer')
+        ->type(StateType::ACTIVE_PLAYER)
         ->possibleactions([
             'actChooseExtraTurn',
         ])
@@ -214,7 +214,7 @@ $machinestates = [
     99 => GameStateBuilder::create()
         ->name('gameEnd')
         ->description(clienttranslate('End of game'))
-        ->type('manager')
+        ->type(StateType::MANAGER)
         ->action('stGameEnd')
         ->args('argGameEnd')
         ->build()
