@@ -27,7 +27,7 @@ namespace Bga\Games\babylonia;
 
 require_once(APP_GAMEMODULE_PATH . "module/table/table.game.php");
 
-class Game extends \Table
+class Game extends \Bga\GameFramework\Table
 {
     // Used during scoring ziggurats in case the scoring of a ziggurat
     //  means another player needs to choose a card; this global holds
