@@ -128,9 +128,8 @@ interface Zcard {
   owning_player_id: number;
 }
 
-interface Gamedatas {
+interface BGamedatas extends Gamedatas {
   player_data: PlayerData[];
-  players: Player[];
   board: Hex[];
   hand: string[];
   ziggurat_cards: Zcard[];
@@ -143,7 +142,7 @@ interface PlayState {
 }
 
 /** Game class */
-class GameBody extends GameBasics<Gamedatas> {
+class GameBody extends GameBasics<BGamedatas> {
   private hand: string[] = [];
   private handCounters: Counter[] = [];
   private poolCounters: Counter[] = [];
@@ -179,7 +178,7 @@ class GameBody extends GameBasics<Gamedatas> {
     this.addPausableHandler($(IDS.AVAILABLE_ZCARDS), 'click', this.onZcardClicked.bind(this));
   }
 
-  override setup(gamedatas: Gamedatas) {
+  override setup(gamedatas: BGamedatas) {
     console.log(gamedatas);
     super.setup(gamedatas);
 
@@ -541,9 +540,9 @@ class GameBody extends GameBasics<Gamedatas> {
     console.log('onHandClicked', ev);
     ev.preventDefault();
     ev.stopPropagation();
-    if (this.inFlight > 0) {
-      return false;
-    }
+    // if (this.inFlight > 0) {
+    //  return false;
+    // }
     if (!this.isCurrentPlayerActive()) {
       return false;
     }
@@ -977,7 +976,7 @@ class GameBody extends GameBasics<Gamedatas> {
     original_piece: (args: any) => `<span class='log-element' ${Attrs.PIECE}='${this.pieceVal(args.original_piece,args.player_id)}'></span>`,
   };
 
-  protected bgaFormatText(log: string, origargs: any): {log: string, args: any} {
+  public override  bgaFormatText(log: string, origargs: any): {log: string, args: any} {
     type SpecialLogArgs = keyof typeof this.special_log_args;
     const saved: { [k in SpecialLogArgs]?: any } = {};
     let args = origargs.clone();

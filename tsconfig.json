@@ -25,7 +25,7 @@
     },
 
     "include": [
-        "../bga-ts-framework/src/bga-framework.d.ts",
+        "bga-framework.d.ts",
         "../bga-ts-framework/src/GameBasics.ts",
         "../bga-animations/src/**/*.ts",
         "src/colormap.ts",
