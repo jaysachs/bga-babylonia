@@ -49,7 +49,7 @@
 
 //    !! It is not a good idea to modify this file when a game is running !!
 
-if ( !defined('STATE_END_GAME')) { // guard since this included multiple times
+if ( !defined('STATE_PLAYER_PLAY_PIECES')) { // guard since this included multiple times
     define('STATE_PLAYER_PLAY_PIECES', 2);
     define('STATE_END_OF_TURN_SCORING', 3);
     define('STATE_PLAYER_SELECT_SCORING_HEX', 4);
@@ -60,23 +60,12 @@ if ( !defined('STATE_END_GAME')) { // guard since this included multiple times
     define('STATE_PLAYER_EXTRA_TURN', 9);
     define('STATE_NEXT_PLAYER', 10);
     define('STATE_AUTO_SCORING_HEX_SELECTION', 11);
-    define('STATE_END_GAME', 99);
 }
 
 use Bga\GameFramework\GameStateBuilder;
 use Bga\GameFramework\StateType;
 
 $machinestates = [
-
-    // The initial state. Please do not modify.
-
-    1 => GameStateBuilder::create()
-        ->name('gameSetup')
-        ->description('')
-        ->type(StateType::MANAGER)
-        ->action('stGameSetup')
-        ->transitions(['' => STATE_PLAYER_PLAY_PIECES])
-        ->build(),
 
     STATE_PLAYER_PLAY_PIECES => GameStateBuilder::create()
         ->name('playPieces')
@@ -208,14 +197,4 @@ $machinestates = [
             'zombiePass' => STATE_NEXT_PLAYER,
         ])
         ->build(),
-
-    // Final state.
-    // Please do not modify (and do not overload action/args methods).
-    99 => GameStateBuilder::create()
-        ->name('gameEnd')
-        ->description(clienttranslate('End of game'))
-        ->type(StateType::MANAGER)
-        ->action('stGameEnd')
-        ->args('argGameEnd')
-        ->build()
 ];

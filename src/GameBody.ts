@@ -977,16 +977,17 @@ class GameBody extends GameBasics<Gamedatas> {
     original_piece: (args: any) => `<span class='log-element' ${Attrs.PIECE}='${this.pieceVal(args.original_piece,args.player_id)}'></span>`,
   };
 
-  override format_string_recursive(log: string, args: any): string {
+  protected bgaFormatText(log: string, origargs: any): {log: string, args: any} {
     type SpecialLogArgs = keyof typeof this.special_log_args;
     const saved: { [k in SpecialLogArgs]?: any } = {};
+    let args = origargs.clone();
     try {
       if (log && args && !args.processed) {
         args.processed = true;
         for (const key in this.special_log_args) {
           if (key in args) {
             const k = key as SpecialLogArgs;
-            saved[k] = args[k];
+//            saved[k] = args[k];
             args[k] = this.special_log_args[k](args);
           }
         }
@@ -995,10 +996,10 @@ class GameBody extends GameBasics<Gamedatas> {
       console.error(log, args, 'Exception thrown', e.stack);
     }
     try {
-      return this.inherited(arguments);
+      return { log, args };
     } finally {
       for (const k in saved) {
-        args[k] = saved[k as SpecialLogArgs];
+//        args[k] = saved[k as SpecialLogArgs];
       }
     }
   }
