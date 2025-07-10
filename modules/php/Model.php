@@ -51,7 +51,6 @@ class Model {
             $this->ps->upsertHand($player_id, $hand);
             $this->ps->upsertPool($player_id, $pool);
         }
-        $this->ps->initializePlayerData($player_ids);
         $this->_components = Components::forNewGame($use_advanced_ziggurats);
         $this->ps->insertComponents($this->_components);
     }
