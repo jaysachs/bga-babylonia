@@ -49,6 +49,9 @@ class ScoredCity {
             $sc->scoringHexes[$pid] = [];
             $sc->captured_city_points[$pid] = 0;
         }
+        ksort($sc->networkHexes);
+        ksort($sc->scoringHexes);
+        ksort($sc->captured_city_points);
         return $sc;
     }
 
@@ -68,8 +71,10 @@ class ScoredCity {
 
     private function addNetworkHex(Hex $hex, int $player_id): void {
         $this->networkHexes[$player_id][] = $hex;
+        sort($this->networkHexes[$player_id]);
         if ($this->scoredHex->piece->scores($hex->piece)) {
             $this->scoringHexes[$player_id][] = $hex;
+            sort($this->scoringHexes[$player_id]);
         }
     }
 
@@ -107,6 +112,15 @@ class ScoredCity {
             },
             $hexes
         );
+    }
+
+    public function equals(ScoredCity $other): bool {
+        return $this->scoredHex == $other->scoredHex
+            && $this->scoringHexes == $other->scoringHexes
+            && $this->networkHexes == $other->networkHexes
+            && $this->captured_by == $other->captured_by
+            && $this->captured_city_points == $other->captured_city_points
+            ;
     }
 }
 

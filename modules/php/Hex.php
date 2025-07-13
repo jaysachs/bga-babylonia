@@ -44,6 +44,15 @@ class Hex {
                                 public Landmass $landmass = Landmass::UNKNOWN) {
     }
 
+    public function equals(Hex $other): bool {
+        return $this->type == $other->type
+            && $this->rc == $other->rc
+            && $this->piece == $other->piece
+            && $this->player_id == $other->player_id
+            && $this->scored == $other->scored
+            && $this->landmass == $other->landmass;
+    }
+
     public function captureCity(): Piece {
         if (!$this->piece->isCity()) {
             throw new \LogicException("attempt to capture a non-city $this");

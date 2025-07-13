@@ -32,6 +32,10 @@ class RowCol {
         return sprintf("%d:%d", $this->row, $this->col);
     }
 
+    public function equals(RowCol $other): bool {
+        return $this->row == $other->row && $this->col == $other->col;
+    }
+
     public function __construct(public readonly int $row,
                                 public readonly int $col) { }
 

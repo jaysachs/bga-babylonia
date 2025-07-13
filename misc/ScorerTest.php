@@ -35,7 +35,7 @@ m-3
 END;
 
     private function assertEq(ScoredCity $expected, ScoredCity $actual):void {
-        $this->assertEqualsCanonicalizing($expected, $actual);
+        $this->assertEquals($expected, $actual);
     }
 
     public function testCityScoring(): void
@@ -51,12 +51,12 @@ END;
             [
                 1 => [],
                 2 => [$hex(7, 1)],
-                3 => [$hex(5, 3), $hex(4, 4), $hex(8,0)]
+                3 => [$hex(4, 4), $hex(5, 3), $hex(8,0)]
             ],
             [
                 1 => [$hex(4,0)],
                 2 => [$hex(7,1)],
-                3 => [$hex(8,0), $hex(6,2), $hex(5,1), $hex(5,3), $hex(4, 4)],
+                3 => [$hex(4, 4), $hex(5,1), $hex(5,3), $hex(6,2), $hex(8,0)],
             ]
         );
         $got = $scorer->computeCityScores($expected->scoredHex);
@@ -74,7 +74,7 @@ END;
             [
                 1 => [$hex(2, 4)],
                 2 => [],
-                3 => [$hex(4, 4), $hex(5, 3), $hex(5,1), $hex(6,2)],
+                3 => [$hex(4, 4), $hex(5, 1), $hex(5,3), $hex(6,2)],
             ]
         );
         $got = $scorer->computeCityScores($expected->scoredHex);
@@ -104,12 +104,12 @@ END;
             [
                 1 => [],
                 2 => [$hex(7, 1)],
-                3 => [$hex(8, 0), $hex(1, 3), $hex(2, 0)]
+                3 => [$hex(1, 3), $hex(2, 0), $hex(8, 0)]
             ],
             [
                 1 => [$hex(4, 0)],
-                2 => [$hex(7, 1), $hex(6, 2)],
-                3 => [$hex(5, 1), $hex(3, 1), $hex(2, 2), $hex(4, 2), $hex(8,0), $hex(1, 3), $hex(2, 0)]
+                2 => [$hex(6, 2), $hex(7, 1)],
+                3 => [$hex(1, 3), $hex(2, 0), $hex(2, 2), $hex(3, 1), $hex(4, 2), $hex(5, 1), $hex(8,0)]
             ]
         );
         $got = $scorer->computeCityScores($expected->scoredHex);
@@ -216,8 +216,8 @@ END;
                 3 => []
             ],
             [
-                1 => [$hex(2, 4), $hex(3, 3), $hex(4, 2), $hex(3,1), $hex(1,1), $hex(0, 2)],
-                2 => [$hex(2, 2), $hex(0, 4), $hex(1, 5)],
+                1 => [$hex(0, 2), $hex(1, 1), $hex(2, 4), $hex(3,1), $hex(3, 3), $hex(4, 2)],
+                2 => [$hex(0, 4), $hex(1, 5), $hex(2, 2)],
                 3 => []
             ]
         );
@@ -248,9 +248,9 @@ END;
                 3 => [$hex(3, 1)]
             ],
             [
-                1 => [$hex(3, 3), $hex(1, 1)],
+                1 => [$hex(1, 1), $hex(3, 3)],
                 2 => [$hex(1, 3), $hex(4, 2)],
-                3 => [$hex(3, 1), $hex(0, 2)]
+                3 => [$hex(0, 2), $hex(3, 1)]
             ]
         );
         $got = $scorer->computeCityScores($expected->scoredHex);
