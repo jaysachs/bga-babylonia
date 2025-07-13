@@ -253,6 +253,9 @@ END;
         foreach ($development_locations as $rc) {
             $hex = $this->hexAt($rc);
             $x = array_shift($available_developments);
+            if ($x == null) {
+                throw new \LogicException("insufficient available developments");
+            }
             $hex->placeDevelopment($x);
         }
     }

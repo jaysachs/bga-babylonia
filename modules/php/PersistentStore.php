@@ -145,7 +145,7 @@ class PersistentStore {
 
     /** @param array<int,PlayerInfo> $player_infos */
     public function updatePlayers(array $player_infos): void {
-        foreach ($player_infos as $player_id => $pi) {
+        foreach ($player_infos as $_ => $pi) {
             $this->updatePlayer($pi);
         }
     }

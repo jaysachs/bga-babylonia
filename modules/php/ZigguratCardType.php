@@ -38,7 +38,8 @@ enum ZigguratCardType : string {
     case FREE_CENTER_LAND_CONNECTS = 'zc_land';
     case FREE_RIVER_CONNECTS = 'zc_river';
 
-    public static function sevenTypes(bool $use_advanced = false): array /* ZigguratCardType */ {
+    /** @return ZigguratCardType[] */
+    public static function sevenTypes(bool $use_advanced = false): array {
         $ziggurats = [
             ZigguratCardType::PLUS_10,
             ZigguratCardType::EXTRA_TURN,

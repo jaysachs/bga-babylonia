@@ -250,7 +250,7 @@ class Model {
 
     private function totalCapturedCities(): int {
         $result = 0;
-        foreach ($this->allPlayerInfo() as $pid => $pi) {
+        foreach ($this->allPlayerInfo() as $_ => $pi) {
             $result += $pi->captured_city_count;
         }
         return $result;

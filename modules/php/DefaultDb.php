@@ -32,15 +32,18 @@ class DefaultDb implements Db {
     public function __construct() { }
 
     /** @return string[][] */
+    #[\Override]
     public function getObjectList(string $sql): array {
         return Game::getObjectListFromDB2($sql);
     }
 
     /** @return string[] */
+    #[\Override]
     public function getSingleFieldList(string $sql): array {
         return Game::getSingleFieldListFromDB2($sql);
     }
 
+    #[\Override]
     public function execute(string $sql): void {
         Game::DbQuery($sql);
     }
