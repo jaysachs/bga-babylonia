@@ -123,7 +123,11 @@ class Board {
 
         foreach ($lines as &$s) {
             $col = ($row & 1) ? 1 : 0;
-            foreach (preg_split("/\s+/", trim($s)) as $t) {
+            $fields = preg_split("/\s+/", trim($s));
+            if ($fields === false) {
+                continue;
+            }
+            foreach ($fields as $t) {
                 $rc = new RowCol($row, $col);
                 $m = [];
                 if ($t == "XXX") {
