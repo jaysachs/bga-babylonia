@@ -761,20 +761,4 @@ class Game extends \Bga\GameFramework\Table
 
         throw new \feException("Zombie mode not supported at this game state: \"{$state_name}\".");
     }
-
-
-    /**
-     * forwarder methods
-     * @return string[][]
-     */
-    final static public function getObjectListFromDB2(string $sql): array
-    {
-        return self::getObjectListFromDB($sql, false);
-    }
-
-    /** @return string[] */
-    final static public function getSingleFieldListFromDB2(string $sql): array
-    {
-        return self::getObjectListFromDB($sql, true);
-    }
 }

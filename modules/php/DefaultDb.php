@@ -34,13 +34,13 @@ class DefaultDb implements Db {
     /** @return string[][] */
     #[\Override]
     public function getObjectList(string $sql): array {
-        return Game::getObjectListFromDB2($sql);
+        return Game::getObjectListFromDB($sql, false);
     }
 
     /** @return string[] */
     #[\Override]
     public function getSingleFieldList(string $sql): array {
-        return Game::getSingleFieldListFromDB2($sql);
+        return Game::getObjectListFromDB($sql, true);
     }
 
     #[\Override]
