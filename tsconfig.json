@@ -24,16 +24,12 @@
         ]
     },
 
-    "include": [
-        "bga-framework.d.ts",
+    "files": [
         "bga-animations.d.ts",
-        "../bga-animations/src/**/*.ts",
+        "bga-framework.d.ts",
         "src/colormap.ts",
         "src/GameBasics.ts",
         "src/GameBody.ts",
         "src/define.ts"
-    ],
-    "exclude": [
-        "../bga-animations/src/define.ts",
     ]
 }

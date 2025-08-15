@@ -148,7 +148,7 @@ class GameBody extends GameBasics<BGamedatas> {
   private poolCounters: Counter[] = [];
   private cityCounters: Counter[] = [];
   private zcards: Zcard[] = [];
-  private animationManager: AnimationManager;
+//  private animationManager: AnimationManager;
   private selectedHandPos: number | null = null;
   private playStateArgs: PlayState | null = null;
   private animating = false;
@@ -157,16 +157,16 @@ class GameBody extends GameBasics<BGamedatas> {
 
   constructor() {
     super();
-    this.animationManager = new AnimationManager(this);
+//    this.animationManager = new AnimationManager(this);
     this.handCounters = [];
     this.hand = [];
   }
 
-  private async play(anim: BgaAnimation<any>): Promise<void> {
-    this.animating = true;
-    return this.animationManager.play(anim)
-      .then(() => { this.animating = false; });
-  }
+  // private async play(anim: BgaAnimation<any>): Promise<void> {
+  //   this.animating = true;
+  //   return this.animationManager.play(anim)
+  //     .then(() => { this.animating = false; });
+  // }
 
   private addPausableHandler(et: EventTarget, type: string, handler: (a: Event) => boolean): void {
     et.addEventListener(type, (e: Event) => { if (this.animating) return true; return handler(e); });
@@ -691,12 +691,37 @@ class GameBody extends GameBasics<BGamedatas> {
         this.handCounters[args.player_id]!.incValue(1);
         this.scoreCtrl[args.player_id]!.incValue(-args.points);
       };
-    await this.play(new BgaSlideTempAnimation({
-      attrs: this.pieceAttr(args.piece, args.player_id),
-      fromId: IDS.hexDiv(args),
-      toId: handPosDiv.id,
-      parentId: IDS.BOARD
-    })).then(onDone);
+      const div = this.mkTemp(IDS.hexDiv(args), null, this.pieceAttr(args.piece, args.player_id));
+      await this.bgaAM.slideOutAndDestroy(div, document.getElementById(handPosDiv.id)!).then(onDone);
+    // await this.play(new BgaSlideTempAnimation({
+    //   attrs: this.pieceAttr(args.piece, args.player_id),
+    //   fromId: IDS.hexDiv(args),
+    //   toId: handPosDiv.id,
+    //   parentId: IDS.BOARD
+    // })).then(onDone);
+  }
+
+  private lastId = 0;
+  private mkTemp(parentId: string, className: string | null, attrs: Record<string,string> | null ): HTMLElement {
+    const div = document.createElement('div');
+    div.id = `bgaanim_tmp_slideTmpDiv${this.lastId++}`;
+            const parent = document.getElementById(parentId);
+            if (className) {
+                div.className = className;
+            }
+            if (attrs) {
+                for (const name in attrs) {
+                    div.setAttribute(name, attrs[name]!);
+                }
+            }
+
+            // // Unclear why setting `style` attribute directly doesn't work.
+            // div.style.position = 'absolute';
+            // div.style.top = `${top}px`;
+            // div.style.left = `${left}px`;
+            // div.style.zIndex = '100';
+            parent!.appendChild(div);
+            return div;
   }
 
   private async notif_undoMove(
@@ -724,12 +749,13 @@ class GameBody extends GameBasics<BGamedatas> {
         this.handCounters[args.player_id]!.incValue(1);
         this.scoreCtrl[args.player_id]!.incValue(-args.points);
       };
-    await this.play(new BgaSlideTempAnimation({
-      attrs: this.pieceAttr(args.piece, args.player_id),
-      fromId: IDS.hexDiv(args),
-      toId: IDS.handcount(args.player_id),
-      parentId: IDS.BOARD
-    })).then(onDone);
+    // await this.play(new BgaSlideTempAnimation({
+    //   attrs: this.pieceAttr(args.piece, args.player_id),
+    //   fromId: IDS.hexDiv(args),
+    //   toId: IDS.handcount(args.player_id),
+    //   parentId: IDS.BOARD
+    // })).then(onDone);
+    onDone();
   }
 
   private async handleUndoMove(
@@ -774,17 +800,18 @@ class GameBody extends GameBasics<BGamedatas> {
         this.updateHandCount(args);
         this.scoreCtrl[args.player_id]!.incValue(args.points);
       };
-    await this.play(new BgaSlideTempAnimation({
-      attrs: this.pieceAttr(args.piece, args.player_id),
-      fromId: sourceDivId,
-      toId: this.hexDiv(args).id,
-      parentId: IDS.BOARD
-    })).then(onDone);
+    // await this.play(new BgaSlideTempAnimation({
+    //   attrs: this.pieceAttr(args.piece, args.player_id),
+    //   fromId: sourceDivId,
+    //   toId: this.hexDiv(args).id,
+    //   parentId: IDS.BOARD
+    // })).then(onDone);
+    onDone();
   }
 
   private async notif_handRefilled(args: { hand: string[] }): Promise<void> {
     console.log('notif_handRefilled', args);
-    const anim: BgaAnimation<any>[] = [];
+//    const anim: BgaAnimation<any>[] = [];
     const pid = this.player_id;
     for (let i = 0; i < args.hand.length; ++i) {
       // extend hand if zig tile just acquired
@@ -795,20 +822,20 @@ class GameBody extends GameBasics<BGamedatas> {
       }
       const div = this.handPosDiv(i);
       if (div.getAttribute(Attrs.PIECE) == 'empty') { // && incoming piece is not empty?
-        const a = new BgaSlideTempAnimation({
-          attrs: this.pieceAttr(this.hand[i]!, this.player_id),
-          fromId: IDS.handcount(pid),
-          toId: div.id,
-          parentId: IDS.BOARD,
-          animationEnd: () => { this.setPiece(div, this.hand[i]!, this.player_id); },
-        });
-        anim.push(a);
+        // const a = new BgaSlideTempAnimation({
+        //   attrs: this.pieceAttr(this.hand[i]!, this.player_id),
+        //   fromId: IDS.handcount(pid),
+        //   toId: div.id,
+        //   parentId: IDS.BOARD,
+        //   animationEnd: () => { this.setPiece(div, this.hand[i]!, this.player_id); },
+        // });
+        // anim.push(a);
       }
     }
-    await this.play(new BgaCompoundAnimation({
-      animations: anim,
-      mode: 'sequential',
-    }));
+    // await this.play(new BgaCompoundAnimation({
+    //   animations: anim,
+    //   mode: 'sequential',
+    // }));
   }
 
   private async notif_extraTurnUsed(args: { card: string; used: boolean; }): Promise<void> {
@@ -846,12 +873,13 @@ class GameBody extends GameBasics<BGamedatas> {
 
     let attrs = {};
     attrs[Attrs.ZTYPE] = zcard.type;
-    await this.play(new BgaSlideTempAnimation({
-      attrs: attrs,
-      fromId: id,
-      toId: IDS.playerBoardZcards(args.player_id),
-      parentId: IDS.AVAILABLE_ZCARDS,
-    })).then(() => this.addZcardDivInPlayerBoard(zcard));
+    // await this.play(new BgaSlideTempAnimation({
+    //   attrs: attrs,
+    //   fromId: id,
+    //   toId: IDS.playerBoardZcards(args.player_id),
+    //   parentId: IDS.AVAILABLE_ZCARDS,
+    // })).then(() => this.addZcardDivInPlayerBoard(zcard));
+    this.addZcardDivInPlayerBoard(zcard);
   }
 
   private async notif_cityScored(
@@ -872,7 +900,7 @@ class GameBody extends GameBasics<BGamedatas> {
   ): Promise<void> {
     console.log('notif_cityScored', args);
 
-    const anim: BgaAnimation<any>[] = [];
+//    const anim: BgaAnimation<any>[] = [];
 
     this.markHexPlayable(args);
     for (const playerId in args.details) {
@@ -884,89 +912,97 @@ class GameBody extends GameBasics<BGamedatas> {
           nonscoringLocations.push(nh);
         }
       }
-      anim.push(new BgaCompoundAnimation({
-        mode: 'parallel',
-        animationStart: () => {
-          details.scored_locations.forEach(
-            (rc) => this.hexDiv(rc).classList.add(CSS.SELECTED));
-        },
-        animations: details.network_locations.map(
-          rc => new BgaFadeAnimation({
-            element: this.hexDiv(rc),
-            duration: 1000,
-            kind: 'outin',
-            iterations: 2,
-          })
-        ),
-      }));
+      // anim.push(new BgaCompoundAnimation({
+      //   mode: 'parallel',
+      //   animationStart: () => {
+      //     details.scored_locations.forEach(
+      //       (rc) => this.hexDiv(rc).classList.add(CSS.SELECTED));
+      //   },
+      //   animations: details.network_locations.map(
+      //     rc => new BgaFadeAnimation({
+      //       element: this.hexDiv(rc),
+      //       duration: 1000,
+      //       kind: 'outin',
+      //       iterations: 2,
+      //     })
+      //   ),
+      // }));
 
-      anim.push(new BgaCompoundAnimation({
-        mode: 'parallel',
-        animations: nonscoringLocations.map(
-          rc => new BgaFadeAnimation({
-            element: this.hexDiv(rc),
-            duration: 400,
-            kind: 'out',
-          })
-        ),
-      }));
+      // anim.push(new BgaCompoundAnimation({
+      //   mode: 'parallel',
+      //   animations: nonscoringLocations.map(
+      //     rc => new BgaFadeAnimation({
+      //       element: this.hexDiv(rc),
+      //       duration: 400,
+      //       kind: 'out',
+      //     })
+      //   ),
+      // }));
 
-      anim.push(new BgaSpinGrowAnimation({
-        className: 'bbl_city_scoring',
-        text: `+${details.network_points}`,
-        centeredOnId: IDS.hexDiv(args),
-        parentId: IDS.BOARD,
-        fontSize: 72,
-        color: '#' + this.gamedatas.players[details.player_id]!.color,
-        duration: 1200,
-      }));
+      // anim.push(new BgaSpinGrowAnimation({
+      //   className: 'bbl_city_scoring',
+      //   text: `+${details.network_points}`,
+      //   centeredOnId: IDS.hexDiv(args),
+      //   parentId: IDS.BOARD,
+      //   fontSize: 72,
+      //   color: '#' + this.gamedatas.players[details.player_id]!.color,
+      //   duration: 1200,
+      // }));
 
-      anim.push(new BgaCompoundAnimation({
-        mode: 'parallel',
-        animations: nonscoringLocations.map(
-          rc => new BgaFadeAnimation({
-            element: this.hexDiv(rc),
-            duration: 400,
-            kind: 'in',
-          })
-        ),
-        animationEnd: () => {
-          details.scored_locations.forEach(
-            (rc) => this.hexDiv(rc).classList.remove(CSS.SELECTED));
-          this.scoreCtrl[details.player_id]!.incValue(details.network_points);
-        },
-      }));
+      // anim.push(new BgaCompoundAnimation({
+      //   mode: 'parallel',
+      //   animations: nonscoringLocations.map(
+      //     rc => new BgaFadeAnimation({
+      //       element: this.hexDiv(rc),
+      //       duration: 400,
+      //       kind: 'in',
+      //     })
+      //   ),
+      //   animationEnd: () => {
+      //     details.scored_locations.forEach(
+      //       (rc) => this.hexDiv(rc).classList.remove(CSS.SELECTED));
+      //     this.scoreCtrl[details.player_id]!.incValue(details.network_points);
+      //   },
+      // }));
     }
 
-    anim.push(new BgaSlideTempAnimation({
-      animationStart:
-        () => {
-          this.renderCityOrField(args, '');
-        },
-      animationEnd:
-        () => {
+    // anim.push(new BgaSlideTempAnimation({
+    //   animationStart:
+    //     () => {
+    //       this.renderCityOrField(args, '');
+    //     },
+    //   animationEnd:
+    //     () => {
+    //       this.renderCityOrField(args, '');
+    //       this.unmarkHexPlayable(args);
+    //       for (const playerId in args.details) {
+    //         const details = args.details[playerId]!;
+    //         this.scoreCtrl[playerId]!.incValue(details.capture_points);
+    //         this.updateCapturedCityCount(details);
+    //       }
+    //     },
+    //   attrs: this.pieceAttr(args.city, 0),
+    //   // className: this.css.cityOrField(args.city),
+    //   fromId: IDS.hexDiv(args),
+    //   toId: (args.player_id != 0)
+    //     ? IDS.citycount(args.player_id)
+    //     // TODO: find a better location for 'off the board'
+    //     : IDS.AVAILABLE_ZCARDS,
+    //   parentId: IDS.BOARD,
+    // }));
+    // await this.play(new BgaCompoundAnimation({
+    //   mode: 'sequential',
+    //   animations: anim,
+    // }));
+
           this.renderCityOrField(args, '');
           this.unmarkHexPlayable(args);
           for (const playerId in args.details) {
             const details = args.details[playerId]!;
             this.scoreCtrl[playerId]!.incValue(details.capture_points);
             this.updateCapturedCityCount(details);
-          }
-        },
-      attrs: this.pieceAttr(args.city, 0),
-      // className: this.css.cityOrField(args.city),
-      fromId: IDS.hexDiv(args),
-      toId: (args.player_id != 0)
-        ? IDS.citycount(args.player_id)
-        // TODO: find a better location for 'off the board'
-        : IDS.AVAILABLE_ZCARDS,
-      parentId: IDS.BOARD,
-    }));
-    await this.play(new BgaCompoundAnimation({
-      mode: 'sequential',
-      animations: anim,
-    }));
-  }
+                      }
+    }
 
   ///////
   readonly special_log_args = {

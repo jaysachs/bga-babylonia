@@ -1,3 +1,5 @@
+declare namespace BgaAnimations {
+
 type HorizontalBase = 'left' | 'center' | 'right';
 type VerticalBase = 'top' | 'center' | 'bottom';
 
@@ -26,7 +28,7 @@ interface AnimationManagerSettings {
     /**
      * Determines the behavior of the placeholder at the starting position ("from") of the animation.
      * Default: 'shrinking'.
-     * 
+     *
      * Options:
      * - 'on': Keeps the placeholder occupying the full element's space until the animation completes.
      * - 'off': Does not add a placeholder.
@@ -37,7 +39,7 @@ interface AnimationManagerSettings {
     /**
      * Determines the behavior of the placeholder at the ending position ("to") of the animation.
      * Default: 'growing'.
-     * 
+     *
      * Options:
      * - 'on': Keeps the placeholder occupying the full element's space until the animation completes.
      * - 'off': Does not add a placeholder.
@@ -209,7 +211,7 @@ interface RunningAnimation {
 /**
  * Base functions to help create animations.
  */
-declare class BaseAnimationManager {
+class BaseAnimationManager {
     /**
      * The surface on which the animations will run. Attached directly to the body.
      */
@@ -361,7 +363,7 @@ declare class BaseAnimationManager {
  * The animation class, giving access to many type of animations, and the possibility to run multiple animation with a delta or sync/async.
  * Instanciate only one for all your game animations.
  */
-declare class AnimationManager {
+class AnimationManager {
     base: BaseAnimationManager;
     private animationSettings;
     /**
@@ -467,8 +469,15 @@ declare class AnimationManager {
     playInterval(animations: ((index: number) => Promise<any>)[], interval?: number): Promise<void>;
 }
 
-declare const BgaAnimations: {
-    Manager: typeof AnimationManager;
-};
+}
 
-export { BgaAnimations, AnimationManager as Manager };
+// declare namespace BgaAnimations {
+//   type Manager = typeof AnimationManager;
+
+// }
+
+// declare const BgaAnimations3: {
+//     Manager: typeof AnimationManager;
+// };
+
+// export { BgaAnimations, AnimationManager as Manager };
