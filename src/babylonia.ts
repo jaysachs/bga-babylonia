@@ -178,9 +178,8 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
     super.setup(gamedatas);
 
     // create the animation manager, and bind it to the `game.bgaAnimationsActive()` function
-    const game = this;
     this.bgaAM = new BgaAnimations.Manager({
-        animationsActive: () => game.bgaAnimationsActive(),
+        animationsActive: () => this.bgaAnimationsActive(),
     });
 
     for (const playerId in gamedatas.players) {
@@ -662,7 +661,7 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
   }
 
   private floatingPieceAnimationSettings = {
-    duration: 1000,
+    duration: 700,
     ignoreScale: true,
     ignoreRotation: true,
   };
@@ -891,14 +890,13 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
   ): Promise<void> {
     console.log('notif_cityScored', args);
 
-    let anim: Promise<void> = Promise.resolve();
-
     const hex = document.getElementById(IDS.hexDiv(args))!;
 
     this.markHexPlayable(args);
     for (const playerId in args.details) {
       const details = args.details[playerId]!;
-      const p = () => {
+      let aa = this.bgaAnimationsActive();
+      if (aa) {
         for (const nh of details.network_locations) {
           let cl = this.hexDiv(nh).classList;
           cl.add(CSS.IN_NETWORK);
@@ -907,34 +905,29 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
             cl.add(CSS.UNIMPORTANT);
           }
         }
-      };
-      anim = anim.then(p);
-
-      // TODO: add a pause here after city highlighted?
-
-      anim = anim.then(async () => this.bgaAM.displayScoring(
+      }
+      await this.bgaAM.displayScoring(
         hex,
         details.network_points,
         this.gamedatas.players[playerId]!.color,
-        { duration: 3000, extraClass: 'bbl_city_scoring' }));
+        { duration: 1500, extraClass: 'bbl_city_scoring' });
 
-      anim = anim.then(() => {
-          details.network_locations.forEach(
-             (rc) => {
-               let cl = this.hexDiv(rc).classList;
-               cl.remove(CSS.IN_NETWORK);
-               cl.remove(CSS.UNIMPORTANT);
-             });
-          this.scoreCtrl[details.player_id]!.incValue(details.network_points);
-      });
+      if (aa) {
+        details.network_locations.forEach(
+           (rc) => {
+             let cl = this.hexDiv(rc).classList;
+             cl.remove(CSS.IN_NETWORK);
+             cl.remove(CSS.UNIMPORTANT);
+           });
+      }
+      this.scoreCtrl[details.player_id]!.incValue(details.network_points);
     }
 
     // TODO: highlight adjacent hexes with winner highlighted.
-    anim = anim.then(() => {
-          this.renderCityOrField(args, '');
-          this.unmarkHexPlayable(args);
-    });
-    anim = anim.then(async () => this.slideTemp(
+    this.renderCityOrField(args, '');
+    this.unmarkHexPlayable(args);
+
+    await this.slideTemp(
       IDS.hexDiv(args),
       (args.player_id != 0)
         ? IDS.citycount(args.player_id)
@@ -943,18 +936,13 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
       this.pieceAttr(args.city, 0)
       // className: this.css.cityOrField(args.city),
       // parentId: IDS.BOARD
-      )
     );
 
-    anim = anim.then(() => {
-          for (const playerId in args.details) {
-            const details = args.details[playerId]!;
-            this.scoreCtrl[playerId]!.incValue(details.capture_points);
-            this.updateCapturedCityCount(details);
-          }
-        });
-
-    await anim;
+    for (const playerId in args.details) {
+      const details = args.details[playerId]!;
+      this.scoreCtrl[playerId]!.incValue(details.capture_points);
+      this.updateCapturedCityCount(details);
+    }
   }
 
   ///////
