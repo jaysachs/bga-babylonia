@@ -1,5 +1,3 @@
-declare namespace BgaAnimations {
-
 type HorizontalBase = 'left' | 'center' | 'right';
 type VerticalBase = 'top' | 'center' | 'bottom';
 
@@ -211,7 +209,7 @@ interface RunningAnimation {
 /**
  * Base functions to help create animations.
  */
-class BaseAnimationManager {
+declare class BaseAnimationManager {
     /**
      * The surface on which the animations will run. Attached directly to the body.
      */
@@ -363,7 +361,7 @@ class BaseAnimationManager {
  * The animation class, giving access to many type of animations, and the possibility to run multiple animation with a delta or sync/async.
  * Instanciate only one for all your game animations.
  */
-class AnimationManager {
+declare class AnimationManager {
     base: BaseAnimationManager;
     private animationSettings;
     /**
@@ -469,15 +467,8 @@ class AnimationManager {
     playInterval(animations: ((index: number) => Promise<any>)[], interval?: number): Promise<void>;
 }
 
-}
-
-// declare namespace BgaAnimations {
-//   type Manager = typeof AnimationManager;
-
-// }
-
-// declare const BgaAnimations3: {
-//     Manager: typeof AnimationManager;
-// };
+declare const BgaAnimations: {
+    Manager: typeof AnimationManager;
+};
 
 // export { BgaAnimations, AnimationManager as Manager };

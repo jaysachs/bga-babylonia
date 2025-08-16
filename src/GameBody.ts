@@ -143,12 +143,12 @@ interface PlayState {
 
 /** Game class */
 class GameBody extends GameBasics<BGamedatas> {
+  private bgaAM: AnimationManager;
   private hand: string[] = [];
   private handCounters: Counter[] = [];
   private poolCounters: Counter[] = [];
   private cityCounters: Counter[] = [];
   private zcards: Zcard[] = [];
-//  private animationManager: AnimationManager;
   private selectedHandPos: number | null = null;
   private playStateArgs: PlayState | null = null;
   private animating = false;
@@ -157,16 +157,9 @@ class GameBody extends GameBasics<BGamedatas> {
 
   constructor() {
     super();
-//    this.animationManager = new AnimationManager(this);
     this.handCounters = [];
     this.hand = [];
   }
-
-  // private async play(anim: BgaAnimation<any>): Promise<void> {
-  //   this.animating = true;
-  //   return this.animationManager.play(anim)
-  //     .then(() => { this.animating = false; });
-  // }
 
   private addPausableHandler(et: EventTarget, type: string, handler: (a: Event) => boolean): void {
     et.addEventListener(type, (e: Event) => { if (this.animating) return true; return handler(e); });
@@ -181,6 +174,12 @@ class GameBody extends GameBasics<BGamedatas> {
   override setup(gamedatas: BGamedatas) {
     console.log(gamedatas);
     super.setup(gamedatas);
+
+    // create the animation manager, and bind it to the `game.bgaAnimationsActive()` function
+    const game = this;
+    this.bgaAM = new BgaAnimations.Manager({
+        animationsActive: () => true, // game.bgaAnimationsActive(),
+    });
 
     for (const playerId in gamedatas.players) {
       this.playerIdToColorIndex[playerId] = colorIndexMap[gamedatas.players[playerId]!.color]!;
@@ -660,6 +659,12 @@ class GameBody extends GameBasics<BGamedatas> {
     return Promise.resolve();
   }
 
+  private floatingPieceAnimationSettings = {
+    duration: 1000,
+    ignoreScale: true,
+    ignoreRotation: true,
+  };
+
   private async notif_undoMoveActive(
     args: {
       player_id: number;
@@ -691,37 +696,33 @@ class GameBody extends GameBasics<BGamedatas> {
         this.handCounters[args.player_id]!.incValue(1);
         this.scoreCtrl[args.player_id]!.incValue(-args.points);
       };
-      const div = this.mkTemp(IDS.hexDiv(args), null, this.pieceAttr(args.piece, args.player_id));
-      await this.bgaAM.slideOutAndDestroy(div, document.getElementById(handPosDiv.id)!).then(onDone);
-    // await this.play(new BgaSlideTempAnimation({
-    //   attrs: this.pieceAttr(args.piece, args.player_id),
-    //   fromId: IDS.hexDiv(args),
-    //   toId: handPosDiv.id,
-    //   parentId: IDS.BOARD
-    // })).then(onDone);
+    await this.slideTemp(
+      IDS.hexDiv(args),
+      handPosDiv.id,
+      this.pieceAttr(args.piece, args.player_id)).then(onDone);
   }
 
-  private lastId = 0;
-  private mkTemp(parentId: string, className: string | null, attrs: Record<string,string> | null ): HTMLElement {
-    const div = document.createElement('div');
-    div.id = `bgaanim_tmp_slideTmpDiv${this.lastId++}`;
-            const parent = document.getElementById(parentId);
-            if (className) {
-                div.className = className;
-            }
-            if (attrs) {
-                for (const name in attrs) {
-                    div.setAttribute(name, attrs[name]!);
-                }
-            }
+  private async slideTemp(fromId: string, toId: string, attrs: Record<string,string> | null,className?: string): Promise<void> {
+    const div = this.mkTemp(attrs, className);
+    const from = document.getElementById(fromId);
+    const to = document.getElementById(toId);
+    this.animating = true;
+    await this.bgaAM.slideFloatingElement(div, from!, to!,
+      this.floatingPieceAnimationSettings).then(() => { this.animating = false; });
+  }
 
-            // // Unclear why setting `style` attribute directly doesn't work.
-            // div.style.position = 'absolute';
-            // div.style.top = `${top}px`;
-            // div.style.left = `${left}px`;
-            // div.style.zIndex = '100';
-            parent!.appendChild(div);
-            return div;
+  private mkTemp(attrs: Record<string,string> | null,className?: string): HTMLElement {
+    const div = document.createElement('div');
+    // document.getElementById(IDS.BOARD)!.appendChild(div);
+    if (className) {
+      div.className = className;
+    }
+    if (attrs) {
+      for (const name in attrs) {
+        div.setAttribute(name, attrs[name]!);
+      }
+    }
+    return div;
   }
 
   private async notif_undoMove(
@@ -749,13 +750,10 @@ class GameBody extends GameBasics<BGamedatas> {
         this.handCounters[args.player_id]!.incValue(1);
         this.scoreCtrl[args.player_id]!.incValue(-args.points);
       };
-    // await this.play(new BgaSlideTempAnimation({
-    //   attrs: this.pieceAttr(args.piece, args.player_id),
-    //   fromId: IDS.hexDiv(args),
-    //   toId: IDS.handcount(args.player_id),
-    //   parentId: IDS.BOARD
-    // })).then(onDone);
-    onDone();
+    await this.slideTemp(
+      IDS.hexDiv(args),
+      IDS.handcount(args.player_id),
+      this.pieceAttr(args.piece, args.player_id)).then(onDone);
   }
 
   private async handleUndoMove(
@@ -800,18 +798,15 @@ class GameBody extends GameBasics<BGamedatas> {
         this.updateHandCount(args);
         this.scoreCtrl[args.player_id]!.incValue(args.points);
       };
-    // await this.play(new BgaSlideTempAnimation({
-    //   attrs: this.pieceAttr(args.piece, args.player_id),
-    //   fromId: sourceDivId,
-    //   toId: this.hexDiv(args).id,
-    //   parentId: IDS.BOARD
-    // })).then(onDone);
-    onDone();
+    await this.slideTemp(
+      sourceDivId,
+      this.hexDiv(args).id,
+      this.pieceAttr(args.piece, args.player_id)).then(onDone);
   }
 
   private async notif_handRefilled(args: { hand: string[] }): Promise<void> {
     console.log('notif_handRefilled', args);
-//    const anim: BgaAnimation<any>[] = [];
+    const anims: Promise<void>[] = [];
     const pid = this.player_id;
     for (let i = 0; i < args.hand.length; ++i) {
       // extend hand if zig tile just acquired
@@ -822,20 +817,15 @@ class GameBody extends GameBasics<BGamedatas> {
       }
       const div = this.handPosDiv(i);
       if (div.getAttribute(Attrs.PIECE) == 'empty') { // && incoming piece is not empty?
-        // const a = new BgaSlideTempAnimation({
-        //   attrs: this.pieceAttr(this.hand[i]!, this.player_id),
-        //   fromId: IDS.handcount(pid),
-        //   toId: div.id,
-        //   parentId: IDS.BOARD,
-        //   animationEnd: () => { this.setPiece(div, this.hand[i]!, this.player_id); },
-        // });
-        // anim.push(a);
+        const a = this.slideTemp(
+          IDS.handcount(pid),
+          div.id,
+          this.pieceAttr(this.hand[i]!, this.player_id))
+          .then(() => { this.setPiece(div, this.hand[i]!, this.player_id) });
+        anims.push(a);
       }
     }
-    // await this.play(new BgaCompoundAnimation({
-    //   animations: anim,
-    //   mode: 'sequential',
-    // }));
+    await Promise.all(anims);
   }
 
   private async notif_extraTurnUsed(args: { card: string; used: boolean; }): Promise<void> {
@@ -873,13 +863,10 @@ class GameBody extends GameBasics<BGamedatas> {
 
     let attrs = {};
     attrs[Attrs.ZTYPE] = zcard.type;
-    // await this.play(new BgaSlideTempAnimation({
-    //   attrs: attrs,
-    //   fromId: id,
-    //   toId: IDS.playerBoardZcards(args.player_id),
-    //   parentId: IDS.AVAILABLE_ZCARDS,
-    // })).then(() => this.addZcardDivInPlayerBoard(zcard));
-    this.addZcardDivInPlayerBoard(zcard);
+    await this.slideTemp(
+      id,
+      IDS.playerBoardZcards(args.player_id),
+      attrs).then(() => this.addZcardDivInPlayerBoard(zcard));
   }
 
   private async notif_cityScored(

@@ -15,19 +15,24 @@
 
 
 /* inspired from https://css-tricks.com/hexagons-and-beyond-flexible-responsive-grid-patterns-sans-media-queries/ */
-
-#bbl_main {
-    --board-width: 1024px;
-    --board-height: 768px;
-    --hex-ratio: 1.155;
+body {
+    /*
+      define these all here so they're available even for "floating" elements.
+     */
+    --bbl-board-width: 1024px;
+    --bbl-board-height: 768px;
+    --bbl-hex-ratio: 1.155;
     /*
       the denominator here works for height. but somehow width gets
       slightly off.
       maybe compute board height/width based on hex size instead?
     */
-    --hex-height: calc(var(--board-height)/12.59); /* 61px; */
-    --hex-width: calc(var(--hex-height) * var(--hex-ratio)); /* 70px; */
-    display: flex;
+    --bbl-hex-height: calc(var(--bbl-board-height)/12.59); /* 61px; */
+    --bbl-hex-width: calc(var(--bbl-hex-height) * var(--bbl-hex-ratio)); /* 70px; */
+}
+
+#bbl_main {
+     display: flex;
     flex-direction: column;
     align-items: center;
 }
@@ -47,14 +52,14 @@
     font-size: 0;
     background: url(img/mapb.jpg) no-repeat center;
     background-size: cover;
-    width: calc(var(--board-width));
-    height: calc(var(--board-height));
+    width: calc(var(--bbl-board-width));
+    height: calc(var(--bbl-board-height));
     position: relative;
 }
 
 #bbl_board > div {
-    height: calc(var(--hex-height));
-    width: calc(var(--hex-width));
+    height: calc(var(--bbl-hex-height));
+    width: calc(var(--bbl-hex-width));
     margin: 0;
     padding: 0;
     background-color: transparent;
@@ -81,7 +86,19 @@
     clip-path: none;
     background-image: url(img/sprites.png);
     background-size: 700% 700%;
+
+    /* so picked up for floating (animated) pieces */
+    display: inline-block;
+    width: calc(var(--bbl-hex-width));
+    height: calc(var(--bbl-hex-height));
 }
+
+/*
+    display: inline-block;
+    border-style: none;
+    margin-top: 5px;
+    margin-bottom: 5px;
+*/
 
 /*
  * Cities and fields sprites
@@ -194,6 +211,10 @@
 {
     background-size: 1000% 100%;
     background-image: url(img/zcards.png);
+
+    /* TODO: not sure computing these based on hex size is right */
+    height: calc((var(--bbl-hex-height) - 4px) * 2.37); /* 135px; */
+    width: calc((var(--bbl-hex-height) - 4px) * 1.58); /* 90px; */
 }
 [bbl_ztype="used"] {
     background-position: -900% 0%;
@@ -234,7 +255,7 @@
 #bbl_hand_container {
     padding-top: 10px;
     margin-top: 10px;
-    width: calc(var(--board-width));
+    width: calc(var(--bbl-board-width));
     display: flex;
     justify-content:center;
 }
@@ -252,8 +273,8 @@
 
 #bbl_hand > div {
     display: inline-block;
-    width: calc(var(--hex-width));
-    height: calc(var(--hex-height));
+    width: calc(var(--bbl-hex-width));
+    height: calc(var(--bbl-hex-height));
     background-size: 700% 700%;
     border-style: none;
     margin-top: 5px;
@@ -303,8 +324,8 @@ div.bbl_selected::before {
 #bbl_available_zcards > div {
     display: inline-block;
     /* TODO: not sure computing these based on hex size is right */
-    height: calc((var(--hex-height) - 4px) * 2.37); /* 135px; */
-    width: calc((var(--hex-height) - 4px) * 1.58); /* 90px; */
+    height: calc((var(--bbl-hex-height) - 4px) * 2.37); /* 135px; */
+    width: calc((var(--bbl-hex-height) - 4px) * 1.58); /* 90px; */
     margin: 10px;
 }
 
@@ -328,9 +349,9 @@ div.bbl_selected::before {
  */
 
 .player-board-game-specific-content {
-    --hex-ratio: 1.155;
-    --label-height: 40px;
-    --label-width: calc(var(--hex-ratio) * var(--label-height));
+    --bbl-hex-ratio: 1.155;
+    --bbl-label-height: 40px;
+    --bbl-label-width: calc(var(--bbl-hex-ratio) * var(--bbl-label-height));
     display: grid;
     padding-top: 7px;
     grid-template-columns: repeat(3, 1fr);
@@ -355,8 +376,8 @@ div.bbl_selected::before {
 .bbl_pb_pool_label_4,
 .bbl_pb_zcard_label
 {
-   width: calc(var(--label-width));
-   height: calc(var(--label-height));
+   width: calc(var(--bbl-label-width));
+   height: calc(var(--bbl-label-height));
    background-image: url(img/sprites.png);
    background-size: 700% 700%;
 }
@@ -412,8 +433,8 @@ div.bbl_pb_zcards {
 div.bbl_pb_zcards > div {
     display: inline-block;
     margin: 3px;
-    height: calc(var(--label-height));
-    width: calc(var(--label-height) * 0.67);
+    height: calc(var(--bbl-label-height));
+    width: calc(var(--bbl-label-height) * 0.67);
 }
 
 

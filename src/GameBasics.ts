@@ -1,3 +1,4 @@
+
 // @ts-ignore
 GameGui = /** @class */ (function () {
   function GameGui() { }
@@ -9,7 +10,6 @@ GameGui = /** @class */ (function () {
 
 class GameBasics<T extends Gamedatas> extends GameGui<T> {
   protected currentState: string | null;
-  protected bgaAM: BgaAnimations.AnimationManager;
   private pendingUpdate: boolean;
   private currentPlayerWasActive: boolean;
 
@@ -26,10 +26,6 @@ class GameBasics<T extends Gamedatas> extends GameGui<T> {
   override setup(gamedatas: T) {
     console.log('Starting game setup', gameui);
     this.gamedatas = gamedatas;
-    // create the animation manager, and bind it to the `game.bgaAnimationsActive()` function
-    this.bgaAM = new BgaAnimations.AnimationManager({
-        animationsActive: () => this.bgaAnimationsActive(),
-    });
   }
 
   override onEnteringState(stateName: string, args: any) {
