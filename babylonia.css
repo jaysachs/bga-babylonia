@@ -485,5 +485,6 @@ a.action-button > div.bbl_zcard {
     color: black;
     font-family: Helvetica;
     font-style: bold;
+    font-size: 72;
     /* text-shadow: '-2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000, 2px 2px 0 #000'; */
 }

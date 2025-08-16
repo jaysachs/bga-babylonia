@@ -178,7 +178,7 @@ class GameBody extends GameBasics<BGamedatas> {
     // create the animation manager, and bind it to the `game.bgaAnimationsActive()` function
     const game = this;
     this.bgaAM = new BgaAnimations.Manager({
-        animationsActive: () => true, // game.bgaAnimationsActive(),
+        animationsActive: () => game.bgaAnimationsActive(),
     });
 
     for (const playerId in gamedatas.players) {
@@ -887,7 +887,7 @@ class GameBody extends GameBasics<BGamedatas> {
   ): Promise<void> {
     console.log('notif_cityScored', args);
 
-//    const anim: BgaAnimation<any>[] = [];
+    let anim: Promise<void> = Promise.resolve();
 
     this.markHexPlayable(args);
     for (const playerId in args.details) {
@@ -899,97 +899,52 @@ class GameBody extends GameBasics<BGamedatas> {
           nonscoringLocations.push(nh);
         }
       }
-      // anim.push(new BgaCompoundAnimation({
-      //   mode: 'parallel',
-      //   animationStart: () => {
-      //     details.scored_locations.forEach(
-      //       (rc) => this.hexDiv(rc).classList.add(CSS.SELECTED));
-      //   },
-      //   animations: details.network_locations.map(
-      //     rc => new BgaFadeAnimation({
-      //       element: this.hexDiv(rc),
-      //       duration: 1000,
-      //       kind: 'outin',
-      //       iterations: 2,
-      //     })
-      //   ),
-      // }));
+      const hex = document.getElementById(IDS.hexDiv(args))!;
+      const p = () => {
+          details.scored_locations.forEach(
+             (rc) => this.hexDiv(rc).classList.add(CSS.SELECTED));
+      };
+      anim = anim.then(p);
 
-      // anim.push(new BgaCompoundAnimation({
-      //   mode: 'parallel',
-      //   animations: nonscoringLocations.map(
-      //     rc => new BgaFadeAnimation({
-      //       element: this.hexDiv(rc),
-      //       duration: 400,
-      //       kind: 'out',
-      //     })
-      //   ),
-      // }));
+      anim = anim.then(async () => this.bgaAM.displayScoring(
+        hex,
+        details.network_points,
+        this.gamedatas.players[playerId]!.color,
+        { duration: 3000, extraClass: 'bbl_city_scoring' }));
 
-      // anim.push(new BgaSpinGrowAnimation({
-      //   className: 'bbl_city_scoring',
-      //   text: `+${details.network_points}`,
-      //   centeredOnId: IDS.hexDiv(args),
-      //   parentId: IDS.BOARD,
-      //   fontSize: 72,
-      //   color: '#' + this.gamedatas.players[details.player_id]!.color,
-      //   duration: 1200,
-      // }));
-
-      // anim.push(new BgaCompoundAnimation({
-      //   mode: 'parallel',
-      //   animations: nonscoringLocations.map(
-      //     rc => new BgaFadeAnimation({
-      //       element: this.hexDiv(rc),
-      //       duration: 400,
-      //       kind: 'in',
-      //     })
-      //   ),
-      //   animationEnd: () => {
-      //     details.scored_locations.forEach(
-      //       (rc) => this.hexDiv(rc).classList.remove(CSS.SELECTED));
-      //     this.scoreCtrl[details.player_id]!.incValue(details.network_points);
-      //   },
-      // }));
+      anim = anim.then(() => {
+          details.scored_locations.forEach(
+             (rc) => this.hexDiv(rc).classList.remove(CSS.SELECTED));
+          this.scoreCtrl[details.player_id]!.incValue(details.network_points);
+      });
     }
 
-    // anim.push(new BgaSlideTempAnimation({
-    //   animationStart:
-    //     () => {
-    //       this.renderCityOrField(args, '');
-    //     },
-    //   animationEnd:
-    //     () => {
-    //       this.renderCityOrField(args, '');
-    //       this.unmarkHexPlayable(args);
-    //       for (const playerId in args.details) {
-    //         const details = args.details[playerId]!;
-    //         this.scoreCtrl[playerId]!.incValue(details.capture_points);
-    //         this.updateCapturedCityCount(details);
-    //       }
-    //     },
-    //   attrs: this.pieceAttr(args.city, 0),
-    //   // className: this.css.cityOrField(args.city),
-    //   fromId: IDS.hexDiv(args),
-    //   toId: (args.player_id != 0)
-    //     ? IDS.citycount(args.player_id)
-    //     // TODO: find a better location for 'off the board'
-    //     : IDS.AVAILABLE_ZCARDS,
-    //   parentId: IDS.BOARD,
-    // }));
-    // await this.play(new BgaCompoundAnimation({
-    //   mode: 'sequential',
-    //   animations: anim,
-    // }));
-
+    anim = anim.then(() => {
           this.renderCityOrField(args, '');
           this.unmarkHexPlayable(args);
+    });
+    anim = anim.then(async () => this.slideTemp(
+      IDS.hexDiv(args),
+      (args.player_id != 0)
+        ? IDS.citycount(args.player_id)
+        // TODO: find a better location for 'off the board'
+        : IDS.AVAILABLE_ZCARDS,
+      this.pieceAttr(args.city, 0)
+      // className: this.css.cityOrField(args.city),
+      // parentId: IDS.BOARD
+      )
+    );
+
+    anim = anim.then(() => {
           for (const playerId in args.details) {
             const details = args.details[playerId]!;
             this.scoreCtrl[playerId]!.incValue(details.capture_points);
             this.updateCapturedCityCount(details);
-                      }
-    }
+          }
+        });
+
+    await anim;
+  }
 
   ///////
   readonly special_log_args = {
