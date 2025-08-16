@@ -690,17 +690,15 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
     // Put any piece (field) captured in the move back on the board
     // TODO: animate this? (and animate the capture too?)
     this.renderCityOrField(args, args.captured_piece);
-    const onDone =
-      () => {
-        this.setPiece(handPosDiv!, args.original_piece, this.player_id);
-        handPosDiv.classList.add(CSS.PLAYABLE);
-        this.handCounters[args.player_id]!.incValue(1);
-        this.scoreCtrl[args.player_id]!.incValue(-args.points);
-      };
     await this.slideTemp(
       IDS.hexDiv(args),
       handPosDiv.id,
-      this.pieceAttr(args.piece, args.player_id)).then(onDone);
+      this.pieceAttr(args.piece, args.player_id));
+
+    this.setPiece(handPosDiv!, args.original_piece, this.player_id);
+    handPosDiv.classList.add(CSS.PLAYABLE);
+    this.handCounters[args.player_id]!.incValue(1);
+    this.scoreCtrl[args.player_id]!.incValue(-args.points);
   }
 
   private async slideTemp(fromId: string, toId: string, attrs: Record<string,string> | null,className?: string): Promise<void> {
@@ -746,15 +744,12 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
     // Put any piece (field) captured in the move back on the board
     // TODO: animate this? (and animate the capture too?)
     this.renderCityOrField(args, args.captured_piece);
-    const onDone =
-      () => {
-        this.handCounters[args.player_id]!.incValue(1);
-        this.scoreCtrl[args.player_id]!.incValue(-args.points);
-      };
     await this.slideTemp(
       IDS.hexDiv(args),
       IDS.handcount(args.player_id),
-      this.pieceAttr(args.piece, args.player_id)).then(onDone);
+      this.pieceAttr(args.piece, args.player_id));
+    this.handCounters[args.player_id]!.incValue(1);
+    this.scoreCtrl[args.player_id]!.incValue(-args.points);
   }
 
   private async handleUndoMove(
@@ -793,18 +788,15 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
     }
     // TODO: do some animation for ziggurat scoring
     // TODO: do some animation for field scoring
-    const onDone =
-      () => {
-        this.renderPlayedPiece(args,
-          args.piece,
-          args.player_id);
-        this.updateHandCount(args);
-        this.scoreCtrl[args.player_id]!.incValue(args.points);
-      };
     await this.slideTemp(
       sourceDivId,
       this.hexDiv(args).id,
-      this.pieceAttr(args.piece, args.player_id)).then(onDone);
+      this.pieceAttr(args.piece, args.player_id));
+    this.renderPlayedPiece(args,
+      args.piece,
+      args.player_id);
+    this.updateHandCount(args);
+    this.scoreCtrl[args.player_id]!.incValue(args.points);
   }
 
   private async notif_handRefilled(args: { hand: string[] }): Promise<void> {
