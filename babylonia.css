@@ -307,6 +307,18 @@ div.bbl_selected::before {
     background: url(img/sprites.png) 0% -500% / 700% 700%;
 }
 
+div.bbl_in_network::before {
+    height: 100%;
+    width: 100%;
+    content: '';
+    display: inline-block;
+    background: url(img/sprites.png) 0% -500% / 700% 700%;
+}
+
+.bbl_unimportant {
+    opacity: 0.33;
+}
+
 /* available ziggurat cards zone (TODO: "panel") */
 
 

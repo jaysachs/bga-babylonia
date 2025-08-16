@@ -57,10 +57,12 @@ class IDS {
 }
 
 class CSS {
+  static readonly IN_NETWORK = 'bbl_in_network';
   static readonly SELECTING = 'bbl_selecting';
   static readonly SELECTED = 'bbl_selected';
   static readonly PLAYABLE = 'bbl_playable';
   static readonly UNPLAYABLE = 'bbl_unplayable';
+  static readonly UNIMPORTANT = 'bbl_unimportant';
 }
 
 class Html {
@@ -790,6 +792,8 @@ class GameBody extends GameBasics<BGamedatas> {
       this.setPiece(handPosDiv, 'empty', 0);
       sourceDivId = handPosDiv.id;
     }
+    // TODO: do some animation for ziggurat scoring
+    // TODO: do some animation for field scoring
     const onDone =
       () => {
         this.renderPlayedPiece(args,
@@ -889,22 +893,24 @@ class GameBody extends GameBasics<BGamedatas> {
 
     let anim: Promise<void> = Promise.resolve();
 
+    const hex = document.getElementById(IDS.hexDiv(args))!;
+
     this.markHexPlayable(args);
     for (const playerId in args.details) {
       const details = args.details[playerId]!;
-      const nonscoringLocations: RowCol[] = [];
-      for (const nh of details.network_locations) {
-        if (!details.scored_locations.some(
-          sh => (nh.row == sh.row && nh.col == sh.col))) {
-          nonscoringLocations.push(nh);
-        }
-      }
-      const hex = document.getElementById(IDS.hexDiv(args))!;
       const p = () => {
-          details.scored_locations.forEach(
-             (rc) => this.hexDiv(rc).classList.add(CSS.SELECTED));
+        for (const nh of details.network_locations) {
+          let cl = this.hexDiv(nh).classList;
+          cl.add(CSS.IN_NETWORK);
+          if (!details.scored_locations.some(
+            sh => (nh.row == sh.row && nh.col == sh.col))) {
+            cl.add(CSS.UNIMPORTANT);
+          }
+        }
       };
       anim = anim.then(p);
+
+      // TODO: add a pause here after city highlighted?
 
       anim = anim.then(async () => this.bgaAM.displayScoring(
         hex,
@@ -913,12 +919,17 @@ class GameBody extends GameBasics<BGamedatas> {
         { duration: 3000, extraClass: 'bbl_city_scoring' }));
 
       anim = anim.then(() => {
-          details.scored_locations.forEach(
-             (rc) => this.hexDiv(rc).classList.remove(CSS.SELECTED));
+          details.network_locations.forEach(
+             (rc) => {
+               let cl = this.hexDiv(rc).classList;
+               cl.remove(CSS.IN_NETWORK);
+               cl.remove(CSS.UNIMPORTANT);
+             });
           this.scoreCtrl[details.player_id]!.incValue(details.network_points);
       });
     }
 
+    // TODO: highlight adjacent hexes with winner highlighted.
     anim = anim.then(() => {
           this.renderCityOrField(args, '');
           this.unmarkHexPlayable(args);
