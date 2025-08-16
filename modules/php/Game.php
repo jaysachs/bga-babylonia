@@ -81,6 +81,8 @@ class Game extends \Bga\GameFramework\Table
                 "player_id" => $player_id,
                 "player_name" => $this->getActivePlayerName(),
                 "piece" => $piece,
+                // TODO: this is technically a security issue
+                //   if the player undos, others know where it came from
                 "handpos" => $handpos,
                 "row" => $row,
                 "col" => $col,
