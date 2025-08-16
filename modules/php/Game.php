@@ -474,7 +474,13 @@ class Game extends \Bga\GameFramework\Table
             "captured_piece" => $move->captured_piece->value,
             "points" => $move->points(),
         ];
-        $this->notify->all("undoMove", clienttranslate('${player_name} undid their move'), $args );
+
+        $player_infos = $model->allPlayerInfo();
+        foreach ($player_infos as $pid => $pi) {
+            if ($pid != $this->activePlayerId()) {
+                $this->notify->player($pid, "undoMove", clienttranslate('${player_name} undid their move'), $args );
+            }
+        }
 
         $args["handpos"] = $move->handpos;
         $args["original_piece"] = $move->original_piece->value;
