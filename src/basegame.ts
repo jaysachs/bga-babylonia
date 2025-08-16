@@ -8,7 +8,7 @@ GameGui = /** @class */ (function () {
 /** Class that extends default bga core game class with more functionality
  */
 
-class GameBasics<T extends Gamedatas> extends GameGui<T> {
+class BaseGame<T extends Gamedatas> extends GameGui<T> {
   protected currentState: string | null;
   private pendingUpdate: boolean;
   private currentPlayerWasActive: boolean;

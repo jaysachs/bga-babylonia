@@ -25,11 +25,11 @@
     },
 
     "files": [
-        "bga-animations.d.ts",
         "bga-framework.d.ts",
+        "src/bga-animations.d.ts",
         "src/colormap.ts",
-        "src/GameBasics.ts",
-        "src/GameBody.ts",
+        "src/basegame.ts",
+        "src/babylonia.ts",
         "src/define.ts"
     ]
 }

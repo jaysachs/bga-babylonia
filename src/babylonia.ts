@@ -144,7 +144,7 @@ interface PlayState {
 }
 
 /** Game class */
-class GameBody extends GameBasics<BGamedatas> {
+class BabyloniaGame extends BaseGame<BGamedatas> {
   private bgaAM: AnimationManager;
   private hand: string[] = [];
   private handCounters: Counter[] = [];
