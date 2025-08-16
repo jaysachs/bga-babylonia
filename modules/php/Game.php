@@ -119,7 +119,7 @@ class Game extends \Bga\GameFramework\Table
         return [
             "allowedMoves" => $model->getAllowedMoves(),
             "canEndTurn" => $model->canEndTurn(),
-            "canUndo" => $model->turnProgress()->canUndo(),
+            "canUndo" => $model->canUndo(),
         ];
     }
 

@@ -106,7 +106,11 @@ class Model {
         return $this->_board;
     }
 
-    public function turnProgress(): TurnProgress {
+    public function canUndo(): bool {
+        return $this->turnProgress()->canUndo();
+    }
+
+    private function turnProgress(): TurnProgress {
         if ($this->_turn_progress == null) {
             $this->_turn_progress = $this->ps->retrieveTurnProgress($this->player_id);
         }
@@ -209,7 +213,7 @@ class Model {
         $hexPiece = $hex->playPiece($piece, $this->player_id);
 
         $field_points = 0;
-        $ziggurat_points = 0;
+        $ziggurats = [];
         // score field
         switch ($hexPiece) {
         case Piece::FIELD_5:
@@ -226,10 +230,10 @@ class Model {
             return $h->piece == Piece::ZIGGURAT;
         });
         if (count($zigs) > 0) {
-            $ziggurat_points = $this->board()->adjacentZiggurats($this->player_id);
+            $ziggurats = $this->board()->touchedZiggurats($this->player_id);
         }
         $move = new Move($this->player_id, $piece, $originalPiece, $handpos,
-                         $rc, $hexPiece, $field_points, $ziggurat_points);
+                         $rc, $hexPiece, $field_points, count($ziggurats));
         $this->turnProgress()->addMove($move);
 
         // update the database

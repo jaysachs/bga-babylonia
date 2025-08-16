@@ -333,15 +333,16 @@ END;
         }
     }
 
-    public function adjacentZiggurats(int $player_id): int {
-        $adjacent = 0;
+    /** @return RowCol[] */
+    public function touchedZiggurats(int $player_id): array {
+        $adjacent = [];
         $this->visitAll(function (Hex $hex) use ($player_id, &$adjacent): void {
             if ($hex->piece == Piece::ZIGGURAT) {
                 $nb = $this->neighbors($hex, function(Hex $nh) use ($player_id): bool {
                     return $nh->player_id == $player_id;
                 });
                 if (count($nb) > 0) {
-                    $adjacent++;
+                    $adjacent[] = $hex->rc;
                 }
             }
         });
