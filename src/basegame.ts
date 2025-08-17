@@ -10,6 +10,8 @@ GameGui = /** @class */ (function () {
 
 class BaseGame<T extends Gamedatas> extends GameGui<T> {
   protected currentState: string | null;
+  protected animationManager: AnimationManager;
+  protected animating = false;
   private pendingUpdate: boolean;
   private currentPlayerWasActive: boolean;
 
@@ -26,6 +28,10 @@ class BaseGame<T extends Gamedatas> extends GameGui<T> {
   override setup(gamedatas: T) {
     console.log('Starting game setup', gameui);
     this.gamedatas = gamedatas;
+    // create the animation manager, and bind it to the `game.bgaAnimationsActive()` function
+    this.animationManager = new BgaAnimations.Manager({
+        animationsActive: () => this.bgaAnimationsActive(),
+    });
   }
 
   override onEnteringState(stateName: string, args: any) {
@@ -81,22 +87,6 @@ class BaseGame<T extends Gamedatas> extends GameGui<T> {
     return res;
   }
 
-  // ajaxcallwrapper(action: string, args?: any, handler? : any): void {
-  //   if (!args) {
-  //     args = {};
-  //   }
-  //   args.lock = true;
-  //   if (gameui.checkAction(action)) {
-  //     gameui.ajaxcall(
-  //       '/' + gameui.game_name + '/' + gameui.game_name + '/' + action + '.html',
-  //       args, //
-  //       gameui,
-  //       (result) => {},
-  //       handler
-  //     );
-  //   }
-  // }
-
   createHtml(divstr: string, location?: string): HTMLElement {
     const tempHolder = document.createElement('div');
     tempHolder.innerHTML = divstr;
@@ -131,7 +121,6 @@ class BaseGame<T extends Gamedatas> extends GameGui<T> {
   private callfn(methodName: string, args: any): any {
     const anythis = this as any;
     if (anythis[methodName] !== undefined) {
-      console.log('Calling ' + methodName, args);
       return anythis[methodName](args);
     }
     return undefined;
@@ -148,5 +137,38 @@ class BaseGame<T extends Gamedatas> extends GameGui<T> {
     // cannot call super - dojo still have to used here
     // super.onScriptError(msg, url, linenumber);
     // return this.inherited(arguments);
+  }
+
+  protected addPausableHandler(et: EventTarget, type: string, handler: (a: Event) => boolean): void {
+    et.addEventListener(type, (e: Event) => { if (this.animating) return true; return handler(e); });
+  }
+
+  private floatingPieceAnimationSettings = {
+    duration: 700,
+    ignoreScale: true,
+    ignoreRotation: true,
+  };
+
+  protected async slideTemp(fromId: string, toId: string, attrs: Record<string,string> | null,className?: string): Promise<void> {
+    const div = this.mkTemp(attrs, className);
+    const from = document.getElementById(fromId);
+    const to = document.getElementById(toId);
+    this.animating = true;
+    await this.animationManager.slideFloatingElement(div, from!, to!,
+      this.floatingPieceAnimationSettings).then(() => { this.animating = false; });
+  }
+
+  private mkTemp(attrs: Record<string,string> | null,className?: string): HTMLElement {
+    const div = document.createElement('div');
+    // document.getElementById(IDS.BOARD)!.appendChild(div);
+    if (className) {
+      div.className = className;
+    }
+    if (attrs) {
+      for (const name in attrs) {
+        div.setAttribute(name, attrs[name]!);
+      }
+    }
+    return div;
   }
 }

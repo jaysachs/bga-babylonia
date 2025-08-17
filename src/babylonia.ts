@@ -145,7 +145,6 @@ interface PlayState {
 
 /** Game class */
 class BabyloniaGame extends BaseGame<BGamedatas> {
-  private bgaAM: AnimationManager;
   private hand: string[] = [];
   private handCounters: Counter[] = [];
   private poolCounters: Counter[] = [];
@@ -153,7 +152,6 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
   private zcards: Zcard[] = [];
   private selectedHandPos: number | null = null;
   private playStateArgs: PlayState | null = null;
-  private animating = false;
   private html: Html = new Html({});
   private playerIdToColorIndex: Record<number, number> = {};
 
@@ -161,10 +159,6 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
     super();
     this.handCounters = [];
     this.hand = [];
-  }
-
-  private addPausableHandler(et: EventTarget, type: string, handler: (a: Event) => boolean): void {
-    et.addEventListener(type, (e: Event) => { if (this.animating) return true; return handler(e); });
   }
 
   private setupHandlers(): void {
@@ -176,11 +170,6 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
   override setup(gamedatas: BGamedatas) {
     console.log(gamedatas);
     super.setup(gamedatas);
-
-    // create the animation manager, and bind it to the `game.bgaAnimationsActive()` function
-    this.bgaAM = new BgaAnimations.Manager({
-        animationsActive: () => this.bgaAnimationsActive(),
-    });
 
     for (const playerId in gamedatas.players) {
       this.playerIdToColorIndex[playerId] = colorIndexMap[gamedatas.players[playerId]!.color]!;
@@ -666,12 +655,6 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
     return Promise.resolve();
   }
 
-  private floatingPieceAnimationSettings = {
-    duration: 700,
-    ignoreScale: true,
-    ignoreRotation: true,
-  };
-
   private async notif_undoMoveActive(
     args: {
       player_id: number;
@@ -704,29 +687,6 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
     handPosDiv.classList.add(CSS.PLAYABLE);
     this.handCounters[args.player_id]!.incValue(1);
     this.scoreCtrl[args.player_id]!.incValue(-args.points);
-  }
-
-  private async slideTemp(fromId: string, toId: string, attrs: Record<string,string> | null,className?: string): Promise<void> {
-    const div = this.mkTemp(attrs, className);
-    const from = document.getElementById(fromId);
-    const to = document.getElementById(toId);
-    this.animating = true;
-    await this.bgaAM.slideFloatingElement(div, from!, to!,
-      this.floatingPieceAnimationSettings).then(() => { this.animating = false; });
-  }
-
-  private mkTemp(attrs: Record<string,string> | null,className?: string): HTMLElement {
-    const div = document.createElement('div');
-    // document.getElementById(IDS.BOARD)!.appendChild(div);
-    if (className) {
-      div.className = className;
-    }
-    if (attrs) {
-      for (const name in attrs) {
-        div.setAttribute(name, attrs[name]!);
-      }
-    }
-    return div;
   }
 
   private async notif_undoMove(
@@ -805,7 +765,6 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
   }
 
   private async notif_handRefilled(args: { hand: string[] }): Promise<void> {
-
     const anims: Promise<void>[] = [];
     const pid = this.player_id;
     for (let i = 0; i < args.hand.length; ++i) {
@@ -829,7 +788,6 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
   }
 
   private async notif_extraTurnUsed(args: { card: string; used: boolean; }): Promise<void> {
-
     const zcard = this.zcardForType(args.card);
     zcard.used = args.used;
     const carddiv = $(IDS.ownedZcard(zcard.type));
@@ -902,11 +860,11 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
           }
         }
       }
-      await this.bgaAM.displayScoring(
+      await this.animationManager.displayScoring(
         hex,
         details.network_points,
         this.gamedatas.players[playerId]!.color,
-        { duration: 1500, extraClass: 'bbl_city_scoring' });
+        { duration: 3000, easing: 'ease-in-out', extraClass: 'bbl_city_scoring' });
 
       if (aa) {
         details.network_locations.forEach(
