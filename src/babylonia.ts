@@ -620,6 +620,7 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
   }
 
   private onUpdateActionButtons_selectZigguratCard(): void {
+    this.markHexPlayable(this.ziggurat_scored);
     const div = $(IDS.AVAILABLE_ZCARDS);
     div.scrollIntoView(false);
     div.classList.add(CSS.SELECTING);
@@ -799,6 +800,18 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
     return Promise.resolve();
   }
 
+  private async notif_zigguratScored(
+    args: {
+      row: number;
+      col: number;
+      player_name: string;
+      player_id: number;
+    }): Promise<void> {
+    this.ziggurat_scored = args;
+  }
+
+  private ziggurat_scored: RowCol;
+
   private async notif_zigguratCardSelection(
       args: {
         zcard: string;
@@ -807,7 +820,7 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
         score: number;
       }
     ): Promise<void> {
-
+    this.unmarkHexPlayable(this.ziggurat_scored);
     const zcard = this.zcardForType(args.zcard);
     zcard.owning_player_id = args.player_id;
     zcard.used = args.cardused;
