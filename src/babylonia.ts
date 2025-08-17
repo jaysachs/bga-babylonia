@@ -207,6 +207,13 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
     this.setupHandlers();
 
     this.bgaSetupPromiseNotifications();
+
+    // Active player gets their own undo notification with private data,
+    //   so ignore the generic undo notification.
+    this.notifqueue.setIgnoreNotificationCheck(
+        'undoMove',
+        (notif: any) => (notif.args.player_id == this.player_id) );
+
     console.log('Game setup done');
   }
 
@@ -652,7 +659,6 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
         pool_size: number;
       }
     ): Promise<void> {
-    console.log('notif_turnFinished', args);
 
     this.updateHandCount(args);
     this.updatePoolCount(args);
@@ -678,7 +684,6 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
       piece: string;
     }
   ): Promise<void> {
-    console.log('notif_undoMove', args);
     if (this.player_id != args.player_id) {
       console.error('Non-active player got the undoMoveActive notification, ignoring');
       return Promise.resolve();
@@ -737,7 +742,7 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
     }
   ): Promise<void> {
     if (this.player_id == args.player_id) {
-      // active player also gets the richer `undoMoveActive` notification, so ignore this.
+      console.error("active player should have undoMove filtered");
       return Promise.resolve();
     }
 
@@ -777,7 +782,7 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
         hand_size: number;
       }
     ): Promise<void> {
-    console.log('notif_piecePlayed', args);
+
     const isActive = this.player_id == args.player_id;
     let sourceDivId = IDS.handcount(args.player_id);
     if (isActive) {
@@ -800,7 +805,7 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
   }
 
   private async notif_handRefilled(args: { hand: string[] }): Promise<void> {
-    console.log('notif_handRefilled', args);
+
     const anims: Promise<void>[] = [];
     const pid = this.player_id;
     for (let i = 0; i < args.hand.length; ++i) {
@@ -824,7 +829,7 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
   }
 
   private async notif_extraTurnUsed(args: { card: string; used: boolean; }): Promise<void> {
-    console.log('notif_extraTurnUsed', args);
+
     const zcard = this.zcardForType(args.card);
     zcard.used = args.used;
     const carddiv = $(IDS.ownedZcard(zcard.type));
@@ -844,7 +849,7 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
         score: number;
       }
     ): Promise<void> {
-    console.log('notif_zigguratCardSelection', args);
+
     const zcard = this.zcardForType(args.zcard);
     zcard.owning_player_id = args.player_id;
     zcard.used = args.cardused;
@@ -880,7 +885,6 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
       }[];
     }
   ): Promise<void> {
-    console.log('notif_cityScored', args);
 
     const hex = document.getElementById(IDS.hexDiv(args))!;
 

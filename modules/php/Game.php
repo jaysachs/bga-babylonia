@@ -81,8 +81,6 @@ class Game extends \Bga\GameFramework\Table
                 "player_id" => $player_id,
                 "player_name" => $this->getActivePlayerName(),
                 "piece" => $piece,
-                // TODO: this is technically a security issue
-                //   if the player undos, others know where it came from
                 "handpos" => $handpos,
                 "row" => $row,
                 "col" => $col,
@@ -475,22 +473,15 @@ class Game extends \Bga\GameFramework\Table
             "piece" => $move->piece->value,
             "captured_piece" => $move->captured_piece->value,
             "points" => $move->points(),
+            "handpos" => $move->handpos,
+            "original_piece" => $move->original_piece->value,
         ];
 
-        $player_infos = $model->allPlayerInfo();
-        foreach ($player_infos as $pid => $pi) {
-            if ($pid != $this->activePlayerId()) {
-                $this->notify->player($pid, "undoMove", clienttranslate('${player_name} undid their move'), $args );
-            }
-        }
-
-        $args["handpos"] = $move->handpos;
-        $args["original_piece"] = $move->original_piece->value;
         $this->notify->player($this->activePlayerId(), "undoMoveActive", clienttranslate('${player_name} undid their move'), $args );
+        unset($args["handpos"]);
+        unset($args["original_piece"]);
 
-        // final notifyAll required to keep moves and replays in sync
-        // TODO: is this needed now?
-        $this->notify->all('sync', '', []);
+        $this->notify->all("undoMove", clienttranslate('${player_name} undid their move'), $args );
 
         $this->gamestate->nextState("playPieces");
     }
