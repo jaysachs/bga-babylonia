@@ -559,8 +559,12 @@ class Game extends \Bga\GameFramework\Table
         return intval($this->getActivePlayerId());
     }
 
-    private function rowColBeingScored(): RowCol {
-        return RowCol::fromKey(intval($this->getGameStateValue(Game::GLOBAL_ROW_COL_BEING_SCORED)));
+    private function rowColBeingScored(): ?RowCol {
+        $v = $this->getGameStateValue(Game::GLOBAL_ROW_COL_BEING_SCORED);
+        if ($v == 0) {
+            return null;
+        }
+        return RowCol::fromKey(intval($v));
     }
 
     private function setRowColBeingScored(RowCol $rc) {
@@ -631,6 +635,7 @@ class Game extends \Bga\GameFramework\Table
             'hand' => array_map(function ($p) { return $p->value; },
                                 $model->hand()->pieces()),
             'board' => $board_data,
+            'current_scoring_hex' => $this->rowColBeingScored(),
             'ziggurat_cards' =>
                 array_map(
                     function ($z) { return [
