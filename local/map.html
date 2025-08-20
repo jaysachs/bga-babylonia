@@ -3,6 +3,7 @@
   <script>
     function cycleThings(e) {
         let pieces = [
+            "empty",
             "farmer_1",
             "merchant_1",
             "servant_1",
@@ -23,13 +24,10 @@
             "servant_4",
             "priest_4",
             "hidden_4",
-
-            "empty",
         ];
         let cities = [
             "city_msp",
             "city_m",
-            "city_back",
             "city_p",
             "city_s",
             "city_ms",
@@ -41,20 +39,19 @@
             "field_X",
             "ziggurat",
         ];
-        let all = cities.concat(pieces);
-        p = e.getAttribute('bbl_piece');
+        let all = pieces.concat(cities);
+        p = e.getAttribute('bbl_piece') || all[0];
         for (i = 0; i < all.length; ++i) {
             if (p == all[i]) {
                 if (i < all.length-1) {
                     e.setAttribute('bbl_piece', all[i+1]);
-                    return;
                 } else {
                     e.setAttribute('bbl_piece', all[0]);
                 }
+                console.log("new e", e);
                 return;
             }
         }
-            e.setAttribute('bbl_piece', all[0]);
     }
 
     function selectHex(event) {
@@ -256,11 +253,11 @@
               boardDiv.insertAdjacentHTML('beforeend', html.hex(hex));
           }
 
-            let someHex = dom.byId('bbl_hex_7_1');
+            let someHex = document.getElementById('bbl_hex_7_1');
             cycleThings(someHex);
             someHex.classList.add('bbl_playable');
 
-            var greeting = dom.byId('greeting');
+            var greeting = document.getElementById('greeting');
             greeting.innerHTML += ' <em>from Dojo!</em>';
         </script>
       </div>
