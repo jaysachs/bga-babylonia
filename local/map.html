@@ -3,59 +3,58 @@
   <script>
     function cycleThings(e) {
         let pieces = [
-            "bbl_farmer_1",
-            "bbl_merchant_1",
-            "bbl_servant_1",
-            "bbl_priest_1",
-            "bbl_hidden_1",
-            "bbl_farmer_2",
-            "bbl_merchant_2",
-            "bbl_servant_2",
+            "farmer_1",
+            "merchant_1",
+            "servant_1",
+            "priest_1",
+            "hidden_1",
+            "farmer_2",
+            "merchant_2",
+            "servant_2",
             "priest_2",
-            "bbl_hidden_2",
-            "bbl_farmer_3",
-            "bbl_merchant_3",
-            "bbl_servant_3",
-            "bbl_priest_3",
-            "bbl_hidden_3",
-            "bbl_farmer_4",
-            "bbl_merchant_4",
-            "bbl_servant_4",
-            "bbl_priest_4",
-            "bbl_hidden_4",
+            "hidden_2",
+            "farmer_3",
+            "merchant_3",
+            "servant_3",
+            "priest_3",
+            "hidden_3",
+            "farmer_4",
+            "merchant_4",
+            "servant_4",
+            "priest_4",
+            "hidden_4",
 
-            "bbl_empty",
+            "empty",
         ];
         let cities = [
-            "bbl_city_msp",
-            "bbl_city_m",
-            "bbl_city_back",
-            "bbl_city_p",
-            "bbl_city_s",
-            "bbl_city_ms",
-            "bbl_city_sp",
-            "bbl_city_mp",
-            "bbl_field_5",
-            "bbl_field_6",
-            "bbl_field_7",
-            "bbl_field_X",
-            "bbl_ziggurat",
+            "city_msp",
+            "city_m",
+            "city_back",
+            "city_p",
+            "city_s",
+            "city_ms",
+            "city_sp",
+            "city_mp",
+            "field_5",
+            "field_6",
+            "field_7",
+            "field_X",
+            "ziggurat",
         ];
         let all = cities.concat(pieces);
-        c = e.classList;
+        p = e.getAttribute('bbl_piece');
         for (i = 0; i < all.length; ++i) {
-            if (c.contains(all[i])) {
-                c.remove(all[i]);
+            if (p == all[i]) {
                 if (i < all.length-1) {
-                    c.add(all[i+1]);
+                    e.setAttribute('bbl_piece', all[i+1]);
                     return;
                 } else {
-                    c.add(all[0]);
+                    e.setAttribute('bbl_piece', all[0]);
                 }
                 return;
             }
         }
-        c.add(all[0]);
+            e.setAttribute('bbl_piece', all[0]);
     }
 
     function selectHex(event) {
@@ -67,7 +66,7 @@
         }
         if (e.parentElement != null) {
             let x = e.id.split("_");
-            console.log("selected hex " + x[1] + ", " + x[2]);
+            console.log("selected hex " + x[2] + ", " + x[3]);
             // e.classList.toggle("selected");
             cycleThings(e);
         }
@@ -237,28 +236,8 @@
       <div id='greeting' style="z-index:1">Hello</div>
       <div id="bbl_board_container">
         <div id="bbl_board" onClick="selectHex(event)"></div>
-        <span id="bbl_vars"></span>
+        <script src="../babylonia.js" ></script/>
         <script>
-          var dojoConfig = {
-              async: true,
-              // This code registers the correct location of the "demo"
-              // package so we can load Dojo from the CDN whilst still
-              // being able to load local modules
-              packages: [{
-                  name: "babylonia",
-                  location: location.pathname.replace(/\/[^/]*$/, '') + '/../modules/js'
-              }]
-          };
-        </script>
-        <script src="https://ajax.googleapis.com/ajax/libs/dojo/1.10.4/dojo/dojo.js"
-                data-dojo-config="async: true"></script>
-        <script type="module">
-        require([
-            'dojo/dom',
-            'dojo/fx',
-            'babylonia/hexloc',
-            'babylonia/fx'
-        ], function (dom, fx, hexloc, bblfx) {
           var boardData = [];
           for (var c = 0; c <= 16; c++) {
               let odd = c % 2 == 1;
@@ -271,31 +250,10 @@
 
           let boardDiv = document.getElementById("bbl_board");
 
+          let html = new Html({});
           for( let h = 0; h < boardData.length; ++h) {
               let hex = boardData[h];
-              let tl = hexloc.hexLocation(hex);
-
-              let top = tl.top;
-              let left = tl.left;
-
-              var cl = 'class="bbl_empty"';
-              if (hex.col == 16) {
-                  cl = "class='bbl_playable'"
-              }
-
-              // dojo.place( this.format_block('jstpl_hex',
-              //                               {
-              //                                   'row': hex.row,
-              //                                   'col': hex.col,
-              //                                   // or ... row / 2 * 63 + 6;
-              //                                   'top': hex.row * 31.75 + 6,
-              //                                   'left': 38 + (hex.col * 55)
-              //                               } ),
-              //             boardDiv );
-              boardDiv.insertAdjacentHTML(
-                  `beforeend`,
-                  `<div ${cl} id="bbl_hex_${hex.row}_${hex.col}" style="top:${top}px; left:${left}px;">${hex.row},${hex.col}</div>`
-              );
+              boardDiv.insertAdjacentHTML('beforeend', html.hex(hex));
           }
 
             let someHex = dom.byId('bbl_hex_7_1');
@@ -304,28 +262,6 @@
 
             var greeting = dom.byId('greeting');
             greeting.innerHTML += ' <em>from Dojo!</em>';
-            // ...but now, with an animation!
-            let tl = hexloc.hexLocation({row: 13, col:3});
-
-            fx.combine([
-                fx.slideTo({
-                    duration: 1200,
-                    node: greeting,
-                    top: tl.top,
-                    left: tl.left
-                }),
-                new dojo.Animation({
-                    curve: [0, 720],
-                    duration: 1200,
-                    onAnimate: function (v) {
-                        greeting.style["transform"] = 'rotate(' + v + 'deg)';
-                    }
-                }),
-                bblfx.spinGrowText({ text: '+117', parent: 'bbl_board', centeredOn: 'bbl_hex_0_8', color: '#ff0000' }),
-                bblfx.spinGrowText({ text: '+35', parent: 'bbl_board', centeredOn: 'bbl_hex_7_1', color: '#00ff00' }),
-                bblfx.spinGrowText({ text: '+8', parent: 'bbl_board', centeredOn: 'bbl_hex_17_13', color: '#0000ff' })
-            ]).play();
-        });
         </script>
       </div>
       <div id="bbl_available_zcards_container">
