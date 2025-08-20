@@ -319,7 +319,9 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
   }
 
   private pieceVal(piece: string, playerId: number): string {
-    return playerId > 0 ? piece + '_' + this.playerIdToColorIndex[playerId] : piece;
+    return (playerId > 0 && piece != Piece.EMPTY)
+        ? piece + '_' + this.playerIdToColorIndex[playerId]
+        : piece;
   }
 
   private pieceAttr(piece: string, playerId: number): Record<string, string> {
