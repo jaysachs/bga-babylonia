@@ -766,14 +766,14 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
     }
     // TODO: do some animation for field scoring
     if (args.field_points > 0) {
-      // TODO: fix the ! ???
-      let field = hexDiv.getAttribute('bbl_piece')!;
+      let field = hexDiv.getAttribute(Attrs.PIECE);
       this.setPiece(hexDiv, Piece.EMPTY, 0);
       await this.slideTemp(
         hexDiv.id,
         // TODO: find a better location
         IDS.handcount(args.player_id),
-        this.pieceAttr(field, 0));
+        // TODO: remove need for the !
+        this.pieceAttr(field!, 0));
     }
     await this.slideTemp(
       sourceDivId,
