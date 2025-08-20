@@ -139,6 +139,7 @@ interface BGamedatas extends Gamedatas {
   board: Hex[];
   hand: string[];
   ziggurat_cards: Zcard[];
+  current_scoring_hex: RowCol | null;
 }
 
 interface PlayState {
@@ -206,6 +207,11 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
     this.notifqueue.setIgnoreNotificationCheck(
         'undoMove',
         (notif: any) => (notif.args.player_id == this.player_id) );
+
+    // if a ziggurat card is being chosen
+    if (gamedatas.current_scoring_hex) {
+      this.markHexPlayable(gamedatas.current_scoring_hex);
+    }
 
     console.log('Game setup done');
   }
