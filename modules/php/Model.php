@@ -196,7 +196,7 @@ class Model {
         return $result;
     }
 
-    public function playPiece(int $handpos, RowCol $rc): Move {
+    public function playPiece(int $handpos, RowCol $rc): ElaboratedMove {
         // also retrieve ziggurat cards held
 
         $piece = $this->hand()->play($handpos);
@@ -232,8 +232,9 @@ class Model {
         if (count($zigs) > 0) {
             $ziggurats = $this->board()->touchedZiggurats($this->player_id);
         }
-        $move = new Move($this->player_id, $piece, $originalPiece, $handpos,
-                         $rc, $hexPiece, $field_points, count($ziggurats));
+        $move = new ElaboratedMove($this->player_id, $piece, $originalPiece,
+                                   $handpos, $rc, $hexPiece, $field_points,
+                                   count($ziggurats), $ziggurats);
         $this->turnProgress()->addMove($move);
 
         // update the database
