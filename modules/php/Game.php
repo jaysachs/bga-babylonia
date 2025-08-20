@@ -37,6 +37,8 @@ class Game extends \Bga\GameFramework\Table
     private const GLOBAL_PLAYER_ON_TURN = 'player_on_turn';
     /** @var string */
     private const GLOBAL_NEXT_PLAYER_TO_BE_ACTIVE = 'next_player_to_be_active';
+    /** @var string */
+    private const GLOBAL_ROW_COL_BEING_SCORED = 'row_col_being_scored';
 
     private PersistentStore $ps;
 
@@ -47,6 +49,7 @@ class Game extends \Bga\GameFramework\Table
         $this->initGameStateLabels([
             Game::GLOBAL_PLAYER_ON_TURN => 10,
             Game::GLOBAL_NEXT_PLAYER_TO_BE_ACTIVE => 11,
+            Game::GLOBAL_ROW_COL_BEING_SCORED => 12,
         ]);
 
         Stats::init($this);
@@ -157,6 +160,7 @@ class Game extends \Bga\GameFramework\Table
         $this->notify->all(
             "zigguratScored",
             $msg, [
+                "hex" => $zighex->rc,
                 "row" => $zighex->rc->row,
                 "col" => $zighex->rc->col,
                 "player_name" => $winner_name,
@@ -233,7 +237,9 @@ class Game extends \Bga\GameFramework\Table
     }
 
     public function argZigguratScoring(): array {
-        return [];
+        return [
+            "hex" => $this->rowColBeingScored(),
+        ];
     }
 
     public function stZigguratScoring(): void {
@@ -254,6 +260,7 @@ class Game extends \Bga\GameFramework\Table
         $model = new Model($this->ps, $player_id);
         $zcards = $model->components()->availableZigguratCards();
         return [
+            "hex" => $this->rowColBeingScored(),
             "available_cards" => array_map(
                 function ($z): string {
                     return $z->type->value;
@@ -291,6 +298,7 @@ class Game extends \Bga\GameFramework\Table
                 "cardused" => $selection->card->used,
                 "points" => $selection->points,
                 "score" => $model->allPlayerInfo()[$player_id]->score,
+                "hex" => $this->rowColBeingScored(),
             ]
         );
         $this->gamestate->nextState("cardSelected");
@@ -321,6 +329,7 @@ class Game extends \Bga\GameFramework\Table
                 "city" => $hex->piece->value,
             ]
         );
+        $this->setRowColBeingScored($rc);
 
         $next_player = 0;
         if ($hex->piece->isCity()) {
@@ -549,6 +558,14 @@ class Game extends \Bga\GameFramework\Table
 
     private function activePlayerId(): int {
         return intval($this->getActivePlayerId());
+    }
+
+    private function rowColBeingScored(): RowCol {
+        return RowCol::fromKey(intval($this->getGameStateValue(Game::GLOBAL_ROW_COL_BEING_SCORED)));
+    }
+
+    private function setRowColBeingScored(RowCol $rc) {
+        $this->setGameStateValue(Game::GLOBAL_ROW_COL_BEING_SCORED, $rc->asKey());
     }
 
     private function playerOnTurn(): int {
