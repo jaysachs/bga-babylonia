@@ -17,6 +17,10 @@ class Attrs {
   static readonly PIECE = 'bbl_piece';
 }
 
+class Piece {
+  static readonly EMPTY = 'empty'
+}
+
 class IDS {
   static readonly AVAILABLE_ZCARDS: string = 'bbl_available_zcards';
   static readonly BOARD = 'bbl_board';
@@ -620,7 +624,6 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
   }
 
   private onUpdateActionButtons_selectZigguratCard(): void {
-    this.markHexPlayable(this.ziggurat_scored);
     const div = $(IDS.AVAILABLE_ZCARDS);
     div.scrollIntoView(false);
     div.classList.add(CSS.SELECTING);
@@ -741,22 +744,40 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
         row: number;
         col: number;
         hand_size: number;
+        field_points: number;
+        ziggurat_points: number;
+        touched_ziggurats: RowCol[];
       }
     ): Promise<void> {
 
     const isActive = this.player_id == args.player_id;
+    const hexDiv = this.hexDiv(args);
     let sourceDivId = IDS.handcount(args.player_id);
     if (isActive) {
-      this.hand[args.handpos] = 'empty';
+      this.hand[args.handpos] = Piece.EMPTY;
       const handPosDiv = this.handPosDiv(args.handpos);
-      this.setPiece(handPosDiv, 'empty', 0);
+      this.setPiece(handPosDiv, Piece.EMPTY, 0);
       sourceDivId = handPosDiv.id;
     }
     // TODO: do some animation for ziggurat scoring
+    if (args.ziggurat_points > 0) {
+       // TODO: flash all the args.touched_ziggurats
+       //   maybe use CSS?
+    }
     // TODO: do some animation for field scoring
+    if (args.field_points > 0) {
+      // TODO: fix the ! ???
+      let field = hexDiv.getAttribute('bbl_piece')!;
+      this.setPiece(hexDiv, Piece.EMPTY, 0);
+      await this.slideTemp(
+        hexDiv.id,
+        // TODO: find a better location
+        IDS.handcount(args.player_id),
+        this.pieceAttr(field, 0));
+    }
     await this.slideTemp(
       sourceDivId,
-      this.hexDiv(args).id,
+      hexDiv.id,
       this.pieceAttr(args.piece, args.player_id));
     this.renderPlayedPiece(args,
       args.piece,
@@ -770,13 +791,13 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
     const pid = this.player_id;
     for (let i = 0; i < args.hand.length; ++i) {
       // extend hand if zig tile just acquired
-      if (i >= this.hand.length || this.hand[i] == 'empty') {
+      if (i >= this.hand.length || this.hand[i] == Piece.EMPTY) {
         this.hand[i] = args.hand[i]!;
       } else if (this.hand[i] != args.hand[i]) {
         console.error(`hand from args ${args.hand[i]} not matches hand ${this.hand[i]}`)
       }
       const div = this.handPosDiv(i);
-      if (div.getAttribute(Attrs.PIECE) == 'empty') { // && incoming piece is not empty?
+      if (div.getAttribute(Attrs.PIECE) == Piece.EMPTY) { // && incoming piece is not empty?
         const a = this.slideTemp(
           IDS.handcount(pid),
           div.id,
@@ -800,17 +821,14 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
     return Promise.resolve();
   }
 
-  private async notif_zigguratScored(
-    args: {
-      row: number;
-      col: number;
-      player_name: string;
-      player_id: number;
-    }): Promise<void> {
-    this.ziggurat_scored = args;
-  }
-
-  private ziggurat_scored: RowCol;
+ private async notif_zigguratScored(
+   args: {
+     hex: RowCol;
+     player_name: string;
+     player_id: number;
+   }): Promise<void> {
+    this.unmarkHexPlayable(args.hex);
+ }
 
   private async notif_zigguratCardSelection(
       args: {
@@ -818,9 +836,10 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
         player_id: number;
         cardused: boolean;
         score: number;
+        hex: RowCol;
       }
     ): Promise<void> {
-    this.unmarkHexPlayable(this.ziggurat_scored);
+    this.unmarkHexPlayable(args.hex);
     const zcard = this.zcardForType(args.zcard);
     zcard.owning_player_id = args.player_id;
     zcard.used = args.cardused;
