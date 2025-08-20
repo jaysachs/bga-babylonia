@@ -160,7 +160,6 @@ class Game extends \Bga\GameFramework\Table
         $this->notify->all(
             "zigguratScored",
             $msg, [
-                "hex" => $zighex->rc,
                 "row" => $zighex->rc->row,
                 "col" => $zighex->rc->col,
                 "player_name" => $winner_name,

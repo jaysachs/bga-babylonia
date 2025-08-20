@@ -802,7 +802,9 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
           IDS.handcount(pid),
           div.id,
           this.pieceAttr(this.hand[i]!, this.player_id))
-          .then(() => { this.setPiece(div, this.hand[i]!, this.player_id) });
+          .then(() => {
+          console.log("setting hand piece", i, this.hand);
+          this.setPiece(div, this.hand[i]!, this.player_id) });
         anims.push(a);
       }
     }
@@ -823,12 +825,23 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
 
  private async notif_zigguratScored(
    args: {
-     hex: RowCol;
+     row: number;
+     col: number;
      player_name: string;
      player_id: number;
    }): Promise<void> {
-    this.unmarkHexPlayable(args.hex);
  }
+
+  private async notif_scoringSelection(
+    args: {
+      player_id: number;
+      player_name: string;
+      row: number;
+      col: number;
+      city: string;
+    }): Promise<void> {
+    this.markHexPlayable(args);
+  }
 
   private async notif_zigguratCardSelection(
       args: {
@@ -839,7 +852,6 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
         hex: RowCol;
       }
     ): Promise<void> {
-    this.unmarkHexPlayable(args.hex);
     const zcard = this.zcardForType(args.zcard);
     zcard.owning_player_id = args.player_id;
     zcard.used = args.cardused;
@@ -856,7 +868,9 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
     await this.slideTemp(
       id,
       IDS.playerBoardZcards(args.player_id),
-      attrs).then(() => this.addZcardDivInPlayerBoard(zcard));
+      attrs)
+        .then(() => this.addZcardDivInPlayerBoard(zcard))
+        .then(() => this.unmarkHexPlayable(args.hex));
   }
 
   private async notif_cityScored(
@@ -878,7 +892,6 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
 
     const hex = document.getElementById(IDS.hexDiv(args))!;
 
-    this.markHexPlayable(args);
     for (const playerId in args.details) {
       const details = args.details[playerId]!;
       let aa = this.bgaAnimationsActive();
