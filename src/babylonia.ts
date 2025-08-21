@@ -635,7 +635,6 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
     const div = $(IDS.AVAILABLE_ZCARDS);
     div.scrollIntoView(false);
     div.classList.add(CSS.SELECTING);
-    this.updateStatusBar(_('You must select a ziggurat card'));
   }
 
   private onUpdateActionButtons_playPieces(args: PlayState): void {

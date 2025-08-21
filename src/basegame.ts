@@ -107,11 +107,6 @@ class BaseGame<T extends Gamedatas> extends GameGui<T> {
     return div;
   }
 
-  updateStatusBar(message: string): void {
-    $('gameaction_status').innerHTML = _(message);
-    $('pagemaintitletext').innerHTML = _(message);
-  }
-
   /**
    *
    * @param {string} methodName
