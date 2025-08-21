@@ -15,17 +15,17 @@
           <div  id="bbl_hand_3" bbl_piece="farmer_3" class="bbl_selected"></div>
           <div  id="bbl_hand_4" bbl_piece="merchant_4"></div>
           <!--
-          <div  id="bbl_hand_5" class="bbl_empty"></div>
-          <div  id="bbl_hand_6" class="bbl_farmer_3"></div>
-          -->
+              <div  id="bbl_hand_5" class="bbl_empty"></div>
+              <div  id="bbl_hand_6" class="bbl_farmer_3"></div>
+              -->
         </div>
       </div>
       <div id="bbl_available_zcards_container">
         <div>
-          <button onclick="toggle_zcards()">Available ziggurat cards</button>
-          </div>
+          <button onclick="toggle_zcards(event)">Available ziggurat cards</button>
+        </div>
         <div>
-          <div id="bbl_available_zcards">
+          <div id="bbl_available_zcards" onclick="selectZCard(event)">
             <div bbl_ztype="zc_10pts"></div>
             <div bbl_ztype="zc_xturn"></div>
             <div bbl_ztype="zc_hand7" style="opacity: 20%"></div>
@@ -57,11 +57,12 @@
               boardDiv.insertAdjacentHTML('beforeend', html.hex(hex));
           }
 
-            let someHex = document.getElementById('bbl_hex_7_1');
-            cycleThings(someHex);
-            someHex.classList.add('bbl_playable');
+          let someHex = document.getElementById('bbl_hex_7_1');
+          cycleThings(someHex);
+          someHex.classList.add('bbl_playable');
         </script>
       </div>
+    </div>
     <div id="tmp_right">
       <!-- player board -->
       <div class="player-board">

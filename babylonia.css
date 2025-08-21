@@ -335,6 +335,17 @@ div.bbl_in_network::before {
 }
 
 #bbl_available_zcards > div {
+    border-style: solid;
+    border-width: 3px;
+    border-color: #F8E6D0;
+}
+
+#bbl_available_zcards > div.bbl_selected {
+    border-color:green;
+}
+
+
+#bbl_available_zcards > div {
     display: inline-block;
     /* TODO: not sure computing these based on hex size is right */
     height: calc((var(--bbl-hex-height) - 4px) * 2.37); /* 135px; */
