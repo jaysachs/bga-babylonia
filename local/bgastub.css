@@ -1,0 +1,123 @@
+      html {
+      background-attachment: scroll;
+      background-clip: border-box;
+      background-color: rgba(0, 0, 0, 0);
+      background-image: url("https://studio.boardgamearena.com:8084/data/themereleases/241023-1437/img/layout/back-main_games.jpg");
+      background-origin: padding-box;
+      background-position-x: 0%;
+      background-position-y: 0%;
+      background-repeat: repeat;
+      background-size: auto;
+      color: rgb(0, 0, 0);
+      direction: ltr;
+      display: block;
+    /*  height: 10973px; */
+      unicode-bidi: isolate;
+/*      width: 1292px; */
+      -webkit-locale: en;
+      }
+
+      .log {
+          word-wrap: break-word;
+          color: red;
+          font-size: 85%;
+          margin-top: 5px;
+          overflow: hidden;
+       }
+      .roundedbox {
+          background-color: #f8f8f8;
+          padding: 5px;
+          position: relative;
+      }
+      .log_replayable {
+          cursor: pointer;
+      }
+      #logs {
+          margin-top: 10px;
+          max-height: 1004px;
+          overflow: hidden;
+          position: relative;
+      }
+
+    .player-board {
+        background-color: #ebd5bd;
+        border-radius: 8px 0 0 8px;
+        box-shadow: 0 3px 8px rgba(0,0,0,.3);
+        padding: 5px 3px;
+    }
+    .player_showcursor {
+        display: none;
+        margin-bottom: 5px;
+        margin-left: 22px;
+        margin-top: 5px;
+    }
+    .fa {
+        display: inline-block;
+        font: normal normal normal 14px/1 FontAwesome;
+        font-size: inherit;
+        text-rendering: auto;
+    }
+    .fa-star, .fa-star-half-o, .fa-star-o {
+        color: #f9a11a;
+    }
+    .fa-star:before {
+        content: "\f005";
+    }
+    .gamerank_average {
+        background-color: #84b8de;
+    }
+    .gamerank {
+        background-color: #74bed1;
+        border-radius: 3px;
+        display: -moz-inline-box;
+        display: inline-block;
+        height: 20px;
+        padding: 0 5px;
+        position: relative;
+        top: 3px;
+    }
+
+    .gamerank .icon20 {
+        top: 0;
+    }
+    .icon20_rankw {
+        background-position: 0 -2080px;
+    }
+    .icon12, .icon20 {
+        background-image: url(../img/common/icons20.png);
+        display: inline-block;
+    }
+    .icon20 {
+        height: 20px;
+        position: relative;
+        top: 4px;
+        width: 20px;
+    }
+    .timeToThink {
+        font-size: 80%;
+        position: absolute;
+        right: 0;
+        top: 20px;
+    }
+    body {
+        font-family: Roboto,Arial,sans-serif;
+        font-size: 16px;
+        display: flex;
+        justify-content: space-between;
+        gap: 5px;
+    }
+
+    #bbl_main {
+      flex: 1;
+      position: relative;
+    }
+
+    #tmp_right {
+        width: 240px;
+        flex-shrink: 0;
+        display: flex;
+        flex-flow: column;
+    }
+
+    #logs_wrap {
+    }

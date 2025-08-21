@@ -323,11 +323,12 @@ div.bbl_in_network::before {
 
 
 #bbl_available_zcards_container {
-    clip-path: rect(auto auto auto auto round 10px);
-    background-color: #F8E6D0;
+    display: flex;
 }
 
 #bbl_available_zcards {
+    clip-path: rect(auto auto auto auto round 10px);
+    background-color: #F8E6D0;
     position: relative;
     display: flex;
     justify-content: center;

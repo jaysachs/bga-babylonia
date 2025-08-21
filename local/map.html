@@ -1,219 +1,9 @@
 <html>
+  <link rel="stylesheet" type="text/css" href="bgastub.css" />
   <link rel="stylesheet" type="text/css" href="../babylonia.css" />
-  <script>
-    function cycleThings(e) {
-        let pieces = [
-            "empty",
-            "farmer_1",
-            "merchant_1",
-            "servant_1",
-            "priest_1",
-            "hidden_1",
-            "farmer_2",
-            "merchant_2",
-            "servant_2",
-            "priest_2",
-            "hidden_2",
-            "farmer_3",
-            "merchant_3",
-            "servant_3",
-            "priest_3",
-            "hidden_3",
-            "farmer_4",
-            "merchant_4",
-            "servant_4",
-            "priest_4",
-            "hidden_4",
-        ];
-        let cities = [
-            "city_msp",
-            "city_m",
-            "city_p",
-            "city_s",
-            "city_ms",
-            "city_sp",
-            "city_mp",
-            "field_5",
-            "field_6",
-            "field_7",
-            "field_X",
-            "ziggurat",
-        ];
-        let all = pieces.concat(cities);
-        p = e.getAttribute('bbl_piece') || all[0];
-        for (i = 0; i < all.length; ++i) {
-            if (p == all[i]) {
-                if (i < all.length-1) {
-                    e.setAttribute('bbl_piece', all[i+1]);
-                } else {
-                    e.setAttribute('bbl_piece', all[0]);
-                }
-                return;
-            }
-        }
-    }
-
-    function selectHex(event) {
-        event.preventDefault();
-        event.stopPropagation();
-        let e = event.target;
-        while (e.parentElement != null && e.parentElement.id != "bbl_board") {
-            e = e.parentElement;
-        }
-        if (e.parentElement != null) {
-            let x = e.id.split("_");
-            console.log("selected hex " + x[2] + ", " + x[3]);
-            // e.classList.toggle("selected");
-            cycleThings(e);
-        }
-    }
-
-    function selectPieceToPlay(event) {
-        event.preventDefault();
-        event.stopPropagation();
-        let e = event.target;
-        let hc = e.parentElement;
-        if (hc.id == "bbl_hand") {
-            let p = e.getAttribute('bbl_piece');
-            if (!p || p == 'empty') { return; }
-            let c = e.classList;
-            if (c.contains('bbl_unplayable')) { return; }
-            if (!c.contains("bbl_selected")) {
-                hc.querySelectorAll('#bbl_hand > .bbl_selected').forEach(
-                div => div.classList.remove('bbl_selected'));
-            }
-            c.toggle("bbl_selected");
-        }
-    }
-  </script>
-  <head>
-    <style>
-
-      html {
-      background-attachment: scroll;
-      background-clip: border-box;
-      background-color: rgba(0, 0, 0, 0);
-      background-image: url("https://studio.boardgamearena.com:8084/data/themereleases/241023-1437/img/layout/back-main_games.jpg");
-      background-origin: padding-box;
-      background-position-x: 0%;
-      background-position-y: 0%;
-      background-repeat: repeat;
-      background-size: auto;
-      color: rgb(0, 0, 0);
-      direction: ltr;
-      display: block;
-    /*  height: 10973px; */
-      unicode-bidi: isolate;
-/*      width: 1292px; */
-      -webkit-locale: en;
-      }
-
-      .log {
-          word-wrap: break-word;
-          color: red;
-          font-size: 85%;
-          margin-top: 5px;
-          overflow: hidden;
-       }
-      .roundedbox {
-          background-color: #f8f8f8;
-          padding: 5px;
-          position: relative;
-      }
-      .log_replayable {
-          cursor: pointer;
-      }
-      #logs {
-          margin-top: 10px;
-          max-height: 1004px;
-          overflow: hidden;
-          position: relative;
-      }
-
-    .player-board {
-        background-color: #ebd5bd;
-        border-radius: 8px 0 0 8px;
-        box-shadow: 0 3px 8px rgba(0,0,0,.3);
-        padding: 5px 3px;
-    }
-    .player_showcursor {
-        display: none;
-        margin-bottom: 5px;
-        margin-left: 22px;
-        margin-top: 5px;
-    }
-    .fa {
-        display: inline-block;
-        font: normal normal normal 14px/1 FontAwesome;
-        font-size: inherit;
-        text-rendering: auto;
-    }
-    .fa-star, .fa-star-half-o, .fa-star-o {
-        color: #f9a11a;
-    }
-    .fa-star:before {
-        content: "\f005";
-    }
-    .gamerank_average {
-        background-color: #84b8de;
-    }
-    .gamerank {
-        background-color: #74bed1;
-        border-radius: 3px;
-        display: -moz-inline-box;
-        display: inline-block;
-        height: 20px;
-        padding: 0 5px;
-        position: relative;
-        top: 3px;
-    }
-
-    .gamerank .icon20 {
-        top: 0;
-    }
-    .icon20_rankw {
-        background-position: 0 -2080px;
-    }
-    .icon12, .icon20 {
-        background-image: url(../img/common/icons20.png);
-        display: inline-block;
-    }
-    .icon20 {
-        height: 20px;
-        position: relative;
-        top: 4px;
-        width: 20px;
-    }
-    .timeToThink {
-        font-size: 80%;
-        position: absolute;
-        right: 0;
-        top: 20px;
-    }
-    body {
-        font-family: Roboto,Arial,sans-serif;
-        font-size: 16px;
-        display: flex;
-        justify-content: space-between;
-        gap: 5px;
-    }
-
-    #bbl_main {
-      flex: 1;
-      position: relative;
-    }
-
-    #tmp_right {
-        width: 240px;
-        flex-shrink: 0;
-        display: flex;
-        flex-flow: column;
-    }
-
-    #logs_wrap {
-    }
-  </style>
-</head>
+  <script src="mockup.js"></script>
+  <!-- this gives an error but harmless -->
+  <script src="../babylonia.js" ></script>
   <body>
     <div id="bbl_main">
       <div id="bbl_hand_container">
@@ -230,9 +20,24 @@
           -->
         </div>
       </div>
+      <div id="bbl_available_zcards_container">
+        <div>
+          <button onclick="toggle_zcards()">Available ziggurat cards</button>
+          </div>
+        <div>
+          <div id="bbl_available_zcards">
+            <div bbl_ztype="zc_10pts"></div>
+            <div bbl_ztype="zc_xturn"></div>
+            <div bbl_ztype="zc_hand7" style="opacity: 20%"></div>
+            <div bbl_ztype></div>
+            <div bbl_ztype="zc_3nobles" class="bbl_selected"></div>
+            <div bbl_ztype="zc_3farmers"></div>
+            <div bbl_ztype="zc_citypts"></div>
+          </div>
+        </div>
+      </div>
       <div id="bbl_board_container">
         <div id="bbl_board" onClick="selectHex(event)"></div>
-        <script src="../babylonia.js" ></script/>
         <script>
           var boardData = [];
           for (var c = 0; c <= 16; c++) {
@@ -257,19 +62,6 @@
             someHex.classList.add('bbl_playable');
         </script>
       </div>
-      <div id="bbl_available_zcards_container">
-<!--        <span>Available ziggurat cards</span> -->
-      <div id="bbl_available_zcards">
-        <div bbl_ztype="zc_10pts"></div>
-        <div bbl_ztype="zc_xturn"></div>
-        <div bbl_ztype="zc_hand7" style="opacity: 20%"></div>
-        <div bbl_ztype></div>
-        <div bbl_ztype="zc_3nobles" class="bbl_selected"></div>
-        <div bbl_ztype="zc_3farmers"></div>
-        <div bbl_ztype="zc_citypts"></div>
-      </div>
-      </div>
-    </div>
     <div id="tmp_right">
       <!-- player board -->
       <div class="player-board">
@@ -309,6 +101,12 @@
           </div>
         </div>
       </div>
+
+
+
+      <!-- nothing interesting here -->
+
+
       <div id="logs_wrap">
         <div id="logs" style="display: block;">
           <div class="log " id="log_39" style="height: auto; display: block; color: rgb(0, 0, 0);"><div class="roundedbox">You are connected again.</div></div>
