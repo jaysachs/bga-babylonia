@@ -445,8 +445,11 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
 
   private expandCollapseZcards(event: Event): boolean {
     console.log('expandCollapseZcards', event);
+    const cl = $(IDS.AVAILABLE_ZCARDS).classList;
     // TODO: disable if need to select a card?
-    $(IDS.AVAILABLE_ZCARDS).classList.toggle(CSS.COLLAPSED);
+    cl.toggle(CSS.COLLAPSED);
+
+    this.zcardsOriginallyCollapsed = cl.contains(CSS.COLLAPSED);
     return true;
   }
 
@@ -690,9 +693,10 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
     this.markAllHexesUnplayable();
   }
 
+  private zcardsOriginallyCollapsed : boolean;
   private onUpdateActionButtons_selectZigguratCard(): void {
       // TODO: scroll to top?
-      this.showZcards();
+      this.zcardsOriginallyCollapsed = this.showZcards();
   }
 
   private onUpdateActionButtons_playPieces(args: PlayState): void {
@@ -939,7 +943,7 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
              $(id).remove();
              this.addZcardDivInPlayerBoard(zcard);
              this.unmarkHexPlayable(args.hex);
-             if (!shown) { this.hideZcards(); }
+             if (!shown || this.zcardsOriginallyCollapsed) { this.hideZcards(); }
         });
   }
 
