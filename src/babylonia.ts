@@ -22,7 +22,9 @@ class Piece {
 }
 
 class IDS {
+  static readonly AVAILABLE_ZCARDS_CONTAINER: string = 'bbl_available_zcards_container';
   static readonly AVAILABLE_ZCARDS: string = 'bbl_available_zcards';
+  static readonly EXPAND_COLLAPSE_ZCARDS = 'bbl_expand_collapse_zcards';
   static readonly BOARD = 'bbl_board';
   static readonly BOARD_CONTAINER = 'bbl_board_container';
   static readonly HAND = 'bbl_hand';
@@ -67,6 +69,7 @@ class CSS {
   static readonly PLAYABLE = 'bbl_playable';
   static readonly UNPLAYABLE = 'bbl_unplayable';
   static readonly UNIMPORTANT = 'bbl_unimportant';
+  static readonly COLLAPSED = 'bbl_collapsed';
 }
 
 class Html {
@@ -117,11 +120,16 @@ class Html {
       <div id='bbl_hand_container'>
         <div id='${IDS.HAND}'></div>
       </div>
+      <div id='bbl_available_zcards_container'>
+        <div>
+          <button id='${IDS.EXPAND_COLLAPSE_ZCARDS}'>zig cards</button>
+        </div>
+        <div id='${IDS.AVAILABLE_ZCARDS}' class='${CSS.COLLAPSED}'></div>
+      </div>
       <div id='${IDS.BOARD_CONTAINER}'>
         <div id='${IDS.BOARD}'></div>
         <span id='bbl_vars'></span>
       </div>
-      <div id='${IDS.AVAILABLE_ZCARDS}'></div>
    </div>
 `;
   }
@@ -170,6 +178,7 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
     this.addPausableHandler($(IDS.HAND), 'click', this.onHandClicked.bind(this));
     this.addPausableHandler($(IDS.BOARD), 'click', this.onBoardClicked.bind(this));
     this.addPausableHandler($(IDS.AVAILABLE_ZCARDS), 'click', this.onZcardClicked.bind(this));
+    this.addPausableHandler($(IDS.EXPAND_COLLAPSE_ZCARDS), 'click', this.expandCollapseZcards.bind(this));
   }
 
   override setup(gamedatas: BGamedatas) {
@@ -422,33 +431,79 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
     return false;
   }
 
+  private showZcards() {
+    $(IDS.AVAILABLE_ZCARDS).classList.remove(CSS.COLLAPSED);
+  }
+
+  private hideZcards() {
+    $(IDS.AVAILABLE_ZCARDS).classList.add(CSS.COLLAPSED);
+  }
+
+  private expandCollapseZcards(event: Event): boolean {
+    console.log('expandCollapseZcards', event);
+    // TODO: disable if need to select a card?
+    $(IDS.AVAILABLE_ZCARDS).classList.toggle(CSS.COLLAPSED);
+    return true;
+  }
+
+  private toggleZcardSelected(e : Element) {
+      let addButtons = () => {
+          this.statusBar.addActionButton(_('Confirm'),
+              () => {
+                  this.bgaPerformAction(
+                      'actSelectZigguratCard',
+                      { zctype: e.getAttribute(Attrs.ZTYPE) }
+                  );
+              },
+              // TODO: do not use this?
+              { autoclick: true }
+          );
+
+          this.statusBar.addActionButton('Cancel', () => {
+             this.toggleZcardSelected(e);
+          });
+      };
+      let alreadySelected =
+          e.parentElement!.querySelector(
+              `#${IDS.AVAILABLE_ZCARDS} > [${Attrs.ZTYPE}].${CSS.SELECTED}`);
+      e.classList.toggle(CSS.SELECTED);
+      if (alreadySelected == null) {
+          addButtons();
+      } else if (alreadySelected == e) {
+          // remove confirm and cancel buttons from action bar
+          this.statusBar.removeActionButtons();
+      } else {
+          alreadySelected.classList.toggle(CSS.SELECTED);
+          // buttons should already be in right state
+          // BUT we can't reset the timer. So we remove & add.
+          // this is a crappy way to reset timer on autoclick.
+          this.statusBar.removeActionButtons();
+          addButtons();
+      }
+  }
+
   private onZcardClicked(event: Event): boolean {
     console.log('onZcardClicked', event);
+
     event.preventDefault();
     event.stopPropagation();
     if (!this.isCurrentPlayerActive()) {
+      console.log("not active player");
       return false;
     }
     if (this.currentState != 'selectZigguratCard') {
+      console.log("not in selectZigguratCard state");
       return false;
     }
-    const elem = event.target as Element;
-    const tid = elem.id;
-    let type = elem.getAttribute(Attrs.ZTYPE);
-    if (type == null) {
-      console.error(`Could not find ${Attrs.ZTYPE} attribute in clicked card ${elem}`);
-      return true;
-    }
-    for (let zc of this.zcards) {
-      if (zc.type == type) {
-        this.bgaPerformAction('actSelectZigguratCard', { zctype: zc.type });
-        const div = $(IDS.AVAILABLE_ZCARDS);
-        div.classList.remove(CSS.SELECTING);
-        return false;
+
+    let e = event.target as HTMLElement;
+    if (e.parentElement!.id == IDS.AVAILABLE_ZCARDS) {
+      // TODO: remove zcards when taken.
+      if (e.getAttribute(Attrs.ZTYPE) != null) {
+        this.toggleZcardSelected(e);
       }
     }
-    console.error(`Unknown zcard type ${type}`);
-    return true;
+    return false;
   }
 
   private allowedMovesFor(pos: number): RowCol[] {
@@ -632,40 +687,8 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
   }
 
   private onUpdateActionButtons_selectZigguratCard(): void {
-//    const div = $(IDS.AVAILABLE_ZCARDS);
-//    div.scrollIntoView(false);
-//    div.classList.add(CSS.SELECTING);
-
-// Should take the Ark Nova approach:
-//   Don't add cards as buttons. Instead, create a subpanel right below
-//   the action bar, and update the button bar to have "confirm" and "cancel"
-//   buttons when a card is selected. The confirm could have an autoclick.
-// One possible treatment is to border-edge highlight the selected card
-//   and darken the other cards.
-
-    this.statusBar.addActionButton('',
-       () => {
-         console.log("10pts!");
-         this.bgaPerformAction('actSelectZigguratCard', { zctype: 'zc_10pts' });
-       },
-       { classes: [ 'bbl_zcard', 'bbl_zc_10pts' ],
-              title: "10 points",
-              tooltip: "Gain an immediate 10 points",
-              confirm: "Are you sure?",
-              // autoclick: true,
-              }
-    );
-    this.statusBar.addActionButton('', () => {
-         console.log("xtra turn!");
-         this.bgaPerformAction('actSelectZigguratCard', { zctype: 'zc_xturn' });
-       },
-    { classes: [ 'bbl_zcard', 'bbl_zc_xturn' ],
-              title: "Extra turn",
-              tooltip: "Gain an extra turn",
-              confirm: "Are you sure, really?",
-              // autoclick: true,
-              }
-    );
+      // TODO: scroll to top?
+      this.showZcards();
   }
 
   private onUpdateActionButtons_playPieces(args: PlayState): void {
@@ -908,7 +931,9 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
       IDS.playerBoardZcards(args.player_id),
       attrs)
         .then(() => this.addZcardDivInPlayerBoard(zcard))
-        .then(() => this.unmarkHexPlayable(args.hex));
+        .then(() => this.unmarkHexPlayable(args.hex))
+        .then(() => this.hideZcards());
+
   }
 
   private async notif_cityScored(
