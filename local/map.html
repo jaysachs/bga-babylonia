@@ -22,10 +22,11 @@
       </div>
       <div id="bbl_available_zcards_container">
         <div>
-          <button onclick="toggle_zcards(event)">Available ziggurat cards</button>
+          <button id="bbl_expand_collapse_zcards"
+                  onclick="toggle_zcards(event)">zig cards</button>
         </div>
         <div>
-          <div id="bbl_available_zcards" onclick="selectZCard(event)">
+          <div id="bbl_available_zcards" class="bbl_collapsed" onclick="selectZCard(event)">
             <div bbl_ztype="zc_10pts"></div>
             <div bbl_ztype="zc_xturn"></div>
             <div bbl_ztype="zc_hand7" style="opacity: 20%"></div>

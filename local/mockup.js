@@ -99,11 +99,7 @@ function selectZCard(event) {
  }
 
 function toggle_zcards() {
-    zcs = document.getElementById('bbl_available_zcards');
-    console.log(zcs);
-    a = zcs.style.height;
-    console.log(`a is x${a}x`);
-    if (a == null || a == '') { zcs.style.height = '0px'; zcs.style.visibility='hidden';}
-    else { zcs.style.height = ''; zcs.style.visibility='initial';}
-
+    let zcs = document.getElementById('bbl_available_zcards');
+    let cl = zcs.classList;
+    cl.toggle('bbl_collapsed');
 }
