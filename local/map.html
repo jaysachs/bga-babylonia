@@ -48,7 +48,6 @@
                 } else {
                     e.setAttribute('bbl_piece', all[0]);
                 }
-                console.log("new e", e);
                 return;
             }
         }
@@ -75,12 +74,13 @@
         let e = event.target;
         let hc = e.parentElement;
         if (hc.id == "bbl_hand") {
+            let p = e.getAttribute('bbl_piece');
+            if (!p || p == 'empty') { return; }
             let c = e.classList;
-            if (c.length == 0) {
-                return;
-            }
+            if (c.contains('bbl_unplayable')) { return; }
             if (!c.contains("bbl_selected")) {
-                hc.querySelectorAll('.bbl_selected').forEach(div => div.classList.remove('bbl_selected'));
+                hc.querySelectorAll('#bbl_hand > .bbl_selected').forEach(
+                div => div.classList.remove('bbl_selected'));
             }
             c.toggle("bbl_selected");
         }
@@ -218,19 +218,18 @@
     <div id="bbl_main">
       <div id="bbl_hand_container">
         <div class="bbl_hand" id="bbl_hand" onClick="selectPieceToPlay(event)">
-          <div id="bbl_hand_0" class="bbl_playable bbl_farmer_1"></div>
-          <div id="bbl_hand_1"  class="bbl_unplayable bbl_priest_2"></div>
+          <div id="bbl_hand_0" class="bbl_playable" bbl_piece="farmer_1"></div>
+          <div id="bbl_hand_1"  class="bbl_unplayable" bbl_piece="priest_2"></div>
           <!-- this one was already played -->
-          <div id="bbl_hand_2"  class="bbl_hidden_2"></div>
-          <div  id="bbl_hand_3" class="bbl_farmer_3 bbl_selected"></div>
-          <div  id="bbl_hand_4" class="bbl_empty"></div>
+          <div id="bbl_hand_2"  bbl_piece="empty"></div>
+          <div  id="bbl_hand_3" bbl_piece="farmer_3" class="bbl_selected"></div>
+          <div  id="bbl_hand_4" bbl_piece="merchant_4"></div>
           <!--
           <div  id="bbl_hand_5" class="bbl_empty"></div>
           <div  id="bbl_hand_6" class="bbl_farmer_3"></div>
           -->
         </div>
       </div>
-      <div id='greeting' style="z-index:1">Hello</div>
       <div id="bbl_board_container">
         <div id="bbl_board" onClick="selectHex(event)"></div>
         <script src="../babylonia.js" ></script/>
@@ -256,21 +255,18 @@
             let someHex = document.getElementById('bbl_hex_7_1');
             cycleThings(someHex);
             someHex.classList.add('bbl_playable');
-
-            var greeting = document.getElementById('greeting');
-            greeting.innerHTML += ' <em>from Dojo!</em>';
         </script>
       </div>
       <div id="bbl_available_zcards_container">
 <!--        <span>Available ziggurat cards</span> -->
       <div id="bbl_available_zcards">
-        <div class="bbl_zc_10pts"></div>
-        <div class="bbl_zc_xturn"></div>
-        <div class="bbl_zc_hand7"></div>
-        <div class=""></div>
-        <div class="bbl_zc_3nobles"></div>
-        <div class="bbl_zc_3farmers"></div>
-        <div class="bbl_zc_citypts"></div>
+        <div bbl_ztype="zc_10pts"></div>
+        <div bbl_ztype="zc_xturn"></div>
+        <div bbl_ztype="zc_hand7" style="opacity: 20%"></div>
+        <div bbl_ztype></div>
+        <div bbl_ztype="zc_3nobles" class="bbl_selected"></div>
+        <div bbl_ztype="zc_3farmers"></div>
+        <div bbl_ztype="zc_citypts"></div>
       </div>
       </div>
     </div>

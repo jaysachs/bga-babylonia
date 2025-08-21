@@ -207,7 +207,7 @@ body {
 /*
  * Ziggurat card sprites
  */
-[bbl_ztype], button.action-button.bbl_zcard
+[bbl_ztype], button.action-button.bbl_zcard, .bbl_zcard
 {
     background-size: 1000% 100%;
     background-image: url(img/zcards.png);
@@ -299,7 +299,7 @@ body {
     background: url(img/sprites.png) 0% -600% / 700% 700%;
 }
 
-div.bbl_selected::before {
+#bbl_hand > div.bbl_selected::before {
     height: 100%;
     width: 100%;
     content: '';
