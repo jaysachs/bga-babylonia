@@ -429,12 +429,18 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
     return false;
   }
 
-  private showZcards() {
-    $(IDS.AVAILABLE_ZCARDS).classList.remove(CSS.COLLAPSED);
+  private showZcards(): boolean {
+    const cl = $(IDS.AVAILABLE_ZCARDS).classList;
+    const wasCollapsed = cl.contains(CSS.COLLAPSED);
+    cl.remove(CSS.COLLAPSED);
+    return wasCollapsed;
   }
 
-  private hideZcards() {
-    $(IDS.AVAILABLE_ZCARDS).classList.add(CSS.COLLAPSED);
+  private hideZcards(): boolean {
+    const cl = $(IDS.AVAILABLE_ZCARDS).classList;
+    const wasCollapsed = cl.contains(CSS.COLLAPSED);
+    cl.add(CSS.COLLAPSED);
+    return wasCollapsed;
   }
 
   private expandCollapseZcards(event: Event): boolean {
@@ -911,7 +917,7 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
         hex: RowCol;
       }
     ): Promise<void> {
-    this.showZcards();
+    const shown = this.showZcards();
     const zcard = this.zcardForType(args.zcard);
     zcard.owning_player_id = args.player_id;
     zcard.used = args.cardused;
@@ -933,7 +939,7 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
              $(id).remove();
              this.addZcardDivInPlayerBoard(zcard);
              this.unmarkHexPlayable(args.hex);
-             this.hideZcards();
+             if (!shown) { this.hideZcards(); }
         });
   }
 
