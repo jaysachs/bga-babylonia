@@ -911,12 +911,13 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
         hex: RowCol;
       }
     ): Promise<void> {
+    this.showZcards();
     const zcard = this.zcardForType(args.zcard);
     zcard.owning_player_id = args.player_id;
     zcard.used = args.cardused;
     this.scoreCtrl[args.player_id]!.toValue(args.score);
 
-    const id = ${IDS.availableZcard(zcard.type)}.remove();
+    const id = IDS.availableZcard(zcard.type);
 
     // mark the available zig card spot as 'taken'
     $(id).removeAttribute(Attrs.ZTYPE);
