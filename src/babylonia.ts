@@ -632,9 +632,40 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
   }
 
   private onUpdateActionButtons_selectZigguratCard(): void {
-    const div = $(IDS.AVAILABLE_ZCARDS);
-    div.scrollIntoView(false);
-    div.classList.add(CSS.SELECTING);
+//    const div = $(IDS.AVAILABLE_ZCARDS);
+//    div.scrollIntoView(false);
+//    div.classList.add(CSS.SELECTING);
+
+// Should take the Ark Nova approach:
+//   Don't add cards as buttons. Instead, create a subpanel right below
+//   the action bar, and update the button bar to have "confirm" and "cancel"
+//   buttons when a card is selected. The confirm could have an autoclick.
+// One possible treatment is to border-edge highlight the selected card
+//   and darken the other cards.
+
+    this.statusBar.addActionButton('',
+       () => {
+         console.log("10pts!");
+         this.bgaPerformAction('actSelectZigguratCard', { zctype: 'zc_10pts' });
+       },
+       { classes: [ 'bbl_zcard', 'bbl_zc_10pts' ],
+              title: "10 points",
+              tooltip: "Gain an immediate 10 points",
+              confirm: "Are you sure?",
+              // autoclick: true,
+              }
+    );
+    this.statusBar.addActionButton('', () => {
+         console.log("xtra turn!");
+         this.bgaPerformAction('actSelectZigguratCard', { zctype: 'zc_xturn' });
+       },
+    { classes: [ 'bbl_zcard', 'bbl_zc_xturn' ],
+              title: "Extra turn",
+              tooltip: "Gain an extra turn",
+              confirm: "Are you sure, really?",
+              // autoclick: true,
+              }
+    );
   }
 
   private onUpdateActionButtons_playPieces(args: PlayState): void {

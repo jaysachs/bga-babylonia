@@ -207,7 +207,7 @@ body {
 /*
  * Ziggurat card sprites
  */
-[bbl_ztype]
+[bbl_ztype], button.action-button.bbl_zcard
 {
     background-size: 1000% 100%;
     background-image: url(img/zcards.png);
@@ -216,34 +216,34 @@ body {
     height: calc((var(--bbl-hex-height) - 4px) * 2.37); /* 135px; */
     width: calc((var(--bbl-hex-height) - 4px) * 1.58); /* 90px; */
 }
-[bbl_ztype="used"] {
+[bbl_ztype="used"], .bbl_zc_used {
     background-position: -900% 0%;
 }
-[bbl_ztype="zc_10pts"] {
+[bbl_ztype="zc_10pts"], .bbl_zc_10pts {
     background-position: 0% 0%;
 }
-[bbl_ztype="zc_xturn"] {
+[bbl_ztype="zc_xturn"], .bbl_zc_xturn {
     background-position: -100% 0%;
 }
-[bbl_ztype="zc_hand7"] {
+[bbl_ztype="zc_hand7"], .bbl_zc_hand7 {
     background-position: -200% 0%;
 }
-[bbl_ztype="zc_3nobles"] {
+[bbl_ztype="zc_3nobles"], .bbl_zc_3nobles {
     background-position: -300% 0%;
 }
-[bbl_ztype="zc_3farmers"] {
+[bbl_ztype="zc_3farmers"], .bbl_zc_3farmers {
     background-position: -400% 0%;
 }
-[bbl_ztype="zc_fields"] {
+[bbl_ztype="zc_fields"], .bbl_zc_fields {
     background-position: -500% 0%;
 }
-[bbl_ztype="zc_citypts"] {
+[bbl_ztype="zc_citypts"], .bbl_zc_citypts {
     background-position: -600% 0%;
 }
-[bbl_ztype="zc_land"] {
+[bbl_ztype="zc_land"], .bbl_zc_land {
     background-position: -700% 0%;
 }
-[bbl_ztype="zc_river"] {
+[bbl_ztype="zc_river"], .bbl_zc_river {
     background-position: -800% 0%;
 }
 
