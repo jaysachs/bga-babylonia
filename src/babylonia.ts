@@ -251,10 +251,8 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
       // TODO: make and use a 'createDiv' method
       if (zcard.owning_player_id != 0) {
         this.addZcardDivInPlayerBoard(zcard);
-        // also 'shell' in available cards
-        $(IDS.AVAILABLE_ZCARDS).insertAdjacentHTML('beforeend', `<div id='${id}'></div>`);
       } else {
-        // just in available cards
+        // in available cards
         $(IDS.AVAILABLE_ZCARDS).insertAdjacentHTML('beforeend', `<div id='${id}' ${Attrs.ZTYPE}='${ztype}'></div>`);
         this.addTooltip(id, zcard.tooltip, '');
       }
@@ -918,7 +916,7 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
     zcard.used = args.cardused;
     this.scoreCtrl[args.player_id]!.toValue(args.score);
 
-    const id = IDS.availableZcard(zcard.type);
+    const id = ${IDS.availableZcard(zcard.type)}.remove();
 
     // mark the available zig card spot as 'taken'
     $(id).removeAttribute(Attrs.ZTYPE);
@@ -930,10 +928,12 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
       id,
       IDS.playerBoardZcards(args.player_id),
       attrs)
-        .then(() => this.addZcardDivInPlayerBoard(zcard))
-        .then(() => this.unmarkHexPlayable(args.hex))
-        .then(() => this.hideZcards());
-
+        .then(() => {
+             $(id).remove();
+             this.addZcardDivInPlayerBoard(zcard);
+             this.unmarkHexPlayable(args.hex);
+             this.hideZcards();
+        });
   }
 
   private async notif_cityScored(
