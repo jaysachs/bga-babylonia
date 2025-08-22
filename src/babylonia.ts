@@ -433,7 +433,6 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
                       { zctype: e.getAttribute(Attrs.ZTYPE) }
                   );
               },
-              // TODO: do not use this?
               { autoclick: true }
           );
 
@@ -476,7 +475,6 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
 
     let e = event.target as HTMLElement;
     if (e.parentElement!.id == IDS.AVAILABLE_ZCARDS) {
-      // TODO: remove zcards when taken.
       if (e.getAttribute(Attrs.ZTYPE) != null) {
         this.toggleZcardSelected(e);
       }
@@ -866,6 +864,7 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
      player_name: string;
      player_id: number;
    }): Promise<void> {
+    // TODO: highlight adjacent hexes with winner highlighted.
  }
 
   private async notif_scoringSelection(
