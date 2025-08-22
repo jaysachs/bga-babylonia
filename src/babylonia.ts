@@ -437,7 +437,7 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
               { autoclick: true }
           );
 
-          this.statusBar.addActionButton('Cancel', () => {
+          this.statusBar.addActionButton(_('Cancel'), () => {
              this.toggleZcardSelected(e);
           });
       };
@@ -555,9 +555,8 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
         });
         this.setPlayablePieces();
       }
-      this.addActionButton(
-        'end-btn',
-        'End turn',
+      this.statusBar.addActionButton(
+        _('End turn'),
         () => {
           this.unselectAllHandPieces();
           this.bgaPerformAction('actDonePlayPieces');
@@ -569,9 +568,8 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
       this.setPlayablePieces();
     }
     if (this.playStateArgs.canUndo) {
-      this.addActionButton(
-        'undo-btn',
-        'Undo',
+      this.statusBar.addActionButton(
+        _('Undo'),
         () => this.bgaPerformAction('actUndoPlay')
       );
     }
@@ -615,9 +613,8 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
         this.setClientState('client_pickHexToPlay', {
           descriptionmyturn: _('${you} must select a hex to play to'),
         });
-        this.addActionButton(
-          'cancel-btn',
-          'Cancel',
+        this.statusBar.addActionButton(
+          _('Cancel'),
           () => {
             this.unselectAllHandPieces();
             this.setStatusBarForPlayState();
@@ -647,15 +644,13 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
   }
 
   private onUpdateActionButtons_chooseExtraTurn(): void {
-    this.addActionButton(
-      'extra-turn-btn',
-      'Take your one-time extra turn',
+    this.statusBar.addActionButton(
+      _('Take your one-time extra turn'),
       () => this.bgaPerformAction('actChooseExtraTurn', {
         take_extra_turn: true
       }));
-    this.addActionButton(
-      'noextra-turn-btn',
-      'Just finish your turn',
+    this.statusBar.addActionButton(
+      _('Just finish your turn'),
       () => this.bgaPerformAction('actChooseExtraTurn', {
         take_extra_turn: false
       }));
