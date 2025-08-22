@@ -123,8 +123,7 @@ class Html {
         <span id='bbl_vars'></span>
       </div>
       <div id='${IDS.AVAILABLE_ZCARDS_CONTAINER}' class="whiteblock">
-        <!-- <div>${_('Ziggurat Cards')}</div> -->
-        <div>Ziggurat Cards</div>
+        <div>${_('Ziggurat Cards')}</div>
         <div id='${IDS.AVAILABLE_ZCARDS}'></div>
       </div>
    </div>
