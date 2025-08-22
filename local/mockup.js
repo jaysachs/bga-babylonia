@@ -97,9 +97,3 @@ function selectZCard(event) {
         c.toggle("bbl_selected");
     }
  }
-
-function toggle_zcards() {
-    let zcs = document.getElementById('bbl_available_zcards');
-    let cl = zcs.classList;
-    cl.toggle('bbl_collapsed');
-}

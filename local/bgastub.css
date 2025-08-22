@@ -2,7 +2,7 @@ html {
     background-attachment: scroll;
     background-clip: border-box;
     background-color: rgba(0, 0, 0, 0);
-    background-image: url("https://studio.boardgamearena.com:8084/data/themereleases/241023-1437/img/layout/back-main_games.jpg");
+    background-image: url(https://x.boardgamearena.net/data/themereleases/250819-1100/img/layout/back-main_games.jpg);
     background-origin: padding-box;
     background-position-x: 0%;
     background-position-y: 0%;
@@ -17,6 +17,12 @@ html {
     -webkit-locale: en;
 }
 
+.whiteblock {
+    background-image: url(https://x.boardgamearena.net/data/themereleases/250819-1100/img/layout/rounded_b.png);
+    margin-bottom: 10px;
+    margin-top: 10px;
+    padding: 10px
+}
 .log {
     word-wrap: break-word;
     color: red;

@@ -20,23 +20,6 @@
               -->
         </div>
       </div>
-      <div id="bbl_available_zcards_container">
-        <div>
-          <button id="bbl_expand_collapse_zcards"
-                  onclick="toggle_zcards(event)">zig cards</button>
-        </div>
-        <div>
-          <div id="bbl_available_zcards" class="bbl_collapsed" onclick="selectZCard(event)">
-            <div bbl_ztype="zc_10pts"></div>
-            <div bbl_ztype="zc_xturn"></div>
-            <div bbl_ztype="zc_hand7" style="opacity: 20%"></div>
-            <div bbl_ztype></div>
-            <div bbl_ztype="zc_3nobles" class="bbl_selected"></div>
-            <div bbl_ztype="zc_3farmers"></div>
-            <div bbl_ztype="zc_citypts"></div>
-          </div>
-        </div>
-      </div>
       <div id="bbl_board_container">
         <div id="bbl_board" onClick="selectHex(event)"></div>
         <script>
@@ -62,6 +45,18 @@
           cycleThings(someHex);
           someHex.classList.add('bbl_playable');
         </script>
+      </div>
+      <div id="bbl_available_zcards_container" class="whiteblock">
+        <div style="font-style: italic">Ziggurat Cards</div>
+        <div id="bbl_available_zcards" onclick="selectZCard(event)">
+          <div bbl_ztype="zc_10pts"></div>
+          <div bbl_ztype="zc_xturn"></div>
+          <div bbl_ztype="zc_hand7" style="opacity: 20%"></div>
+          <div bbl_ztype></div>
+          <div bbl_ztype="zc_3nobles" class="bbl_selected"></div>
+          <div bbl_ztype="zc_3farmers"></div>
+          <div bbl_ztype="zc_citypts"></div>
+        </div>
       </div>
     </div>
     <div id="tmp_right">

@@ -323,17 +323,19 @@ div.bbl_in_network::before {
 
 
 #bbl_available_zcards_container {
-    display: flex;
+    border-width: 1px;
+    border-style: solid;
+    border-radius: 10px;
+    clip-path: rect(auto auto auto auto round 10px);
 }
 
-#bbl_available_zcards.bbl_collapsed {
-    height: 0px;
-    visibility: hidden;
+#bbl_available_zcards_container > div {
+    font-style: italic;
 }
 
 #bbl_available_zcards {
-    clip-path: rect(auto auto auto auto round 10px);
-    background-color: #F8E6D0;
+/*    clip-path: rect(auto auto auto auto round 10px); */
+/*    background-color: #F8E6D0; */
     position: relative;
     display: flex;
     justify-content: center;

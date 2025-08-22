@@ -24,7 +24,6 @@ class Piece {
 class IDS {
   static readonly AVAILABLE_ZCARDS_CONTAINER: string = 'bbl_available_zcards_container';
   static readonly AVAILABLE_ZCARDS: string = 'bbl_available_zcards';
-  static readonly EXPAND_COLLAPSE_ZCARDS = 'bbl_expand_collapse_zcards';
   static readonly BOARD = 'bbl_board';
   static readonly BOARD_CONTAINER = 'bbl_board_container';
   static readonly HAND = 'bbl_hand';
@@ -69,7 +68,6 @@ class CSS {
   static readonly PLAYABLE = 'bbl_playable';
   static readonly UNPLAYABLE = 'bbl_unplayable';
   static readonly UNIMPORTANT = 'bbl_unimportant';
-  static readonly COLLAPSED = 'bbl_collapsed';
 }
 
 class Html {
@@ -120,15 +118,14 @@ class Html {
       <div id='bbl_hand_container'>
         <div id='${IDS.HAND}'></div>
       </div>
-      <div id='bbl_available_zcards_container'>
-        <div>
-          <button id='${IDS.EXPAND_COLLAPSE_ZCARDS}'>zig cards</button>
-        </div>
-        <div id='${IDS.AVAILABLE_ZCARDS}' class='${CSS.COLLAPSED}'></div>
-      </div>
       <div id='${IDS.BOARD_CONTAINER}'>
         <div id='${IDS.BOARD}'></div>
         <span id='bbl_vars'></span>
+      </div>
+      <div id='${IDS.AVAILABLE_ZCARDS_CONTAINER}' class="whiteblock">
+        <!-- <div>${_('Ziggurat Cards')}</div> -->
+        <div>Ziggurat Cards</div>
+        <div id='${IDS.AVAILABLE_ZCARDS}'></div>
       </div>
    </div>
 `;
@@ -178,7 +175,6 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
     this.addPausableHandler($(IDS.HAND), 'click', this.onHandClicked.bind(this));
     this.addPausableHandler($(IDS.BOARD), 'click', this.onBoardClicked.bind(this));
     this.addPausableHandler($(IDS.AVAILABLE_ZCARDS), 'click', this.onZcardClicked.bind(this));
-    this.addPausableHandler($(IDS.EXPAND_COLLAPSE_ZCARDS), 'click', this.expandCollapseZcards.bind(this));
   }
 
   override setup(gamedatas: BGamedatas) {
@@ -429,30 +425,6 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
     return false;
   }
 
-  private showZcards(): boolean {
-    const cl = $(IDS.AVAILABLE_ZCARDS).classList;
-    const wasCollapsed = cl.contains(CSS.COLLAPSED);
-    cl.remove(CSS.COLLAPSED);
-    return wasCollapsed;
-  }
-
-  private hideZcards(): boolean {
-    const cl = $(IDS.AVAILABLE_ZCARDS).classList;
-    const wasCollapsed = cl.contains(CSS.COLLAPSED);
-    cl.add(CSS.COLLAPSED);
-    return wasCollapsed;
-  }
-
-  private expandCollapseZcards(event: Event): boolean {
-    console.log('expandCollapseZcards', event);
-    const cl = $(IDS.AVAILABLE_ZCARDS).classList;
-    // TODO: disable if need to select a card?
-    cl.toggle(CSS.COLLAPSED);
-
-    this.zcardsOriginallyCollapsed = cl.contains(CSS.COLLAPSED);
-    return true;
-  }
-
   private toggleZcardSelected(e : Element) {
       let addButtons = () => {
           this.statusBar.addActionButton(_('Confirm'),
@@ -689,14 +661,15 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
         take_extra_turn: false
       }));
   }
+
   private onUpdateActionButtons_endOfTurnScoring(): void {
     this.markAllHexesUnplayable();
   }
 
-  private zcardsOriginallyCollapsed : boolean;
   private onUpdateActionButtons_selectZigguratCard(): void {
-      // TODO: scroll to top?
-      this.zcardsOriginallyCollapsed = this.showZcards();
+      const div = $(IDS.AVAILABLE_ZCARDS);
+      div.scrollIntoView(false);
+      //  div.classList.add(CSS.SELECTING);
   }
 
   private onUpdateActionButtons_playPieces(args: PlayState): void {
@@ -921,7 +894,6 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
         hex: RowCol;
       }
     ): Promise<void> {
-    const shown = this.showZcards();
     const zcard = this.zcardForType(args.zcard);
     zcard.owning_player_id = args.player_id;
     zcard.used = args.cardused;
@@ -943,7 +915,6 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
              $(id).remove();
              this.addZcardDivInPlayerBoard(zcard);
              this.unmarkHexPlayable(args.hex);
-             if (!shown || this.zcardsOriginallyCollapsed) { this.hideZcards(); }
         });
   }
 
