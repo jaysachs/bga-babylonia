@@ -17,7 +17,7 @@ $gameinfos = [
     'publisher' => 'Ludonova',
 
     // Url of game publisher website
-    'publisher_website' => 'http://http://ludonova.com/',
+    'publisher_website' => 'http://ludonova.com/',
 
     // Board Game Geek ID of the publisher
     'publisher_bgg_id' => 16826,
