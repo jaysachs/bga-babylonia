@@ -346,6 +346,7 @@ class Game extends \Bga\GameFramework\Table
     }
 
     public function stEndOfTurnScoring(): void {
+        // TODO: automate when there is just one hex.
         $player_id = $this->activePlayerId();
         $player_on_turn = $this->playerOnTurn();
         if ($player_id != $player_on_turn) {
