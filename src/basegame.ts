@@ -144,7 +144,7 @@ class BaseGame<T extends Gamedatas> extends GameGui<T> {
     ignoreRotation: true,
   };
 
-  protected async slideTemp(fromId: string, toId: string, attrs: Record<string,string> | null,className?: string): Promise<void> {
+  protected slideTemp(fromId: string, toId: string, attrs: Record<string,string> | null,className?: string): Promise<void> {
     const div = this.mkTemp(attrs, className);
     const from = document.getElementById(fromId);
     const to = document.getElementById(toId);
