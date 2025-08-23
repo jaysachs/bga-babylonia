@@ -23,6 +23,9 @@
       <div id="bbl_board_container">
         <div id="bbl_board" onClick="selectHex(event)"></div>
         <script>
+          const hexDiv = (r,c) => {
+              return document.getElementById(`bbl_hex_${r}_${c}`);
+          }
           var boardData = [];
           for (var c = 0; c <= 16; c++) {
               let odd = c % 2 == 1;
@@ -41,13 +44,18 @@
               boardDiv.insertAdjacentHTML('beforeend', html.hex(hex));
           }
 
-          let someHex = document.getElementById('bbl_hex_7_1');
+          let someHex = hexDiv(7,1);
           cycleThings(someHex);
           someHex.classList.add('bbl_playable');
+
+          cycleThings(hexDiv(8, 4));
+          cycleThings(hexDiv(10, 6));
+          hexDiv(8,4).classList.add('bbl_in_network');
+          hexDiv(10,6).classList.add('bbl_in_network');
+          hexDiv(10,6).classList.add('bbl_unimportant');
         </script>
       </div>
       <div id="bbl_available_zcards_container" class="whiteblock">
-        <div style="font-style: italic">Ziggurat Cards</div>
         <div id="bbl_available_zcards" onclick="selectZCard(event)">
           <div bbl_ztype="zc_10pts"></div>
           <div bbl_ztype="zc_xturn"></div>

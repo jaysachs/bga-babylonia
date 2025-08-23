@@ -857,14 +857,41 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
     return Promise.resolve();
   }
 
+  private async indicateNeighbors(
+    winnerHexes: RowCol[],
+    otherHexes: RowCol[]) {
+    if (this.bgaAnimationsActive()) {
+      for (const rc of winnerHexes) {
+          this.hexDiv(rc).classList.add(CSS.IN_NETWORK);
+      }
+      for (const rc of otherHexes) {
+          this.hexDiv(rc).classList.add(CSS.IN_NETWORK);
+          this.hexDiv(rc).classList.add(CSS.UNIMPORTANT);
+      }
+      await this.wait(2500).then(() => {
+          for (const rc of winnerHexes) {
+              this.hexDiv(rc).classList.remove(CSS.IN_NETWORK);
+          }
+          for (const rc of otherHexes) {
+              this.hexDiv(rc).classList.remove(CSS.IN_NETWORK);
+              this.hexDiv(rc).classList.remove(CSS.UNIMPORTANT);
+          }
+      });
+    }
+  }
+
  private async notif_zigguratScored(
    args: {
      row: number;
      col: number;
      player_name: string;
      player_id: number;
+     winner_hexes: RowCol[];
+     other_hexes: RowCol[];
    }): Promise<void> {
-    // TODO: highlight adjacent hexes with winner highlighted.
+    console.log("notif_zigguratScore", args);
+    await this.indicateNeighbors(args.winner_hexes, args.other_hexes);
+    // TODO: consider better visual treatments
  }
 
   private async notif_scoringSelection(
@@ -917,6 +944,8 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
       col: number;
       city: string;
       player_id: number;
+      winner_hexes: RowCol[];
+      other_hexes: RowCol[];
       details: {
         player_id: number;
         captured_city_count: number;
@@ -960,7 +989,9 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
       this.scoreCtrl[details.player_id]!.incValue(details.network_points);
     }
 
-    // TODO: highlight adjacent hexes with winner highlighted.
+    console.log("notif_zigguratScore", args);
+    await this.indicateNeighbors(args.winner_hexes, args.other_hexes);
+
     this.renderCityOrField(args, '');
     this.unmarkHexPlayable(args);
 

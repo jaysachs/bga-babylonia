@@ -33,7 +33,7 @@ class Scorer {
                                 private array $player_infos,
                                 private Components $components) { }
 
-    public function computeHexWinner(Hex $hex): int {
+    public function computeHexWinner(Hex $hex): HexWinner {
         // first compute who will win the city / ziggurat, if anyone.
         $neighbors = $this->board->neighbors(
             $hex,
@@ -56,13 +56,12 @@ class Scorer {
                 $captured_by = 0;
             }
         }
-        return $captured_by;
+        return new HexWinner($hex, $captured_by, $neighbors);
     }
 
     public function computeCityScores(Hex $hex): ScoredCity {
-        $result = ScoredCity::makeEmpty($hex, array_keys($this->player_infos));
-        $result->captured_by = $this->computeHexWinner($hex);
-
+        $hexWinner = $this->computeHexWinner($hex);
+        $result = ScoredCity::makeEmpty($hexWinner, array_keys($this->player_infos));
         foreach (array_keys($this->player_infos) as $pid) {
             $this->computeNetwork($result, $pid);
         }
@@ -73,9 +72,9 @@ class Scorer {
 
     private function computeNetwork(ScoredCity $result, int $pid): void {
         $this->board->bfs(
-            $result->scoredHex->rc,
+            $result->hex_winner->hex->rc,
             function (Hex $h) use (&$result, $pid): bool {
-                if ($h == $result->scoredHex) {
+                if ($h == $result->hex_winner->hex) {
                     return true;
                 }
                 $player_id = $this->networkOwnerOf($h);
@@ -88,7 +87,7 @@ class Scorer {
     }
 
     private function computeCapturedCityPoints(ScoredCity $result): void {
-        if ($result->captured_by == 0) {
+        if ($result->hex_winner->captured_by == 0) {
             // if no capturer of city, no points for anyone
             return;
         }
@@ -96,7 +95,7 @@ class Scorer {
         foreach ($this->player_infos as $pid => $pi) {
             $points = $pi->captured_city_count;
             // Include the currently captured city
-            if ($result->captured_by == $pid) {
+            if ($result->hex_winner->captured_by == $pid) {
                 $points++;
             }
             if ($pid == $this->components->zigguratCardOwner(

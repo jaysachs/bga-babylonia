@@ -306,7 +306,7 @@ class Model {
         $this->ps->updateAuxScores($aux_scores);
     }
 
-    public function scoreZiggurat(RowCol $rc): ScoredZiggurat {
+    public function scoreZiggurat(RowCol $rc): HexWinner {
         $hex = $this->board()->hexAt($rc);
         if (!$hex->piece->isZiggurat()) {
             throw new \InvalidArgumentException("Attempt to score non-ziggurat {$hex} as a ziggurat");
@@ -321,7 +321,7 @@ class Model {
         $hex->scored = true;
         $this->ps->updateHex($hex->rc, null, null, true);
 
-        return new ScoredZiggurat($this->scorer()->computeHexWinner($hex));
+        return $this->scorer()->computeHexWinner($hex);
     }
 
     public function scoreCity(RowCol $rc): ScoredCity {
@@ -337,8 +337,8 @@ class Model {
         $playerInfos = $this->allPlayerInfo();
 
         // Increase captured_city_count for capturing player, if any
-        if ($scoredCity->captured_by > 0) {
-            $playerInfos[$scoredCity->captured_by]->captured_city_count++;
+        if ($scoredCity->hex_winner->captured_by > 0) {
+            $playerInfos[$scoredCity->hex_winner->captured_by]->captured_city_count++;
         }
         // Give players points for connected pieces
         foreach ($playerInfos as $pid => $pi) {
@@ -367,19 +367,19 @@ class Model {
 
             $winner = $this->scorer()->computeHexWinner($hex);
             if ($hex->piece->isZiggurat()) {
-                if ($winner == $this->player_id) {
+                if ($winner->captured_by == $this->player_id) {
                     return 0;
                 }
-                if ($winner == 0) {
+                if ($winner->captured_by == 0) {
                     return 1;
                 }
                 return 5;
             }
             if ($hex->piece->isCity()) {
-                if ($winner == $this->player_id) {
+                if ($winner->captured_by == $this->player_id) {
                     return 2;
                 }
-                if ($winner == 0) {
+                if ($winner->captured_by == 0) {
                     return 3;
                 }
                 return 4;

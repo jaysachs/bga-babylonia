@@ -30,20 +30,20 @@ class ScoredCity {
 
     /**
      * all are from player_id -> ...
+     * @param HexWinner $hex_winner
      * @param array<int,int> $captured_city_points
      * @param array<int,Hex[]> $scoringHexes,
      * @param array<int,Hex[]> $networkHexes
      */
     public function __construct(
-        public Hex $scoredHex,
-        public int $captured_by,
+        public HexWinner $hex_winner,
         public array $captured_city_points,
         private array $scoringHexes,
         private array $networkHexes) { }
 
     /** @param int[] $player_ids */
-    public static function makeEmpty(Hex $scoredHex, array $player_ids): ScoredCity {
-        $sc = new ScoredCity($scoredHex, 0, [], [], []);
+    public static function makeEmpty(HexWinner $hex_winner, array $player_ids): ScoredCity {
+        $sc = new ScoredCity($hex_winner, [], [], []);
         foreach ($player_ids as $pid) {
             $sc->networkHexes[$pid] = [];
             $sc->scoringHexes[$pid] = [];
@@ -56,7 +56,7 @@ class ScoredCity {
     }
 
     public function addIfInNetwork(Hex $hex, int $player_id): bool {
-        if ($hex->isNeighbor($this->scoredHex)) {
+        if ($hex->isNeighbor($this->hex_winner->hex)) {
             $this->addNetworkHex($hex, $player_id);
             return true;
         }
@@ -72,7 +72,7 @@ class ScoredCity {
     private function addNetworkHex(Hex $hex, int $player_id): void {
         $this->networkHexes[$player_id][] = $hex;
         sort($this->networkHexes[$player_id]);
-        if ($this->scoredHex->piece->scores($hex->piece)) {
+        if ($this->hex_winner->hex->piece->scores($hex->piece)) {
             $this->scoringHexes[$player_id][] = $hex;
             sort($this->scoringHexes[$player_id]);
         }
@@ -115,10 +115,9 @@ class ScoredCity {
     }
 
     public function equals(ScoredCity $other): bool {
-        return $this->scoredHex == $other->scoredHex
+        return $this->hex_winner == $other->hex_winner
             && $this->scoringHexes == $other->scoringHexes
             && $this->networkHexes == $other->networkHexes
-            && $this->captured_by == $other->captured_by
             && $this->captured_city_points == $other->captured_city_points
             ;
     }

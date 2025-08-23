@@ -316,7 +316,7 @@ div.bbl_in_network::before {
 }
 
 .bbl_unimportant {
-    opacity: 0.33;
+    opacity: 0.45;
 }
 
 /* available ziggurat cards zone (TODO: "panel") */
@@ -466,23 +466,6 @@ div.bbl_pb_zcards > div {
     margin: 3px;
     height: calc(var(--bbl-label-height));
     width: calc(var(--bbl-label-height) * 0.67);
-}
-
-
-/*
- * image action buttons
- */
-
-a.action-button:has(> div.bbl_zcard) {
-    padding: 0;
-    border-style: none;
-}
-
-a.action-button > div.bbl_zcard {
-    border: 0;
-    border-style: none;
-    height: 6em;
-    width: 4em;
 }
 
 /*

@@ -149,7 +149,7 @@ class Game extends \Bga\GameFramework\Table
 
     private function scoreZiggurat(Model $model, Hex $zighex): int {
         $scored_zig = $model->scoreZiggurat($zighex->rc);
-        $winner = $scored_zig->winning_player_id;
+        $winner = $scored_zig->captured_by;
         if ($winner == 0) {
             $winner_name = 'noone';
             $msg = clienttranslate('${city} at (${row},${col}) scored, no winner');
@@ -162,6 +162,8 @@ class Game extends \Bga\GameFramework\Table
             $msg, [
                 "row" => $zighex->rc->row,
                 "col" => $zighex->rc->col,
+                "winner_hexes" => $scored_zig->winnerRowCols(),
+                "other_hexes" => $scored_zig->othersRowCols(),
                 "player_name" => $winner_name,
                 "player_id" => $winner,
                 "city" => "ziggurat",
@@ -174,7 +176,7 @@ class Game extends \Bga\GameFramework\Table
         // grab this, as it will change underneath when the model scores it.
         $city = $cityhex->piece->value;
         $scored_city = $model->scoreCity($cityhex->rc);
-        $captured_by = $scored_city->captured_by;
+        $captured_by = $scored_city->hex_winner->captured_by;
         if ($captured_by > 0) {
             Stats::PLAYER_CITIES_CAPTURED->inc($captured_by);
             $msg = clienttranslate('${city} at (${row},${col}) scored, captured by ${player_name}');
@@ -217,6 +219,8 @@ class Game extends \Bga\GameFramework\Table
                 "city" => $city,
                 "row" => $cityhex->rc->row,
                 "col" => $cityhex->rc->col,
+                "winner_hexes" => $scored_city->hex_winner->winnerRowCols(),
+                "other_hexes" => $scored_city->hex_winner->othersRowCols(),
                 "player_name" => $capturer_name,
                 "player_id" => $captured_by,
                 "details" => $details,
