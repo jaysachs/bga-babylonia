@@ -861,23 +861,27 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
     winnerHexes: RowCol[],
     otherHexes: RowCol[]) {
     if (this.bgaAnimationsActive()) {
-      for (const rc of winnerHexes) {
-          this.hexDiv(rc).classList.add(CSS.IN_NETWORK);
-      }
       for (const rc of otherHexes) {
           this.hexDiv(rc).classList.add(CSS.IN_NETWORK);
           this.hexDiv(rc).classList.add(CSS.UNIMPORTANT);
       }
-      await this.wait(2500).then(() => {
-          for (const rc of winnerHexes) {
-              this.hexDiv(rc).classList.remove(CSS.IN_NETWORK);
-          }
-          for (const rc of otherHexes) {
-              this.hexDiv(rc).classList.remove(CSS.IN_NETWORK);
-              this.hexDiv(rc).classList.remove(CSS.UNIMPORTANT);
-          }
-      });
+      for (let i = 0; i < 3; i++) {
+        console.log("indicating loop", i);
+        for (const rc of winnerHexes) {
+            this.hexDiv(rc).classList.add(CSS.IN_NETWORK);
+        }
+        await this.wait(250);
+        for (const rc of winnerHexes) {
+          this.hexDiv(rc).classList.remove(CSS.IN_NETWORK);
+        }
+        await this.wait(250);
+      }
+      for (const rc of otherHexes) {
+          this.hexDiv(rc).classList.remove(CSS.IN_NETWORK);
+          this.hexDiv(rc).classList.remove(CSS.UNIMPORTANT);
+      }
     }
+    return Promise.resolve();
   }
 
  private async notif_zigguratScored(
@@ -957,11 +961,13 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
     }
   ): Promise<void> {
 
+    console.log("notif_cityScored", args);
+
     const hex = document.getElementById(IDS.hexDiv(args))!;
 
+    let aa = this.bgaAnimationsActive();
     for (const playerId in args.details) {
       const details = args.details[playerId]!;
-      let aa = this.bgaAnimationsActive();
       if (aa) {
         for (const nh of details.network_locations) {
           let cl = this.hexDiv(nh).classList;
@@ -971,14 +977,11 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
             cl.add(CSS.UNIMPORTANT);
           }
         }
-      }
-      await this.animationManager.displayScoring(
-        hex,
-        details.network_points,
-        this.gamedatas.players[playerId]!.color,
-        { duration: 3000, easing: 'ease-in-out', extraClass: 'bbl_city_scoring' });
-
-      if (aa) {
+        await this.animationManager.displayScoring(
+          hex,
+          details.network_points,
+          this.gamedatas.players[playerId]!.color,
+          { duration: 3000, easing: 'ease-in-out', extraClass: 'bbl_city_scoring' });
         details.network_locations.forEach(
            (rc) => {
              let cl = this.hexDiv(rc).classList;
@@ -989,7 +992,6 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
       this.scoreCtrl[details.player_id]!.incValue(details.network_points);
     }
 
-    console.log("notif_zigguratScore", args);
     await this.indicateNeighbors(args.winner_hexes, args.other_hexes);
 
     this.renderCityOrField(args, '');
