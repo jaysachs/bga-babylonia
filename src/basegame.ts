@@ -149,7 +149,7 @@ class BaseGame<T extends Gamedatas> extends GameGui<T> {
     const from = document.getElementById(fromId);
     const to = document.getElementById(toId);
     this.animating = true;
-    await this.animationManager.slideFloatingElement(div, from!, to!,
+    return this.animationManager.slideFloatingElement(div, from!, to!,
       this.floatingPieceAnimationSettings).then(() => { this.animating = false; });
   }
 
