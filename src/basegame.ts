@@ -35,7 +35,7 @@ class BaseGame<T extends Gamedatas> extends GameGui<T> {
   }
 
   override onEnteringState(stateName: string, args: any) {
-//    console.debug('onEnteringState: ' + stateName, args, this.debugStateInfo());
+    // console.debug('onEnteringState: ' + stateName, args, this.debugStateInfo());
     this.currentState = stateName;
     // Call appropriate method
     args = args ? args.args : null; // this method has extra wrapper for args for some reason
@@ -121,19 +121,6 @@ class BaseGame<T extends Gamedatas> extends GameGui<T> {
       // console.debug("no method", methodName);
     }
     return undefined;
-  }
-
-  /** @Override onScriptError from gameui */
-  onScriptError(msg: string, url: string, linenumber: number): void {
-    // if (gameui.page_is_unloading) {
-      // // Don't report errors during page unloading
-      // return;
-    // }
-    // In anycase, report these errors in the console
-    console.error(msg);
-    // cannot call super - dojo still have to used here
-    // super.onScriptError(msg, url, linenumber);
-    // return this.inherited(arguments);
   }
 
   protected addPausableHandler(et: EventTarget, type: string, handler: (a: Event) => boolean): void {
