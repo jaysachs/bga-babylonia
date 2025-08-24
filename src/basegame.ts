@@ -35,7 +35,7 @@ class BaseGame<T extends Gamedatas> extends GameGui<T> {
   }
 
   override onEnteringState(stateName: string, args: any) {
-    console.log('onEnteringState: ' + stateName, args, this.debugStateInfo());
+//    console.debug('onEnteringState: ' + stateName, args, this.debugStateInfo());
     this.currentState = stateName;
     // Call appropriate method
     args = args ? args.args : null; // this method has extra wrapper for args for some reason
@@ -49,7 +49,7 @@ class BaseGame<T extends Gamedatas> extends GameGui<T> {
   }
 
   override onLeavingState(stateName: string) {
-    console.log('onLeavingState: ' + stateName, this.debugStateInfo());
+    // console.debug('onLeavingState: ' + stateName, this.debugStateInfo());
     this.currentPlayerWasActive = false;
   }
 
@@ -57,12 +57,12 @@ class BaseGame<T extends Gamedatas> extends GameGui<T> {
     if (this.currentState != stateName) {
       // delay firing this until onEnteringState is called so they always called in same order
       this.pendingUpdate = true;
-      //console.log('   DELAYED onUpdateActionButtons');
+      // console.debug('   DELAYED onUpdateActionButtons');
       return;
     }
     this.pendingUpdate = false;
     if (gameui.isCurrentPlayerActive() && this.currentPlayerWasActive == false) {
-      console.log('onUpdateActionButtons: ' + stateName, args, this.debugStateInfo());
+      // console.debug('onUpdateActionButtons: ' + stateName, args, this.debugStateInfo());
       this.currentPlayerWasActive = true;
       // Call appropriate method
       this.callfn('onUpdateActionButtons_' + stateName, args);
@@ -117,6 +117,8 @@ class BaseGame<T extends Gamedatas> extends GameGui<T> {
     const anythis = this as any;
     if (anythis[methodName] !== undefined) {
       return anythis[methodName](args);
+    } else {
+      // console.debug("no method", methodName);
     }
     return undefined;
   }
