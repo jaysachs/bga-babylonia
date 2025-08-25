@@ -213,6 +213,9 @@ class Game extends \Bga\GameFramework\Table
             }
         }
 
+        // FIXME: need to better distinguish unset.
+        $this->setRowColBeingScored(new RowCol(0, 0));
+
         $this->notify->all(
             "cityScored",
             $msg, [
@@ -304,6 +307,8 @@ class Game extends \Bga\GameFramework\Table
                 "hex" => $this->rowColBeingScored(),
             ]
         );
+        // FIXME: need to better distinguish unset.
+        $this->setRowColBeingScored(new RowCol(0, 0));
         $this->gamestate->nextState("cardSelected");
     }
 
