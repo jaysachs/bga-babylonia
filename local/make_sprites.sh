@@ -1,6 +1,8 @@
 #!/bin/zsh
 SIZE=100x87
 HEX="0,43 24,0 74,0 99,43 74,86 24,86"
+HEX2="2,43 24,2 74,2 97,43 74,84 24,84"
+HEX4="4,43 24,4 74,4 95,43 74,82 24,82"
 ZIG="20,43 32,43 32,33 44,33 44,23 56,23 56,33 68,33 68,43 80,43 80,53 92,53 92,63 8,63 8,53 20,53"
 COLORS=(FFFFFF 76A89B F9C29A 9A9A9A)
 
@@ -32,7 +34,7 @@ addCanvas "-stroke none -fill \#D6C6B5 -draw 'polygon ${HEX}' -fill \#212575 -dr
 addCanvas "-stroke none -fill \#924018 -draw 'polygon ${ZIG}'"
 
 # hex highlight
-addCanvas "-stroke yellow -strokewidth 5 -fill none -draw 'polygon ${HEX}'"
+addCanvas "-stroke yellow -strokewidth 5 -fill none -draw 'polygon ${HEX2}'"
 
 # hand piece highlight
 addCanvas "-stroke yellow -strokewidth 5 -fill none -draw 'circle 50,43 50,84'"
@@ -77,6 +79,9 @@ done
 
 # ziggurat
 addCanvas "-stroke none -fill \#924018 -draw 'polygon ${ZIG}'"
+
+# hex scoring
+addCanvas "-stroke \#FF2222 -strokewidth 9 -fill none -draw 'polygon ${HEX4}'"
 
 while [[ "$ROWS" != 0 ]];
 do

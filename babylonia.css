@@ -82,6 +82,14 @@ body {
     cursor: pointer;
 }
 
+#bbl_board > div.bbl_selected::after {
+    content:'';
+    display: inline-block;
+    height: 100%;
+    width: 100%;
+    background: url(img/sprites.png) -600% -500% / 700% 700%;
+}
+
 [bbl_piece] {
     clip-path: none;
     background-image: url(img/sprites.png);
@@ -349,6 +357,7 @@ div.bbl_in_network::before {
 
 #bbl_available_zcards > div.bbl_selected {
     border-color:green;
+    border-width: 5px;
 }
 
 

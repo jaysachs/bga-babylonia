@@ -214,7 +214,7 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
 
     // if a ziggurat card is being chosen
     if (gamedatas.current_scoring_hex) {
-      this.markHexPlayable(gamedatas.current_scoring_hex);
+      this.markHexSelected(gamedatas.current_scoring_hex);
     }
 
     console.log('Game setup done');
@@ -383,6 +383,7 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
     this.bgaPerformAction('actSelectHexToScore', hex).then(() => {
     });
     this.unmarkHexPlayable(hex);
+    // this.markHexSelected(hex);
   }
 
   private playSelectedPiece(event: Event): void {
@@ -493,6 +494,14 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
 
   private unmarkHexPlayable(rc: RowCol): void {
     this.hexDiv(rc).classList.remove(CSS.PLAYABLE);
+  }
+
+  private markHexSelected(rc: RowCol): void {
+    this.hexDiv(rc).classList.add(CSS.SELECTED);
+  }
+
+  private unmarkHexSelected(rc: RowCol): void {
+    this.hexDiv(rc).classList.remove(CSS.SELECTED);
   }
 
   private markScoreableHexesPlayable(hexes: RowCol[]): void {
@@ -906,7 +915,7 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
       col: number;
       city: string;
     }): Promise<void> {
-    this.markHexPlayable(args);
+    this.markHexSelected(args);
   }
 
   private async notif_zigguratCardSelection(
@@ -938,7 +947,7 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
         .then(() => {
              $(id).remove();
              this.addZcardDivInPlayerBoard(zcard);
-             this.unmarkHexPlayable(args.hex);
+             this.unmarkHexSelected(args.hex);
         });
   }
 
@@ -995,7 +1004,7 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
     await this.indicateNeighbors(args.winner_hexes, args.other_hexes);
 
     this.renderCityOrField(args, '');
-    this.unmarkHexPlayable(args);
+    this.unmarkHexSelected(args);
 
     await this.slideTemp(
       IDS.hexDiv(args),
