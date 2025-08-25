@@ -127,30 +127,36 @@ class BaseGame<T extends Gamedatas> extends GameGui<T> {
     et.addEventListener(type, (e: Event) => { if (this.animating) return true; return handler(e); });
   }
 
-  private floatingPieceAnimationSettings = {
-    duration: 700,
-    ignoreScale: true,
-    ignoreRotation: true,
-  };
-
-  protected slideTemp(fromId: string, toId: string, attrs: Record<string,string> | null,className?: string): Promise<void> {
-    const div = this.mkTemp(attrs, className);
+  protected slideTemp(fromId: string, toId: string,
+      settings: {
+        attrs?: Record<string,string> | null;
+        className?: string | null;
+        duration?: number | null;
+      }): Promise<void> {
+    const div = this.mkTemp(settings);
     const from = document.getElementById(fromId);
     const to = document.getElementById(toId);
     this.animating = true;
     return this.animationManager.slideFloatingElement(div, from!, to!,
-      this.floatingPieceAnimationSettings).then(() => { this.animating = false; });
+      {
+        duration: settings.duration || 700,
+        ignoreScale: true,
+        ignoreRotation: true,
+      }).then(() => { this.animating = false; });
   }
 
-  private mkTemp(attrs: Record<string,string> | null,className?: string): HTMLElement {
+  private mkTemp(settings: {
+    attrs?: Record<string,string> | null;
+    className?: string | null;
+    }): HTMLElement {
     const div = document.createElement('div');
     // document.getElementById(IDS.BOARD)!.appendChild(div);
-    if (className) {
-      div.className = className;
+    if (settings.className) {
+      div.className = settings.className;
     }
-    if (attrs) {
-      for (const name in attrs) {
-        div.setAttribute(name, attrs[name]!);
+    if (settings.attrs) {
+      for (const name in settings.attrs) {
+        div.setAttribute(name, settings.attrs[name]!);
       }
     }
     return div;

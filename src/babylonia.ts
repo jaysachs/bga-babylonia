@@ -728,7 +728,7 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
     await this.slideTemp(
       IDS.hexDiv(args),
       handPosDiv.id,
-      this.pieceAttr(args.piece, args.player_id));
+      { attrs: this.pieceAttr(args.piece, args.player_id) });
 
     this.setPiece(handPosDiv!, args.original_piece, this.player_id);
     handPosDiv.classList.add(CSS.PLAYABLE);
@@ -759,7 +759,7 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
     await this.slideTemp(
       IDS.hexDiv(args),
       IDS.handcount(args.player_id),
-      this.pieceAttr(args.piece, args.player_id));
+      { attrs: this.pieceAttr(args.piece, args.player_id) });
     this.handCounters[args.player_id]!.incValue(1);
     this.scoreCtrl[args.player_id]!.incValue(-args.points);
   }
@@ -793,10 +793,9 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
       }
     ): Promise<void> {
 
-    const isActive = this.player_id == args.player_id;
     const hexDiv = this.hexDiv(args);
     let sourceDivId = IDS.handcount(args.player_id);
-    if (isActive) {
+    if (this.isCurrentPlayerActive()) {
       this.hand[args.handpos] = Piece.EMPTY;
       const handPosDiv = this.handPosDiv(args.handpos);
       this.setPiece(handPosDiv, Piece.EMPTY, 0);
@@ -816,12 +815,12 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
         // TODO: find a better location
         IDS.handcount(args.player_id),
         // TODO: remove need for the !
-        this.pieceAttr(field!, 0));
+        { attrs: this.pieceAttr(field!, 0) });
     }
     await this.slideTemp(
       sourceDivId,
       hexDiv.id,
-      this.pieceAttr(args.piece, args.player_id));
+      { attrs: this.pieceAttr(args.piece, args.player_id) });
     this.renderPlayedPiece(args,
       args.piece,
       args.player_id);
@@ -844,7 +843,7 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
         const a = this.slideTemp(
           IDS.handcount(pid),
           div.id,
-          this.pieceAttr(this.hand[i]!, this.player_id))
+          { attrs: this.pieceAttr(this.hand[i]!, this.player_id) })
           .then(() => {
           console.log("setting hand piece", i, this.hand);
           this.setPiece(div, this.hand[i]!, this.player_id) });
@@ -943,7 +942,7 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
     await this.slideTemp(
       id,
       IDS.playerBoardZcards(args.player_id),
-      attrs)
+      { attrs: attrs })
         .then(() => {
              $(id).remove();
              this.addZcardDivInPlayerBoard(zcard);
@@ -990,7 +989,7 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
           hex,
           details.network_points,
           this.gamedatas.players[playerId]!.color,
-          { duration: 3000, easing: 'ease-in-out', extraClass: 'bbl_city_scoring' });
+          { duration: 2500, easing: 'ease-in-out', extraClass: 'bbl_city_scoring' });
         details.network_locations.forEach(
            (rc) => {
              let cl = this.hexDiv(rc).classList;
@@ -1012,9 +1011,11 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
         ? IDS.citycount(args.player_id)
         // TODO: find a better location for 'off the board'
         : IDS.AVAILABLE_ZCARDS,
-      this.pieceAttr(args.city, 0)
-      // className: this.css.cityOrField(args.city),
-      // parentId: IDS.BOARD
+      {
+        attrs: this.pieceAttr(args.city, 0),
+        // className: this.css.cityOrField(args.city),
+        // parentId: IDS.BOARD
+      }
     );
 
     for (const playerId in args.details) {
