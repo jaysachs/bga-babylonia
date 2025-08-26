@@ -97,16 +97,6 @@ class BaseGame<T extends Gamedatas> extends GameGui<T> {
     return div as HTMLElement;
   }
 
-  createDiv(id?: string | undefined, classes?: string, location?: string): HTMLElement {
-    const div = document.createElement('div');
-    if (id) div.id = id;
-    if (classes) div.classList.add(...classes.split(' '));
-    if (location) {
-      document.getElementById(location)?.appendChild(div);
-    }
-    return div;
-  }
-
   /**
    *
    * @param {string} methodName
@@ -133,7 +123,7 @@ class BaseGame<T extends Gamedatas> extends GameGui<T> {
       className?: string | null;
       duration?: number | null;
     }): Promise<void> {
-    const div = this.mkTemp(settings);
+    const div = this.createDiv(settings);
     const from = document.getElementById(fromId);
     const to = document.getElementById(toId);
     this.animating = true;
@@ -145,11 +135,15 @@ class BaseGame<T extends Gamedatas> extends GameGui<T> {
       }).then(() => { this.animating = false; });
   }
 
-  private mkTemp(settings: {
+  protected createDiv(settings: {
+    id?: string,
     attrs?: Record<string, string> | null;
     className?: string | null;
   }): HTMLElement {
     const div = document.createElement('div');
+    if (settings.id) {
+      div.id = settings.id;
+    }
     // document.getElementById(IDS.BOARD)!.appendChild(div);
     if (settings.className) {
       div.className = settings.className;

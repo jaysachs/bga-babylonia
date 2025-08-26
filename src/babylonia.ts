@@ -13,8 +13,8 @@ interface Hex extends RowCol {
 }
 
 class Attrs {
-  static readonly ZTYPE = 'bbl_ztype';
-  static readonly PIECE = 'bbl_piece';
+  static readonly ZTYPE : string = 'bbl_ztype';
+  static readonly PIECE : string = 'bbl_piece';
 }
 
 class Piece {
@@ -85,10 +85,6 @@ class Html {
     let left = this.hstart + rc.col * this.hdelta;
 
     return `<div id='${IDS.hexDiv(rc)}' style='top:${top}px; left:${left}px;'></div>`;
-  }
-
-  public emptyHandPiece(id: string): string {
-    return `<div id='${id}'/>`;
   }
 
   public player_board_ext(player_id: number): string {
@@ -243,12 +239,11 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
     for (let zcard of this.zcards) {
       const id = IDS.availableZcard(zcard.type);
       const ztype = zcard.used ? 'used' : zcard.type;
-      // TODO: make and use a 'createDiv' method
       if (zcard.owning_player_id != 0) {
         this.addZcardDivInPlayerBoard(zcard);
       } else {
         // in available cards
-        $(IDS.AVAILABLE_ZCARDS).insertAdjacentHTML('beforeend', `<div id='${id}' ${Attrs.ZTYPE}='${ztype}'></div>`);
+        $(IDS.AVAILABLE_ZCARDS).appendChild(this.createDiv({ id: id, attrs: this.ztypeAttr(ztype) }));
         this.addTooltip(id, zcard.tooltip, '');
       }
     }
@@ -257,7 +252,7 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
   private addZcardDivInPlayerBoard(zcard: Zcard) {
     const id = IDS.ownedZcard(zcard.type);
     const ztype = zcard.used ? 'used' : zcard.type;
-    $(IDS.playerBoardZcards(zcard.owning_player_id)).insertAdjacentHTML('beforeend', `<div id='${id}' ${Attrs.ZTYPE}='${ztype}'></div>`);
+    $(IDS.playerBoardZcards(zcard.owning_player_id)).appendChild(this.createDiv({ id: id, attrs: this.ztypeAttr(ztype) } ));
     this.addTooltip(id, zcard.tooltip, '');
   }
 
@@ -316,7 +311,7 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
     for (let j = 0; j <= i; ++j) {
       const id = IDS.handPos(j);
       if ($(id) == null) {
-        hand.insertAdjacentHTML('beforeend', this.html.emptyHandPiece(id));
+        hand.appendChild(this.createDiv({id: id}));
       }
     }
     return $(id);
@@ -326,16 +321,22 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
     this.setPiece(this.hexDiv(rc), piece, 0);
   }
 
+  private  ztypeAttr(val: string): Record<string, string> {
+    let result : Record<string, string> = {};
+    result[Attrs.ZTYPE] = val;
+    return result;
+  }
+
+  private pieceAttr(piece: string, playerId: number): Record<string, string> {
+    let result : Record<string, string> = {};
+    result[Attrs.PIECE] = this.pieceVal(piece, playerId);
+    return result;
+  }
+
   private pieceVal(piece: string, playerId: number): string {
     return (playerId > 0 && piece != Piece.EMPTY)
       ? piece + '_' + this.playerIdToColorIndex[playerId]
       : piece;
-  }
-
-  private pieceAttr(piece: string, playerId: number): Record<string, string> {
-    let v = {};
-    v[Attrs.PIECE] = this.pieceVal(piece, playerId);
-    return v;
   }
 
   private setPiece(e: Element, piece: string, playerId: number) {
