@@ -458,9 +458,8 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
       removeButtons();
     } else {
       alreadySelected.classList.toggle(CSS.SELECTED);
-      // buttons should already be in right state
-      // BUT we can't reset the timer. So we remove & add.
-      // this is a crappy way to reset timer on autoclick.
+      // buttons should already be in right state but we need to change the title bar text.
+      // (We also can't reset the timer.) So we remove & add.
       removeButtons();
       addButtons();
     }
