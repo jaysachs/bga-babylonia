@@ -427,6 +427,8 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
 
   private toggleZcardSelected(e: Element) {
     let addButtons = () => {
+      this.pushActionBarTitle(this.format_string_recursive(
+        _('Select ziggurat card ${zcard}?'), { zcard: e.getAttribute(Attrs.ZTYPE) }));
       this.statusBar.addActionButton(_('Confirm'),
         () => {
           this.bgaPerformAction(
@@ -441,21 +443,25 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
         this.toggleZcardSelected(e);
       });
     };
+    let removeButtons = () => {
+      this.popActionBarTitle();
+      this.statusBar.removeActionButtons();
+    };
     let alreadySelected =
       e.parentElement!.querySelector(
         `#${IDS.AVAILABLE_ZCARDS} > [${Attrs.ZTYPE}].${CSS.SELECTED}`);
     e.classList.toggle(CSS.SELECTED);
     if (alreadySelected == null) {
       addButtons();
-    } else if (alreadySelected == e) {
+  } else if (alreadySelected == e) {
       // remove confirm and cancel buttons from action bar
-      this.statusBar.removeActionButtons();
+      removeButtons();
     } else {
       alreadySelected.classList.toggle(CSS.SELECTED);
       // buttons should already be in right state
       // BUT we can't reset the timer. So we remove & add.
       // this is a crappy way to reset timer on autoclick.
-      this.statusBar.removeActionButtons();
+      removeButtons();
       addButtons();
     }
   }
