@@ -1,4 +1,5 @@
 <?php
+
 /**
  *------
  * BGA framework: Gregory Isabelli & Emmanuel Colin & BoardGameArena
@@ -26,8 +27,7 @@ declare(strict_types=1);
 
 namespace Bga\Games\babylonia;
 
-class ZigguratCardSelection {
-    public function __construct(public ZigguratCard $card, public int $points) { }
+class ZigguratCardSelection
+{
+    public function __construct(public ZigguratCard $card, public int $points) {}
 }
-
-?>

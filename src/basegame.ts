@@ -30,7 +30,7 @@ class BaseGame<T extends Gamedatas> extends GameGui<T> {
     this.gamedatas = gamedatas;
     // create the animation manager, and bind it to the `game.bgaAnimationsActive()` function
     this.animationManager = new BgaAnimations.Manager({
-        animationsActive: () => this.bgaAnimationsActive(),
+      animationsActive: () => this.bgaAnimationsActive(),
     });
   }
 
@@ -128,11 +128,11 @@ class BaseGame<T extends Gamedatas> extends GameGui<T> {
   }
 
   protected slideTemp(fromId: string, toId: string,
-      settings: {
-        attrs?: Record<string,string> | null;
-        className?: string | null;
-        duration?: number | null;
-      }): Promise<void> {
+    settings: {
+      attrs?: Record<string, string> | null;
+      className?: string | null;
+      duration?: number | null;
+    }): Promise<void> {
     const div = this.mkTemp(settings);
     const from = document.getElementById(fromId);
     const to = document.getElementById(toId);
@@ -146,9 +146,9 @@ class BaseGame<T extends Gamedatas> extends GameGui<T> {
   }
 
   private mkTemp(settings: {
-    attrs?: Record<string,string> | null;
+    attrs?: Record<string, string> | null;
     className?: string | null;
-    }): HTMLElement {
+  }): HTMLElement {
     const div = document.createElement('div');
     // document.getElementById(IDS.BOARD)!.appendChild(div);
     if (settings.className) {

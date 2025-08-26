@@ -27,12 +27,14 @@ body {
       slightly off.
       maybe compute board height/width based on hex size instead?
     */
-    --bbl-hex-height: calc(var(--bbl-board-height)/12.59); /* 61px; */
-    --bbl-hex-width: calc(var(--bbl-hex-height) * var(--bbl-hex-ratio)); /* 70px; */
+    --bbl-hex-height: calc(var(--bbl-board-height)/12.59);
+    /* 61px; */
+    --bbl-hex-width: calc(var(--bbl-hex-height) * var(--bbl-hex-ratio));
+    /* 70px; */
 }
 
 #bbl_main {
-     display: flex;
+    display: flex;
     flex-direction: column;
     align-items: center;
 }
@@ -57,23 +59,23 @@ body {
     position: relative;
 }
 
-#bbl_board > div {
+#bbl_board>div {
     height: calc(var(--bbl-hex-height));
     width: calc(var(--bbl-hex-width));
     margin: 0;
     padding: 0;
     background-color: transparent;
     display: inline-block;
-    font-size:10pt;
+    font-size: 10pt;
     text-align: center;
     align-items: center;
     color: #000000;
     clip-path: polygon(0 50%, 25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%);
     position: absolute;
-/*    background-color: rgba(255, 22, 255, 0.2); */
+    /*    background-color: rgba(255, 22, 255, 0.2); */
 }
 
-#bbl_board > div.bbl_playable::before {
+#bbl_board>div.bbl_playable::before {
     content: '';
     display: inline-block;
     height: 100%;
@@ -82,8 +84,8 @@ body {
     cursor: pointer;
 }
 
-#bbl_board > div.bbl_selected::after {
-    content:'';
+#bbl_board>div.bbl_selected::after {
+    content: '';
     display: inline-block;
     height: 100%;
     width: 100%;
@@ -114,36 +116,47 @@ body {
 [bbl_piece="city_m"] {
     background-position: -500% 0%;
 }
+
 [bbl_piece="city_p"] {
     background-position: -500% -200%;
 }
+
 [bbl_piece="city_s"] {
     background-position: -500% -100%;
 }
+
 [bbl_piece="city_mp"] {
     background-position: -500% -400%;
 }
+
 [bbl_piece="city_ms"] {
     background-position: -500% -300%;
 }
+
 [bbl_piece="city_sp"] {
     background-position: -500% -500%;
 }
+
 [bbl_piece="city_msp"] {
     background-position: -500% -600%;
 }
+
 [bbl_piece="field_5"] {
     background-position: -600% 0%;
 }
+
 [bbl_piece="field_6"] {
     background-position: -600% -100%;
 }
+
 [bbl_piece="field_7"] {
     background-position: -600% -200%;
 }
+
 [bbl_piece="field_X"] {
     background-position: -600% -300%;
 }
+
 [bbl_piece="ziggurat"] {
     background-position: -600% -400%;
 }
@@ -154,104 +167,146 @@ body {
 [bbl_piece="hidden_1"] {
     background-position: -100% 0;
 }
-[bbl_piece="hidden_2"]    {
+
+[bbl_piece="hidden_2"] {
     background-position: -200% 0;
 }
-[bbl_piece="hidden_3"]    {
+
+[bbl_piece="hidden_3"] {
     background-position: -300% 0;
 }
-[bbl_piece="hidden_4"]    {
+
+[bbl_piece="hidden_4"] {
     background-position: -400% 0;
 }
-[bbl_piece="farmer_1"]    {
+
+[bbl_piece="farmer_1"] {
     background-position: -100% -100%;
 }
-[bbl_piece="farmer_2"]   {
+
+[bbl_piece="farmer_2"] {
     background-position: -200% -100%;
 }
+
 [bbl_piece="farmer_3"] {
     background-position: -300% -100%;
 }
+
 [bbl_piece="farmer_4"] {
     background-position: -400% -100%;
 }
+
 [bbl_piece="merchant_1"] {
     background-position: -100% -200%;
 }
+
 [bbl_piece="merchant_2"] {
     background-position: -200% -200%;
 }
+
 [bbl_piece="merchant_3"] {
     background-position: -300% -200%;
 }
+
 [bbl_piece="merchant_4"] {
     background-position: -400% -200%;
 }
-[bbl_piece="servant_1"]  {
+
+[bbl_piece="servant_1"] {
     background-position: -100% -300%;
 }
-[bbl_piece="servant_2"]  {
+
+[bbl_piece="servant_2"] {
     background-position: -200% -300%;
 }
-[bbl_piece="servant_3"]  {
+
+[bbl_piece="servant_3"] {
     background-position: -300% -300%;
 }
-[bbl_piece="servant_4"]  {
+
+[bbl_piece="servant_4"] {
     background-position: -400% -300%;
 }
-[bbl_piece="priest_1"]   {
+
+[bbl_piece="priest_1"] {
     background-position: -100% -400%;
 }
-[bbl_piece="priest_2"]   {
+
+[bbl_piece="priest_2"] {
     background-position: -200% -400%;
 }
-[bbl_piece="priest_3"]   {
+
+[bbl_piece="priest_3"] {
     background-position: -300% -400%;
 }
-[bbl_piece="priest_4"]  {
+
+[bbl_piece="priest_4"] {
     background-position: -400% -400%;
 }
 
 /*
  * Ziggurat card sprites
  */
-[bbl_ztype], button.action-button.bbl_zcard, .bbl_zcard
-{
+[bbl_ztype],
+button.action-button.bbl_zcard,
+.bbl_zcard {
     background-size: 1000% 100%;
     background-image: url(img/zcards.png);
 
     /* TODO: not sure computing these based on hex size is right */
-    height: calc((var(--bbl-hex-height) - 4px) * 2.37); /* 135px; */
-    width: calc((var(--bbl-hex-height) - 4px) * 1.58); /* 90px; */
+    height: calc((var(--bbl-hex-height) - 4px) * 2.37);
+    /* 135px; */
+    width: calc((var(--bbl-hex-height) - 4px) * 1.58);
+    /* 90px; */
 }
-[bbl_ztype="used"], .bbl_zc_used {
+
+[bbl_ztype="used"],
+.bbl_zc_used {
     background-position: -900% 0%;
 }
-[bbl_ztype="zc_10pts"], .bbl_zc_10pts {
+
+[bbl_ztype="zc_10pts"],
+.bbl_zc_10pts {
     background-position: 0% 0%;
 }
-[bbl_ztype="zc_xturn"], .bbl_zc_xturn {
+
+[bbl_ztype="zc_xturn"],
+.bbl_zc_xturn {
     background-position: -100% 0%;
 }
-[bbl_ztype="zc_hand7"], .bbl_zc_hand7 {
+
+[bbl_ztype="zc_hand7"],
+.bbl_zc_hand7 {
     background-position: -200% 0%;
 }
-[bbl_ztype="zc_3nobles"], .bbl_zc_3nobles {
+
+[bbl_ztype="zc_3nobles"],
+.bbl_zc_3nobles {
     background-position: -300% 0%;
 }
-[bbl_ztype="zc_3farmers"], .bbl_zc_3farmers {
+
+[bbl_ztype="zc_3farmers"],
+.bbl_zc_3farmers {
     background-position: -400% 0%;
 }
-[bbl_ztype="zc_fields"], .bbl_zc_fields {
+
+[bbl_ztype="zc_fields"],
+.bbl_zc_fields {
     background-position: -500% 0%;
 }
-[bbl_ztype="zc_citypts"], .bbl_zc_citypts {
+
+[bbl_ztype="zc_citypts"],
+.bbl_zc_citypts {
     background-position: -600% 0%;
 }
-[bbl_ztype="zc_land"], .bbl_zc_land {
+
+[bbl_ztype="zc_land"],
+.bbl_zc_land {
     background-position: -700% 0%;
 }
-[bbl_ztype="zc_river"], .bbl_zc_river {
+
+[bbl_ztype="zc_river"],
+.bbl_zc_river {
     background-position: -800% 0%;
 }
 
@@ -265,11 +320,11 @@ body {
     margin-top: 10px;
     width: calc(var(--bbl-board-width));
     display: flex;
-    justify-content:center;
+    justify-content: center;
 }
 
 #bbl_hand {
-    box-shadow: 0 3px 8px rgba(0,0,0,.3);
+    box-shadow: 0 3px 8px rgba(0, 0, 0, .3);
     display: flex;
     width: auto;
     background-image: url(img/stand.png);
@@ -279,7 +334,7 @@ body {
     padding-right: 16px;
 }
 
-#bbl_hand > div {
+#bbl_hand>div {
     display: inline-block;
     width: calc(var(--bbl-hex-width));
     height: calc(var(--bbl-hex-height));
@@ -293,12 +348,12 @@ body {
     cursor: pointer;
 }
 
-#bbl_hand > div.bbl_unplayable {
+#bbl_hand>div.bbl_unplayable {
     cursor: not-allowed;
     opacity: 0.5;
 }
 
-#bbl_hand > div.bbl_unplayable::before {
+#bbl_hand>div.bbl_unplayable::before {
     cursor: not-allowed;
     height: 100%;
     width: 100%;
@@ -307,7 +362,7 @@ body {
     background: url(img/sprites.png) 0% -600% / 700% 700%;
 }
 
-#bbl_hand > div.bbl_selected::before {
+#bbl_hand>div.bbl_selected::before {
     height: 100%;
     width: 100%;
     content: '';
@@ -337,44 +392,46 @@ div.bbl_in_network::before {
     clip-path: rect(auto auto auto auto round 10px);
 }
 
-#bbl_available_zcards_container > div {
+#bbl_available_zcards_container>div {
     font-style: italic;
 }
 
 #bbl_available_zcards {
-/*    clip-path: rect(auto auto auto auto round 10px); */
-/*    background-color: #F8E6D0; */
+    /*    clip-path: rect(auto auto auto auto round 10px); */
+    /*    background-color: #F8E6D0; */
     position: relative;
     display: flex;
     justify-content: center;
 }
 
-#bbl_available_zcards > div {
+#bbl_available_zcards>div {
     border-style: solid;
     border-width: 3px;
     border-color: #F8E6D0;
 }
 
-#bbl_available_zcards > div.bbl_selected {
-    border-color:green;
+#bbl_available_zcards>div.bbl_selected {
+    border-color: green;
     border-width: 5px;
 }
 
 
-#bbl_available_zcards > div {
+#bbl_available_zcards>div {
     display: inline-block;
     /* TODO: not sure computing these based on hex size is right */
-    height: calc((var(--bbl-hex-height) - 4px) * 2.37); /* 135px; */
-    width: calc((var(--bbl-hex-height) - 4px) * 1.58); /* 90px; */
+    height: calc((var(--bbl-hex-height) - 4px) * 2.37);
+    /* 135px; */
+    width: calc((var(--bbl-hex-height) - 4px) * 1.58);
+    /* 90px; */
     margin: 10px;
 }
 
-#bbl_available_zcards.bbl_selecting > div[bbl_ztype] {
+#bbl_available_zcards.bbl_selecting>div[bbl_ztype] {
     cursor: pointer;
 }
 
-#bbl_available_zcards > div:not([bbl_ztype]),
-#bbl_available_zcards > div[bbl_ztype=''] {
+#bbl_available_zcards>div:not([bbl_ztype]),
+#bbl_available_zcards>div[bbl_ztype=''] {
     background-image: unset;
     border-style: dotted;
     border-color: #444444;
@@ -398,7 +455,7 @@ div.bbl_in_network::before {
     grid-row-gap: 7px;
 }
 
-.player-board-game-specific-content > div {
+.player-board-game-specific-content>div {
     display: flex;
     flex: 1;
     align-items: center;
@@ -414,38 +471,45 @@ div.bbl_in_network::before {
 .bbl_pb_pool_label_2,
 .bbl_pb_pool_label_3,
 .bbl_pb_pool_label_4,
-.bbl_pb_zcard_label
-{
-   width: calc(var(--bbl-label-width));
-   height: calc(var(--bbl-label-height));
-   background-image: url(img/sprites.png);
-   background-size: 700% 700%;
+.bbl_pb_zcard_label {
+    width: calc(var(--bbl-label-width));
+    height: calc(var(--bbl-label-height));
+    background-image: url(img/sprites.png);
+    background-size: 700% 700%;
 }
 
 .bbl_pb_hand_label_1 {
     background-position: -100% -500%;
 }
+
 .bbl_pb_hand_label_2 {
     background-position: -200% -500%;
 }
+
 .bbl_pb_hand_label_3 {
     background-position: -300% -500%;
 }
+
 .bbl_pb_hand_label_4 {
     background-position: -400% -500%;
 }
+
 .bbl_pb_pool_label_1 {
     background-position: -100% -600%;
 }
+
 .bbl_pb_pool_label_2 {
     background-position: -200% -600%;
 }
+
 .bbl_pb_pool_label_3 {
     background-position: -300% -600%;
 }
+
 .bbl_pb_pool_label_4 {
     background-position: -400% -600%;
 }
+
 .bbl_pb_citycount_label {
     background-position: 0% -200%;
 }
@@ -470,7 +534,7 @@ div.bbl_pb_zcards {
     background-position: 0% -300%;
 }
 
-div.bbl_pb_zcards > div {
+div.bbl_pb_zcards>div {
     display: inline-block;
     margin: 3px;
     height: calc(var(--bbl-label-height));
@@ -482,8 +546,7 @@ div.bbl_pb_zcards > div {
  *   particularly images for pieces
  */
 
-.log-element[bbl_piece]
-{
+.log-element[bbl_piece] {
     height: 1.0em;
     width: 1.15em;
     display: inline-block;
@@ -492,8 +555,7 @@ div.bbl_pb_zcards > div {
     background-color: transparent;
 }
 
-.log-element[bbl_ztype]
-{
+.log-element[bbl_ztype] {
     display: inline-block;
     height: 1.0em;
     width: 0.67em;

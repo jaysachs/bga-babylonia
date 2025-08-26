@@ -1,4 +1,5 @@
 <?php
+
 /**
  *------
  * BGA framework: Gregory Isabelli & Emmanuel Colin & BoardGameArena
@@ -26,7 +27,8 @@ declare(strict_types=1);
 
 namespace Bga\Games\babylonia;
 
-enum Piece: string {
+enum Piece: string
+{
 
     case ZIGGURAT = 'ziggurat';
     case PRIEST = 'priest';
@@ -47,8 +49,9 @@ enum Piece: string {
     case FIELD_CITIES = 'field_X';
     case EMPTY = 'empty';
 
-    public function isField(): bool {
-        return match($this) {
+    public function isField(): bool
+    {
+        return match ($this) {
             Piece::FIELD_5,
             Piece::FIELD_6,
             Piece::FIELD_7,
@@ -57,8 +60,9 @@ enum Piece: string {
         };
     }
 
-    public function isCity(): bool {
-        return match($this) {
+    public function isCity(): bool
+    {
+        return match ($this) {
             Piece::CITY_P,
             Piece::CITY_S,
             Piece::CITY_M,
@@ -71,18 +75,33 @@ enum Piece: string {
     }
 
     /** @return Piece[] */
-    public static function playerPieces(): array {
+    public static function playerPieces(): array
+    {
         return [Piece::FARMER, Piece::MERCHANT, Piece::SERVANT, Piece::PRIEST];
     }
 
-    public function isEmpty(): bool { return $this == Piece::EMPTY; }
-    public function isZiggurat(): bool { return $this == Piece::ZIGGURAT; }
-    public function isPlayerPiece(): bool {
+    public function isEmpty(): bool
+    {
+        return $this == Piece::EMPTY;
+    }
+    public function isZiggurat(): bool
+    {
+        return $this == Piece::ZIGGURAT;
+    }
+    public function isPlayerPiece(): bool
+    {
         return $this->isFarmer() || $this->isNoble() || $this->isHidden();
     }
-    public function isHidden(): bool { return $this == Piece::HIDDEN; }
-    public function isFarmer(): bool { return $this == Piece::FARMER; }
-    public function isNoble(): bool {
+    public function isHidden(): bool
+    {
+        return $this == Piece::HIDDEN;
+    }
+    public function isFarmer(): bool
+    {
+        return $this == Piece::FARMER;
+    }
+    public function isNoble(): bool
+    {
         return match ($this) {
             Piece::MERCHANT,
             Piece::SERVANT,
@@ -91,7 +110,8 @@ enum Piece: string {
         };
     }
 
-    public function scores(Piece $p): bool {
+    public function scores(Piece $p): bool
+    {
         return match ($p) {
             Piece::PRIEST => match ($this) {
                 Piece::CITY_P,
@@ -118,5 +138,3 @@ enum Piece: string {
         };
     }
 }
-
-?>

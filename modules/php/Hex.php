@@ -1,4 +1,5 @@
 <?php
+
 /**
  *------
  * BGA framework: Gregory Isabelli & Emmanuel Colin & BoardGameArena
@@ -30,21 +31,26 @@ namespace Bga\Games\babylonia;
  * We use doubled coordinate representation.
  * (see https://www.redblobgames.com/grids/hexagons/#neighbors)
  */
-class Hex {
 
-    public function __toString(): string {
+class Hex
+{
+
+    public function __toString(): string
+    {
         return sprintf("%s %s %s(%d)", $this->type->value, $this->rc, $this->piece->value, $this->player_id);
     }
 
-    public function __construct(public readonly HexType $type,
-                                public readonly RowCol $rc,
-                                public Piece $piece = Piece::EMPTY,
-                                public int $player_id = 0,
-                                public bool $scored = false,
-                                public Landmass $landmass = Landmass::UNKNOWN) {
-    }
+    public function __construct(
+        public readonly HexType $type,
+        public readonly RowCol $rc,
+        public Piece $piece = Piece::EMPTY,
+        public int $player_id = 0,
+        public bool $scored = false,
+        public Landmass $landmass = Landmass::UNKNOWN
+    ) {}
 
-    public function equals(Hex $other): bool {
+    public function equals(Hex $other): bool
+    {
         return $this->type == $other->type
             && $this->rc == $other->rc
             && $this->piece == $other->piece
@@ -53,7 +59,8 @@ class Hex {
             && $this->landmass == $other->landmass;
     }
 
-    public function captureCity(): Piece {
+    public function captureCity(): Piece
+    {
         if (!$this->piece->isCity()) {
             throw new \LogicException("attempt to capture a non-city $this");
         }
@@ -62,7 +69,8 @@ class Hex {
         return $p;
     }
 
-    public function placeDevelopment(Piece $development): Hex {
+    public function placeDevelopment(Piece $development): Hex
+    {
         if ($this->piece != Piece::EMPTY) {
             throw new \LogicException("attempt to place city or field on top of $this");
         }
@@ -76,7 +84,8 @@ class Hex {
         return $this;
     }
 
-    public function playPiece(Piece $piece, int $player_id): Piece {
+    public function playPiece(Piece $piece, int $player_id): Piece
+    {
         if ($player_id == 0) {
             throw new \InvalidArgumentException("playing a piece requires a non-zero player_id");
         }
@@ -97,29 +106,33 @@ class Hex {
         return $result;
     }
 
-    public function isLand(): bool {
+    public function isLand(): bool
+    {
         return $this->type == HexType::LAND;
     }
 
-    public function isWater(): bool {
+    public function isWater(): bool
+    {
         return $this->type == HexType::WATER;
     }
 
-    public function isNeighbor(Hex $hex): bool {
+    public function isNeighbor(Hex $hex): bool
+    {
         return $this->rc->isNeighbor($hex->rc);
     }
 
-    public static function land(RowCol $rc):Hex {
+    public static function land(RowCol $rc): Hex
+    {
         return new Hex(HexType::LAND, $rc);
     }
 
-    public static function water(RowCol $rc): Hex {
+    public static function water(RowCol $rc): Hex
+    {
         return new Hex(HexType::WATER, $rc);
     }
 
-    public static function ziggurat(RowCol $rc): Hex {
+    public static function ziggurat(RowCol $rc): Hex
+    {
         return new Hex(HexType::LAND, $rc, Piece::ZIGGURAT);
     }
 }
-
-?>

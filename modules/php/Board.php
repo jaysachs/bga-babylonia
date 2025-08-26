@@ -1,4 +1,5 @@
 <?php
+
 /**
  *------
  * BGA framework: Gregory Isabelli & Emmanuel Colin & BoardGameArena
@@ -26,7 +27,8 @@ declare(strict_types=1);
 
 namespace Bga\Games\babylonia;
 
-class Board {
+class Board
+{
 
     private function __construct() {}
 
@@ -34,11 +36,13 @@ class Board {
     /** @var array<int,Hex> */
     private array $hexes = [];
 
-    private function addHex(Hex $hex): void {
+    private function addHex(Hex $hex): void
+    {
         $this->hexes[$hex->rc->asKey()] = $hex;
     }
 
-    public function hexAt(RowCol $rc) : Hex {
+    public function hexAt(RowCol $rc): Hex
+    {
         $hex = $this->maybeHexAt($rc);
         if ($hex != null) {
             return $hex;
@@ -46,11 +50,13 @@ class Board {
         throw new \InvalidArgumentException("No hex at $rc");
     }
 
-    private function maybeHexAt(RowCol $rc) : ?Hex {
-        return @ $this->hexes[$rc->asKey()];
+    private function maybeHexAt(RowCol $rc): ?Hex
+    {
+        return @$this->hexes[$rc->asKey()];
     }
 
-    public function asTestMap(): string {
+    public function asTestMap(): string
+    {
         $lines = [];
         $row = -1;
         $col = -2;
@@ -63,8 +69,8 @@ class Board {
                     $col = -1;
                 }
             }
-            $z = count($lines)-1;
-            for ($i = $col+2; $i < $hex->rc->col; $i+=2) {
+            $z = count($lines) - 1;
+            for ($i = $col + 2; $i < $hex->rc->col; $i += 2) {
                 $lines[$z][] = 'XXX';
             }
             $col = $hex->rc->col;
@@ -98,25 +104,29 @@ class Board {
         $x = '';
         $row = 0;
         foreach ($lines as $line) {
-            if ($row++ & 1) { $x .= '   '; }
+            if ($row++ & 1) {
+                $x .= '   ';
+            }
             $x .= implode('   ', $line) . "\n";
         }
         return $x;
     }
 
-    public static function fromTestMap(string $map): Board {
+    public static function fromTestMap(string $map): Board
+    {
         $dev_locs = [];
         return self::fromMap($map, $dev_locs);
     }
 
     /** @param RowCol[] $dev_locs */
-    private static function fromMap(string $map, array &$dev_locs): Board {
+    private static function fromMap(string $map, array &$dev_locs): Board
+    {
         $board = new Board();
         $lines = explode("\n", trim($map));
         $row = 0;
 
         // convenience utility function
-        $play = function(Hex $hex, Piece $piece, string $playerMatch) use (&$board): void {
+        $play = function (Hex $hex, Piece $piece, string $playerMatch) use (&$board): void {
             $board->addHex($hex);
             $hex->playPiece($piece, intval($playerMatch));
         };
@@ -153,37 +163,48 @@ class Board {
                     $dev_locs[] = $rc;
                 } else if ($t == "C.P") {
                     $board->addHex(
-                        Hex::land($rc)->placeDevelopment(Piece::CITY_P));
+                        Hex::land($rc)->placeDevelopment(Piece::CITY_P)
+                    );
                 } else if ($t == "C.S") {
                     $board->addHex(
-                        Hex::land($rc)->placeDevelopment(Piece::CITY_S));
+                        Hex::land($rc)->placeDevelopment(Piece::CITY_S)
+                    );
                 } else if ($t == "C.M") {
                     $board->addHex(
-                        Hex::land($rc)->placeDevelopment(Piece::CITY_M));
+                        Hex::land($rc)->placeDevelopment(Piece::CITY_M)
+                    );
                 } else if ($t == "CSP") {
                     $board->addHex(
-                        Hex::land($rc)->placeDevelopment(Piece::CITY_SP));
+                        Hex::land($rc)->placeDevelopment(Piece::CITY_SP)
+                    );
                 } else if ($t == "CMS") {
                     $board->addHex(
-                        Hex::land($rc)->placeDevelopment(Piece::CITY_MS));
+                        Hex::land($rc)->placeDevelopment(Piece::CITY_MS)
+                    );
                 } else if ($t == "CMP") {
                     $board->addHex(
-                        Hex::land($rc)->placeDevelopment(Piece::CITY_MP));
+                        Hex::land($rc)->placeDevelopment(Piece::CITY_MP)
+                    );
                 } else if ($t == "C**") {
                     $board->addHex(
-                        Hex::land($rc)->placeDevelopment(Piece::CITY_MSP));
+                        Hex::land($rc)->placeDevelopment(Piece::CITY_MSP)
+                    );
                 } else if ($t == "F.5") {
                     $board->addHex(
-                        Hex::land($rc)->placeDevelopment(Piece::FIELD_5));
+                        Hex::land($rc)->placeDevelopment(Piece::FIELD_5)
+                    );
                 } else if ($t == "F.6") {
                     $board->addHex(
-                        Hex::land($rc)->placeDevelopment(Piece::FIELD_6));
+                        Hex::land($rc)->placeDevelopment(Piece::FIELD_6)
+                    );
                 } else if ($t == "F.7") {
                     $board->addHex(
-                        Hex::land($rc)->placeDevelopment(Piece::FIELD_7));
+                        Hex::land($rc)->placeDevelopment(Piece::FIELD_7)
+                    );
                 } else if ($t == "F.C") {
                     $board->addHex(
-                        Hex::land($rc)->placeDevelopment(Piece::FIELD_CITIES));
+                        Hex::land($rc)->placeDevelopment(Piece::FIELD_CITIES)
+                    );
                 } else {
                     throw new \InvalidArgumentException("Unexpected string in board map: '$t' in '$s'");
                 }
@@ -194,7 +215,7 @@ class Board {
         return $board;
     }
 
-    const ACTUAL_MAP =<<<'END'
+    const ACTUAL_MAP = <<<'END'
 XXX   XXX   XXX   XXX   ≈≈≈   ---
    ---   XXX   XXX   ---   CCC   ---
 ---   ≈≈≈   ---   ---   ≈≈≈   ---   CCC
@@ -220,7 +241,8 @@ CCC   ---   ---   CCC   ZZZ   ≈≈≈   ---   ---   CCC
 XXX   ---   CCC   ---   CCC   ≈≈≈   CCC   CCC
 END;
 
-    public static function forPlayerCount(int $numPlayers): Board {
+    public static function forPlayerCount(int $numPlayers): Board
+    {
         if ($numPlayers < 2 || $numPlayers > 4) {
             throw new \InvalidArgumentException(sprintf("invalid number of players: %s", $numPlayers));
         }
@@ -233,11 +255,11 @@ END;
         $board->markLandmass(Landmass::CENTER, new RowCol(11, 7));
 
         switch ($numPlayers) {
-        case 2:
-            $board->removeLandmass(Landmass::WEST, $development_locations);
-            break;
-        case 3:
-            $board->removeLandmass(Landmass::EAST, $development_locations);
+            case 2:
+                $board->removeLandmass(Landmass::WEST, $development_locations);
+                break;
+            case 3:
+                $board->removeLandmass(Landmass::EAST, $development_locations);
         }
 
         $available_developments = self::initializePool($numPlayers);
@@ -252,8 +274,10 @@ END;
      * @param Piece[] $available_developments
      * @param RowCol[] $development_locations
      */
-    private function placeDevelopments(array &$available_developments,
-                                       array &$development_locations): void {
+    private function placeDevelopments(
+        array &$available_developments,
+        array &$development_locations
+    ): void {
         foreach ($development_locations as $rc) {
             $hex = $this->hexAt($rc);
             $x = array_shift($available_developments);
@@ -264,7 +288,8 @@ END;
         }
     }
 
-    public function cityCount(): int {
+    public function cityCount(): int
+    {
         $city_count = 0;
         $this->visitAll(function (Hex $hex) use (&$city_count): void {
             if ($hex->piece->isCity()) {
@@ -274,14 +299,16 @@ END;
         return $city_count;
     }
 
-    public function visitAll(\Closure $visit): void {
+    public function visitAll(\Closure $visit): void
+    {
         foreach ($this->hexes as $hex) {
             $visit($hex);
         }
     }
 
     /** @param Hex[] $hexes */
-    public static function fromHexes(array &$hexes): Board {
+    public static function fromHexes(array &$hexes): Board
+    {
         $board = new Board();
         foreach ($hexes as $hex) {
             $board->addHex($hex);
@@ -290,9 +317,10 @@ END;
     }
 
     /* visit should return true if continue exploring */
-    public function bfs(RowCol $start, \Closure $visit): void {
+    public function bfs(RowCol $start, \Closure $visit): void
+    {
         $seen = [];
-        $queue = [ $this->hexAt($start) ];
+        $queue = [$this->hexAt($start)];
         while ($queue) {
             $hex = array_shift($queue);
             $seen[] = $hex;
@@ -307,10 +335,11 @@ END;
         }
     }
 
-    private function markLandmass(Landmass $landmass, RowCol $start): void {
+    private function markLandmass(Landmass $landmass, RowCol $start): void
+    {
         $this->bfs(
             $start,
-            function(Hex $hex) use ($landmass) {
+            function (Hex $hex) use ($landmass) {
                 if ($hex->isLand()) {
                     $hex->landmass = $landmass;
                     return true;
@@ -321,7 +350,8 @@ END;
     }
 
     /** @param RowCol[] $development_locations */
-    private function removeLandmass(Landmass $landmass, array &$development_locations): void {
+    private function removeLandmass(Landmass $landmass, array &$development_locations): void
+    {
         foreach ($this->hexes as $hex) {
             if ($hex->landmass == $landmass) {
                 unset($this->hexes[$hex->rc->asKey()]);
@@ -334,11 +364,12 @@ END;
     }
 
     /** @return RowCol[] */
-    public function touchedZiggurats(int $player_id): array {
+    public function touchedZiggurats(int $player_id): array
+    {
         $adjacent = [];
         $this->visitAll(function (Hex $hex) use ($player_id, &$adjacent): void {
             if ($hex->piece == Piece::ZIGGURAT) {
-                $nb = $this->neighbors($hex, function(Hex $nh) use ($player_id): bool {
+                $nb = $this->neighbors($hex, function (Hex $nh) use ($player_id): bool {
                     return $nh->player_id == $player_id;
                 });
                 if (count($nb) > 0) {
@@ -352,24 +383,27 @@ END;
     /**
      * @return Hex[]
      */
-    public function neighbors(Hex $hex, ?\Closure $matching = null): array {
+    public function neighbors(Hex $hex, ?\Closure $matching = null): array
+    {
         $rc = $hex->rc;
         return array_filter(
-                [
-                    $this->maybeHexAt($rc->north()),
-                    $this->maybeHexAt($rc->northeast()),
-                    $this->maybeHexAt($rc->southeast()),
-                    $this->maybeHexAt($rc->south()),
-                    $this->maybeHexAt($rc->southwest()),
-                    $this->maybeHexAt($rc->northwest()),
-                ], function ($nh) use ($matching) {
-                    return $nh != null && ($matching === null || $matching($nh));
-                }
-            );
+            [
+                $this->maybeHexAt($rc->north()),
+                $this->maybeHexAt($rc->northeast()),
+                $this->maybeHexAt($rc->southeast()),
+                $this->maybeHexAt($rc->south()),
+                $this->maybeHexAt($rc->southwest()),
+                $this->maybeHexAt($rc->northwest()),
+            ],
+            function ($nh) use ($matching) {
+                return $nh != null && ($matching === null || $matching($nh));
+            }
+        );
     }
 
     /** @return Piece[] */
-    private static function initializePool(int $numPlayers): array {
+    private static function initializePool(int $numPlayers): array
+    {
         $available_developments = array();
         for ($i = 0; $i < 2; $i++) {
             $available_developments[] = Piece::CITY_P;
@@ -414,4 +448,3 @@ print $b->asTestMap();
 $b2 = Board::fromTestMap($b->asTestMap());
 print $b2->asTestMap();
 */
-?>

@@ -1,4 +1,5 @@
 <?php
+
 /**
  *------
  * BGA framework: Gregory Isabelli & Emmanuel Colin & BoardGameArena
@@ -26,12 +27,14 @@ declare(strict_types=1);
 
 namespace Bga\Games\babylonia;
 
-class Hand {
+class Hand
+{
 
     /** @param Piece[] $pieces */
-    public function __construct(private array $pieces) { }
+    public function __construct(private array $pieces) {}
 
-    public static function new(int $size = 5): Hand {
+    public static function new(int $size = 5): Hand
+    {
         $pieces = [];
         for ($i = 0; $i < $size; $i++) {
             $pieces[] = Piece::EMPTY;
@@ -39,7 +42,8 @@ class Hand {
         return new Hand($pieces);
     }
 
-    public function extend(int $newsize): void {
+    public function extend(int $newsize): void
+    {
         if ($newsize <= count($this->pieces)) {
             throw new \InvalidArgumentException("Can't shrink hand from " . $this->size() . " to " . $newsize);
         }
@@ -50,15 +54,18 @@ class Hand {
     }
 
     /** @return Piece[] */
-    public function pieces(): array {
+    public function pieces(): array
+    {
         return $this->pieces;
     }
 
-    public function limit(): int {
+    public function limit(): int
+    {
         return count($this->pieces);
     }
 
-    public function size(): int {
+    public function size(): int
+    {
         $x = 0;
         foreach ($this->pieces as $p) {
             if (!$p->isEmpty()) {
@@ -68,11 +75,13 @@ class Hand {
         return $x;
     }
 
-    public function contains(Piece $piece): bool {
+    public function contains(Piece $piece): bool
+    {
         return in_array($piece, $this->pieces);
     }
 
-    public function play(int $pos): Piece {
+    public function play(int $pos): Piece
+    {
         $p = $this->pieces[$pos];
         if ($p->isEmpty()) {
             throw new \InvalidArgumentException("Can't play hand piece at empty position $pos");
@@ -81,11 +90,13 @@ class Hand {
         return $p;
     }
 
-    public function isEmpty(): bool {
+    public function isEmpty(): bool
+    {
         return $this->size() == 0;
     }
 
-    public function replenish(Piece $piece): void {
+    public function replenish(Piece $piece): void
+    {
         if (!$piece->isPlayerPiece() || $piece == Piece::HIDDEN) {
             throw new \InvalidArgumentException("Can't add $piece->value to hand");
         }
@@ -98,6 +109,3 @@ class Hand {
         throw new \LogicException("Can't replenish a full hand");
     }
 }
-
-
-?>

@@ -1,4 +1,5 @@
 <?php
+
 /**
  *------
  * BGA framework: Gregory Isabelli & Emmanuel Colin & BoardGameArena
@@ -27,33 +28,39 @@ declare(strict_types=1);
 namespace Bga\Games\babylonia;
 
 /* A played move */
-class Move {
-    function __construct(public int $player_id,
-                         public Piece $piece,
-                         public Piece $original_piece,
-                         public int $handpos,
-                         public RowCol $rc,
-                         public Piece $captured_piece,
-                         public int $field_points,
-                         public int $ziggurat_points,
-                         public int $seq_id = 0) {}
 
-    public function points(): int {
+class Move
+{
+    function __construct(
+        public int $player_id,
+        public Piece $piece,
+        public Piece $original_piece,
+        public int $handpos,
+        public RowCol $rc,
+        public Piece $captured_piece,
+        public int $field_points,
+        public int $ziggurat_points,
+        public int $seq_id = 0
+    ) {}
+
+    public function points(): int
+    {
         return $this->field_points + $this->ziggurat_points;
     }
 
-    public function __toString(): string {
-        return sprintf("id:%d/%d piece:%s opiece:%s pos:%d %s cap:%s field points:%d zig points:%d",
-                       $this->player_id, $this->seq_id,
-                       $this->piece->value, $this->original_piece->value,
-                       $this->handpos,
-                       $this->rc,
-                       $this->captured_piece->value,
-                       $this->field_points,
-                       $this->ziggurat_points);
+    public function __toString(): string
+    {
+        return sprintf(
+            "id:%d/%d piece:%s opiece:%s pos:%d %s cap:%s field points:%d zig points:%d",
+            $this->player_id,
+            $this->seq_id,
+            $this->piece->value,
+            $this->original_piece->value,
+            $this->handpos,
+            $this->rc,
+            $this->captured_piece->value,
+            $this->field_points,
+            $this->ziggurat_points
+        );
     }
-
-
 }
-
-?>

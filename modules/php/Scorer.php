@@ -1,4 +1,5 @@
 <?php
+
 /**
  *------
  * BGA framework: Gregory Isabelli & Emmanuel Colin & BoardGameArena
@@ -26,18 +27,24 @@ declare(strict_types=1);
 
 namespace Bga\Games\babylonia;
 
-class Scorer {
+class Scorer
+{
 
     /** @param array<int, PlayerInfo> $player_infos */
-    public function __construct(private Board $board,
-                                private array $player_infos,
-                                private Components $components) { }
+    public function __construct(
+        private Board $board,
+        private array $player_infos,
+        private Components $components
+    ) {}
 
-    public function computeHexWinner(Hex $hex): HexWinner {
+    public function computeHexWinner(Hex $hex): HexWinner
+    {
         // first compute who will win the city / ziggurat, if anyone.
         $neighbors = $this->board->neighbors(
             $hex,
-            function (Hex $h): bool { return $h->piece->isPlayerPiece(); }
+            function (Hex $h): bool {
+                return $h->piece->isPlayerPiece();
+            }
         );
         $adjacent = [];
         foreach ($this->player_infos as $pi) {
@@ -59,7 +66,8 @@ class Scorer {
         return new HexWinner($hex, $captured_by, $neighbors);
     }
 
-    public function computeCityScores(Hex $hex): ScoredCity {
+    public function computeCityScores(Hex $hex): ScoredCity
+    {
         $hexWinner = $this->computeHexWinner($hex);
         $result = ScoredCity::makeEmpty($hexWinner, array_keys($this->player_infos));
         foreach (array_keys($this->player_infos) as $pid) {
@@ -70,7 +78,8 @@ class Scorer {
         return $result;
     }
 
-    private function computeNetwork(ScoredCity $result, int $pid): void {
+    private function computeNetwork(ScoredCity $result, int $pid): void
+    {
         $this->board->bfs(
             $result->hex_winner->hex->rc,
             function (Hex $h) use (&$result, $pid): bool {
@@ -86,7 +95,8 @@ class Scorer {
         );
     }
 
-    private function computeCapturedCityPoints(ScoredCity $result): void {
+    private function computeCapturedCityPoints(ScoredCity $result): void
+    {
         if ($result->hex_winner->captured_by == 0) {
             // if no capturer of city, no points for anyone
             return;
@@ -99,26 +109,28 @@ class Scorer {
                 $points++;
             }
             if ($pid == $this->components->zigguratCardOwner(
-                ZigguratCardType::EXTRA_CITY_POINTS)) {
+                ZigguratCardType::EXTRA_CITY_POINTS
+            )) {
                 $points += intval(floor($points / 2));
             }
             $result->captured_city_points[$pid] = $points;
         }
     }
 
-    private function networkOwnerOf(Hex $h): int /* player_id */ {
+    private function networkOwnerOf(Hex $h): int /* player_id */
+    {
         if ($h->player_id > 0) {
             return $h->player_id;
         }
         if ($h->isWater()) {
             return $this->components->zigguratCardOwner(
-                ZigguratCardType::FREE_RIVER_CONNECTS);
+                ZigguratCardType::FREE_RIVER_CONNECTS
+            );
         } else if ($h->landmass == Landmass::CENTER) {
             return $this->components->zigguratCardOwner(
-                ZigguratCardType::FREE_CENTER_LAND_CONNECTS);
+                ZigguratCardType::FREE_CENTER_LAND_CONNECTS
+            );
         }
         return 0;
     }
 }
-
-?>

@@ -1,4 +1,5 @@
 <?php
+
 /**
  *------
  * BGA framework: Gregory Isabelli & Emmanuel Colin & BoardGameArena
@@ -26,14 +27,17 @@ declare(strict_types=1);
 
 namespace Bga\Games\babylonia;
 
-class PersistentStore {
-    public function __construct(private Db $db) { }
+class PersistentStore
+{
+    public function __construct(private Db $db) {}
 
-    private function boolValue(bool $b): string {
+    private function boolValue(bool $b): string
+    {
         return $b ? 'TRUE' : 'FALSE';
     }
 
-    public function retrieveBoard(): Board {
+    public function retrieveBoard(): Board
+    {
         $sql = "SELECT board_row row, board_col col, hextype, piece, scored,
                        player_id board_player, landmass
                 FROM board";
@@ -42,18 +46,23 @@ class PersistentStore {
         /** @var Hex[] */
         $hexes = [];
         foreach ($data as &$hex) {
-            $hexes[] = new Hex(HexType::from($hex['hextype']),
-                               new RowCol(intval($hex['row']),
-                                          intval($hex['col'])),
-                               Piece::from($hex['piece']),
-                               intval($hex['board_player']),
-                               boolval($hex['scored']),
-                               Landmass::from($hex['landmass']));
+            $hexes[] = new Hex(
+                HexType::from($hex['hextype']),
+                new RowCol(
+                    intval($hex['row']),
+                    intval($hex['col'])
+                ),
+                Piece::from($hex['piece']),
+                intval($hex['board_player']),
+                boolval($hex['scored']),
+                Landmass::from($hex['landmass'])
+            );
         };
         return Board::fromHexes($hexes);
     }
 
-    public function insertBoard(Board $board): void {
+    public function insertBoard(Board $board): void
+    {
         $sql_values = [];
         $board->visitAll(function (Hex $hex) use (&$sql_values) {
             $piece = $hex->piece->value;
@@ -72,7 +81,8 @@ class PersistentStore {
         $this->db->execute($sql);
     }
 
-    public function upsertPool(int $player_id, Pool $pool): void {
+    public function upsertPool(int $player_id, Pool $pool): void
+    {
         $sql = "DELETE FROM handpools WHERE player_id = $player_id";
         $this->db->execute($sql);
 
@@ -90,7 +100,8 @@ class PersistentStore {
         $this->db->execute($sql);
     }
 
-    public function retrievePool(int $player_id): Pool {
+    public function retrievePool(int $player_id): Pool
+    {
         $sql = "SELECT piece
                 FROM handpools
                 WHERE player_id = $player_id";
@@ -104,7 +115,8 @@ class PersistentStore {
     }
 
     // Not efficient, but there are at most seven rows involed here.
-    public function upsertHand(int $player_id, Hand $hand): void {
+    public function upsertHand(int $player_id, Hand $hand): void
+    {
         $sql = "DELETE FROM hands
                 WHERE player_id = $player_id";
         $this->db->execute($sql);
@@ -122,7 +134,8 @@ class PersistentStore {
         $this->db->execute($sql);
     }
 
-    public function retrieveHand(int $player_id): Hand {
+    public function retrieveHand(int $player_id): Hand
+    {
         $sql = "SELECT piece
                 FROM hands
                 WHERE player_id = $player_id
@@ -135,7 +148,8 @@ class PersistentStore {
         return new Hand($pieces);
     }
 
-    public function updatePlayer(PlayerInfo $player_info): void {
+    public function updatePlayer(PlayerInfo $player_info): void
+    {
         $sql = "UPDATE player p
                 SET p.player_score = $player_info->score,
                     p.captured_city_count = $player_info->captured_city_count
@@ -144,29 +158,34 @@ class PersistentStore {
     }
 
     /** @param array<int,PlayerInfo> $player_infos */
-    public function updatePlayers(array $player_infos): void {
+    public function updatePlayers(array $player_infos): void
+    {
         foreach ($player_infos as $_ => $pi) {
             $this->updatePlayer($pi);
         }
     }
 
-    public function deleteAllMoves(int $player_id): void {
+    public function deleteAllMoves(int $player_id): void
+    {
         $sql = "DELETE FROM turn_progress
                 WHERE player_id=$player_id";
         $this->db->execute($sql);
     }
 
-    public function deleteSingleMove(Move $move): void {
+    public function deleteSingleMove(Move $move): void
+    {
         $sql = "DELETE FROM turn_progress
                 WHERE player_id = $move->player_id
                 AND seq_id = $move->seq_id";
         $this->db->execute($sql);
     }
 
-    public function updateHex(RowCol $rc,
-                              ?Piece $piece = null,
-                              ?int $player_id = null,
-                              ?bool $scored = null): void {
+    public function updateHex(
+        RowCol $rc,
+        ?Piece $piece = null,
+        ?int $player_id = null,
+        ?bool $scored = null
+    ): void {
         $updates = [];
         if ($piece !== null) {
             $updates[] = "piece='$piece->value'";
@@ -185,14 +204,16 @@ class PersistentStore {
         $this->db->execute($sql);
     }
 
-    public function updateHand(int $player_id, int $handpos, Piece $piece): void {
+    public function updateHand(int $player_id, int $handpos, Piece $piece): void
+    {
         $sql = "UPDATE hands
                 SET piece = '$piece->value'
                 WHERE player_id=$player_id AND pos=$handpos";
         $this->db->execute($sql);
     }
 
-    public function incPlayerScore(int $player_id, int $points): void {
+    public function incPlayerScore(int $player_id, int $points): void
+    {
         if ($points == 0) {
             return;
         }
@@ -206,7 +227,8 @@ class PersistentStore {
         $this->db->execute($sql);
     }
 
-    public function insertMove(Move $move): void {
+    public function insertMove(Move $move): void
+    {
         $captured_piece = $move->captured_piece->value;
         $piece = $move->piece->value;
         $opiece = $move->original_piece->value;
@@ -223,7 +245,8 @@ class PersistentStore {
         $this->db->execute($sql);
     }
 
-    public function retrieveTurnProgress(int $player_id): TurnProgress {
+    public function retrieveTurnProgress(int $player_id): TurnProgress
+    {
         $sql = "SELECT seq_id, player_id, handpos, piece, original_piece,
                        board_row, board_col, captured_piece, field_points,
                        ziggurat_points
@@ -234,22 +257,27 @@ class PersistentStore {
         $data = $this->db->getObjectList($sql);
         $moves = [];
         foreach ($data as &$md) {
-            $moves[] = new Move(intval($md['player_id']),
-                                Piece::from($md['piece']),
-                                Piece::from($md['original_piece']),
-                                intval($md['handpos']),
-                                new RowCol(intval($md['board_row']),
-                                           intval($md['board_col'])),
-                                Piece::from($md['captured_piece']),
-                                intval($md['field_points']),
-                                intval($md['ziggurat_points']),
-                                intval($md['seq_id']));
+            $moves[] = new Move(
+                intval($md['player_id']),
+                Piece::from($md['piece']),
+                Piece::from($md['original_piece']),
+                intval($md['handpos']),
+                new RowCol(
+                    intval($md['board_row']),
+                    intval($md['board_col'])
+                ),
+                Piece::from($md['captured_piece']),
+                intval($md['field_points']),
+                intval($md['ziggurat_points']),
+                intval($md['seq_id'])
+            );
         }
         return new TurnProgress($moves);
     }
 
     /** @param array<int,int> $aux_scores */
-    public function updateAuxScores(array $aux_scores): void {
+    public function updateAuxScores(array $aux_scores): void
+    {
         if (count($aux_scores) == 0) {
             return;
         }
@@ -269,7 +297,8 @@ class PersistentStore {
     }
 
     /** @return array<int,PlayerInfo> */
-    public function &retrieveAllPlayerInfo(): array {
+    public function &retrieveAllPlayerInfo(): array
+    {
         $sql = "SELECT P.player_id player_id, P.player_score score,
                        P.captured_city_count captured_city_count,
                        H.hand_size, Q.pool_size
@@ -299,15 +328,19 @@ class PersistentStore {
     }
 
     /** @param string[] $pd */
-    private function playerInfoFromData(int $player_id, array $pd): PlayerInfo {
-        return new PlayerInfo($player_id,
-                              intval($pd["score"]),
-                              intval($pd["captured_city_count"]),
-                              intval($pd["hand_size"]),
-                              intval($pd["pool_size"]));
+    private function playerInfoFromData(int $player_id, array $pd): PlayerInfo
+    {
+        return new PlayerInfo(
+            $player_id,
+            intval($pd["score"]),
+            intval($pd["captured_city_count"]),
+            intval($pd["hand_size"]),
+            intval($pd["pool_size"])
+        );
     }
 
-    public function insertComponents(Components $components): void {
+    public function insertComponents(Components $components): void
+    {
         $sql_values = [];
         foreach ($components->allZigguratCards() as &$zc) {
             $used = $this->boolValue($zc->used);
@@ -320,7 +353,8 @@ class PersistentStore {
         $this->db->execute($sql);
     }
 
-    public function retrieveComponents(): Components {
+    public function retrieveComponents(): Components
+    {
         $sql = "SELECT card_type, player_id, used
                 FROM ziggurat_cards";
         $data = $this->db->getObjectList($sql);
@@ -328,14 +362,17 @@ class PersistentStore {
         $cards = [];
         foreach ($data as $zd) {
             $cards[] =
-                new ZigguratCard(ZigguratCardType::from($zd["card_type"]),
-                                 intval($zd["player_id"]),
-                                 boolval($zd["used"]));
+                new ZigguratCard(
+                    ZigguratCardType::from($zd["card_type"]),
+                    intval($zd["player_id"]),
+                    boolval($zd["used"])
+                );
         }
         return new Components($cards);
     }
 
-    public function updateZigguratCard(ZigguratCard $card): void {
+    public function updateZigguratCard(ZigguratCard $card): void
+    {
         $player_id = $card->owning_player_id;
         $used = $this->boolValue($card->used);
         $type = $card->type->value;
@@ -346,7 +383,3 @@ class PersistentStore {
         $this->db->execute($sql);
     }
 }
-
-
-
-?>

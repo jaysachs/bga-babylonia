@@ -27,11 +27,11 @@ declare(strict_types=1);
 
 namespace Bga\Games\babylonia;
 
-class ZigguratCard {
-    public function __construct(public ZigguratCardType $type,
-                                public int $owning_player_id = 0,
-                                public bool $used = false) {
-    }
+class ZigguratCard
+{
+    public function __construct(
+        public ZigguratCardType $type,
+        public int $owning_player_id = 0,
+        public bool $used = false
+    ) {}
 };
-
-?>

@@ -1,4 +1,5 @@
 <?php
+
 /**
  *------
  * BGA framework: Gregory Isabelli & Emmanuel Colin & BoardGameArena
@@ -26,12 +27,11 @@ declare(strict_types=1);
 
 namespace Bga\Games\babylonia;
 
-enum Landmass: string {
+enum Landmass: string
+{
     case EAST = 'EAST';
     case WEST = 'WEST';
     case CENTER = 'CENTER';
 
     case UNKNOWN = 'UNKNOWN';
 }
-
-?>

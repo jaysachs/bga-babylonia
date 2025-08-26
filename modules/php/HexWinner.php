@@ -1,4 +1,5 @@
 <?php
+
 /**
  *------
  * BGA framework: Gregory Isabelli & Emmanuel Colin & BoardGameArena
@@ -26,15 +27,19 @@ declare(strict_types=1);
 
 namespace Bga\Games\babylonia;
 
-class HexWinner {
+class HexWinner
+{
 
     /** @param array<int, Hex> $neighbors */
-    public function __construct(public Hex $hex,
-                                public int $captured_by,
-                                public array $neighbors) { }
+    public function __construct(
+        public Hex $hex,
+        public int $captured_by,
+        public array $neighbors
+    ) {}
 
     /** @return array<int, RowCol> */
-    public function winnerRowCols(): array {
+    public function winnerRowCols(): array
+    {
         return $this->rcs(
             array_filter(
                 $this->neighbors,
@@ -46,7 +51,8 @@ class HexWinner {
     }
 
     /** @return array<int, RowCol> */
-    public function othersRowCols(): array {
+    public function othersRowCols(): array
+    {
         return $this->rcs(
             array_filter(
                 $this->neighbors,
@@ -62,12 +68,14 @@ class HexWinner {
      * @param array<int, Hex> $hexes
      * @return array<int, RowCol>
      */
-    private function rcs(array $hexes): array {
+    private function rcs(array $hexes): array
+    {
         $a = array_map(
-            function (Hex $hex): RowCol { return $hex->rc; },
-            $hexes);
+            function (Hex $hex): RowCol {
+                return $hex->rc;
+            },
+            $hexes
+        );
         return [...$a];
     }
 }
-
-?>

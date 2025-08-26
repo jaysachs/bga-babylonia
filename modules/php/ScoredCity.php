@@ -1,4 +1,5 @@
 <?php
+
 /**
  *------
  * BGA framework: Gregory Isabelli & Emmanuel Colin & BoardGameArena
@@ -26,7 +27,8 @@ declare(strict_types=1);
 
 namespace Bga\Games\babylonia;
 
-class ScoredCity {
+class ScoredCity
+{
 
     /**
      * all are from player_id -> ...
@@ -39,10 +41,12 @@ class ScoredCity {
         public HexWinner $hex_winner,
         public array $captured_city_points,
         private array $scoringHexes,
-        private array $networkHexes) { }
+        private array $networkHexes
+    ) {}
 
     /** @param int[] $player_ids */
-    public static function makeEmpty(HexWinner $hex_winner, array $player_ids): ScoredCity {
+    public static function makeEmpty(HexWinner $hex_winner, array $player_ids): ScoredCity
+    {
         $sc = new ScoredCity($hex_winner, [], [], []);
         foreach ($player_ids as $pid) {
             $sc->networkHexes[$pid] = [];
@@ -55,7 +59,8 @@ class ScoredCity {
         return $sc;
     }
 
-    public function addIfInNetwork(Hex $hex, int $player_id): bool {
+    public function addIfInNetwork(Hex $hex, int $player_id): bool
+    {
         if ($hex->isNeighbor($this->hex_winner->hex)) {
             $this->addNetworkHex($hex, $player_id);
             return true;
@@ -69,7 +74,8 @@ class ScoredCity {
         return false;
     }
 
-    private function addNetworkHex(Hex $hex, int $player_id): void {
+    private function addNetworkHex(Hex $hex, int $player_id): void
+    {
         $this->networkHexes[$player_id][] = $hex;
         sort($this->networkHexes[$player_id]);
         if ($this->hex_winner->hex->piece->scores($hex->piece)) {
@@ -78,26 +84,31 @@ class ScoredCity {
         }
     }
 
-    public function pointsForPlayer(int $player_id): int {
+    public function pointsForPlayer(int $player_id): int
+    {
         return $this->networkPointsForPlayer($player_id)
             + $this->capturePointsForPlayer($player_id);
     }
 
-    public function networkPointsForPlayer(int $player_id): int {
+    public function networkPointsForPlayer(int $player_id): int
+    {
         return 2 * count($this->scoringHexes[$player_id]);
     }
 
-    public function capturePointsForPlayer(int $player_id): int {
+    public function capturePointsForPlayer(int $player_id): int
+    {
         return $this->captured_city_points[$player_id];
     }
 
     /** @return RowCol[] */
-    public function scoringLocationsForPlayer(int $player_id): array {
+    public function scoringLocationsForPlayer(int $player_id): array
+    {
         return $this->toRowCol($this->scoringHexes[$player_id]);
     }
 
     /** @return RowCol[] */
-    public function networkLocationsForPlayer(int $player_id): array {
+    public function networkLocationsForPlayer(int $player_id): array
+    {
         return $this->toRowCol($this->networkHexes[$player_id]);
     }
 
@@ -105,7 +116,8 @@ class ScoredCity {
      * @param Hex[] $hexes
      * @return RowCol[]
      */
-    private function toRowCol(array &$hexes): array {
+    private function toRowCol(array &$hexes): array
+    {
         return array_map(
             function (Hex $hex): RowCol {
                 return $hex->rc;
@@ -114,13 +126,11 @@ class ScoredCity {
         );
     }
 
-    public function equals(ScoredCity $other): bool {
+    public function equals(ScoredCity $other): bool
+    {
         return $this->hex_winner == $other->hex_winner
             && $this->scoringHexes == $other->scoringHexes
             && $this->networkHexes == $other->networkHexes
-            && $this->captured_city_points == $other->captured_city_points
-            ;
+            && $this->captured_city_points == $other->captured_city_points;
     }
 }
-
-?>

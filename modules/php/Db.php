@@ -1,4 +1,5 @@
 <?php
+
 /**
  *------
  * BGA framework: Gregory Isabelli & Emmanuel Colin & BoardGameArena
@@ -27,7 +28,8 @@ declare(strict_types=1);
 namespace Bga\Games\babylonia;
 
 
-interface Db {
+interface Db
+{
     /** @return string[][] */
     public function getObjectList(string $sql): array;
 

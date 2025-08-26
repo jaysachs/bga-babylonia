@@ -78,7 +78,7 @@ class Html {
   readonly hdelta = 0.75 * this.width + 2.0;
   readonly vdelta = 1.0 * this.height + 2.0;
 
-  constructor(private colorIndexMap: Record<number, number>) {}
+  constructor(private colorIndexMap: Record<number, number>) { }
 
   public hex(rc: RowCol): string {
     let top = this.vstart + rc.row * this.vdelta / 2;
@@ -209,8 +209,8 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
     // Active player gets their own undo notification with private data,
     //   so ignore the generic undo notification.
     this.notifqueue.setIgnoreNotificationCheck(
-        'undoMove',
-        (notif: any) => (notif.args.player_id == this.player_id) );
+      'undoMove',
+      (notif: any) => (notif.args.player_id == this.player_id));
 
     // if a ziggurat card is being chosen
     if (gamedatas.current_scoring_hex) {
@@ -328,8 +328,8 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
 
   private pieceVal(piece: string, playerId: number): string {
     return (playerId > 0 && piece != Piece.EMPTY)
-        ? piece + '_' + this.playerIdToColorIndex[playerId]
-        : piece;
+      ? piece + '_' + this.playerIdToColorIndex[playerId]
+      : piece;
   }
 
   private pieceAttr(piece: string, playerId: number): Record<string, string> {
@@ -425,39 +425,39 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
     return false;
   }
 
-  private toggleZcardSelected(e : Element) {
-      let addButtons = () => {
-          this.statusBar.addActionButton(_('Confirm'),
-              () => {
-                  this.bgaPerformAction(
-                      'actSelectZigguratCard',
-                      { zctype: e.getAttribute(Attrs.ZTYPE) }
-                  );
-              },
-              { autoclick: true }
+  private toggleZcardSelected(e: Element) {
+    let addButtons = () => {
+      this.statusBar.addActionButton(_('Confirm'),
+        () => {
+          this.bgaPerformAction(
+            'actSelectZigguratCard',
+            { zctype: e.getAttribute(Attrs.ZTYPE) }
           );
+        },
+        { autoclick: true }
+      );
 
-          this.statusBar.addActionButton(_('Cancel'), () => {
-             this.toggleZcardSelected(e);
-          });
-      };
-      let alreadySelected =
-          e.parentElement!.querySelector(
-              `#${IDS.AVAILABLE_ZCARDS} > [${Attrs.ZTYPE}].${CSS.SELECTED}`);
-      e.classList.toggle(CSS.SELECTED);
-      if (alreadySelected == null) {
-          addButtons();
-      } else if (alreadySelected == e) {
-          // remove confirm and cancel buttons from action bar
-          this.statusBar.removeActionButtons();
-      } else {
-          alreadySelected.classList.toggle(CSS.SELECTED);
-          // buttons should already be in right state
-          // BUT we can't reset the timer. So we remove & add.
-          // this is a crappy way to reset timer on autoclick.
-          this.statusBar.removeActionButtons();
-          addButtons();
-      }
+      this.statusBar.addActionButton(_('Cancel'), () => {
+        this.toggleZcardSelected(e);
+      });
+    };
+    let alreadySelected =
+      e.parentElement!.querySelector(
+        `#${IDS.AVAILABLE_ZCARDS} > [${Attrs.ZTYPE}].${CSS.SELECTED}`);
+    e.classList.toggle(CSS.SELECTED);
+    if (alreadySelected == null) {
+      addButtons();
+    } else if (alreadySelected == e) {
+      // remove confirm and cancel buttons from action bar
+      this.statusBar.removeActionButtons();
+    } else {
+      alreadySelected.classList.toggle(CSS.SELECTED);
+      // buttons should already be in right state
+      // BUT we can't reset the timer. So we remove & add.
+      // this is a crappy way to reset timer on autoclick.
+      this.statusBar.removeActionButtons();
+      addButtons();
+    }
   }
 
   private onZcardClicked(event: Event): boolean {
@@ -637,7 +637,7 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
     const playerId = player.player_id;
     console.log('Setting up board for player ' + playerId);
     this.getPlayerPanelElement(playerId)
-        .insertAdjacentHTML('beforeend', this.html.player_board_ext(playerId));
+      .insertAdjacentHTML('beforeend', this.html.player_board_ext(playerId));
     //    create counters per player
     this.handCounters[playerId] = new ebg.counter();
     this.handCounters[playerId]!.create(IDS.handcount(playerId));
@@ -668,9 +668,9 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
   }
 
   private onUpdateActionButtons_selectZigguratCard(): void {
-      const div = $(IDS.AVAILABLE_ZCARDS);
-      div.scrollIntoView(false);
-      //  div.classList.add(CSS.SELECTING);
+    const div = $(IDS.AVAILABLE_ZCARDS);
+    div.scrollIntoView(false);
+    //  div.classList.add(CSS.SELECTING);
   }
 
   private onUpdateActionButtons_playPieces(args: PlayState): void {
@@ -679,7 +679,7 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
     this.markAllHexesUnplayable();
   }
 
-  private onUpdateActionButtons_selectHexToScore(args: {hexes: RowCol[]}): void {
+  private onUpdateActionButtons_selectHexToScore(args: { hexes: RowCol[] }): void {
     this.markScoreableHexesPlayable(args.hexes);
   }
 
@@ -689,12 +689,12 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
   }
 
   private async notif_turnFinished(
-      args: {
-        player_id: number;
-        hand_size: number;
-        pool_size: number;
-      }
-    ): Promise<void> {
+    args: {
+      player_id: number;
+      hand_size: number;
+      pool_size: number;
+    }
+  ): Promise<void> {
 
     this.updateHandCount(args);
     this.updatePoolCount(args);
@@ -776,22 +776,22 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
       piece: string;
     }
   ): Promise<void> {
- }
+  }
 
   private async notif_piecePlayed(
-      args: {
-        player_id: number;
-        points: number;
-        piece: string;
-        handpos: number;
-        row: number;
-        col: number;
-        hand_size: number;
-        field_points: number;
-        ziggurat_points: number;
-        touched_ziggurats: RowCol[];
-      }
-    ): Promise<void> {
+    args: {
+      player_id: number;
+      points: number;
+      piece: string;
+      handpos: number;
+      row: number;
+      col: number;
+      hand_size: number;
+      field_points: number;
+      ziggurat_points: number;
+      touched_ziggurats: RowCol[];
+    }
+  ): Promise<void> {
 
     const hexDiv = this.hexDiv(args);
     let sourceDivId = IDS.handcount(args.player_id);
@@ -803,8 +803,8 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
     }
     // TODO: do some animation for ziggurat scoring
     if (args.ziggurat_points > 0) {
-       // TODO: flash all the args.touched_ziggurats
-       //   maybe use CSS?
+      // TODO: flash all the args.touched_ziggurats
+      //   maybe use CSS?
     }
     // TODO: do some animation for field scoring
     if (args.field_points > 0) {
@@ -845,8 +845,9 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
           div.id,
           { attrs: this.pieceAttr(this.hand[i]!, this.player_id) })
           .then(() => {
-          console.log("setting hand piece", i, this.hand);
-          this.setPiece(div, this.hand[i]!, this.player_id) });
+            console.log("setting hand piece", i, this.hand);
+            this.setPiece(div, this.hand[i]!, this.player_id)
+          });
         anims.push(a);
       }
     }
@@ -870,13 +871,13 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
     otherHexes: RowCol[]) {
     if (this.bgaAnimationsActive()) {
       for (const rc of otherHexes) {
-          this.hexDiv(rc).classList.add(CSS.IN_NETWORK);
-          this.hexDiv(rc).classList.add(CSS.UNIMPORTANT);
+        this.hexDiv(rc).classList.add(CSS.IN_NETWORK);
+        this.hexDiv(rc).classList.add(CSS.UNIMPORTANT);
       }
       for (let i = 0; i < 3; i++) {
         console.log("indicating loop", i);
         for (const rc of winnerHexes) {
-            this.hexDiv(rc).classList.add(CSS.IN_NETWORK);
+          this.hexDiv(rc).classList.add(CSS.IN_NETWORK);
         }
         await this.wait(250);
         for (const rc of winnerHexes) {
@@ -885,26 +886,26 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
         await this.wait(250);
       }
       for (const rc of otherHexes) {
-          this.hexDiv(rc).classList.remove(CSS.IN_NETWORK);
-          this.hexDiv(rc).classList.remove(CSS.UNIMPORTANT);
+        this.hexDiv(rc).classList.remove(CSS.IN_NETWORK);
+        this.hexDiv(rc).classList.remove(CSS.UNIMPORTANT);
       }
     }
     return Promise.resolve();
   }
 
- private async notif_zigguratScored(
-   args: {
-     row: number;
-     col: number;
-     player_name: string;
-     player_id: number;
-     winner_hexes: RowCol[];
-     other_hexes: RowCol[];
-   }): Promise<void> {
+  private async notif_zigguratScored(
+    args: {
+      row: number;
+      col: number;
+      player_name: string;
+      player_id: number;
+      winner_hexes: RowCol[];
+      other_hexes: RowCol[];
+    }): Promise<void> {
     console.log("notif_zigguratScore", args);
     await this.indicateNeighbors(args.winner_hexes, args.other_hexes);
     // TODO: consider better visual treatments
- }
+  }
 
   private async notif_scoringSelection(
     args: {
@@ -918,14 +919,14 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
   }
 
   private async notif_zigguratCardSelection(
-      args: {
-        zcard: string;
-        player_id: number;
-        cardused: boolean;
-        score: number;
-        hex: RowCol;
-      }
-    ): Promise<void> {
+    args: {
+      zcard: string;
+      player_id: number;
+      cardused: boolean;
+      score: number;
+      hex: RowCol;
+    }
+  ): Promise<void> {
     const zcard = this.zcardForType(args.zcard);
     zcard.owning_player_id = args.player_id;
     zcard.used = args.cardused;
@@ -943,11 +944,11 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
       id,
       IDS.playerBoardZcards(args.player_id),
       { attrs: attrs })
-        .then(() => {
-             $(id).remove();
-             this.addZcardDivInPlayerBoard(zcard);
-             this.unmarkHexSelected(args.hex);
-        });
+      .then(() => {
+        $(id).remove();
+        this.addZcardDivInPlayerBoard(zcard);
+        this.unmarkHexSelected(args.hex);
+      });
   }
 
   private async notif_cityScored(
@@ -991,11 +992,11 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
           this.gamedatas.players[playerId]!.color,
           { duration: 2500, easing: 'ease-in-out', extraClass: 'bbl_city_scoring' });
         details.network_locations.forEach(
-           (rc) => {
-             let cl = this.hexDiv(rc).classList;
-             cl.remove(CSS.IN_NETWORK);
-             cl.remove(CSS.UNIMPORTANT);
-           });
+          (rc) => {
+            let cl = this.hexDiv(rc).classList;
+            cl.remove(CSS.IN_NETWORK);
+            cl.remove(CSS.UNIMPORTANT);
+          });
       }
       this.scoreCtrl[details.player_id]!.incValue(details.network_points);
     }
@@ -1028,15 +1029,15 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
   ///////
   readonly special_log_args = {
     piece: (args: any) => `<span class='log-element' ${Attrs.PIECE}='${this.pieceVal(args.piece, args.player_id)}'></span>`,
-    city: (args: any) => `<span class='log-element' ${Attrs.PIECE}='${this.pieceVal(args.city,0)}'></span>`,
+    city: (args: any) => `<span class='log-element' ${Attrs.PIECE}='${this.pieceVal(args.city, 0)}'></span>`,
     zcard: (args: any) => `<span class='log-element' ${Attrs.ZTYPE}='${args.zcard}'></span>`,
-    original_piece: (args: any) => `<span class='log-element' ${Attrs.PIECE}='${this.pieceVal(args.original_piece,args.player_id)}'></span>`,
+    original_piece: (args: any) => `<span class='log-element' ${Attrs.PIECE}='${this.pieceVal(args.original_piece, args.player_id)}'></span>`,
   };
 
   override format_string_recursive(log: string, args: any): string {
-     type SpecialLogArgs = keyof typeof this.special_log_args;
-     const saved: { [k in SpecialLogArgs]?: any } = {};
-     try {
+    type SpecialLogArgs = keyof typeof this.special_log_args;
+    const saved: { [k in SpecialLogArgs]?: any } = {};
+    try {
       if (log && args && !args.processed) {
         args.processed = true;
         for (const key in this.special_log_args) {
@@ -1053,9 +1054,9 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
     try {
       return (this as any).inherited(arguments);
     } finally {
-       for (const k in saved) {
-         args[k] = saved[k as SpecialLogArgs];
-       }
+      for (const k in saved) {
+        args[k] = saved[k as SpecialLogArgs];
+      }
     }
   }
 }

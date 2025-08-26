@@ -1,4 +1,5 @@
 <?php
+
 /**
  *------
  * BGA framework: Gregory Isabelli & Emmanuel Colin & BoardGameArena
@@ -26,10 +27,12 @@ declare(strict_types=1);
 
 namespace Bga\Games\babylonia;
 
-class TurnResult {
+class TurnResult
+{
     public function __construct(public bool $pieces_exhausted, public bool $less_than_two_remaining_cities) {}
 
-    public function gameOver(): bool {
+    public function gameOver(): bool
+    {
         return $this->pieces_exhausted || $this->less_than_two_remaining_cities;
     }
 }

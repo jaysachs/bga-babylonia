@@ -1,4 +1,5 @@
 <?php
+
 /**
  *------
  * BGA framework: Gregory Isabelli & Emmanuel Colin & BoardGameArena
@@ -26,19 +27,23 @@ declare(strict_types=1);
 
 namespace Bga\Games\babylonia;
 
-class TurnProgress {
+class TurnProgress
+{
     /** @param Move[] $moves */
     function __construct(public array &$moves = []) {}
 
-    public function addMove(Move $move): void {
+    public function addMove(Move $move): void
+    {
         $this->moves[] = $move;
     }
 
-    public function canUndo(): bool {
+    public function canUndo(): bool
+    {
         return count($this->moves) > 0;
     }
 
-    public function undoLastMove(): Move {
+    public function undoLastMove(): Move
+    {
         $move = array_pop($this->moves);
         if ($move == null) {
             throw new \LogicException("No moves to undo!");
@@ -47,18 +52,24 @@ class TurnProgress {
     }
 
     /** @return Piece[] */
-    public function uniqueNoblesPlayed(): array {
+    public function uniqueNoblesPlayed(): array
+    {
         $seen = [];
         foreach ($this->moves as &$move) {
             if ($move->piece->isNoble()) {
                 $seen[$move->piece->value] = 1;
             }
         }
-        return array_map(function ($p) { return Piece::from($p); },
-                         array_keys($seen));
+        return array_map(
+            function ($p) {
+                return Piece::from($p);
+            },
+            array_keys($seen)
+        );
     }
 
-    public function allMovesFarmersOnLand(Board $board): bool {
+    public function allMovesFarmersOnLand(Board $board): bool
+    {
         foreach ($this->moves as &$move) {
             if ($move->piece != Piece::FARMER) {
                 return false;
@@ -71,5 +82,3 @@ class TurnProgress {
         return true;
     }
 }
-
-?>

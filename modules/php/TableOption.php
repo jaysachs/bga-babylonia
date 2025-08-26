@@ -1,4 +1,5 @@
 <?php
+
 /**
  *------
  * BGA framework: Gregory Isabelli & Emmanuel Colin & BoardGameArena
@@ -26,9 +27,8 @@ declare(strict_types=1);
 
 namespace Bga\Games\babylonia;
 
-enum TableOption: int {
+enum TableOption: int
+{
     case ADVANCED_ZIGGURAT_CARDS = 100;
     case AUTOMATED_SCORING_SELECTION = 101;
 }
-
-?>

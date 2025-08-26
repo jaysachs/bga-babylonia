@@ -27,7 +27,8 @@ declare(strict_types=1);
 
 namespace Bga\Games\babylonia;
 
-enum ZigguratCardType : string {
+enum ZigguratCardType: string
+{
     case PLUS_10 = 'zc_10pts';
     case EXTRA_TURN = 'zc_xturn';
     case HAND_SIZE_7 = 'zc_hand7';
@@ -39,7 +40,8 @@ enum ZigguratCardType : string {
     case FREE_RIVER_CONNECTS = 'zc_river';
 
     /** @return ZigguratCardType[] */
-    public static function sevenTypes(bool $use_advanced = false): array {
+    public static function sevenTypes(bool $use_advanced = false): array
+    {
         $ziggurats = [
             ZigguratCardType::PLUS_10,
             ZigguratCardType::EXTRA_TURN,
@@ -47,7 +49,8 @@ enum ZigguratCardType : string {
             ZigguratCardType::NOBLES_3_KINDS,
             ZigguratCardType::NOBLE_WITH_3_FARMERS,
             ZigguratCardType::NOBLES_IN_FIELDS,
-            ZigguratCardType::EXTRA_CITY_POINTS ];
+            ZigguratCardType::EXTRA_CITY_POINTS
+        ];
         if ($use_advanced) {
             $ziggurats[] = ZigguratCardType::FREE_CENTER_LAND_CONNECTS;
             $ziggurats[] = ZigguratCardType::FREE_RIVER_CONNECTS;
@@ -56,10 +59,10 @@ enum ZigguratCardType : string {
             array_pop($ziggurats);
         }
         return $ziggurats;
-
     }
 
-    public function tooltip(): string {
+    public function tooltip(): string
+    {
         return match ($this) {
             ZigguratCardType::PLUS_10 =>
             clienttranslate("Receive 10 points immediately. Next, turn the card face down: you can not use it any longer."),
@@ -83,5 +86,3 @@ enum ZigguratCardType : string {
         };
     }
 };
-
-?>

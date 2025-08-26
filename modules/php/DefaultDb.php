@@ -1,4 +1,5 @@
 <?php
+
 /**
  *------
  * BGA framework: Gregory Isabelli & Emmanuel Colin & BoardGameArena
@@ -27,24 +28,28 @@ declare(strict_types=1);
 namespace Bga\Games\babylonia;
 
 
-class DefaultDb implements Db {
+class DefaultDb implements Db
+{
 
-    public function __construct() { }
+    public function __construct() {}
 
     /** @return string[][] */
     #[\Override]
-    public function getObjectList(string $sql): array {
+    public function getObjectList(string $sql): array
+    {
         return Game::getObjectListFromDB($sql, false);
     }
 
     /** @return string[] */
     #[\Override]
-    public function getSingleFieldList(string $sql): array {
+    public function getSingleFieldList(string $sql): array
+    {
         return Game::getObjectListFromDB($sql, true);
     }
 
     #[\Override]
-    public function execute(string $sql): void {
+    public function execute(string $sql): void
+    {
         Game::DbQuery($sql);
     }
 }

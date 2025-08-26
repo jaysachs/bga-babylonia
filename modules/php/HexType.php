@@ -1,4 +1,5 @@
 <?php
+
 /**
  *------
  * BGA framework: Gregory Isabelli & Emmanuel Colin & BoardGameArena
@@ -26,9 +27,8 @@ declare(strict_types=1);
 
 namespace Bga\Games\babylonia;
 
-enum HexType: string {
+enum HexType: string
+{
     case LAND = 'LAND';
     case WATER = 'WATER';
 }
-
-?>

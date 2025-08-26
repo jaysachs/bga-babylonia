@@ -1,4 +1,5 @@
 <?php
+
 /**
  *------
  * BGA framework: Gregory Isabelli & Emmanuel Colin & BoardGameArena
@@ -49,7 +50,7 @@
 
 //    !! It is not a good idea to modify this file when a game is running !!
 
-if ( !defined('STATE_PLAYER_PLAY_PIECES')) { // guard since this included multiple times
+if (!defined('STATE_PLAYER_PLAY_PIECES')) { // guard since this included multiple times
     define('STATE_PLAYER_PLAY_PIECES', 2);
     define('STATE_END_OF_TURN_SCORING', 3);
     define('STATE_PLAYER_SELECT_SCORING_HEX', 4);
@@ -70,7 +71,7 @@ $machinestates = [
     STATE_PLAYER_PLAY_PIECES => GameStateBuilder::create()
         ->name('playPieces')
         ->description(clienttranslate('${actplayer} is playing pieces'))
-        ->descriptionmyturn( clienttranslate('${you} may play a piece or end the turn'))
+        ->descriptionmyturn(clienttranslate('${you} may play a piece or end the turn'))
         ->type(StateType::ACTIVE_PLAYER)
         ->args('argPlayPieces')
         ->possibleactions([
@@ -113,7 +114,7 @@ $machinestates = [
     STATE_PLAYER_SELECT_SCORING_HEX => GameStateBuilder::create()
         ->name('selectHexToScore')
         ->description(clienttranslate('${actplayer} must select a hex to score'))
-        ->descriptionmyturn( clienttranslate('${you} must select a hex to score'))
+        ->descriptionmyturn(clienttranslate('${you} must select a hex to score'))
         ->type(StateType::ACTIVE_PLAYER)
         ->args('argSelectHexToScore')
         ->possibleactions([
@@ -144,7 +145,7 @@ $machinestates = [
     STATE_PLAYER_SELECT_ZIGGURAT_CARD => GameStateBuilder::create()
         ->name('selectZigguratCard')
         ->description(clienttranslate('${actplayer} must select a ziggurat card'))
-        ->descriptionmyturn( clienttranslate('${you} must select a ziggurat card'))
+        ->descriptionmyturn(clienttranslate('${you} must select a ziggurat card'))
         ->type(StateType::ACTIVE_PLAYER)
         ->args('argSelectZigguratCard')
         ->possibleactions([
@@ -185,7 +186,7 @@ $machinestates = [
     STATE_PLAYER_EXTRA_TURN => GameStateBuilder::create()
         ->name('chooseExtraTurn')
         ->description(clienttranslate('${actplayer} may choose to take another turn'))
-        ->descriptionmyturn( clienttranslate('${you} must choose whether to take another turn'))
+        ->descriptionmyturn(clienttranslate('${you} must choose whether to take another turn'))
         ->type(StateType::ACTIVE_PLAYER)
         ->possibleactions([
             'actChooseExtraTurn',

@@ -1,4 +1,5 @@
 <?php
+
 /**
  *------
  * BGA framework: Gregory Isabelli & Emmanuel Colin & BoardGameArena
@@ -21,6 +22,7 @@
  * This code has been produced on the BGA studio platform for use on http://boardgamearena.com.
  * See http://en.boardgamearena.com/#!doc/Studio for more information.
  */
+
 declare(strict_types=1);
 
 namespace Bga\Games\babylonia;
@@ -147,7 +149,8 @@ class Game extends \Bga\GameFramework\Table
         return intval(100 - ($remaining_pieces * 100) / $total_pieces);
     }
 
-    private function scoreZiggurat(Model $model, Hex $zighex): int {
+    private function scoreZiggurat(Model $model, Hex $zighex): int
+    {
         $scored_zig = $model->scoreZiggurat($zighex->rc);
         $winner = $scored_zig->captured_by;
         if ($winner == 0) {
@@ -159,7 +162,8 @@ class Game extends \Bga\GameFramework\Table
         }
         $this->notify->all(
             "zigguratScored",
-            $msg, [
+            $msg,
+            [
                 "row" => $zighex->rc->row,
                 "col" => $zighex->rc->col,
                 "winner_hexes" => $scored_zig->winnerRowCols(),
@@ -172,7 +176,8 @@ class Game extends \Bga\GameFramework\Table
         return $winner;
     }
 
-    private function scoreCity(Model $model, Hex $cityhex): void {
+    private function scoreCity(Model $model, Hex $cityhex): void
+    {
         // grab this, as it will change underneath when the model scores it.
         $city = $cityhex->piece->value;
         $scored_city = $model->scoreCity($cityhex->rc);
@@ -191,10 +196,8 @@ class Game extends \Bga\GameFramework\Table
         $details = [];
         foreach ($player_infos as $pid => $pi) {
             $points = $scored_city->pointsForPlayer($pid);
-            Stats::PLAYER_POINTS_FROM_CITY_NETWORKS->
-                inc($pid, $scored_city->networkPointsForPlayer($pid));
-            Stats::PLAYER_POINTS_FROM_CAPTURED_CITIES->
-                inc($pid, $scored_city->capturePointsForPlayer($pid));
+            Stats::PLAYER_POINTS_FROM_CITY_NETWORKS->inc($pid, $scored_city->networkPointsForPlayer($pid));
+            Stats::PLAYER_POINTS_FROM_CAPTURED_CITIES->inc($pid, $scored_city->capturePointsForPlayer($pid));
             $details[$pid] = [
                 "player_id" => $pid,
                 "player_name" => $this->getPlayerNameById($pid),
@@ -218,7 +221,8 @@ class Game extends \Bga\GameFramework\Table
 
         $this->notify->all(
             "cityScored",
-            $msg, [
+            $msg,
+            [
                 "city" => $city,
                 "row" => $cityhex->rc->row,
                 "col" => $cityhex->rc->col,
@@ -231,7 +235,8 @@ class Game extends \Bga\GameFramework\Table
         );
     }
 
-    public function stAutoScoringHexSelection(): void {
+    public function stAutoScoringHexSelection(): void
+    {
         $model = new Model($this->ps, $this->playerOnTurn());
         $rcs = $model->locationsRequiringScoring();
         if (count($rcs) == 0) {
@@ -242,13 +247,15 @@ class Game extends \Bga\GameFramework\Table
         $this->actSelectHexToScore($rc->row, $rc->col);
     }
 
-    public function argZigguratScoring(): array {
+    public function argZigguratScoring(): array
+    {
         return [
             "hex" => $this->rowColBeingScored(),
         ];
     }
 
-    public function stZigguratScoring(): void {
+    public function stZigguratScoring(): void
+    {
         $next_player_id = $this->nextPlayerToBeActive();
         if ($next_player_id != 0) {
             if ($next_player_id != $this->activePlayerId()) {
@@ -261,7 +268,8 @@ class Game extends \Bga\GameFramework\Table
         }
     }
 
-    public function argSelectZigguratCard(): array {
+    public function argSelectZigguratCard(): array
+    {
         $player_id = $this->activePlayerId();
         $model = new Model($this->ps, $player_id);
         $zcards = $model->components()->availableZigguratCards();
@@ -276,7 +284,8 @@ class Game extends \Bga\GameFramework\Table
         ];
     }
 
-    public function actSelectZigguratCard(string $zctype): void {
+    public function actSelectZigguratCard(string $zctype): void
+    {
         $player_id = $this->activePlayerId();
         $model = new Model($this->ps, $player_id);
         $selection =
@@ -312,13 +321,15 @@ class Game extends \Bga\GameFramework\Table
         $this->gamestate->nextState("cardSelected");
     }
 
-    public function argSelectHexToScore(): array {
+    public function argSelectHexToScore(): array
+    {
         $model = new Model($this->ps, $this->activePlayerId());
         $rcs = $model->locationsRequiringScoring();
         return ["hexes" => $rcs];
     }
 
-    public function actSelectHexToScore(int $row, int $col): void {
+    public function actSelectHexToScore(int $row, int $col): void
+    {
         $player_id = $this->activePlayerId();
         $model = new Model($this->ps, $player_id);
         $rc = new RowCol($row, $col);
@@ -354,7 +365,8 @@ class Game extends \Bga\GameFramework\Table
         }
     }
 
-    public function stEndOfTurnScoring(): void {
+    public function stEndOfTurnScoring(): void
+    {
         // TODO: automate when there is just one hex.
         $player_id = $this->activePlayerId();
         $player_on_turn = $this->playerOnTurn();
@@ -388,7 +400,8 @@ class Game extends \Bga\GameFramework\Table
         $this->gamestate->nextState("selectHex");
     }
 
-    public function stFinishTurn(): void {
+    public function stFinishTurn(): void
+    {
         $player_id = $this->activePlayerId();
         $player_on_turn = $this->playerOnTurn();
         if ($player_on_turn != 0) {
@@ -427,8 +440,12 @@ class Game extends \Bga\GameFramework\Table
             clienttranslate("You refilled your hand"),
             [
                 "player_id" => $player_id,
-                'hand' => array_map(function ($p) { return $p->value; },
-                                    $model->hand()->pieces()),
+                'hand' => array_map(
+                    function ($p) {
+                        return $p->value;
+                    },
+                    $model->hand()->pieces()
+                ),
             ]
         );
 
@@ -445,8 +462,8 @@ class Game extends \Bga\GameFramework\Table
 
         $this->setNextPlayerToBeActive(0);
 
-        if ($model->components()->
-            hasUnusedZigguratCard($player_id, ZigguratCardtype::EXTRA_TURN)) {
+        if ($model->components()->hasUnusedZigguratCard($player_id, ZigguratCardtype::EXTRA_TURN)
+        ) {
             $this->gamestate->nextState("extraTurn");
             return;
         }
@@ -454,7 +471,8 @@ class Game extends \Bga\GameFramework\Table
         $this->gamestate->nextState("nextPlayer");
     }
 
-    private function turnToNextPlayer(): void {
+    private function turnToNextPlayer(): void
+    {
         $this->activeNextPlayer();
         $player_id = $this->activePlayerId();
         Stats::PLAYER_NUMBER_TURNS->inc($player_id);
@@ -463,12 +481,14 @@ class Game extends \Bga\GameFramework\Table
         $this->setNextPlayerToBeActive(0);
     }
 
-    public function stNextPlayer() {
+    public function stNextPlayer()
+    {
         $this->turnToNextPlayer();
         $this->gamestate->nextState("done");
     }
 
-    public function actUndoPlay() {
+    public function actUndoPlay()
+    {
         $player_id = $this->activePlayerId();
         $model = new Model($this->ps, $player_id);
         $move = $model->undo();
@@ -480,10 +500,11 @@ class Game extends \Bga\GameFramework\Table
             Stats::PLAYER_FIELDS_CAPTURED->inc($player_id, -1);
         }
         if ($move->points() > 0) {
-            Stats::PLAYER_POINTS_FROM_FIELDS->
-                inc($player_id, -$move->field_points);
+            Stats::PLAYER_POINTS_FROM_FIELDS->inc($player_id, -$move->field_points);
             Stats::PLAYER_POINTS_FROM_ZIGGURATS->inc(
-                $player_id, -$move->ziggurat_points);
+                $player_id,
+                -$move->ziggurat_points
+            );
         }
 
         $args = [
@@ -498,16 +519,17 @@ class Game extends \Bga\GameFramework\Table
             "original_piece" => $move->original_piece->value,
         ];
 
-        $this->notify->player($this->activePlayerId(), "undoMoveActive", clienttranslate('${player_name} undid their move'), $args );
+        $this->notify->player($this->activePlayerId(), "undoMoveActive", clienttranslate('${player_name} undid their move'), $args);
         unset($args["handpos"]);
         unset($args["original_piece"]);
 
-        $this->notify->all("undoMove", clienttranslate('${player_name} undid their move'), $args );
+        $this->notify->all("undoMove", clienttranslate('${player_name} undid their move'), $args);
 
         $this->gamestate->nextState("playPieces");
     }
 
-    public function actChooseExtraTurn(bool $take_extra_turn) {
+    public function actChooseExtraTurn(bool $take_extra_turn)
+    {
         if ($take_extra_turn) {
             $player_id = $this->activePlayerId();
             $model = new Model($this->ps, $player_id);
@@ -544,32 +566,35 @@ class Game extends \Bga\GameFramework\Table
      */
     public function upgradeTableDb($from_version)
     {
-//       if ($from_version <= 1404301345)
-//       {
-//            // ! important ! Use DBPREFIX_<table_name> for all tables
-//
-//            $sql = "ALTER TABLE DBPREFIX_xxxxxxx ....";
-//            $this->applyDbUpgradeToAllDB( $sql );
-//       }
-//
-//       if ($from_version <= 1405061421)
-//       {
-//            // ! important ! Use DBPREFIX_<table_name> for all tables
-//
-//            $sql = "CREATE TABLE DBPREFIX_xxxxxxx ....";
-//            $this->applyDbUpgradeToAllDB( $sql );
-//       }
+        //       if ($from_version <= 1404301345)
+        //       {
+        //            // ! important ! Use DBPREFIX_<table_name> for all tables
+        //
+        //            $sql = "ALTER TABLE DBPREFIX_xxxxxxx ....";
+        //            $this->applyDbUpgradeToAllDB( $sql );
+        //       }
+        //
+        //       if ($from_version <= 1405061421)
+        //       {
+        //            // ! important ! Use DBPREFIX_<table_name> for all tables
+        //
+        //            $sql = "CREATE TABLE DBPREFIX_xxxxxxx ....";
+        //            $this->applyDbUpgradeToAllDB( $sql );
+        //       }
     }
 
-    private function currentPlayerId(): int {
+    private function currentPlayerId(): int
+    {
         return intval($this->getCurrentPlayerId());
     }
 
-    private function activePlayerId(): int {
+    private function activePlayerId(): int
+    {
         return intval($this->getActivePlayerId());
     }
 
-    private function rowColBeingScored(): ?RowCol {
+    private function rowColBeingScored(): ?RowCol
+    {
         $v = $this->getGameStateValue(Game::GLOBAL_ROW_COL_BEING_SCORED);
         if ($v == 0) {
             return null;
@@ -577,26 +602,34 @@ class Game extends \Bga\GameFramework\Table
         return RowCol::fromKey(intval($v));
     }
 
-    private function setRowColBeingScored(RowCol $rc) {
+    private function setRowColBeingScored(RowCol $rc)
+    {
         $this->setGameStateValue(Game::GLOBAL_ROW_COL_BEING_SCORED, $rc->asKey());
     }
 
-    private function playerOnTurn(): int {
+    private function playerOnTurn(): int
+    {
         return intval($this->getGameStateValue(Game::GLOBAL_PLAYER_ON_TURN));
     }
 
-    private function setPlayerOnTurn(int $player_id) {
+    private function setPlayerOnTurn(int $player_id)
+    {
         $this->setGameStateValue(Game::GLOBAL_PLAYER_ON_TURN, $player_id);
     }
 
-    private function nextPlayerToBeActive(): int {
+    private function nextPlayerToBeActive(): int
+    {
         return intval(
-            $this->getGameStateValue(Game::GLOBAL_NEXT_PLAYER_TO_BE_ACTIVE));
+            $this->getGameStateValue(Game::GLOBAL_NEXT_PLAYER_TO_BE_ACTIVE)
+        );
     }
 
-    private function setNextPlayerToBeActive(int $player_id) {
-        $this->setGameStateValue(Game::GLOBAL_NEXT_PLAYER_TO_BE_ACTIVE,
-                                 $player_id);
+    private function setNextPlayerToBeActive(int $player_id)
+    {
+        $this->setGameStateValue(
+            Game::GLOBAL_NEXT_PLAYER_TO_BE_ACTIVE,
+            $player_id
+        );
     }
 
 
@@ -642,19 +675,26 @@ class Game extends \Bga\GameFramework\Table
 
         return [
             'player_data' => $player_data,
-            'hand' => array_map(function ($p) { return $p->value; },
-                                $model->hand()->pieces()),
+            'hand' => array_map(
+                function ($p) {
+                    return $p->value;
+                },
+                $model->hand()->pieces()
+            ),
             'board' => $board_data,
             'current_scoring_hex' => $this->rowColBeingScored(),
             'ziggurat_cards' =>
-                array_map(
-                    function ($z) { return [
+            array_map(
+                function ($z) {
+                    return [
                         "type" => $z->type->value,
                         "owning_player_id" => $z->owning_player_id,
                         "used" => $z->used,
                         "tooltip" => $z->type->tooltip(),
-                    ]; },
-                    $model->components()->allZigguratCards()),
+                    ];
+                },
+                $model->components()->allZigguratCards()
+            ),
         ];
     }
 
@@ -671,7 +711,8 @@ class Game extends \Bga\GameFramework\Table
     /**
      * @param $arr string[]
      */
-    private function shuffle(&$arr): void {
+    private function shuffle(&$arr): void
+    {
         $e = sizeof($arr) - 1;
         for ($i = 0; $i < $e; ++$i) {
             $j = random_int($i, $e);
@@ -725,13 +766,15 @@ class Game extends \Bga\GameFramework\Table
         $model = new Model($this->ps, 0);
         $model->createNewGame(
             array_keys($players),
-            $this->optionEnabled(TableOption::ADVANCED_ZIGGURAT_CARDS));
+            $this->optionEnabled(TableOption::ADVANCED_ZIGGURAT_CARDS)
+        );
 
         // Activate first player once everything has been initialized and ready.
         $this->turnToNextPlayer();
     }
 
-    private function optionEnabled(TableOption $option): bool {
+    private function optionEnabled(TableOption $option): bool
+    {
         return $this->tableOptions->get($option->value) > 0;
     }
 
@@ -761,26 +804,24 @@ class Game extends \Bga\GameFramework\Table
 
         if ($state["type"] === "activeplayer") {
             switch ($state_name) {
-                case 'selectHexToScore':
-                {
-                    // If a player goes zombie when they are on turn
-                    // and have surrounded one or more ziggurats / cities.
-                    // the game cannot progress properly. So choose one
-                    // randomly.
-                    $player_id = $this->activePlayerId();
-                    $model = new Model($this->ps, $player_id);
-                    $rcs = $model->locationsRequiringScoring();
-                    if (count($rcs) > 0) {
-                        $rc = array_shift($rcs);
-                        $this->actSelectHexToScore($rc->row, $rc->col);
+                case 'selectHexToScore': {
+                        // If a player goes zombie when they are on turn
+                        // and have surrounded one or more ziggurats / cities.
+                        // the game cannot progress properly. So choose one
+                        // randomly.
+                        $player_id = $this->activePlayerId();
+                        $model = new Model($this->ps, $player_id);
+                        $rcs = $model->locationsRequiringScoring();
+                        if (count($rcs) > 0) {
+                            $rc = array_shift($rcs);
+                            $this->actSelectHexToScore($rc->row, $rc->col);
+                        }
+                        break;
                     }
-                    break;
-                }
-                default:
-                {
-                    $this->gamestate->nextState("zombiePass");
-                    break;
-                }
+                default: {
+                        $this->gamestate->nextState("zombiePass");
+                        break;
+                    }
             }
 
             return;

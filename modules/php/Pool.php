@@ -1,4 +1,5 @@
 <?php
+
 /**
  *------
  * BGA framework: Gregory Isabelli & Emmanuel Colin & BoardGameArena
@@ -26,12 +27,14 @@ declare(strict_types=1);
 
 namespace Bga\Games\babylonia;
 
-class Pool {
+class Pool
+{
 
     /** @param Piece[] $pieces */
-    public function __construct(private array $pieces) { }
+    public function __construct(private array $pieces) {}
 
-    public static function new(): Pool {
+    public static function new(): Pool
+    {
         $pieces = [];
         for ($i = 0; $i < 6; $i++) {
             $pieces[] = Piece::PRIEST;
@@ -44,24 +47,26 @@ class Pool {
     }
 
     /** @return array<Piece> */
-    public function pieces(): array {
+    public function pieces(): array
+    {
         return $this->pieces;
     }
 
-    public function isEmpty(): bool {
+    public function isEmpty(): bool
+    {
         return $this->size() == 0;
     }
 
-    public function size(): int {
+    public function size(): int
+    {
         return count($this->pieces);
     }
 
-    public function take(): Piece {
-        $ix = random_int(0, count($this->pieces)-1);
+    public function take(): Piece
+    {
+        $ix = random_int(0, count($this->pieces) - 1);
         $result = $this->pieces[$ix];
         array_splice($this->pieces, $ix, 1);
         return $result;
     }
 }
-
-?>

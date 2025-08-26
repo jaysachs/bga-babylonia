@@ -1,4 +1,5 @@
 <?php
+
 /**
  *------
  * BGA framework: Gregory Isabelli & Emmanuel Colin & BoardGameArena
@@ -26,56 +27,68 @@ declare(strict_types=1);
 
 namespace Bga\Games\babylonia;
 
-class RowCol {
+class RowCol
+{
 
-    public function __toString(): string {
+    public function __toString(): string
+    {
         return sprintf("%d:%d", $this->row, $this->col);
     }
 
-    public function equals(RowCol $other): bool {
+    public function equals(RowCol $other): bool
+    {
         return $this->row == $other->row && $this->col == $other->col;
     }
 
-    public function __construct(public readonly int $row,
-                                public readonly int $col) { }
+    public function __construct(
+        public readonly int $row,
+        public readonly int $col
+    ) {}
 
-    public function north(): RowCol {
-        return new RowCol($this->row-2, $this->col);
+    public function north(): RowCol
+    {
+        return new RowCol($this->row - 2, $this->col);
     }
 
-    public function northwest(): RowCol {
-        return new RowCol($this->row-1, $this->col-1);
+    public function northwest(): RowCol
+    {
+        return new RowCol($this->row - 1, $this->col - 1);
     }
 
-    public function northeast(): RowCol {
-        return new RowCol($this->row-1, $this->col+1);
+    public function northeast(): RowCol
+    {
+        return new RowCol($this->row - 1, $this->col + 1);
     }
 
-    public function south(): RowCol {
-        return new RowCol($this->row+2, $this->col);
+    public function south(): RowCol
+    {
+        return new RowCol($this->row + 2, $this->col);
     }
 
-    public function southwest(): RowCol {
-        return new RowCol($this->row+1, $this->col-1);
+    public function southwest(): RowCol
+    {
+        return new RowCol($this->row + 1, $this->col - 1);
     }
 
-    public function southeast(): RowCol {
-        return new RowCol($this->row+1, $this->col+1);
+    public function southeast(): RowCol
+    {
+        return new RowCol($this->row + 1, $this->col + 1);
     }
 
-    public function isNeighbor(RowCol $rc): bool {
+    public function isNeighbor(RowCol $rc): bool
+    {
         $cd = abs($this->col - $rc->col);
         $rd = abs($this->row - $rc->row);
         return $cd == 1 && $rd == 1 || $cd == 0 && $rd == 2;
     }
 
-    public function asKey(): int {
+    public function asKey(): int
+    {
         return $this->row * 100000 + $this->col;
     }
 
-    public static function fromKey(int $key): RowCol {
+    public static function fromKey(int $key): RowCol
+    {
         return new RowCol(intval($key / 100000), $key % 100000);
     }
- }
-
-?>
+}

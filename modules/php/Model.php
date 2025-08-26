@@ -1,4 +1,5 @@
 <?php
+
 /**
  *------
  * BGA framework: Gregory Isabelli & Emmanuel Colin & BoardGameArena
@@ -26,7 +27,8 @@ declare(strict_types=1);
 
 namespace Bga\Games\babylonia;
 
-class Model {
+class Model
+{
 
     private ?Board $_board = null;
     private ?TurnProgress $_turn_progress = null;
@@ -37,10 +39,11 @@ class Model {
     private ?Components $_components = null;
     private ?Scorer $_scorer = null;
 
-    public function __construct(private PersistentStore $ps, private int $player_id) { }
+    public function __construct(private PersistentStore $ps, private int $player_id) {}
 
     /** @param int[] $player_ids */
-    public function createNewGame(array $player_ids, bool $use_advanced_ziggurats): void {
+    public function createNewGame(array $player_ids, bool $use_advanced_ziggurats): void
+    {
         $this->_board = Board::forPlayerCount(count($player_ids));
         $this->ps->insertBoard($this->_board);
 
@@ -55,17 +58,21 @@ class Model {
         $this->ps->insertComponents($this->_components);
     }
 
-    private function scorer(): Scorer {
+    private function scorer(): Scorer
+    {
         if ($this->_scorer == null) {
             $this->_scorer =
-                new Scorer($this->board(),
-                           $this->allPlayerInfo(),
-                           $this->components());
+                new Scorer(
+                    $this->board(),
+                    $this->allPlayerInfo(),
+                    $this->components()
+                );
         }
         return $this->_scorer;
     }
 
-    public function components(): Components {
+    public function components(): Components
+    {
         if ($this->_components == null) {
             $this->_components = $this->ps->retrieveComponents();
         }
@@ -73,7 +80,8 @@ class Model {
     }
 
     /** @return array<int,PlayerInfo> */
-    public function &allPlayerInfo(): array {
+    public function &allPlayerInfo(): array
+    {
         if ($this->_allPlayerInfo == null) {
             $this->_allPlayerInfo = $this->ps->retrieveAllPlayerInfo();
         }
@@ -81,43 +89,50 @@ class Model {
     }
 
     /** @return int[] */
-    public function allPlayerIds(): array {
+    public function allPlayerIds(): array
+    {
         return array_keys($this->allPlayerInfo());
     }
 
-    public function hand(): Hand {
+    public function hand(): Hand
+    {
         if ($this->_hand == null) {
             $this->_hand = $this->ps->retrieveHand($this->player_id);
         }
         return $this->_hand;
     }
 
-    public function pool(): Pool {
+    public function pool(): Pool
+    {
         if ($this->_pool == null) {
             $this->_pool = $this->ps->retrievePool($this->player_id);
         }
         return $this->_pool;
     }
 
-    public function board(): Board {
+    public function board(): Board
+    {
         if ($this->_board == null) {
             $this->_board = $this->ps->retrieveBoard();
         }
         return $this->_board;
     }
 
-    public function canUndo(): bool {
+    public function canUndo(): bool
+    {
         return $this->turnProgress()->canUndo();
     }
 
-    private function turnProgress(): TurnProgress {
+    private function turnProgress(): TurnProgress
+    {
         if ($this->_turn_progress == null) {
             $this->_turn_progress = $this->ps->retrieveTurnProgress($this->player_id);
         }
         return $this->_turn_progress;
     }
 
-    public function isPlayAllowed(Piece $piece, Hex $hex): bool {
+    public function isPlayAllowed(Piece $piece, Hex $hex): bool
+    {
         if ($hex->piece->isField()) {
             if ($piece->isFarmer()) {
                 // ensure player has at least one noble adjacent.
@@ -129,11 +144,12 @@ class Model {
                     return false;
                 }
             } else if (!$this->components()->hasUnusedZigguratCard(
-                $this->player_id, ZigguratCardType::NOBLES_IN_FIELDS)) {
+                $this->player_id,
+                ZigguratCardType::NOBLES_IN_FIELDS
+            )) {
                 return false;
             }
-        }
-        else if ($hex->piece != Piece::EMPTY) {
+        } else if ($hex->piece != Piece::EMPTY) {
             return false;
         }
 
@@ -152,20 +168,26 @@ class Model {
         if ($piece->isFarmer()) {
             return !$non_land_farmer_played;
         }
-        if (!$non_land_farmer_played
+        if (
+            !$non_land_farmer_played
             && count($this->turnProgress()->moves) >= 3
             && $this->components()->hasUnusedZigguratCard(
                 $this->player_id,
-                ZigguratCardType::NOBLE_WITH_3_FARMERS)) {
+                ZigguratCardType::NOBLE_WITH_3_FARMERS
+            )
+        ) {
             return true;
         }
 
         $nobles_played = $this->turnProgress()->uniqueNoblesPlayed();
-        if (count($nobles_played) == 2
+        if (
+            count($nobles_played) == 2
             && !in_array($piece, $nobles_played)
             && $this->components()->hasUnusedZigguratCard(
                 $this->player_id,
-                ZigguratCardType::NOBLES_3_KINDS)) {
+                ZigguratCardType::NOBLES_3_KINDS
+            )
+        ) {
             return true;
         }
 
@@ -178,10 +200,11 @@ class Model {
      *
      * @return RowCol[]
      */
-    public function getAllowedMoves(): array {
+    public function getAllowedMoves(): array
+    {
         $result = [];
         $hand = $this->hand();
-        $this->board()->visitAll(function (Hex $hex) use (&$result, &$hand) :void {
+        $this->board()->visitAll(function (Hex $hex) use (&$result, &$hand): void {
             foreach (Piece::playerPieces() as $piece) {
                 if ($hand->contains($piece)) {
                     if ($this->isPlayAllowed($piece, $hex)) {
@@ -196,7 +219,8 @@ class Model {
         return $result;
     }
 
-    public function playPiece(int $handpos, RowCol $rc): ElaboratedMove {
+    public function playPiece(int $handpos, RowCol $rc): ElaboratedMove
+    {
         // also retrieve ziggurat cards held
 
         $piece = $this->hand()->play($handpos);
@@ -216,15 +240,18 @@ class Model {
         $ziggurats = [];
         // score field
         switch ($hexPiece) {
-        case Piece::FIELD_5:
-            $field_points = 5; break;
-        case Piece::FIELD_6:
-            $field_points = 6; break;
-        case Piece::FIELD_7:
-            $field_points = 7; break;
-        case Piece::FIELD_CITIES:
-            $field_points = $this->totalCapturedCities();
-            break;
+            case Piece::FIELD_5:
+                $field_points = 5;
+                break;
+            case Piece::FIELD_6:
+                $field_points = 6;
+                break;
+            case Piece::FIELD_7:
+                $field_points = 7;
+                break;
+            case Piece::FIELD_CITIES:
+                $field_points = $this->totalCapturedCities();
+                break;
         }
         $zigs = $this->board()->neighbors($hex, function (Hex $h): bool {
             return $h->piece == Piece::ZIGGURAT;
@@ -232,9 +259,17 @@ class Model {
         if (count($zigs) > 0) {
             $ziggurats = $this->board()->touchedZiggurats($this->player_id);
         }
-        $move = new ElaboratedMove($this->player_id, $piece, $originalPiece,
-                                   $handpos, $rc, $hexPiece, $field_points,
-                                   count($ziggurats), $ziggurats);
+        $move = new ElaboratedMove(
+            $this->player_id,
+            $piece,
+            $originalPiece,
+            $handpos,
+            $rc,
+            $hexPiece,
+            $field_points,
+            count($ziggurats),
+            $ziggurats
+        );
         $this->turnProgress()->addMove($move);
 
         // update the database
@@ -253,7 +288,8 @@ class Model {
         return $move;
     }
 
-    private function totalCapturedCities(): int {
+    private function totalCapturedCities(): int
+    {
         $result = 0;
         foreach ($this->allPlayerInfo() as $_ => $pi) {
             $result += $pi->captured_city_count;
@@ -261,25 +297,30 @@ class Model {
         return $result;
     }
 
-    private function refill(Hand $hand, Pool $pool): void {
+    private function refill(Hand $hand, Pool $pool): void
+    {
         while ($hand->size() < $hand->limit() && !$pool->isEmpty()) {
             $hand->replenish($pool->take());
         }
     }
 
-    private function refillHand(): void {
+    private function refillHand(): void
+    {
         $this->refill($this->hand(), $this->pool());
     }
 
     /* return true if game should end */
-    public function finishTurn(): TurnResult {
+    public function finishTurn(): TurnResult
+    {
         $hand = $this->hand();
         $this->refillHand();
         $this->ps->upsertHand($this->player_id, $hand);
         $this->ps->upsertPool($this->player_id, $this->pool());
 
-        $result = new TurnResult($hand->size() == 0,
-                                 $this->board()->cityCount() <= 1);
+        $result = new TurnResult(
+            $hand->size() == 0,
+            $this->board()->cityCount() <= 1
+        );
         if ($result->gameOver()) {
             $this->resolveAnyTies();
             return $result;
@@ -289,24 +330,26 @@ class Model {
         return $result;
     }
 
-    private function resolveAnyTies(): void {
+    private function resolveAnyTies(): void
+    {
         $infos = array_values($this->allPlayerInfo());
         usort($infos, function (PlayerInfo $i1, PlayerInfo $i2): int {
             return $i1->score - $i2->score;
         });
-        $aux_scores=[];
+        $aux_scores = [];
         for ($i = 1; $i < count($infos); $i++) {
-            if ($infos[$i]->score == $infos[$i-1]->score) {
+            if ($infos[$i]->score == $infos[$i - 1]->score) {
                 $aux_scores[$infos[$i]->player_id] =
                     $infos[$i]->captured_city_count;
-                $aux_scores[$infos[$i-1]->player_id] =
-                    $infos[$i-1]->captured_city_count;
+                $aux_scores[$infos[$i - 1]->player_id] =
+                    $infos[$i - 1]->captured_city_count;
             }
         }
         $this->ps->updateAuxScores($aux_scores);
     }
 
-    public function scoreZiggurat(RowCol $rc): HexWinner {
+    public function scoreZiggurat(RowCol $rc): HexWinner
+    {
         $hex = $this->board()->hexAt($rc);
         if (!$hex->piece->isZiggurat()) {
             throw new \InvalidArgumentException("Attempt to score non-ziggurat {$hex} as a ziggurat");
@@ -324,7 +367,8 @@ class Model {
         return $this->scorer()->computeHexWinner($hex);
     }
 
-    public function scoreCity(RowCol $rc): ScoredCity {
+    public function scoreCity(RowCol $rc): ScoredCity
+    {
         $hex = $this->board()->hexAt($rc);
         if (!$hex->piece->isCity()) {
             throw new \InvalidArgumentException("Attempt to score non-city {$hex} as a city");
@@ -354,7 +398,8 @@ class Model {
     }
 
     /** @return RowCol[] */
-    public function locationsRequiringScoring(): array {
+    public function locationsRequiringScoring(): array
+    {
         $result = [];
         $val = function (Hex $hex): int {
             // order is:
@@ -393,21 +438,27 @@ class Model {
                 }
             }
         );
-        usort($result,
-              /**
-               * @param array{0:RowCol,1:int} $a
-               * @param array{0:RowCol,1:int} $b
-               */
-              function (array $a, array $b): int {
-                  return $a[1] - $b[1];
-              });
+        usort(
+            $result,
+            /**
+             * @param array{0:RowCol,1:int} $a
+             * @param array{0:RowCol,1:int} $b
+             */
+            function (array $a, array $b): int {
+                return $a[1] - $b[1];
+            }
+        );
         /** @param array{0:RowCol,1:int} $a */
-        return array_map(function (array $a): RowCol { return $a[0]; }, $result);
+        return array_map(function (array $a): RowCol {
+            return $a[0];
+        }, $result);
     }
 
-    private function hexRequiresScoring(Hex $hex): bool {
+    private function hexRequiresScoring(Hex $hex): bool
+    {
         if (($hex->piece->isZiggurat() && !$hex->scored)
-            || $hex->piece->isCity()) {
+            || $hex->piece->isCity()
+        ) {
             $missing = $this->board()->neighbors(
                 $hex,
                 function (Hex $nh): bool {
@@ -420,14 +471,16 @@ class Model {
         return false;
     }
 
-    public function canEndTurn(): bool {
+    public function canEndTurn(): bool
+    {
         // NOTE: could check that there allowed moves but given the
         // board size and piece count, there are always allowed moves.
         return count($this->turnProgress()->moves) >= 2
             || $this->hand()->size() == 0;
     }
 
-    public function selectZigguratCard(ZigguratCardType $card_type): ZigguratCardSelection {
+    public function selectZigguratCard(ZigguratCardType $card_type): ZigguratCardSelection
+    {
         $card = $this->components()->takeCard($this->player_id, $card_type);
         $points = 0;
         if ($card_type == ZigguratCardType::PLUS_10) {
@@ -444,7 +497,8 @@ class Model {
         return new ZigguratCardSelection($card, $points);
     }
 
-    public function useExtraTurnCard(): void {
+    public function useExtraTurnCard(): void
+    {
         $card = $this->components()->getOwnedCard($this->player_id, ZigguratCardType::EXTRA_TURN);
         if ($card == null) {
             throw new \InvalidArgumentException(ZigguratCardType::EXTRA_TURN->value . " is not owned by $this->player_id");
@@ -456,12 +510,14 @@ class Model {
         $this->ps->updateZigguratCard($card);
     }
 
-    public function undo(): Move {
+    public function undo(): Move
+    {
         $tp = $this->turnProgress();
         $move = $tp->undoLastMove();
         if ($move->player_id != $this->player_id) {
             throw new \InvalidArgumentException(
-                "Move $move is not for player $this->player_id");
+                "Move $move is not for player $this->player_id"
+            );
         }
         $this->ps->deleteSingleMove($move);
         $this->ps->updateHex($move->rc, $move->captured_piece, 0);
@@ -473,5 +529,3 @@ class Model {
         return $move;
     }
 }
-
-?>

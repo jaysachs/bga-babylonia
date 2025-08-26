@@ -1,4 +1,5 @@
 <?php
+
 /**
  *------
  * BGA framework: Gregory Isabelli & Emmanuel Colin & BoardGameArena
@@ -26,10 +27,14 @@ declare(strict_types=1);
 
 namespace Bga\Games\babylonia;
 
-class Components {
-    public static function forNewGame(bool $use_advanced_ziggurats): Components {
+class Components
+{
+    public static function forNewGame(bool $use_advanced_ziggurats): Components
+    {
         $cards = array_map(
-            function (ZigguratCardType $z) { return new ZigguratCard($z); },
+            function (ZigguratCardType $z) {
+                return new ZigguratCard($z);
+            },
             ZigguratCardType::sevenTypes($use_advanced_ziggurats)
         );
         return new Components($cards);
@@ -37,10 +42,10 @@ class Components {
 
 
     /** @param ZigguratCard[] $ziggurat_cards */
-    public function __construct(private array $ziggurat_cards) {
-    }
+    public function __construct(private array $ziggurat_cards) {}
 
-    public function getOwnedCard(int $player_id, ZigguratCardType $type): ?ZigguratCard {
+    public function getOwnedCard(int $player_id, ZigguratCardType $type): ?ZigguratCard
+    {
         foreach ($this->ziggurat_cards as $card) {
             if ($card->type == $type && $player_id == $card->owning_player_id) {
                 return $card;
@@ -50,16 +55,19 @@ class Components {
     }
 
     /** @return ZigguratCard[] */
-    public function &allZigguratCards(): array {
+    public function &allZigguratCards(): array
+    {
         return $this->ziggurat_cards;
     }
 
     /** @return ZigguratCard[] */
-    public function availableZigguratCards(): array {
+    public function availableZigguratCards(): array
+    {
         return $this->zigguratCardsOwnedBy(0);
     }
 
-    public function hasUnusedZigguratCard(int $player_id, ZigguratCardType $type): bool {
+    public function hasUnusedZigguratCard(int $player_id, ZigguratCardType $type): bool
+    {
         $card = $this->getOwnedCard($player_id, $type);
         if ($card == null) {
             return false;
@@ -67,7 +75,8 @@ class Components {
         return !$card->used;
     }
 
-    public function zigguratCardOwner(ZigguratCardType $type): int /* player_id */ {
+    public function zigguratCardOwner(ZigguratCardType $type): int /* player_id */
+    {
         foreach ($this->ziggurat_cards as $zc) {
             if ($zc->type == $type) {
                 return $zc->owning_player_id;
@@ -77,18 +86,20 @@ class Components {
     }
 
     /** @return ZigguratCard[] */
-    public function zigguratCardsOwnedBy(int $player_id): array {
+    public function zigguratCardsOwnedBy(int $player_id): array
+    {
         return array_values(
             array_filter(
                 $this->ziggurat_cards,
-                function (ZigguratCard $z) use($player_id) {
+                function (ZigguratCard $z) use ($player_id) {
                     return $z->owning_player_id == $player_id;
                 }
             )
         );
     }
 
-    public function takeCard(int $player_id, ZigguratCardType $type): ZigguratCard {
+    public function takeCard(int $player_id, ZigguratCardType $type): ZigguratCard
+    {
         foreach ($this->allZigguratCards() as &$card) {
             if ($card->type == $type) {
                 if ($card->owning_player_id != 0) {
@@ -104,4 +115,3 @@ class Components {
         throw new \InvalidArgumentException("Ziggurat card $type->value not found");
     }
 }
-?>
