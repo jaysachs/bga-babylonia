@@ -15,4 +15,5 @@
 15. Tooltips for cities (and fields) showing the points that would be scored for it.
 16. ~~ONLY IF REQUESTED User preferences for autoconfirm?~~
 17. ~~NOT MY BUG Game option to permit undo? Only undo on turn-based? Change undo to full-turn undo and implement turns client side? (Or even still use server-side and merge pending actions for the active player?)~~
-18. When choosing zcards, change status to something like "Select card .... [confirm] [cancel]". (Maybe re-use log formatting for zcards).
+18.~~DONE When choosing zcards, change status to something like "Select card .... [confirm] [cancel]". (Maybe re-use log formatting for zcards).~~
+19. For zcards in log and status bar, make more readable and/or add tooltips.
