@@ -573,3 +573,11 @@ div.bbl_pb_zcards>div {
     font-size: 72;
     /* text-shadow: '-2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000, 2px 2px 0 #000'; */
 }
+
+
+#pagemaintitletext .log-element[bbl_ztype] {
+    display: inline-block;
+    height: 5.0em;
+    width: 3.33em;
+    vertical-align: middle;
+}
