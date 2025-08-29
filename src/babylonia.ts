@@ -167,9 +167,9 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
   }
 
   private setupHandlers(): void {
-    this.addPausableHandler($(IDS.HAND), 'click', this.onHandClicked.bind(this));
-    this.addPausableHandler($(IDS.BOARD), 'click', this.onBoardClicked.bind(this));
-    this.addPausableHandler($(IDS.AVAILABLE_ZCARDS), 'click', this.onZcardClicked.bind(this));
+    $(IDS.HAND).addEventListener('click', this.onHandClicked.bind(this));
+    $(IDS.BOARD).addEventListener('click', this.onBoardClicked.bind(this));
+    $(IDS.AVAILABLE_ZCARDS).addEventListener('click', this.onZcardClicked.bind(this));
   }
 
   override setup(gamedatas: BGamedatas) {
@@ -418,9 +418,11 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
     switch (this.currentState) {
       case 'client_pickHexToPlay':
         this.playSelectedPiece(event);
+        this.setClientState('client_hexpicked', {});
         break;
       case 'selectHexToScore':
         this.selectHexToScore(event);
+        this.setClientState('client_hexpicked', {});
         break;
     }
     return false;
@@ -472,11 +474,9 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
     event.preventDefault();
     event.stopPropagation();
     if (!this.isCurrentPlayerActive()) {
-      console.log("not active player");
       return false;
     }
     if (this.currentState != 'selectZigguratCard') {
-      console.log("not in selectZigguratCard state");
       return false;
     }
 
@@ -583,7 +583,7 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
     if (this.playStateArgs.canUndo) {
       this.statusBar.addActionButton(
         _('Undo'),
-        () => this.bgaPerformAction('actUndoPlay')
+        () => { this.setClientState('client_undo', { }); this.bgaPerformAction('actUndoPlay'); }
       );
     }
   }

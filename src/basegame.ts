@@ -11,7 +11,6 @@ GameGui = /** @class */ (function () {
 class BaseGame<T extends Gamedatas> extends GameGui<T> {
   protected currentState: string | null;
   protected animationManager: AnimationManager;
-  protected animating = false;
   private pendingUpdate: boolean;
   private currentPlayerWasActive: boolean;
 
@@ -34,8 +33,13 @@ class BaseGame<T extends Gamedatas> extends GameGui<T> {
     });
   }
 
+  override bgaPerformAction(action: string, args?: any, params?: { lock?: boolean; checkAction?: boolean; checkPossibleActions?: boolean; }): Promise<any> {
+    console.debug("action", action, args);
+    return (this as any).inherited(arguments).then(() => console.debug("action completed", action, args));
+  }
+
   override onEnteringState(stateName: string, args: any) {
-    // console.debug('onEnteringState: ' + stateName, args, this.debugStateInfo());
+    console.debug('onEnteringState: ' + stateName, args, this.debugStateInfo());
     this.currentState = stateName;
     // Call appropriate method
     args = args ? args.args : null; // this method has extra wrapper for args for some reason
@@ -57,12 +61,12 @@ class BaseGame<T extends Gamedatas> extends GameGui<T> {
     if (this.currentState != stateName) {
       // delay firing this until onEnteringState is called so they always called in same order
       this.pendingUpdate = true;
-      // console.debug('   DELAYED onUpdateActionButtons');
+      console.debug('   DELAYED onUpdateActionButtons');
       return;
     }
     this.pendingUpdate = false;
     if (gameui.isCurrentPlayerActive() && this.currentPlayerWasActive == false) {
-      // console.debug('onUpdateActionButtons: ' + stateName, args, this.debugStateInfo());
+      console.debug('onUpdateActionButtons: ' + stateName, args, this.debugStateInfo());
       this.currentPlayerWasActive = true;
       // Call appropriate method
       this.callfn('onUpdateActionButtons_' + stateName, args);
@@ -73,18 +77,12 @@ class BaseGame<T extends Gamedatas> extends GameGui<T> {
 
   // utils
   debugStateInfo(): any {
-    var iscurac = gameui.isCurrentPlayerActive();
-    var replayMode = false;
-    if (typeof g_replayFrom != 'undefined') {
-      replayMode = true;
-    }
-    var instantaneousMode = gameui.instantaneousMode ? true : false;
-    var res = {
-      isCurrentPlayerActive: iscurac,
-      instantaneousMode: instantaneousMode,
-      replayMode: replayMode,
-    };
-    return res;
+    return "";
+    // return {
+    //   isCurrentPlayerActive: gameui.isCurrentPlayerActive(),
+    //   instantaneousMode: gameui.instantaneousMode,
+    //   replayMode: typeof g_replayFrom != 'undefined',
+    // };
   }
 
   createHtml(divstr: string, location?: string): HTMLElement {
@@ -113,10 +111,6 @@ class BaseGame<T extends Gamedatas> extends GameGui<T> {
     return undefined;
   }
 
-  protected addPausableHandler(et: EventTarget, type: string, handler: (a: Event) => boolean): void {
-    et.addEventListener(type, (e: Event) => { if (this.animating) return true; return handler(e); });
-  }
-
   protected slideTemp(fromId: string, toId: string,
     settings: {
       attrs?: Record<string, string> | null;
@@ -126,13 +120,12 @@ class BaseGame<T extends Gamedatas> extends GameGui<T> {
     const div = this.createDiv(settings);
     const from = document.getElementById(fromId);
     const to = document.getElementById(toId);
-    this.animating = true;
     return this.animationManager.slideFloatingElement(div, from!, to!,
       {
         duration: settings.duration || 700,
         ignoreScale: true,
         ignoreRotation: true,
-      }).then(() => { this.animating = false; });
+      });
   }
 
   protected createDiv(settings: {
