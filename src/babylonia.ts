@@ -380,6 +380,7 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
     if (hex == null) {
       return;
     }
+    this.setClientState('client_hexpicked', {});
     // console.log('selected hex ' + hex.row + ',' + hex.col);
     this.bgaPerformAction('actSelectHexToScore', hex).then(() => {
     });
@@ -398,6 +399,7 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
     }
     // console.log('selected hex ' + hex.row + ',' + hex.col);
 
+    this.setClientState('client_hexpicked', {});
     this.bgaPerformAction('actPlayPiece', {
       handpos: this.selectedHandPos,
       row: hex.row,
@@ -418,11 +420,9 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
     switch (this.currentState) {
       case 'client_pickHexToPlay':
         this.playSelectedPiece(event);
-        this.setClientState('client_hexpicked', {});
         break;
       case 'selectHexToScore':
         this.selectHexToScore(event);
-        this.setClientState('client_hexpicked', {});
         break;
     }
     return false;
