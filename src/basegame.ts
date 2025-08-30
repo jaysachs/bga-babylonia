@@ -90,7 +90,7 @@ class BaseGame<T extends Gamedatas> extends GameGui<T> {
     tempHolder.innerHTML = divstr;
     const div = tempHolder.firstElementChild!;
     if (location) {
-      document.getElementById(location)?.appendChild(div);
+      $(location).appendChild(div);
     }
     return div as HTMLElement;
   }
@@ -117,10 +117,7 @@ class BaseGame<T extends Gamedatas> extends GameGui<T> {
       className?: string | null;
       duration?: number | null;
     }): Promise<void> {
-    const div = this.createDiv(settings);
-    const from = document.getElementById(fromId);
-    const to = document.getElementById(toId);
-    return this.animationManager.slideFloatingElement(div, from!, to!,
+    return this.animationManager.slideFloatingElement(this.createDiv(settings), $(fromId), $(toId),
       {
         duration: settings.duration || 700,
         ignoreScale: true,
@@ -137,7 +134,7 @@ class BaseGame<T extends Gamedatas> extends GameGui<T> {
     if (settings.id) {
       div.id = settings.id;
     }
-    // document.getElementById(IDS.BOARD)!.appendChild(div);
+    // $(IDS.BOARD).appendChild(div);
     if (settings.className) {
       div.className = settings.className;
     }

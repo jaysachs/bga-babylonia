@@ -978,7 +978,7 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
 
     console.log("notif_cityScored", args);
 
-    const hex = document.getElementById(IDS.hexDiv(args))!;
+    const hex = $(IDS.hexDiv(args));
 
     let aa = this.bgaAnimationsActive();
     for (const playerId in args.details) {
