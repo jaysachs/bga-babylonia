@@ -154,7 +154,7 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
   private handCounters: Counter[] = [];
   private poolCounters: Counter[] = [];
   private cityCounters: Counter[] = [];
-  private zcards: Zcard[] = [];
+  private allZcards: Zcard[] = [];
   private selectedHandPos: number | null = null;
   private playStateArgs: PlayState | null = null;
   private html: Html = new Html({});
@@ -235,8 +235,8 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
 
   private setupAvailableZcards(zcards: Zcard[]): void {
     console.log('Setting up available ziggurat cards', zcards);
-    this.zcards = zcards;
-    for (let zcard of this.zcards) {
+    this.allZcards = zcards;
+    for (let zcard of this.allZcards) {
       const id = IDS.availableZcard(zcard.type);
       const ztype = zcard.used ? 'used' : zcard.type;
       if (zcard.owning_player_id != 0) {
@@ -257,7 +257,7 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
   }
 
   private zcardForType(cardType: string): Zcard {
-    for (let z of this.zcards) {
+    for (let z of this.allZcards) {
       if (z.type == cardType) {
         return z;
       }
@@ -266,7 +266,7 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
   }
 
   private setupGameHtml(): void {
-    $('game_play_area').insertAdjacentHTML('beforeend', this.html.base_html());
+    this.getGameAreaElement().insertAdjacentHTML('beforeend', this.html.base_html());
   }
 
   private updateCounter(counter: Counter, value: number, animate: boolean) {
