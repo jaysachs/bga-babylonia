@@ -150,7 +150,6 @@ interface PlayState {
 
 /** Game class */
 class BabyloniaGame extends BaseGame<BGamedatas> {
-  private hand: string[] = [];
   private handCounters: Counter[] = [];
   private poolCounters: Counter[] = [];
   private cityCounters: Counter[] = [];
@@ -163,7 +162,6 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
   constructor() {
     super();
     this.handCounters = [];
-    this.hand = [];
   }
 
   private setupHandlers(): void {
@@ -192,8 +190,7 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
     }
 
     console.log('setting up player hand');
-    this.hand = gamedatas.hand;
-    this.renderHand();
+    this.renderHand(gamedatas.hand);
 
     this.setupAvailableZcards(gamedatas.ziggurat_cards);
 
@@ -347,9 +344,9 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
     this.setPiece(this.hexDiv(rc), piece, playerId);
   }
 
-  private renderHand(): void {
-    for (let i = 0; i < this.hand.length; ++i) {
-      this.setPiece(this.handPosDiv(i), this.hand[i]!, this.player_id);
+  private renderHand(hand: string[]): void {
+    for (let i = 0; i < hand.length; ++i) {
+      this.setPiece(this.handPosDiv(i), hand[i]!, this.player_id);
     }
   }
 
@@ -489,8 +486,13 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
     return false;
   }
 
+  private pieceType(attr: string): string {
+    return attr.split('_')[0]!;
+  }
+
   private allowedMovesFor(pos: number): RowCol[] {
-    const piece = this.hand[pos]!;
+    const hand = $(IDS.HAND);
+    const piece = this.pieceType(hand.children[pos]!.getAttribute(Attrs.PIECE)!);
     return (this.playStateArgs!.allowedMoves as any)[piece] || [];
   }
 
@@ -523,7 +525,8 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
   }
 
   private unselectAllHandPieces(): void {
-    for (let p = 0; p < this.hand.length; ++p) {
+    const hand = $(IDS.HAND);
+    for (let p = 0; p < hand.children.length; ++p) {
       const cl = $(IDS.handPos(p)).classList;
       if (cl.contains(CSS.SELECTED)) {
         this.unmarkHexesPlayableForPiece(p);
@@ -536,7 +539,8 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
   }
 
   private setPlayablePieces(): void {
-    for (let p = 0; p < this.hand.length; ++p) {
+    const hand = $(IDS.HAND);
+    for (let p = 0; p < hand.children.length; ++p) {
       const cl = $(IDS.handPos(p)).classList;
       if (this.allowedMovesFor(p).length > 0) {
         cl.add(CSS.PLAYABLE);
@@ -725,7 +729,6 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
       return Promise.resolve();
     }
 
-    this.hand[args.handpos] = args.original_piece;
     let handPosDiv = this.handPosDiv(args.handpos);
 
     // Put any piece (field) captured in the move back on the board
@@ -802,7 +805,6 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
     const hexDiv = this.hexDiv(args);
     let sourceDivId = IDS.handcount(args.player_id);
     if (this.isCurrentPlayerActive()) {
-      this.hand[args.handpos] = Piece.EMPTY;
       const handPosDiv = this.handPosDiv(args.handpos);
       this.setPiece(handPosDiv, Piece.EMPTY, 0);
       sourceDivId = handPosDiv.id;
@@ -837,22 +839,23 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
   private async notif_handRefilled(args: { hand: string[] }): Promise<void> {
     const anims: Promise<void>[] = [];
     const pid = this.player_id;
+    const hand = $(IDS.HAND);
     for (let i = 0; i < args.hand.length; ++i) {
       // extend hand if zig tile just acquired
-      if (i >= this.hand.length || this.hand[i] == Piece.EMPTY) {
-        this.hand[i] = args.hand[i]!;
-      } else if (this.hand[i] != args.hand[i]) {
-        console.error(`hand from args ${args.hand[i]} not matches hand ${this.hand[i]}`)
+      if (i < hand.children.length && hand.children[i]?.getAttribute(Attrs.PIECE) != Piece.EMPTY) {
+        if (hand.children[i]?.getAttribute(Attrs.PIECE) != args.hand[i]) {
+          console.error(`hand from args ${args.hand[i]} not matches hand ${hand.children[i]}`)
+        }
       }
       const div = this.handPosDiv(i);
       if (div.getAttribute(Attrs.PIECE) == Piece.EMPTY) { // && incoming piece is not empty?
         const a = this.slideTemp(
           IDS.handcount(pid),
           div.id,
-          { attrs: this.pieceAttr(this.hand[i]!, this.player_id) })
+          { attrs: this.pieceAttr(args.hand[i]!, this.player_id) })
           .then(() => {
-            console.log("setting hand piece", i, this.hand);
-            this.setPiece(div, this.hand[i]!, this.player_id)
+            console.log("setting hand piece", i, args.hand);
+            this.setPiece(div, args.hand[i]!, this.player_id)
           });
         anims.push(a);
       }
