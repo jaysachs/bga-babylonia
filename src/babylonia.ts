@@ -776,21 +776,25 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
       // TODO: flash all the args.touched_ziggurats
       //   maybe use CSS?
     }
+
+    let anims: Promise<any>[] = [];
     // TODO: do some animation for field scoring
     if (args.field_points > 0) {
       let field = hexDiv.getAttribute(Attrs.PIECE);
       this.setPiece(hexDiv, Piece.EMPTY, 0);
-      await this.slideTemp(
+      anims.push(this.slideTemp(
         hexDiv.id,
         // TODO: find a better location
         IDS.handcount(args.player_id),
         // TODO: remove need for the !
-        { attrs: this.pieceAttr(field!, 0) });
+        { attrs: this.pieceAttr(field!, 0) }));
     }
-    await this.slideTemp(
+    anims.push(this.slideTemp(
       sourceDivId,
       hexDiv.id,
-      { attrs: this.pieceAttr(args.piece, args.player_id) });
+      { attrs: this.pieceAttr(args.piece, args.player_id) }));
+    await this.animationManager.playParallel([(i: number) => anims[i]!]);
+
     this.renderPlayedPiece(args,
       args.piece,
       args.player_id);
