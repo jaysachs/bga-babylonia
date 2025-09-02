@@ -14,6 +14,7 @@ interface Hex extends RowCol {
 
 class Attrs {
   static readonly ZTYPE : string = 'bbl_ztype';
+  static readonly ZUSED : string = 'bbl_zused';
   static readonly PIECE : string = 'bbl_piece';
 }
 
@@ -52,12 +53,8 @@ class IDS {
     return `bbl_zcards_${playerId}`;
   }
 
-  static ownedZcard(type: string): string {
-    return `bbl_owned_zig_${type}`;
-  }
-
-  static availableZcard(type: string): string {
-    return `bbl_available_zig_${type}`;
+  static zcard(type: string): string {
+    return `bbl_${type}`;
   }
 }
 
@@ -153,7 +150,6 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
   private handCounters: Counter[] = [];
   private poolCounters: Counter[] = [];
   private cityCounters: Counter[] = [];
-  private allZcards: Zcard[] = [];
   private selectedHandPos: number | null = null;
   private playStateArgs: PlayState | null = null;
   private html: Html = new Html({});
@@ -192,7 +188,7 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
     console.log('setting up player hand');
     gamedatas.hand.forEach((piece, i) => this.setPiece(this.handPosDiv(i), piece, this.player_id));
 
-    this.setupAvailableZcards(gamedatas.ziggurat_cards);
+    this.setupZcards(gamedatas.ziggurat_cards);
 
     console.log('setting up handlers');
     this.setupHandlers();
@@ -230,36 +226,23 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
     }
   }
 
-  private setupAvailableZcards(zcards: Zcard[]): void {
-    console.log('Setting up available ziggurat cards', zcards);
-    this.allZcards = zcards;
+  private setupZcards(zcards: Zcard[]): void {
+    console.log('Setting up ziggurat cards', zcards);
     for (let zcard of zcards) {
-      const id = IDS.availableZcard(zcard.type);
-      const ztype = zcard.used ? 'used' : zcard.type;
+      const id = IDS.zcard(zcard.type);
+      const attrs: Record<string, string> = {};
+      attrs[Attrs.ZTYPE] = zcard.type;
+      const zelem = this.createDiv({ id: id, attrs: attrs });
+      if (zcard.used) {
+        zelem.setAttribute(Attrs.ZUSED, "");
+      }
       if (zcard.owning_player_id != 0) {
-        this.addZcardDivInPlayerBoard(zcard);
+        $(IDS.playerBoardZcards(zcard.owning_player_id)).appendChild(zelem);
       } else {
-        // in available cards
-        $(IDS.AVAILABLE_ZCARDS).appendChild(this.createDiv({ id: id, attrs: this.ztypeAttr(ztype) }));
-        this.addTooltip(id, zcard.tooltip, '');
+        $(IDS.AVAILABLE_ZCARDS).appendChild(zelem);
       }
+      this.addTooltip(id, zcard.tooltip, '');
     }
-  }
-
-  private addZcardDivInPlayerBoard(zcard: Zcard) {
-    const id = IDS.ownedZcard(zcard.type);
-    const ztype = zcard.used ? 'used' : zcard.type;
-    $(IDS.playerBoardZcards(zcard.owning_player_id)).appendChild(this.createDiv({ id: id, attrs: this.ztypeAttr(ztype) } ));
-    this.addTooltip(id, zcard.tooltip, '');
-  }
-
-  private zcardForType(cardType: string): Zcard {
-    for (let z of this.allZcards) {
-      if (z.type == cardType) {
-        return z;
-      }
-    }
-    throw new Error(`Zcard type ${cardType} not found`);
   }
 
   private setupGameHtml(): void {
@@ -316,12 +299,6 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
 
   private renderCityOrField(rc: RowCol, piece: string): void {
     this.setPiece(this.hexDiv(rc), piece, 0);
-  }
-
-  private  ztypeAttr(val: string): Record<string, string> {
-    let result : Record<string, string> = {};
-    result[Attrs.ZTYPE] = val;
-    return result;
   }
 
   private pieceAttr(piece: string, playerId: number): Record<string, string> {
@@ -473,7 +450,7 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
 
     let e = event.target as HTMLElement;
     if (e.parentElement!.id == IDS.AVAILABLE_ZCARDS) {
-      if (e.getAttribute(Attrs.ZTYPE) != null) {
+      if (e.getAttribute(Attrs.ZTYPE)) {
         this.toggleZcardSelected(e);
       }
     }
@@ -854,13 +831,11 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
   }
 
   private async notif_extraTurnUsed(args: { card: string; used: boolean; }): Promise<void> {
-    const zcard = this.zcardForType(args.card);
-    zcard.used = args.used;
-    const carddiv = $(IDS.ownedZcard(zcard.type));
+    const carddiv = $(IDS.zcard(args.card));
     if (carddiv == undefined) {
-      console.error(`Could not find div for owned ${args.card} card`, zcard);
+      console.error(`Could not find div for owned ${args.card} card`, args.card);
     } else {
-      carddiv.setAttribute(Attrs.ZTYPE, 'used');
+      carddiv.setAttribute(Attrs.ZUSED, '');
     }
     return Promise.resolve();
   }
@@ -926,28 +901,11 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
       hex: RowCol;
     }
   ): Promise<void> {
-    const zcard = this.zcardForType(args.zcard);
-    zcard.owning_player_id = args.player_id;
-    zcard.used = args.cardused;
     this.scoreCtrl[args.player_id]!.toValue(args.score);
-
-    const id = IDS.availableZcard(zcard.type);
-
-    // mark the available zig card spot as 'taken'
-    $(id).removeAttribute(Attrs.ZTYPE);
-    this.removeTooltip(id);
-
-    let attrs = {};
-    attrs[Attrs.ZTYPE] = zcard.type;
-    await this.slideTemp(
-      id,
-      IDS.playerBoardZcards(args.player_id),
-      { attrs: attrs })
-      .then(() => {
-        $(id).remove();
-        this.addZcardDivInPlayerBoard(zcard);
-        this.unmarkHexSelected(args.hex);
-      });
+    const zelem = $(IDS.zcard(args.zcard));
+    zelem.classList.remove(CSS.SELECTED);
+    await this.animationManager.slideAndAttach(zelem, $(IDS.playerBoardZcards(args.player_id)))
+       .then(() => this.unmarkHexSelected(args.hex));
   }
 
   private async notif_cityScored(

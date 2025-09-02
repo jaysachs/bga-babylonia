@@ -247,9 +247,8 @@ body {
 /*
  * Ziggurat card sprites
  */
-[bbl_ztype],
-button.action-button.bbl_zcard,
-.bbl_zcard {
+/* button.action-button[bbl_ztype], */
+[bbl_ztype] {
     background-size: 1000% 100%;
     background-image: url(img/zcards.png);
 
@@ -260,53 +259,44 @@ button.action-button.bbl_zcard,
     /* 90px; */
 }
 
-[bbl_ztype="used"],
-.bbl_zc_used {
-    background-position: -900% 0%;
+[bbl_zused] {
+    background-image: repeating-linear-gradient(45deg, rgb(127 127 127 / 80%), rgb(127 127 127 / 80%) 1px, transparent 1px, transparent 2px),
+        url(img/zcards.png);
 }
 
-[bbl_ztype="zc_10pts"],
-.bbl_zc_10pts {
+[bbl_ztype="zc_10pts"] {
     background-position: 0% 0%;
 }
 
-[bbl_ztype="zc_xturn"],
-.bbl_zc_xturn {
+[bbl_ztype="zc_xturn"] {
     background-position: -100% 0%;
 }
 
-[bbl_ztype="zc_hand7"],
-.bbl_zc_hand7 {
+[bbl_ztype="zc_hand7"] {
     background-position: -200% 0%;
 }
 
-[bbl_ztype="zc_3nobles"],
-.bbl_zc_3nobles {
+[bbl_ztype="zc_3nobles"] {
     background-position: -300% 0%;
 }
 
-[bbl_ztype="zc_3farmers"],
-.bbl_zc_3farmers {
+[bbl_ztype="zc_3farmers"] {
     background-position: -400% 0%;
 }
 
-[bbl_ztype="zc_fields"],
-.bbl_zc_fields {
+[bbl_ztype="zc_fields"] {
     background-position: -500% 0%;
 }
 
-[bbl_ztype="zc_citypts"],
-.bbl_zc_citypts {
+[bbl_ztype="zc_citypts"] {
     background-position: -600% 0%;
 }
 
-[bbl_ztype="zc_land"],
-.bbl_zc_land {
+[bbl_ztype="zc_land"] {
     background-position: -700% 0%;
 }
 
-[bbl_ztype="zc_river"],
-.bbl_zc_river {
+[bbl_ztype="zc_river"] {
     background-position: -800% 0%;
 }
 
@@ -429,17 +419,6 @@ div.bbl_in_network::before {
 #bbl_available_zcards.bbl_selecting>div[bbl_ztype] {
     cursor: pointer;
 }
-
-#bbl_available_zcards>div:not([bbl_ztype]),
-#bbl_available_zcards>div[bbl_ztype=''] {
-    background-image: unset;
-    border-style: dotted;
-    border-color: #444444;
-    border-width: 1px;
-}
-
-
-
 
 /*
  * Player boards
