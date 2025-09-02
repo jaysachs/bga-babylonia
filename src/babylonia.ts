@@ -155,11 +155,6 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
   private html: Html = new Html({});
   private playerIdToColorIndex: Record<number, number> = {};
 
-  constructor() {
-    super();
-    this.handCounters = [];
-  }
-
   private setupHandlers(): void {
     $(IDS.HAND).addEventListener('click', this.onHandClicked.bind(this));
     $(IDS.BOARD).addEventListener('click', this.onBoardClicked.bind(this));
@@ -229,19 +224,17 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
   private setupZcards(zcards: Zcard[]): void {
     console.log('Setting up ziggurat cards', zcards);
     for (let zcard of zcards) {
-      const id = IDS.zcard(zcard.type);
-      const attrs: Record<string, string> = {};
-      attrs[Attrs.ZTYPE] = zcard.type;
-      const zelem = this.createDiv({ id: id, attrs: attrs });
+      const zelem = this.createDiv({ id: IDS.zcard(zcard.type) });
+      zelem.setAttribute(Attrs.ZTYPE, zcard.type);
       if (zcard.used) {
         zelem.setAttribute(Attrs.ZUSED, "");
       }
+      this.addTooltip(zelem.id, zcard.tooltip, '');
       if (zcard.owning_player_id != 0) {
         $(IDS.playerBoardZcards(zcard.owning_player_id)).appendChild(zelem);
       } else {
         $(IDS.AVAILABLE_ZCARDS).appendChild(zelem);
       }
-      this.addTooltip(id, zcard.tooltip, '');
     }
   }
 
