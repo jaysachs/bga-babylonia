@@ -649,6 +649,7 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
     this.updateHandCount(player, false);
     this.updatePoolCount(player, false);
     this.updateCapturedCityCount(player, false);
+    this.scoreCtrl[player.player_id]!.setValue(player.score);
   }
 
   private onUpdateActionButtons_chooseExtraTurn(): void {
