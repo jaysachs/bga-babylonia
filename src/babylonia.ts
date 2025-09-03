@@ -183,6 +183,7 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
     console.log('setting up player hand');
     gamedatas.hand.forEach((piece, i) => this.setPiece(this.handPosDiv(i), piece, this.player_id));
 
+    console.log('Setting up ziggurat cards', zcards);
     this.setupZcards(gamedatas.ziggurat_cards);
 
     console.log('setting up handlers');
@@ -222,7 +223,6 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
   }
 
   private setupZcards(zcards: Zcard[]): void {
-    console.log('Setting up ziggurat cards', zcards);
     for (let zcard of zcards) {
       const zelem = this.createDiv({ id: IDS.zcard(zcard.type) });
       zelem.setAttribute(Attrs.ZTYPE, zcard.type);
@@ -372,7 +372,7 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
   }
 
   private onBoardClicked(event: Event): boolean {
-    console.log('onBoardClicked:' + (event.target as Element).id);
+    // console.log('onBoardClicked:' + (event.target as Element).id);
     event.preventDefault();
     event.stopPropagation();
     if (!this.isCurrentPlayerActive()) {
@@ -430,7 +430,7 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
   }
 
   private onZcardClicked(event: Event): boolean {
-    console.log('onZcardClicked', event);
+    // console.log('onZcardClicked', event);
 
     event.preventDefault();
     event.stopPropagation();
@@ -557,7 +557,7 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
   }
 
   private onHandClicked(ev: Event): boolean {
-    console.log('onHandClicked', ev);
+    // console.log('onHandClicked', ev);
     ev.preventDefault();
     ev.stopPropagation();
     if (!this.isCurrentPlayerActive()) {
@@ -667,11 +667,8 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
       pool_size: number;
     }
   ): Promise<void> {
-
     this.updateHandCount(args);
     this.updatePoolCount(args);
-
-    return Promise.resolve();
   }
 
   private async notif_undoMoveActive(
@@ -733,20 +730,6 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
       { attrs: this.pieceAttr(args.piece, args.player_id) });
     this.handCounters[args.player_id]!.incValue(1);
     this.scoreCtrl[args.player_id]!.incValue(-args.points);
-  }
-
-  private async handleUndoMove(
-    args: {
-      player_id: number;
-      points: number;
-      handpos: number;
-      row: number;
-      col: number;
-      original_piece: string;
-      captured_piece: string;
-      piece: string;
-    }
-  ): Promise<void> {
   }
 
   private async notif_piecePlayed(
@@ -834,7 +817,6 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
     } else {
       carddiv.setAttribute(Attrs.ZUSED, '');
     }
-    return Promise.resolve();
   }
 
   private async indicateNeighbors(
@@ -861,7 +843,6 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
         this.hexDiv(rc).classList.remove(CSS.UNIMPORTANT);
       }
     }
-    return Promise.resolve();
   }
 
   private async notif_zigguratScored(
