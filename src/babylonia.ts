@@ -746,7 +746,7 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
       touched_ziggurats: RowCol[];
     }
   ): Promise<void> {
-
+    console.log("notif_piecePlayed", args);
     const hexDiv = this.hexDiv(args);
     let sourceDivId = IDS.handcount(args.player_id);
     if (this.isCurrentPlayerActive()) {
@@ -969,29 +969,20 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
     original_piece: (args: any) => `<span class='log-element' ${Attrs.PIECE}='${this.pieceVal(args.original_piece, args.player_id)}'></span>`,
   };
 
-  override format_string_recursive(log: string, args: any): string {
-    type SpecialLogArgs = keyof typeof this.special_log_args;
-    const saved: { [k in SpecialLogArgs]?: any } = {};
+  override bgaFormatText(log: string, origArgs: any): {log: string, args: any } {
+    let args = structuredClone(origArgs);
     try {
       if (log && args && !args.processed) {
         args.processed = true;
         for (const key in this.special_log_args) {
           if (key in args) {
-            const k = key as SpecialLogArgs;
-            saved[k] = args[k];
-            args[k] = this.special_log_args[k](args);
+            args[key] = this.special_log_args[key](args);
           }
         }
       }
     } catch (e: any) {
       console.error(log, args, 'Exception thrown', e.stack);
     }
-    try {
-      return (this as any).inherited(arguments);
-    } finally {
-      for (const k in saved) {
-        args[k] = saved[k as SpecialLogArgs];
-      }
-    }
+    return { log, args };
   }
 }
