@@ -183,7 +183,7 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
     console.log('setting up player hand');
     gamedatas.hand.forEach((piece, i) => this.setPiece(this.handPosDiv(i), piece, this.player_id));
 
-    console.log('Setting up ziggurat cards', zcards);
+    console.log('Setting up ziggurat cards', gamedatas.ziggurat_cards);
     this.setupZcards(gamedatas.ziggurat_cards);
 
     console.log('setting up handlers');
