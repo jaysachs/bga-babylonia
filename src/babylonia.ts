@@ -969,8 +969,7 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
     original_piece: (args: any) => `<span class='log-element' ${Attrs.PIECE}='${this.pieceVal(args.original_piece, args.player_id)}'></span>`,
   };
 
-  override bgaFormatText(log: string, origArgs: any): {log: string, args: any } {
-    let args = structuredClone(origArgs);
+  override bgaFormatText(log: string, args: any): {log: string, args: any } {
     try {
       if (log && args && !args.processed) {
         args.processed = true;
