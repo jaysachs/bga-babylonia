@@ -983,12 +983,12 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
     await this.indicateNeighbors(args.winner_hexes, args.other_hexes);
 
     let dest = (args.player_id != 0)
-      ? IDS.citycount(args.player_id)
-      // TODO: find a better location for 'off the board'
-      : IDS.AVAILABLE_ZCARDS;
+      ? $(IDS.citycount(args.player_id))
+      // TODO: find a location for 'off the board' but not to any player?
+      : undefined;
 
     await this.animationManager.slideOutAndDestroy(
-      hex.firstElementChild as HTMLElement, $(dest), {}).then(() => {
+      hex.firstElementChild as HTMLElement, dest, {}).then(() => {
         this.unmarkHexSelected(args);
         for (const playerId in args.details) {
           const details = args.details[playerId]!;
