@@ -73,13 +73,6 @@ class Html {
 
   constructor(private colorIndexMap: Record<number, number>) { }
 
-  public hex(rc: RowCol): string {
-    let top = this.vstart + rc.row * this.vdelta / 2;
-    let left = this.hstart + rc.col * this.hdelta;
-
-    return `<div id='${IDS.hexDiv(rc)}' style='top:${top}px; left:${left}px;'></div>`;
-  }
-
   public hexDiv(rc: RowCol): HTMLElement {
     let top = this.vstart + rc.row * this.vdelta / 2;
     let left = this.hstart + rc.col * this.hdelta;
