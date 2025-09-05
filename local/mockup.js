@@ -1,3 +1,17 @@
+const hstart = 38.0; // this is related to board width but not sure how
+const vstart = 9.0; // depends on board size too
+const height = 768 / 12.59;
+const width = height * 1.155;
+const hdelta = 0.75 * width + 2.0;
+const vdelta = 1.0 * height + 2.0;
+
+const putHex = function(rc) {
+    let top = vstart + rc.row * vdelta / 2;
+    let left = hstart + rc.col * hdelta;
+
+    return `<div style='top:${top}px; left:${left}px;' id='bbl_hex_${rc.row}_${rc.col}'></div>`;
+};
+
 function cycleThings(e) {
     let pieces = [
         "empty",
@@ -37,15 +51,22 @@ function cycleThings(e) {
         "ziggurat",
     ];
     let all = pieces.concat(cities);
-    p = e.getAttribute('bbl_piece') || all[0];
-    for (i = 0; i < all.length; ++i) {
-        if (p == all[i]) {
-            if (i < all.length-1) {
-                e.setAttribute('bbl_piece', all[i+1]);
-            } else {
-                e.setAttribute('bbl_piece', all[0]);
+    let pdiv = e.firstElementChild;
+    if (pdiv == null) {
+        idiv = document.createElement('div');
+        idiv.setAttribute('bbl_piece', all[1]);
+        e.appendChild(idiv);
+    } else {
+        let p = pdiv.getAttribute('bbl_piece');
+        for (let i = 0; i < all.length; ++i) {
+            if (p == all[i]) {
+                if (i < all.length-1) {
+                    pdiv.setAttribute('bbl_piece', all[i+1]);
+                } else {
+                    e.replaceChildren();
+                }
+                return;
             }
-            return;
         }
     }
 }
@@ -69,31 +90,29 @@ function selectPieceToPlay(event) {
     event.preventDefault();
     event.stopPropagation();
     let e = event.target;
-    let hc = e.parentElement;
-    if (hc.id == "bbl_hand") {
-        let p = e.getAttribute('bbl_piece');
-        if (!p || p == 'empty') { return; }
-        let c = e.classList;
-        if (c.contains('bbl_unplayable')) { return; }
-        if (!c.contains("bbl_selected")) {
-            hc.querySelectorAll('#bbl_hand > .bbl_selected').forEach(
-                div => div.classList.remove('bbl_selected'));
-        }
-        c.toggle("bbl_selected");
+    console.log(e);
+    let p = e.getAttribute('bbl_piece');
+    if (!p || p == 'empty') { return; }
+    let c = e.parentElement.classList;
+    if (c.contains('bbl_unplayable')) { return; }
+    if (!c.contains("bbl_selected")) {
+        document.querySelectorAll('#bbl_hand > .bbl_selected').forEach(
+            div => div.classList.remove('bbl_selected'));
     }
+    c.toggle("bbl_selected");
 }
 
 function selectZCard(event) {
     event.preventDefault();
     event.stopPropagation();
     let e = event.target;
-    let hc = e.parentElement;
-    if (hc.id == "bbl_available_zcards") {
-        let c = e.classList;
-        if (!c.contains("bbl_selected")) {
-            hc.querySelectorAll('#bbl_available_zcards > .bbl_selected').forEach(
-                div => div.classList.remove('bbl_selected'));
-        }
-        c.toggle("bbl_selected");
+    let z = e.getAttribute('bbl_ztype');
+    if (!z) { return; }
+    let c = e.parentElement.classList;
+    if (c.contains('bbl_unplayable')) { return; }
+    if (!c.contains("bbl_selected")) {
+        document.querySelectorAll('#bbl_available_zcards > .bbl_selected').forEach(
+            div => div.classList.remove('bbl_selected'));
     }
+    c.toggle("bbl_selected");
  }

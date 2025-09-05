@@ -8,12 +8,12 @@
     <div id="bbl_main">
       <div id="bbl_hand_container">
         <div class="bbl_hand" id="bbl_hand" onClick="selectPieceToPlay(event)">
-          <div id="bbl_hand_0" class="bbl_playable" bbl_piece="farmer_1"></div>
-          <div id="bbl_hand_1"  class="bbl_unplayable" bbl_piece="priest_2"></div>
+          <div id="bbl_hand_0" class="bbl_playable"><div bbl_piece="farmer_1"></div></div>
+          <div id="bbl_hand_1"  class="bbl_unplayable"><div bbl_piece="priest_2"></div></div>
           <!-- this one was already played -->
-          <div id="bbl_hand_2"  bbl_piece="empty"></div>
-          <div  id="bbl_hand_3" bbl_piece="farmer_3" class="bbl_selected"></div>
-          <div  id="bbl_hand_4" bbl_piece="merchant_4"></div>
+          <div id="bbl_hand_2"></div>
+          <div  id="bbl_hand_3" class="bbl_selected"><div bbl_piece="farmer_3"></div></div>
+          <div  id="bbl_hand_4"><div bbl_piece="merchant_4"></div></div>
           <!--
               <div  id="bbl_hand_5" class="bbl_empty"></div>
               <div  id="bbl_hand_6" class="bbl_farmer_3"></div>
@@ -41,7 +41,7 @@
           let html = new Html({});
           for( let h = 0; h < boardData.length; ++h) {
               let hex = boardData[h];
-              boardDiv.insertAdjacentHTML('beforeend', html.hex(hex));
+              boardDiv.insertAdjacentHTML('beforeend', putHex(hex));
           }
 
           let someHex = hexDiv(7,1);
@@ -62,13 +62,27 @@
       </div>
       <div id="bbl_available_zcards_container" class="whiteblock">
         <div id="bbl_available_zcards" onclick="selectZCard(event)">
-          <div bbl_ztype="zc_10pts"></div>
-          <div bbl_ztype="zc_xturn"></div>
-          <div bbl_ztype="zc_hand7" style="opacity: 20%"></div>
-          <div bbl_ztype></div>
-          <div bbl_ztype="zc_3nobles" class="bbl_selected"></div>
-          <div bbl_ztype="zc_3farmers"></div>
-          <div bbl_ztype="zc_citypts"></div>
+          <div>
+            <div bbl_ztype="zc_10pts"></div>
+          </div>
+          <div>
+            <div bbl_ztype="zc_xturn"></div>
+          </div>
+          <div class="bbl_unplayable">
+            <div bbl_ztype="zc_hand7"></div>
+          </div>
+          <div>
+            <div bbl_ztype></div>
+          </div>
+          <div class="bbl_selected">
+            <div bbl_ztype="zc_3nobles"></div>
+          </div>
+          <div>
+            <div bbl_ztype="zc_3farmers"></div>
+          </div>
+          <div>
+            <div bbl_ztype="zc_citypts"></div>
+          </div>
         </div>
       </div>
     </div>

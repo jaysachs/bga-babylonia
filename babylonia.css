@@ -15,7 +15,7 @@
 
 
 /* inspired from https://css-tricks.com/hexagons-and-beyond-flexible-responsive-grid-patterns-sans-media-queries/ */
-body {
+:root {
     /*
       define these all here so they're available even for "floating" elements.
      */
@@ -75,21 +75,38 @@ body {
     /*    background-color: rgba(255, 22, 255, 0.2); */
 }
 
-#bbl_board>div.bbl_playable::before {
-    content: '';
-    display: inline-block;
-    height: 100%;
-    width: 100%;
+#bbl_board>div.bbl_playable::after {
     background: url(img/sprites.png) 0% -400% / 700% 700%;
     cursor: pointer;
+    content: '';
+    display: inline;
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: calc(var(--bbl-hex-height));
+    width: calc(var(--bbl-hex-width));
+}
+
+#bbl_board>div>div {
+    position: absolute;
+    left: 0;
+    top: 0;
 }
 
 #bbl_board>div.bbl_selected::after {
     content: '';
-    display: inline-block;
-    height: 100%;
-    width: 100%;
+    display: inline;
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: calc(var(--bbl-hex-height));
+    width: calc(var(--bbl-hex-width));
     background: url(img/sprites.png) -600% -500% / 700% 700%;
+}
+
+/* does this need the same ::after treatment as bbl_selected? */
+#bbl_board>div.bbl_in_network {
+    background: url(img/sprites.png) 0% -500% / 700% 700%;
 }
 
 [bbl_piece] {
@@ -102,13 +119,6 @@ body {
     width: calc(var(--bbl-hex-width));
     height: calc(var(--bbl-hex-height));
 }
-
-/*
-    display: inline-block;
-    border-style: none;
-    margin-top: 5px;
-    margin-bottom: 5px;
-*/
 
 /*
  * Cities and fields sprites
@@ -259,6 +269,10 @@ body {
     /* 90px; */
 }
 
+[bbl_ztype=""] {
+    background-image: none;
+}
+
 [bbl_zused] {
     background-image: repeating-linear-gradient(45deg, rgb(127 127 127 / 80%), rgb(127 127 127 / 80%) 1px, transparent 1px, transparent 2px),
         url(img/zcards.png);
@@ -338,33 +352,13 @@ body {
     cursor: pointer;
 }
 
-#bbl_hand>div.bbl_unplayable {
+.bbl_unplayable {
     cursor: not-allowed;
     opacity: 0.5;
-}
-
-#bbl_hand>div.bbl_unplayable::before {
-    cursor: not-allowed;
-    height: 100%;
-    width: 100%;
-    content: '';
-    display: inline-block;
     background: url(img/sprites.png) 0% -600% / 700% 700%;
 }
 
-#bbl_hand>div.bbl_selected::before {
-    height: 100%;
-    width: 100%;
-    content: '';
-    display: inline-block;
-    background: url(img/sprites.png) 0% -500% / 700% 700%;
-}
-
-div.bbl_in_network::before {
-    height: 100%;
-    width: 100%;
-    content: '';
-    display: inline-block;
+#bbl_hand>div.bbl_selected {
     background: url(img/sprites.png) 0% -500% / 700% 700%;
 }
 
@@ -403,6 +397,7 @@ div.bbl_in_network::before {
 #bbl_available_zcards>div.bbl_selected {
     border-color: green;
     border-width: 5px;
+    margin: 8px;
 }
 
 

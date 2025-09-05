@@ -111,36 +111,28 @@ class BaseGame<T extends Gamedatas> extends GameGui<T> {
     return undefined;
   }
 
-  protected slideTemp(fromId: string, toId: string,
-    settings: {
-      attrs?: Record<string, string> | null;
-      className?: string | null;
-      duration?: number | null;
-    }): Promise<void> {
-    return this.animationManager.slideFloatingElement(this.createDiv(settings), $(fromId), $(toId),
-      {
-        duration: settings.duration || 700,
-        ignoreScale: true,
-        ignoreRotation: true,
-      });
+  protected playParallel(anims: Promise<any>[]): Promise<any> {
+    return this.animationManager.playParallel([(i: number) => anims[i]!]);
   }
 
-  protected createDiv(settings: {
+  protected createDiv(settings?: {
     id?: string,
     attrs?: Record<string, string> | null;
     className?: string | null;
   }): HTMLElement {
     const div = document.createElement('div');
-    if (settings.id) {
-      div.id = settings.id;
-    }
-    // $(IDS.BOARD).appendChild(div);
-    if (settings.className) {
-      div.className = settings.className;
-    }
-    if (settings.attrs) {
-      for (const name in settings.attrs) {
-        div.setAttribute(name, settings.attrs[name]!);
+    if (settings) {
+      if (settings.id) {
+        div.id = settings.id;
+      }
+      // $(IDS.BOARD).appendChild(div);
+      if (settings.className) {
+        div.className = settings.className;
+      }
+      if (settings.attrs) {
+        for (const name in settings.attrs) {
+          div.setAttribute(name, settings.attrs[name]!);
+        }
       }
     }
     return div;

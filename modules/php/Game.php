@@ -89,6 +89,7 @@ class Game extends \Bga\GameFramework\Table
                 "handpos" => $handpos,
                 "row" => $row,
                 "col" => $col,
+                "captured_piece" => $move->captured_piece->value,
                 "points" => $points,
                 "ziggurat_points" => $move->ziggurat_points,
                 "field_points" => $move->field_points,

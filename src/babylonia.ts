@@ -29,10 +29,6 @@ class IDS {
   static readonly BOARD_CONTAINER = 'bbl_board_container';
   static readonly HAND = 'bbl_hand';
 
-  static handPos(pos: number): string {
-    return `bbl_hand_${pos}`;
-  }
-
   static handcount(playerId: number): string {
     return `bbl_handcount_${playerId}`;
   }
@@ -82,6 +78,17 @@ class Html {
     let left = this.hstart + rc.col * this.hdelta;
 
     return `<div id='${IDS.hexDiv(rc)}' style='top:${top}px; left:${left}px;'></div>`;
+  }
+
+  public hexDiv(rc: RowCol): HTMLElement {
+    let top = this.vstart + rc.row * this.vdelta / 2;
+    let left = this.hstart + rc.col * this.hdelta;
+    let div = document.createElement('div') as HTMLElement;
+    div.id = IDS.hexDiv(rc);
+    div.style.top = `${top}px`;
+    div.style.left = `${left}px`;
+    // div.style = `top:${top}px; left:${left}px;`;
+    return div;
   }
 
   public player_board_ext(player_id: number): string {
@@ -172,16 +179,21 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
 
     this.setupGameHtml();
 
-    console.log('setting the the game board');
-    this.setupGameBoard(gamedatas.board, gamedatas.player_data);
-
     console.log('setting up player boards', gamedatas.player_data);
     for (const playerId in gamedatas.player_data) {
       this.setupPlayerBoard(gamedatas.player_data[playerId]!);
     }
 
-    console.log('setting up player hand');
-    gamedatas.hand.forEach((piece, i) => this.setPiece(this.handPosDiv(i), piece, this.player_id));
+    console.log('setting the the game board');
+    this.setupGameBoard(gamedatas.board, gamedatas.player_data);
+
+    console.log('setting up player hand', gamedatas.hand);
+    gamedatas.hand.forEach((piece, i) => {
+      const hpd = this.handPosDiv(i);
+      if (piece && piece != Piece.EMPTY) {
+        hpd.appendChild(this.createPieceDiv(piece, this.player_id));
+      }
+    });
 
     console.log('Setting up ziggurat cards', gamedatas.ziggurat_cards);
     this.setupZcards(gamedatas.ziggurat_cards);
@@ -205,24 +217,50 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
     console.log('Game setup done');
   }
 
+  private createPieceDiv(piece: string, player_id?: number) : HTMLElement {
+    let e = this.createDiv();
+    e.setAttribute(Attrs.PIECE, this.pieceVal(piece, player_id || 0));
+    return e;
+  }
+
   private setupGameBoard(boardData: Hex[], playersData: PlayerData[]): void {
     const boardDiv = $(IDS.BOARD);
     // console.log(gamedatas.board);
 
     for (const hex of boardData) {
-      boardDiv.insertAdjacentHTML('beforeend', this.html.hex(hex));
-
-      if (hex.piece != null) {
-        if (hex.board_player == 0) {
-          this.renderCityOrField(hex, hex.piece);
-        } else {
-          this.renderPlayedPiece(hex, hex.piece, hex.board_player);
+      const hexDiv = this.html.hexDiv(hex);
+      boardDiv.appendChild(hexDiv);
+      if (hex.piece != null && hex.piece != Piece.EMPTY) {
+        let pieceDiv = this.createPieceDiv(hex.piece, hex.board_player)
+        hexDiv.appendChild(pieceDiv);
+      }
+    }
+    // alternative, that theoretically would have pieces animating in:
+    if (false) {
+      let anims: Promise<any>[] = [];
+      for (const hex of boardData) {
+        const hexDiv = this.html.hexDiv(hex);
+        boardDiv.appendChild(hexDiv);
+        if (hex.piece != null) {
+          let pieceDiv = this.createPieceDiv(hex.piece, hex.board_player)
+          if (hex.board_player == 0) {
+            hexDiv.appendChild(pieceDiv);
+          } else {
+            $(IDS.handcount(hex.board_player)).appendChild(pieceDiv);
+            anims.push(this.animationManager.slideAndAttach(pieceDiv, hexDiv));
+          }
         }
       }
+      /* await */ this.playParallel(anims);
     }
   }
 
   private setupZcards(zcards: Zcard[]): void {
+    const available = $(IDS.AVAILABLE_ZCARDS);
+    for (let i = 0; i < 7; ++i) {
+      available.appendChild(this.createDiv());
+    }
+    let i = 0;
     for (let zcard of zcards) {
       const zelem = this.createDiv({ id: IDS.zcard(zcard.type) });
       zelem.setAttribute(Attrs.ZTYPE, zcard.type);
@@ -233,8 +271,9 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
       if (zcard.owning_player_id != 0) {
         $(IDS.playerBoardZcards(zcard.owning_player_id)).appendChild(zelem);
       } else {
-        $(IDS.AVAILABLE_ZCARDS).appendChild(zelem);
+        available.children[i]!.appendChild(zelem);
       }
+      i++;
     }
   }
 
@@ -274,44 +313,17 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
   }
 
   private handPosDiv(i: number): HTMLElement {
-    const id = IDS.handPos(i);
-    const div = $(id);
-    if (div != null) {
-      return div;
-    }
-    // dynamically extend hand as needed.
     const hand = $(IDS.HAND);
-    for (let j = 0; j <= i; ++j) {
-      const id = IDS.handPos(j);
-      if ($(id) == null) {
-        hand.appendChild(this.createDiv({id: id}));
-      }
+    while (i >= hand.childElementCount) {
+      hand.appendChild(this.createDiv());
     }
-    return $(id);
-  }
-
-  private renderCityOrField(rc: RowCol, piece: string): void {
-    this.setPiece(this.hexDiv(rc), piece, 0);
-  }
-
-  private pieceAttr(piece: string, playerId: number): Record<string, string> {
-    let result : Record<string, string> = {};
-    result[Attrs.PIECE] = this.pieceVal(piece, playerId);
-    return result;
+    return $(IDS.HAND).childNodes.item(i)! as HTMLElement;
   }
 
   private pieceVal(piece: string, playerId: number): string {
     return (playerId > 0 && piece != Piece.EMPTY)
       ? piece + '_' + this.playerIdToColorIndex[playerId]
       : piece;
-  }
-
-  private setPiece(e: Element, piece: string, playerId: number) {
-    e.setAttribute(Attrs.PIECE, this.pieceVal(piece, playerId));
-  }
-
-  private renderPlayedPiece(rc: RowCol, piece: string, playerId: number) {
-    this.setPiece(this.hexDiv(rc), piece, playerId);
   }
 
   // Returns the hex (row,col) clicked on, or null if not a playable hex
@@ -389,46 +401,6 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
     return false;
   }
 
-  private toggleZcardSelected(e: Element) {
-    let addButtons = () => {
-      this.pushActionBarTitle(this.format_string_recursive(
-        _('Select ziggurat card ${zcard}?'), { zcard: e.getAttribute(Attrs.ZTYPE) }));
-      this.statusBar.addActionButton(_('Confirm'),
-        () => {
-          this.bgaPerformAction(
-            'actSelectZigguratCard',
-            { zctype: e.getAttribute(Attrs.ZTYPE) }
-          );
-        },
-        { autoclick: true }
-      );
-
-      this.statusBar.addActionButton(_('Cancel'), () => {
-        this.toggleZcardSelected(e);
-      });
-    };
-    let removeButtons = () => {
-      this.popActionBarTitle();
-      this.statusBar.removeActionButtons();
-    };
-    let alreadySelected =
-      e.parentElement!.querySelector(
-        `#${IDS.AVAILABLE_ZCARDS} > [${Attrs.ZTYPE}].${CSS.SELECTED}`);
-    e.classList.toggle(CSS.SELECTED);
-    if (alreadySelected == null) {
-      addButtons();
-  } else if (alreadySelected == e) {
-      // remove confirm and cancel buttons from action bar
-      removeButtons();
-    } else {
-      alreadySelected.classList.toggle(CSS.SELECTED);
-      // buttons should already be in right state but we need to change the title bar text.
-      // (We also can't reset the timer.) So we remove & add.
-      removeButtons();
-      addButtons();
-    }
-  }
-
   private onZcardClicked(event: Event): boolean {
     // console.log('onZcardClicked', event);
 
@@ -442,21 +414,57 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
     }
 
     let e = event.target as HTMLElement;
-    if (e.parentElement!.id == IDS.AVAILABLE_ZCARDS) {
-      if (e.getAttribute(Attrs.ZTYPE)) {
-        this.toggleZcardSelected(e);
-      }
+    let z = e.getAttribute(Attrs.ZTYPE);
+    if (!z) { return false; }
+    // let c = e.parentElement!.classList;
+    // if (c.contains(CSS.UNPLAYABLE)) { return false; }
+    if (e.getAttribute(Attrs.ZTYPE)) {
+      this.toggleZcardSelected(e);
     }
     return false;
   }
 
-  private pieceType(attr: string): string {
-    return attr.split('_')[0]!;
+  private toggleZcardSelected(e: Element) {
+    const zt = e.getAttribute(Attrs.ZTYPE);
+    let addButtons = () => {
+      this.pushActionBarTitle(this.format_string_recursive(
+        _('Select ziggurat card ${zcard}?'), { zcard: zt }));
+      this.statusBar.addActionButton(_('Confirm'),
+        () => {
+          this.bgaPerformAction('actSelectZigguratCard', { zctype: zt });
+        },
+        { autoclick: true }
+      );
+
+      this.statusBar.addActionButton(_('Cancel'), () => {
+        this.toggleZcardSelected(e);
+      });
+    };
+    let removeButtons = () => {
+      this.popActionBarTitle();
+      this.statusBar.removeActionButtons();
+    };
+    const epar = e.parentElement!;
+    let alreadySelected = document.querySelector(`#${IDS.AVAILABLE_ZCARDS} > .${CSS.SELECTED}`);
+    epar.classList.toggle(CSS.SELECTED);
+    if (alreadySelected == null) {
+      addButtons();
+    } else if (alreadySelected == epar) {
+      // remove confirm and cancel buttons from action bar
+      removeButtons();
+    } else {
+      alreadySelected.classList.toggle(CSS.SELECTED);
+      // buttons should already be in right state but we need to change the title bar text.
+      // (We also can't reset the timer.) So we remove & add.
+      removeButtons();
+      addButtons();
+    }
   }
 
-  private allowedMovesFor(pos: number): RowCol[] {
-    const hand = $(IDS.HAND);
-    const piece = this.pieceType(hand.children[pos]!.getAttribute(Attrs.PIECE)!);
+  private allowedMovesFor(div: Element | null): RowCol[] {
+    if (!div) { return []; }
+    // Peel off player number
+    const piece = div.getAttribute(Attrs.PIECE)!.split('_')[0]!;
     return (this.playStateArgs!.allowedMoves as any)[piece] || [];
   }
 
@@ -480,40 +488,40 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
     hexes.forEach(rc => this.markHexPlayable(rc));
   }
 
-  private markHexesPlayableForPiece(pos: number): void {
-    this.allowedMovesFor(pos).forEach(rc => this.markHexPlayable(rc));
+  private markHexesPlayableForPiece(div: Element): void {
+    this.allowedMovesFor(div).forEach(rc => this.markHexPlayable(rc));
   }
 
-  private unmarkHexesPlayableForPiece(pos: number): void {
-    this.allowedMovesFor(pos).forEach(rc => this.unmarkHexPlayable(rc));
+  private unmarkHexesPlayableForPiece(div: Element): void {
+    this.allowedMovesFor(div).forEach(rc => this.unmarkHexPlayable(rc));
   }
 
   private unselectAllHandPieces(): void {
     const hand = $(IDS.HAND);
-    for (let p = 0; p < hand.children.length; ++p) {
-      const cl = $(IDS.handPos(p)).classList;
+    hand.childNodes.forEach((posDiv : HTMLElement) => {
+      const cl = posDiv.classList;
       if (cl.contains(CSS.SELECTED)) {
-        this.unmarkHexesPlayableForPiece(p);
+        this.unmarkHexesPlayableForPiece(posDiv.firstElementChild!);
       }
       cl.remove(CSS.SELECTED);
       cl.remove(CSS.PLAYABLE);
       cl.remove(CSS.UNPLAYABLE);
-    }
+    });
     this.selectedHandPos = null;
   }
 
   private setPlayablePieces(): void {
     const hand = $(IDS.HAND);
-    for (let p = 0; p < hand.children.length; ++p) {
-      const cl = $(IDS.handPos(p)).classList;
-      if (this.allowedMovesFor(p).length > 0) {
+    hand.childNodes.forEach((child : HTMLElement, p : number) => {
+      const cl = child.classList;
+      if (this.allowedMovesFor(child.firstElementChild).length > 0) {
         cl.add(CSS.PLAYABLE);
         cl.remove(CSS.UNPLAYABLE);
       } else {
         cl.remove(CSS.PLAYABLE);
         cl.add(CSS.UNPLAYABLE);
       }
-    }
+    });
   }
 
   private setStatusBarForPlayState(): void {
@@ -557,7 +565,7 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
   }
 
   private onHandClicked(ev: Event): boolean {
-    // console.log('onHandClicked', ev);
+    console.log('onHandClicked', ev);
     ev.preventDefault();
     ev.stopPropagation();
     if (!this.isCurrentPlayerActive()) {
@@ -568,23 +576,40 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
       && this.currentState != 'client_mustSelectPiece') {
       return false;
     }
-    const selectedDiv = ev.target as HTMLElement;
-    if (selectedDiv.parentElement!.id != IDS.HAND) {
-      return false;
+    const pieceDiv = ev.target as HTMLElement;
+    let p = pieceDiv.getAttribute(Attrs.PIECE);
+    if (!p || p == Piece.EMPTY) { return false; }
+
+    let parentDiv = pieceDiv.parentElement!;
+    let cl = parentDiv.classList;
+    if (cl.contains(CSS.UNPLAYABLE)) { return false; }
+    // if (parent.parentElement!.id != IDS.HAND) {
+    //   return false;
+    // }
+
+    let handpos = -1;
+    let hand = $(IDS.HAND);
+    for (let i = 0; i < hand.childElementCount; ++i) {
+      if (hand.childNodes.item(i) == parentDiv) {
+        handpos = i;
+      }
     }
-    const handpos = Number(selectedDiv.id.split('_')[2]);
-    if (this.allowedMovesFor(handpos).length == 0) {
+    if (handpos < 0) {
+      console.error("couldn't find element in its parent's children?");
+    }
+
+    if (this.allowedMovesFor(pieceDiv).length == 0) {
       return false;
     }
     let playable = false;
-    if (!selectedDiv.classList.contains(CSS.SELECTED)) {
+    if (!cl.contains(CSS.SELECTED)) {
       this.unselectAllHandPieces();
-      this.markHexesPlayableForPiece(handpos);
+      this.markHexesPlayableForPiece(pieceDiv);
       playable = true;
     } else {
-      this.unmarkHexesPlayableForPiece(handpos);
+      this.unmarkHexesPlayableForPiece(pieceDiv);
     }
-    selectedDiv.classList.toggle(CSS.SELECTED);
+    cl.toggle(CSS.SELECTED);
     if (playable) {
       this.selectedHandPos = handpos;
       if (this.currentState != 'client_pickHexToPlay') {
@@ -640,6 +665,7 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
   }
 
   private onUpdateActionButtons_selectZigguratCard(): void {
+    // TODO: do better than this?
     const div = $(IDS.AVAILABLE_ZCARDS);
     div.scrollIntoView(false);
     //  div.classList.add(CSS.SELECTING);
@@ -683,6 +709,7 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
       piece: string;
     }
   ): Promise<void> {
+    console.log("notif_undoMoveActive", args);
     if (this.player_id != args.player_id) {
       console.error('Non-active player got the undoMoveActive notification, ignoring');
       return Promise.resolve();
@@ -690,18 +717,25 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
 
     let handPosDiv = this.handPosDiv(args.handpos);
 
-    // Put any piece (field) captured in the move back on the board
-    // TODO: animate this? (and animate the capture too?)
-    this.renderCityOrField(args, args.captured_piece);
-    await this.slideTemp(
-      IDS.hexDiv(args),
-      handPosDiv.id,
-      { attrs: this.pieceAttr(args.piece, args.player_id) });
+    let anims: Promise<any>[] = [];
+    let hexDiv = $(IDS.hexDiv(args));
+    let pieceDiv = hexDiv.firstElementChild as HTMLElement;
 
-    this.setPiece(handPosDiv!, args.original_piece, this.player_id);
-    handPosDiv.classList.add(CSS.PLAYABLE);
-    this.handCounters[args.player_id]!.incValue(1);
-    this.scoreCtrl[args.player_id]!.incValue(-args.points);
+    // restore piece value, e.g. if it was originally hidden
+    pieceDiv.setAttribute(Attrs.PIECE, this.pieceVal(args.original_piece, this.player_id));
+    anims.push(this.animationManager.slideAndAttach(pieceDiv, handPosDiv));
+
+    if (args.captured_piece != Piece.EMPTY) {
+      let field = this.createPieceDiv(args.captured_piece, 0);
+      hexDiv.appendChild(field);
+      anims.push(this.animationManager.slideIn(field, $(IDS.handcount(args.player_id)), {}));
+    }
+
+    await this.playParallel(anims).then(() => {
+      handPosDiv.classList.add(CSS.PLAYABLE);
+      this.handCounters[args.player_id]!.incValue(1);
+      this.scoreCtrl[args.player_id]!.incValue(-args.points);
+    });
   }
 
   private async notif_undoMove(
@@ -716,20 +750,32 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
       piece: string;
     }
   ): Promise<void> {
+    console.log("notif_undoMove", args);
     if (this.player_id == args.player_id) {
       console.error("active player should have undoMove filtered");
       return Promise.resolve();
     }
 
-    // Put any piece (field) captured in the move back on the board
-    // TODO: animate this? (and animate the capture too?)
-    this.renderCityOrField(args, args.captured_piece);
-    await this.slideTemp(
-      IDS.hexDiv(args),
-      IDS.handcount(args.player_id),
-      { attrs: this.pieceAttr(args.piece, args.player_id) });
-    this.handCounters[args.player_id]!.incValue(1);
-    this.scoreCtrl[args.player_id]!.incValue(-args.points);
+    let hexDiv = $(IDS.hexDiv(args));
+    let anims: Promise<any>[] = [];
+
+    if (args.captured_piece != Piece.EMPTY) {
+      let field = this.createPieceDiv(args.captured_piece, 0);
+      hexDiv.appendChild(field);
+      anims.push(this.animationManager.slideIn(field, $(IDS.handcount(args.player_id)), {}));
+    }
+
+    let piece = hexDiv.children[0] as HTMLElement;
+    anims.push(this.animationManager.slideOutAndDestroy(
+      piece,
+      $(IDS.handcount(args.player_id)),
+      {}
+     ));
+
+    await this.playParallel(anims).then(() => {
+      this.handCounters[args.player_id]!.incValue(1);
+      this.scoreCtrl[args.player_id]!.incValue(-args.points);
+    });
   }
 
   private async notif_piecePlayed(
@@ -741,18 +787,41 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
       row: number;
       col: number;
       hand_size: number;
+      captured_piece: string;
       field_points: number;
       ziggurat_points: number;
       touched_ziggurats: RowCol[];
     }
   ): Promise<void> {
     console.log("notif_piecePlayed", args);
+
+    let anims: Promise<any>[] = [];
+
     const hexDiv = this.hexDiv(args);
-    let sourceDivId = IDS.handcount(args.player_id);
+
+    // Check for field capture
+    if (args.captured_piece != Piece.EMPTY /* .startsWith('field') */) {
+      let field = hexDiv.children[0] as HTMLElement;
+      if (!field) { // or field is not F567X
+        console.error("attempt to capture a field that is not there");
+      }
+      // TODO: consider capturing to player board
+      anims.push(this.animationManager.slideOutAndDestroy(field, $(IDS.handcount(args.player_id)), {}));
+    }
+
     if (this.isCurrentPlayerActive()) {
       const handPosDiv = this.handPosDiv(args.handpos);
-      this.setPiece(handPosDiv, Piece.EMPTY, 0);
-      sourceDivId = handPosDiv.id;
+      const pieceDiv = handPosDiv.firstElementChild as HTMLElement;
+      anims.push(
+        this.animationManager.slideAndAttach(pieceDiv, hexDiv)
+          // play into river, piece is hidden
+          .then(() => pieceDiv.setAttribute(Attrs.PIECE, this.pieceVal(args.piece, this.player_id)))
+      );
+    } else {
+      // for non-active player, need to create it first
+      let div = this.createPieceDiv(args.piece, args.player_id);
+      hexDiv.appendChild(div);
+      anims.push(this.animationManager.slideIn(div, $(IDS.handcount(args.player_id))));
     }
     // TODO: do some animation for ziggurat scoring
     if (args.ziggurat_points > 0) {
@@ -760,27 +829,8 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
       //   maybe use CSS?
     }
 
-    let anims: Promise<any>[] = [];
-    // TODO: do some animation for field scoring
-    if (args.field_points > 0) {
-      let field = hexDiv.getAttribute(Attrs.PIECE);
-      this.setPiece(hexDiv, Piece.EMPTY, 0);
-      anims.push(this.slideTemp(
-        hexDiv.id,
-        // TODO: find a better location
-        IDS.handcount(args.player_id),
-        // TODO: remove need for the !
-        { attrs: this.pieceAttr(field!, 0) }));
-    }
-    anims.push(this.slideTemp(
-      sourceDivId,
-      hexDiv.id,
-      { attrs: this.pieceAttr(args.piece, args.player_id) }));
-    await this.animationManager.playParallel([(i: number) => anims[i]!]);
+    await this.playParallel(anims);
 
-    this.renderPlayedPiece(args,
-      args.piece,
-      args.player_id);
     this.updateHandCount(args);
     this.scoreCtrl[args.player_id]!.incValue(args.points);
   }
@@ -789,25 +839,29 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
     const anims: Promise<void>[] = [];
     const pid = this.player_id;
     const hand = $(IDS.HAND);
-    args.hand.forEach( (newPiece, i) => {
-      let p = hand.children[i]?.getAttribute(Attrs.PIECE) || Piece.EMPTY;
-      if (p != Piece.EMPTY && p != newPiece) {
-        console.error(`hand from args ${args.hand[i]} not matches hand ${hand.children[i]}`);
+    for (let i = 0; i < args.hand.length; ++i) {
+      let newPiece = args.hand[i];
+      if (i >= hand.childElementCount) {
+        // dynamically expand hand if 7 size hand is chosen
+        hand.appendChild(this.createDiv());
       }
-      const div = this.handPosDiv(i);
-      if (p == Piece.EMPTY) { // && incoming piece is not empty?
-        const a = this.slideTemp(
-          IDS.handcount(pid),
-          div.id,
-          { attrs: this.pieceAttr(newPiece, this.player_id) })
-          .then(() => {
-            console.log("setting hand piece", i, newPiece);
-            this.setPiece(div, newPiece, this.player_id)
-          });
-        anims.push(a);
+      let pdiv = hand.children[i]?.children[0] as HTMLElement;
+      if (!pdiv) {
+        if (newPiece && newPiece != Piece.EMPTY) {
+          pdiv = this.createPieceDiv(newPiece, pid);
+          hand.children[i]?.appendChild(pdiv);
+          anims.push(this.animationManager.slideIn(pdiv, $(IDS.poolcount(pid))));
+        }
+      } else {
+         let pt = pdiv.getAttribute(Attrs.PIECE);
+         if (!pt) {
+           console.error("hand had piece div but no attribute");
+         } else if (pt != this.pieceVal(newPiece!, pid)) {
+           console.error("piece from args", newPiece, "not matches hand", pdiv);
+         }
       }
-    });
-    await Promise.all(anims);
+    };
+    await this.playParallel(anims);
   }
 
   private async notif_extraTurnUsed(args: { card: string; used: boolean; }): Promise<void> {
@@ -828,7 +882,6 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
         this.hexDiv(rc).classList.add(CSS.UNIMPORTANT);
       }
       for (let i = 0; i < 3; i++) {
-        console.log("indicating loop", i);
         for (const rc of winnerHexes) {
           this.hexDiv(rc).classList.add(CSS.IN_NETWORK);
         }
@@ -855,7 +908,7 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
       other_hexes: RowCol[];
     }): Promise<void> {
     console.log("notif_zigguratScore", args);
-    await this.indicateNeighbors(args.winner_hexes, args.other_hexes);
+    await this.indicateNeighbors(args.winner_hexes, args.other_hexes).then(() => this.unmarkHexSelected(args));
     // TODO: consider better visual treatments
   }
 
@@ -882,8 +935,7 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
     this.scoreCtrl[args.player_id]!.toValue(args.score);
     const zelem = $(IDS.zcard(args.zcard));
     zelem.classList.remove(CSS.SELECTED);
-    await this.animationManager.slideAndAttach(zelem, $(IDS.playerBoardZcards(args.player_id)))
-       .then(() => this.unmarkHexSelected(args.hex));
+    await this.animationManager.slideAndAttach(zelem, $(IDS.playerBoardZcards(args.player_id)));
   }
 
   private async notif_cityScored(
@@ -904,9 +956,10 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
       }[];
     }
   ): Promise<void> {
-
     console.log("notif_cityScored", args);
 
+    this.pushActionBarTitle(this.format_string(_("City at ${row},${col} scoring"),
+                                               {"row": `${args.row}`, "col": `${args.col}`}));
     const hex = $(IDS.hexDiv(args));
 
     let aa = this.bgaAnimationsActive();
@@ -938,27 +991,20 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
 
     await this.indicateNeighbors(args.winner_hexes, args.other_hexes);
 
-    this.renderCityOrField(args, '');
-    this.unmarkHexSelected(args);
+    let dest = (args.player_id != 0)
+      ? IDS.citycount(args.player_id)
+      // TODO: find a better location for 'off the board'
+      : IDS.AVAILABLE_ZCARDS;
 
-    await this.slideTemp(
-      IDS.hexDiv(args),
-      (args.player_id != 0)
-        ? IDS.citycount(args.player_id)
-        // TODO: find a better location for 'off the board'
-        : IDS.AVAILABLE_ZCARDS,
-      {
-        attrs: this.pieceAttr(args.city, 0),
-        // className: this.css.cityOrField(args.city),
-        // parentId: IDS.BOARD
-      }
-    );
-
-    for (const playerId in args.details) {
-      const details = args.details[playerId]!;
-      this.scoreCtrl[playerId]!.incValue(details.capture_points);
-      this.updateCapturedCityCount(details);
-    }
+    await this.animationManager.slideOutAndDestroy(
+      hex.firstElementChild as HTMLElement, $(dest), {}).then(() => {
+        this.unmarkHexSelected(args);
+        for (const playerId in args.details) {
+          const details = args.details[playerId]!;
+          this.scoreCtrl[playerId]!.incValue(details.capture_points);
+          this.updateCapturedCityCount(details);
+        }
+      }).then(() => this.popActionBarTitle());
   }
 
   ///////
@@ -984,4 +1030,16 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
     }
     return { log, args };
   }
+
+
+  /// experimental
+  private handPieceDivs() : (HTMLElement | undefined)[] {
+    let result: (HTMLElement | undefined)[] = [];
+    const hand = $(IDS.HAND);
+    hand.childNodes.forEach((n: ChildNode) => {
+      result.push(n as HTMLElement);
+    });
+    return result;
+  }
+
 }
