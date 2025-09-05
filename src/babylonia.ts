@@ -815,14 +815,15 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
     }
     // animate the ziggurat scoring, if any
     if (args.ziggurat_points > 0) {
-      // TODO: other options? flash all the args.touched_ziggurats via CSS/wait?
+      args.touched_ziggurats.forEach((rc) => this.markHexSelected(rc));
       anims.push(this.playParallel(
         args.touched_ziggurats.map((rc: RowCol) =>
           this.animationManager.displayScoring(
-            this.hexDiv(rc),
-            1,
-            this.gamedatas.players[this.player_id]!.color,
-            { duration: 2000, easing: 'ease-in-out', extraClass: 'bbl_city_scoring' }))
+              this.hexDiv(rc),
+              1,
+              this.gamedatas.players[this.player_id]!.color,
+              { duration: 2000, easing: 'ease-in-out', extraClass: 'bbl_city_scoring' })
+            .then(() => args.touched_ziggurats.forEach((rc) => this.unmarkHexSelected(rc))))
       ));
     }
 
