@@ -250,11 +250,9 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
 
   private setupZcards(zcards: Zcard[]): void {
     const available = $(IDS.AVAILABLE_ZCARDS);
-    for (let i = 0; i < 7; ++i) {
-      available.appendChild(this.createDiv());
-    }
-    let i = 0;
     for (let zcard of zcards) {
+      let nextSpot = this.createDiv();
+      available.appendChild(nextSpot);
       const zelem = this.createDiv({ id: IDS.zcard(zcard.type) });
       zelem.setAttribute(Attrs.ZTYPE, zcard.type);
       if (zcard.used) {
@@ -264,9 +262,8 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
       if (zcard.owning_player_id != 0) {
         $(IDS.playerBoardZcards(zcard.owning_player_id)).appendChild(zelem);
       } else {
-        available.children[i]!.appendChild(zelem);
+        nextSpot.appendChild(zelem);
       }
-      i++;
     }
   }
 
@@ -749,9 +746,8 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
       anims.push(this.animationManager.slideIn(field, $(IDS.handcount(args.player_id)), {}));
     }
 
-    let piece = hexDiv.children[0] as HTMLElement;
     anims.push(this.animationManager.slideOutAndDestroy(
-      piece,
+      hexDiv.firstElementChild as HTMLElement,
       $(IDS.handcount(args.player_id)),
       {}
      ));
@@ -785,7 +781,7 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
 
     // Check for field capture
     if (args.captured_piece != Piece.EMPTY /* .startsWith('field') */) {
-      let field = hexDiv.children[0] as HTMLElement;
+      let field = hexDiv.firstElementChild as HTMLElement;
       if (!field) { // or field is not F567X
         console.error("attempt to capture a field that is not there");
       }
@@ -830,28 +826,30 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
     const anims: Promise<void>[] = [];
     const pid = this.player_id;
     const hand = $(IDS.HAND);
-    for (let i = 0; i < args.hand.length; ++i) {
-      let newPiece = args.hand[i];
-      if (i >= hand.childElementCount) {
+    let handPosDiv = hand.firstElementChild;
+    for (let newPiece of args.hand) {
+      if (!handPosDiv) {
         // dynamically expand hand if 7 size hand is chosen
-        hand.appendChild(this.createDiv());
+        handPosDiv = this.createDiv();
+        hand.appendChild(handPosDiv);
       }
-      let pdiv = hand.children[i]?.children[0] as HTMLElement;
-      if (!pdiv) {
+      let pieceDiv = handPosDiv!.firstElementChild as HTMLElement;
+      if (!pieceDiv) {
         if (newPiece && newPiece != Piece.EMPTY) {
-          pdiv = this.createPieceDiv(newPiece, pid);
-          hand.children[i]?.appendChild(pdiv);
-          anims.push(this.animationManager.slideIn(pdiv, $(IDS.poolcount(pid))));
+          pieceDiv = this.createPieceDiv(newPiece, pid);
+          handPosDiv?.appendChild(pieceDiv);
+          anims.push(this.animationManager.slideIn(pieceDiv, $(IDS.poolcount(pid))));
         }
       } else {
-         let pt = pdiv.getAttribute(Attrs.PIECE);
+         let pt = pieceDiv.getAttribute(Attrs.PIECE);
          if (!pt) {
            console.error("hand had piece div but no attribute");
          } else if (pt != this.pieceVal(newPiece!, pid)) {
-           console.error("piece from args", newPiece, "not matches hand", pdiv);
+           console.error("piece from args", newPiece, "not matches hand", pieceDiv);
          }
       }
-    };
+      handPosDiv = handPosDiv!.nextElementSibling;
+    }
     await this.playParallel(anims);
   }
 
