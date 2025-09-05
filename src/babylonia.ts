@@ -328,20 +328,20 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
 
   // Returns the hex (row,col) clicked on, or null if not a playable hex
   private selectedHex(target: EventTarget): RowCol | null {
-    let e = target as Element;
-    while (e.parentElement != null && e.parentElement.id != IDS.BOARD) {
-      e = e.parentElement;
+    let hexDiv = target as Element;
+    while (hexDiv.parentElement != null && hexDiv.parentElement.id != IDS.BOARD) {
+      hexDiv = hexDiv.parentElement;
     }
-    if (e.parentElement == null) {
+    if (hexDiv.parentElement == null) {
       console.warn('no hex');
       return null;
     }
     // now check if it's allowed
-    if (!e.classList.contains(CSS.PLAYABLE)) {
+    if (!hexDiv.classList.contains(CSS.PLAYABLE)) {
       // console.log('not playable');
       return null;
     }
-    const id = e.id.split('_');
+    const id = hexDiv.id.split('_');
     return {
       row: Number(id[2]),
       col: Number(id[3]),
@@ -486,7 +486,7 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
     this.hexDiv(rc).classList.remove(CSS.SELECTED);
   }
 
-  private markScoreableHexesPlayable(hexes: RowCol[]): void {
+  private markHexesPlayable(hexes: RowCol[]): void {
     hexes.forEach(rc => this.markHexPlayable(rc));
   }
 
@@ -669,7 +669,7 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
   }
 
   private onUpdateActionButtons_selectHexToScore(args: { hexes: RowCol[] }): void {
-    this.markScoreableHexesPlayable(args.hexes);
+    this.markHexesPlayable(args.hexes);
   }
 
   private markAllHexesUnplayable(): void {
@@ -979,7 +979,7 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
           this.gamedatas.players[playerId]!.color,
           { duration: 2500, easing: 'ease-in-out', extraClass: 'bbl_city_scoring' });
         details.network_locations.forEach(
-          (rc) => {
+          (rc: RowCol) => {
             let cl = this.hexDiv(rc).classList;
             cl.remove(CSS.IN_NETWORK);
             cl.remove(CSS.UNIMPORTANT);
