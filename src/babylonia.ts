@@ -216,35 +216,45 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
     return e;
   }
 
-  private setupGameBoard(boardData: Hex[], playersData: PlayerData[]): void {
+  private async setupGameBoard(boardData: Hex[], playersData: PlayerData[]): Promise<void> {
     const boardDiv = $(IDS.BOARD);
     // console.log(gamedatas.board);
 
-    for (const hex of boardData) {
-      const hexDiv = this.html.hexDiv(hex);
-      boardDiv.appendChild(hexDiv);
-      if (hex.piece != null && hex.piece != Piece.EMPTY) {
-        let pieceDiv = this.createPieceDiv(hex.piece, hex.board_player)
-        hexDiv.appendChild(pieceDiv);
-      }
-    }
-    // alternative, that theoretically would have pieces animating in:
-    if (false) {
-      let anims: Promise<any>[] = [];
+    const animateBoardInitialPlacement = true;
+
+    if (animateBoardInitialPlacement) {
+      const inParallel = true;
+      const duration = inParallel ? 500 : 125;
+      let anims: (() => Promise<any>)[] = [];
       for (const hex of boardData) {
         const hexDiv = this.html.hexDiv(hex);
         boardDiv.appendChild(hexDiv);
-        if (hex.piece != null) {
+        if (hex.piece != null && hex.piece != Piece.EMPTY) {
           let pieceDiv = this.createPieceDiv(hex.piece, hex.board_player)
           if (hex.board_player == 0) {
             hexDiv.appendChild(pieceDiv);
           } else {
-            $(IDS.handcount(hex.board_player)).appendChild(pieceDiv);
-            anims.push(this.animationManager.slideAndAttach(pieceDiv, hexDiv));
+            anims.push(() => {
+              hexDiv.appendChild(pieceDiv);
+              return this.animationManager.slideIn(pieceDiv, $(IDS.handcount(hex.board_player)), { duration: duration });
+            });
           }
         }
       }
-      /* await */ this.playParallel(anims);
+      if (inParallel) {
+        await this.animationManager.playParallel(anims);
+      } else {
+        await this.animationManager.playSequentially(anims);
+      }
+    } else {
+      for (const hex of boardData) {
+        const hexDiv = this.html.hexDiv(hex);
+        boardDiv.appendChild(hexDiv);
+        if (hex.piece != null && hex.piece != Piece.EMPTY) {
+          let pieceDiv = this.createPieceDiv(hex.piece, hex.board_player)
+          hexDiv.appendChild(pieceDiv);
+        }
+      }
     }
   }
 
