@@ -157,7 +157,7 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
   private handCounters: Counter[] = [];
   private poolCounters: Counter[] = [];
   private cityCounters: Counter[] = [];
-  private selectedHandPos: number | null = null;
+  private selectedHandDiv: Element | null = null;
   private playStateArgs: PlayState | null = null;
   private html: Html = new Html({});
   private playerIdToColorIndex: Record<number, number> = {};
@@ -362,19 +362,21 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
   }
 
   private playSelectedPiece(event: Event): void {
-    if (this.selectedHandPos == null) {
+    if (!this.selectedHandDiv) {
       console.error('no piece selected!');
+      return;
     }
 
     const hex = this.selectedHex(event.target!);
     if (hex == null) {
+      console.error('no hex selected!');
       return;
     }
     // console.log('selected hex ' + hex.row + ',' + hex.col);
 
     this.setClientState('client_hexpicked', {});
     this.bgaPerformAction('actPlayPiece', {
-      handpos: this.selectedHandPos,
+      handpos: this.indexInParent(this.selectedHandDiv),
       row: hex.row,
       col: hex.col
     }).then(() => {
@@ -507,7 +509,7 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
       cl.remove(CSS.PLAYABLE);
       cl.remove(CSS.UNPLAYABLE);
     });
-    this.selectedHandPos = null;
+    this.selectedHandDiv = null;
   }
 
   private setPlayablePieces(): void {
@@ -532,7 +534,7 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
       console.error('playStateArgs unexpectedly null');
       return;
     }
-    this.selectedHandPos = null;
+    this.selectedHandDiv = null;
     if (this.playStateArgs.canEndTurn) {
       if (this.playStateArgs.allowedMoves.length == 0) {
         this.setClientState('client_noPlaysLeft', {
@@ -587,17 +589,6 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
     //   return false;
     // }
 
-    let handpos = -1;
-    let hand = $(IDS.HAND);
-    for (let i = 0; i < hand.childElementCount; ++i) {
-      if (hand.childNodes.item(i) == parentDiv) {
-        handpos = i;
-      }
-    }
-    if (handpos < 0) {
-      console.error("couldn't find element in its parent's children?");
-    }
-
     if (this.allowedMovesFor(pieceDiv).length == 0) {
       return false;
     }
@@ -611,7 +602,7 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
     }
     cl.toggle(CSS.SELECTED);
     if (playable) {
-      this.selectedHandPos = handpos;
+      this.selectedHandDiv = parentDiv;
       if (this.currentState != 'client_pickHexToPlay') {
         this.setClientState('client_pickHexToPlay', {
           descriptionmyturn: _('${you} must select a hex to play to'),

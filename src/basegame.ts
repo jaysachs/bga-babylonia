@@ -115,6 +115,19 @@ class BaseGame<T extends Gamedatas> extends GameGui<T> {
     return this.animationManager.playParallel([(i: number) => anims[i]!]);
   }
 
+  // Returns the index of the given element among its parent's child elements
+  // Returns 0 if no parent.
+  protected indexInParent(el: Element): number {
+    const parentEl = el.parentElement;
+    if (!parentEl) { return 0; }
+    for (let i = 0; i < parentEl.childElementCount; ++i) {
+      if (el == parentEl.children[i]) {
+        return i;
+      }
+    }
+    throw new Error("element not found among its parent's children: ${el}");
+  }
+
   protected createDiv(settings?: {
     id?: string,
     attrs?: Record<string, string> | null;
