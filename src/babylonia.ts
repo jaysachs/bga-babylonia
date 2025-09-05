@@ -814,10 +814,17 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
       hexDiv.appendChild(div);
       anims.push(this.animationManager.slideIn(div, $(IDS.handcount(args.player_id))));
     }
-    // TODO: do some animation for ziggurat scoring
+    // animate the ziggurat scoring, if any
     if (args.ziggurat_points > 0) {
-      // TODO: flash all the args.touched_ziggurats
-      //   maybe use CSS?
+      // TODO: other options? flash all the args.touched_ziggurats via CSS/wait?
+      anims.push(this.playParallel(
+        args.touched_ziggurats.map((rc: RowCol) =>
+          this.animationManager.displayScoring(
+            this.hexDiv(rc),
+            1,
+            this.gamedatas.players[this.player_id]!.color,
+            { duration: 2000, easing: 'ease-in-out', extraClass: 'bbl_city_scoring' }))
+      ));
     }
 
     await this.playParallel(anims);
