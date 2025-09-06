@@ -477,11 +477,11 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
   }
 
   private markHexesPlayable(hexes: RowCol[]): void {
-    hexes.forEach(rc => this.markHexPlayable(rc));
+    hexes.forEach(this.markHexPlayable.bind(this));
   }
 
   private unmarkHexesPlayable(hexes: RowCol[]): void {
-    hexes.forEach(rc => this.unmarkHexPlayable(rc));
+    hexes.forEach(this.unmarkHexPlayable.bind(this));
   }
 
   private markHexesPlayableForPiece(div: Element): void {
@@ -804,7 +804,7 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
     }
     // animate the ziggurat scoring, if any
     if (args.ziggurat_points > 0) {
-      args.touched_ziggurats.forEach((rc) => this.markHexSelected(rc));
+      args.touched_ziggurats.forEach(this.markHexSelected.bind(this));
       anims.push(this.playParallel(
         args.touched_ziggurats.map((rc: RowCol) =>
           this.animationManager.displayScoring(
@@ -812,7 +812,7 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
               1,
               this.gamedatas.players[this.player_id]!.color,
               { duration: 2000, easing: 'ease-in-out', extraClass: 'bbl_city_scoring' })
-            .then(() => args.touched_ziggurats.forEach((rc) => this.unmarkHexSelected(rc))))
+            .then(() => args.touched_ziggurats.forEach(this.unmarkHexSelected.bind(this))))
       ));
     }
 
@@ -1016,16 +1016,4 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
     }
     return { log, args };
   }
-
-
-  /// experimental
-  private handPieceDivs() : (HTMLElement | undefined)[] {
-    let result: (HTMLElement | undefined)[] = [];
-    const hand = $(IDS.HAND);
-    hand.childNodes.forEach((n: ChildNode) => {
-      result.push(n as HTMLElement);
-    });
-    return result;
-  }
-
 }
