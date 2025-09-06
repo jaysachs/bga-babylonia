@@ -10,7 +10,7 @@
 10.~~NOT MY BUG Consider timed confirm for manual selection of scored hexes.~~
 11. Optimize the representation / payload for allowed moves. In particular, consider not sending RowCol as objects but instead their string rep (e.g. "3_8"). The FE only needs the separate row col when constructing the grid, and when sending actions back (though could also use the string format there too).
 12. ~~DONE Thorough manual testing of manual scoring hex selection.~~
-13. For manual scoring hex selection, automate if just one possibility.
+13. ~~DONE For manual scoring hex selection, automate if just one possibility.~~
 14. ~~NOT MY BUG Figure out bug with intermittend animation waiting on nonvisibloe separate tab.~~
 15. Tooltips for cities (and fields) showing the points that would be scored for it.
 16. ~~ONLY IF REQUESTED User preferences for autoconfirm?~~

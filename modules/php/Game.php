@@ -368,7 +368,6 @@ class Game extends \Bga\GameFramework\Table
 
     public function stEndOfTurnScoring(): void
     {
-        // TODO: automate when there is just one hex.
         $player_id = $this->activePlayerId();
         $player_on_turn = $this->playerOnTurn();
         if ($player_id != $player_on_turn) {
@@ -383,6 +382,15 @@ class Game extends \Bga\GameFramework\Table
 
         if (count($rcs) == 0) {
             $this->gamestate->nextState("done");
+            return;
+        }
+        if (count($rcs) == 1) {
+            $this->gamestate->nextState("automatedHexSelection");
+            // TODO: is this useful/needed?
+            // $this->notify->all(
+            //     "automatedScoringSingle",
+            //     clienttranslate('Single hex requiring scoring selected automatically')
+            // );
             return;
         }
 
@@ -764,7 +772,7 @@ class Game extends \Bga\GameFramework\Table
         // Init game statistics.
         Stats::initAll(array_keys($players));
 
-        // Create the game mode.
+        // Create the game.
         $model = new Model($this->ps, 0);
         $model->createNewGame(
             array_keys($players),
@@ -820,6 +828,7 @@ class Game extends \Bga\GameFramework\Table
                         }
                         break;
                     }
+                // TODO: player may need to select ziggurat card
                 default: {
                         $this->gamestate->nextState("zombiePass");
                         break;
