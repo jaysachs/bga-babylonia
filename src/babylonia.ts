@@ -352,9 +352,8 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
     }
     this.setClientState('client_hexpicked', {});
     this.bgaPerformAction('actSelectHexToScore', hex).then(() => {
+      this.unmarkHexPlayable(hex);
     });
-    this.unmarkHexPlayable(hex);
-    // this.markHexSelected(hex);
   }
 
   private playSelectedPiece(event: Event): void {
@@ -481,12 +480,16 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
     hexes.forEach(rc => this.markHexPlayable(rc));
   }
 
+  private unmarkHexesPlayable(hexes: RowCol[]): void {
+    hexes.forEach(rc => this.unmarkHexPlayable(rc));
+  }
+
   private markHexesPlayableForPiece(div: Element): void {
-    this.allowedMovesFor(div).forEach(rc => this.markHexPlayable(rc));
+    this.markHexesPlayable(this.allowedMovesFor(div));
   }
 
   private unmarkHexesPlayableForPiece(div: Element): void {
-    this.allowedMovesFor(div).forEach(rc => this.unmarkHexPlayable(rc));
+    this.unmarkHexesPlayable(this.allowedMovesFor(div));
   }
 
   private unselectAllHandPieces(): void {
