@@ -757,8 +757,9 @@ class Game extends \Bga\GameFramework\Table
             )
         );
 
-        $this->reattributeColorsBasedOnPreferences($players, $gameinfos['player_colors']);
-        $this->reloadPlayersBasicInfos();
+        // TODO: turn this into a game option?
+        // $this->reattributeColorsBasedOnPreferences($players, $gameinfos['player_colors']);
+        // $this->reloadPlayersBasicInfos();
 
         // Init game statistics.
         Stats::initAll(array_keys($players));
