@@ -218,7 +218,6 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
 
   private async setupGameBoard(boardData: Hex[], playersData: PlayerData[]): Promise<void> {
     const boardDiv = $(IDS.BOARD);
-    // console.log(gamedatas.board);
 
     const animateBoardInitialPlacement = true;
 
@@ -290,7 +289,6 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
   }
 
   private updateHandCount(player: { player_id: number; hand_size: number; }, animate: boolean = true) {
-    console.log('update hand count', player, this.handCounters[player.player_id]);
     this.updateCounter(this.handCounters[player.player_id]!,
       player.hand_size,
       animate);
@@ -338,7 +336,6 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
     }
     // now check if it's allowed
     if (!hexDiv.classList.contains(CSS.PLAYABLE)) {
-      // console.log('not playable');
       return null;
     }
     const id = hexDiv.id.split('_');
@@ -354,7 +351,6 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
       return;
     }
     this.setClientState('client_hexpicked', {});
-    // console.log('selected hex ' + hex.row + ',' + hex.col);
     this.bgaPerformAction('actSelectHexToScore', hex).then(() => {
     });
     this.unmarkHexPlayable(hex);
@@ -372,8 +368,6 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
       console.error('no hex selected!');
       return;
     }
-    // console.log('selected hex ' + hex.row + ',' + hex.col);
-
     this.setClientState('client_hexpicked', {});
     this.bgaPerformAction('actPlayPiece', {
       handpos: this.indexInParent(this.selectedHandDiv),
@@ -386,7 +380,6 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
   }
 
   private onBoardClicked(event: Event): boolean {
-    // console.log('onBoardClicked:' + (event.target as Element).id);
     event.preventDefault();
     event.stopPropagation();
     if (!this.isCurrentPlayerActive()) {
@@ -404,8 +397,6 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
   }
 
   private onZcardClicked(event: Event): boolean {
-    // console.log('onZcardClicked', event);
-
     event.preventDefault();
     event.stopPropagation();
     if (!this.isCurrentPlayerActive()) {
@@ -567,7 +558,6 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
   }
 
   private onHandClicked(ev: Event): boolean {
-    console.log('onHandClicked', ev);
     ev.preventDefault();
     ev.stopPropagation();
     if (!this.isCurrentPlayerActive()) {
@@ -700,7 +690,6 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
       piece: string;
     }
   ): Promise<void> {
-    console.log("notif_undoMoveActive", args);
     if (this.player_id != args.player_id) {
       console.error('Non-active player got the undoMoveActive notification, ignoring');
       return Promise.resolve();
@@ -741,7 +730,6 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
       piece: string;
     }
   ): Promise<void> {
-    console.log("notif_undoMove", args);
     if (this.player_id == args.player_id) {
       console.error("active player should have undoMove filtered");
       return Promise.resolve();
@@ -783,8 +771,6 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
       touched_ziggurats: RowCol[];
     }
   ): Promise<void> {
-    console.log("notif_piecePlayed", args);
-
     let anims: Promise<any>[] = [];
 
     const hexDiv = this.hexDiv(args);
@@ -907,7 +893,6 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
       winner_hexes: RowCol[];
       other_hexes: RowCol[];
     }): Promise<void> {
-    console.log("notif_zigguratScore", args);
     await this.indicateNeighbors(args.winner_hexes, args.other_hexes).then(() => this.unmarkHexSelected(args));
     // TODO: consider better visual treatments
   }
@@ -956,8 +941,6 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
       }[];
     }
   ): Promise<void> {
-    console.log("notif_cityScored", args);
-
     this.pushActionBarTitle(this.format_string(_("City at ${row},${col} scoring"),
                                                {"row": `${args.row}`, "col": `${args.col}`}));
     const hex = $(IDS.hexDiv(args));
