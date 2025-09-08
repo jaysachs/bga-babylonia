@@ -29,6 +29,8 @@ namespace Bga\Games\babylonia;
 
 require_once(APP_GAMEMODULE_PATH . "module/table/table.game.php");
 
+require_once("Stats.php");
+
 class Game extends \Bga\GameFramework\Table /* implements \Bga\Games\babylonia\StatsImpl */
 {
     // Used during scoring ziggurats in case the scoring of a ziggurat
