@@ -922,7 +922,7 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
   ): Promise<void> {
     this.scoreCtrl[args.player_id]!.toValue(args.score);
     const zelem = $(IDS.zcard(args.zcard));
-    zelem.classList.remove(CSS.SELECTED);
+    zelem.parentElement!.classList.remove(CSS.SELECTED);
     await this.animationManager.slideAndAttach(zelem, $(IDS.playerBoardZcards(args.player_id)));
   }
 
