@@ -29,7 +29,7 @@ namespace Bga\Games\babylonia;
 
 require_once(APP_GAMEMODULE_PATH . "module/table/table.game.php");
 
-class Game extends \Bga\GameFramework\Table
+class Game extends \Bga\GameFramework\Table /* implements \Bga\Games\babylonia\StatsImpl */
 {
     // Used during scoring ziggurats in case the scoring of a ziggurat
     //  means another player needs to choose a card; this global holds
@@ -43,6 +43,7 @@ class Game extends \Bga\GameFramework\Table
     private const GLOBAL_ROW_COL_BEING_SCORED = 'row_col_being_scored';
 
     private PersistentStore $ps;
+    private Stats $stats;
 
     public function __construct()
     {
@@ -54,7 +55,7 @@ class Game extends \Bga\GameFramework\Table
             Game::GLOBAL_ROW_COL_BEING_SCORED => 12,
         ]);
 
-        Stats::init($this);
+        $this->stats = new Stats($this);
         $this->ps = new PersistentStore(new DefaultDb());
     }
 
@@ -66,16 +67,16 @@ class Game extends \Bga\GameFramework\Table
         $points = $move->points();
         $piece = $move->piece->value;
         if ($move->captured_piece->isField()) {
-            Stats::PLAYER_FIELDS_CAPTURED->inc($player_id);
+            $this->stats->PLAYER_FIELDS_CAPTURED->inc($player_id);
         }
         if ($move->piece->isHidden()) {
-            Stats::PLAYER_RIVER_SPACES_PLAYED->inc($player_id);
+            $this->stats->PLAYER_RIVER_SPACES_PLAYED->inc($player_id);
         }
         $msg = null;
         if ($points > 0) {
             $msg = clienttranslate('${player_name} plays ${piece} to (${row},${col}) scoring ${points}');
-            Stats::PLAYER_POINTS_FROM_FIELDS->inc($player_id, $move->field_points);
-            Stats::PLAYER_POINTS_FROM_ZIGGURATS->inc($player_id, $move->ziggurat_points);
+            $this->stats->PLAYER_POINTS_FROM_FIELDS->inc($player_id, $move->field_points);
+            $this->stats->PLAYER_POINTS_FROM_ZIGGURATS->inc($player_id, $move->ziggurat_points);
         } else {
             $msg = clienttranslate('${player_name} plays ${piece} to (${row},${col})');
         }
@@ -184,7 +185,7 @@ class Game extends \Bga\GameFramework\Table
         $scored_city = $model->scoreCity($cityhex->rc);
         $captured_by = $scored_city->hex_winner->captured_by;
         if ($captured_by > 0) {
-            Stats::PLAYER_CITIES_CAPTURED->inc($captured_by);
+            $this->stats->PLAYER_CITIES_CAPTURED->inc($captured_by);
             $msg = clienttranslate('${city} at (${row},${col}) scored, captured by ${player_name}');
         } else {
             $msg = clienttranslate('${city} at (${row},${col}) scored, uncaptured');
@@ -197,8 +198,8 @@ class Game extends \Bga\GameFramework\Table
         $details = [];
         foreach ($player_infos as $pid => $pi) {
             $points = $scored_city->pointsForPlayer($pid);
-            Stats::PLAYER_POINTS_FROM_CITY_NETWORKS->inc($pid, $scored_city->networkPointsForPlayer($pid));
-            Stats::PLAYER_POINTS_FROM_CAPTURED_CITIES->inc($pid, $scored_city->capturePointsForPlayer($pid));
+            $this->stats->PLAYER_POINTS_FROM_CITY_NETWORKS->inc($pid, $scored_city->networkPointsForPlayer($pid));
+            $this->stats->PLAYER_POINTS_FROM_CAPTURED_CITIES->inc($pid, $scored_city->capturePointsForPlayer($pid));
             $details[$pid] = [
                 "player_id" => $pid,
                 "player_name" => $this->getPlayerNameById($pid),
@@ -291,17 +292,17 @@ class Game extends \Bga\GameFramework\Table
         $model = new Model($this->ps, $player_id);
         $selection =
             $model->selectZigguratCard(ZigguratCardType::from($zctype));
-        Stats::PLAYER_ZIGGURAT_CARDS->inc($player_id);
+        $this->stats->PLAYER_ZIGGURAT_CARDS->inc($player_id);
         $stat = match ($selection->card->type) {
-            ZigguratCardType::PLUS_10 => Stats::PLAYER_ZIGGURAT_CARD_1_CHOSEN,
-            ZigguratCardType::EXTRA_TURN => Stats::PLAYER_ZIGGURAT_CARD_2_CHOSEN,
-            ZigguratCardType::HAND_SIZE_7 => Stats::PLAYER_ZIGGURAT_CARD_3_CHOSEN,
-            ZigguratCardType::NOBLES_3_KINDS => Stats::PLAYER_ZIGGURAT_CARD_4_CHOSEN,
-            ZigguratCardType::NOBLE_WITH_3_FARMERS => Stats::PLAYER_ZIGGURAT_CARD_5_CHOSEN,
-            ZigguratCardType::NOBLES_IN_FIELDS => Stats::PLAYER_ZIGGURAT_CARD_6_CHOSEN,
-            ZigguratCardType::EXTRA_CITY_POINTS => Stats::PLAYER_ZIGGURAT_CARD_7_CHOSEN,
-            ZigguratCardType::FREE_CENTER_LAND_CONNECTS => Stats::PLAYER_ZIGGURAT_CARD_8_CHOSEN,
-            ZigguratCardType::FREE_RIVER_CONNECTS => Stats::PLAYER_ZIGGURAT_CARD_9_CHOSEN,
+            ZigguratCardType::PLUS_10 => $this->stats->PLAYER_ZIGGURAT_CARD_1_CHOSEN,
+            ZigguratCardType::EXTRA_TURN => $this->stats->PLAYER_ZIGGURAT_CARD_2_CHOSEN,
+            ZigguratCardType::HAND_SIZE_7 => $this->stats->PLAYER_ZIGGURAT_CARD_3_CHOSEN,
+            ZigguratCardType::NOBLES_3_KINDS => $this->stats->PLAYER_ZIGGURAT_CARD_4_CHOSEN,
+            ZigguratCardType::NOBLE_WITH_3_FARMERS => $this->stats->PLAYER_ZIGGURAT_CARD_5_CHOSEN,
+            ZigguratCardType::NOBLES_IN_FIELDS => $this->stats->PLAYER_ZIGGURAT_CARD_6_CHOSEN,
+            ZigguratCardType::EXTRA_CITY_POINTS => $this->stats->PLAYER_ZIGGURAT_CARD_7_CHOSEN,
+            ZigguratCardType::FREE_CENTER_LAND_CONNECTS => $this->stats->PLAYER_ZIGGURAT_CARD_8_CHOSEN,
+            ZigguratCardType::FREE_RIVER_CONNECTS => $this->stats->PLAYER_ZIGGURAT_CARD_9_CHOSEN,
         };
         $stat->set($player_id, true);
         $this->notify->all(
@@ -354,14 +355,14 @@ class Game extends \Bga\GameFramework\Table
         $next_player = 0;
         if ($hex->piece->isCity()) {
             $this->scoreCity($model, $hex);
-            Stats::PLAYER_CITY_SCORING_TRIGGERED->inc($player_id);
+            $this->stats->PLAYER_CITY_SCORING_TRIGGERED->inc($player_id);
             $this->gamestate->nextState("citySelected");
         } else if ($hex->piece->isZiggurat()) {
             $next_player = $this->scoreZiggurat($model, $hex);
             if ($next_player != 0) {
                 $this->setNextPlayerToBeActive($next_player);
             }
-            Stats::PLAYER_ZIGGURAT_SCORING_TRIGGERED->inc($player_id);
+            $this->stats->PLAYER_ZIGGURAT_SCORING_TRIGGERED->inc($player_id);
             $this->gamestate->nextState("zigguratSelected");
         }
     }
@@ -426,10 +427,10 @@ class Game extends \Bga\GameFramework\Table
         $result = $model->finishTurn();
         if ($result->gameOver()) {
             if ($result->less_than_two_remaining_cities) {
-                Stats::TABLE_GAME_END_BY_CITY_CAPTURES->set(true);
+                $this->stats->TABLE_GAME_END_BY_CITY_CAPTURES->set(true);
             }
             if ($result->pieces_exhausted) {
-                Stats::TABLE_GAME_END_BY_POOL_EXHAUSTION->set(true);
+                $this->stats->TABLE_GAME_END_BY_POOL_EXHAUSTION->set(true);
             }
             $this->notify->all(
                 "gameEnded",
@@ -484,7 +485,7 @@ class Game extends \Bga\GameFramework\Table
     {
         $this->activeNextPlayer();
         $player_id = $this->activePlayerId();
-        Stats::PLAYER_NUMBER_TURNS->inc($player_id);
+        $this->stats->PLAYER_NUMBER_TURNS->inc($player_id);
         $this->giveExtraTime($player_id);
         $this->setPlayerOnTurn($player_id);
         $this->setNextPlayerToBeActive(0);
@@ -503,14 +504,14 @@ class Game extends \Bga\GameFramework\Table
         $move = $model->undo();
 
         if ($move->piece->isHidden()) {
-            Stats::PLAYER_RIVER_SPACES_PLAYED->inc($player_id, -1);
+            $this->stats->PLAYER_RIVER_SPACES_PLAYED->inc($player_id, -1);
         }
         if ($move->captured_piece->isField()) {
-            Stats::PLAYER_FIELDS_CAPTURED->inc($player_id, -1);
+            $this->stats->PLAYER_FIELDS_CAPTURED->inc($player_id, -1);
         }
         if ($move->points() > 0) {
-            Stats::PLAYER_POINTS_FROM_FIELDS->inc($player_id, -$move->field_points);
-            Stats::PLAYER_POINTS_FROM_ZIGGURATS->inc(
+            $this->stats->PLAYER_POINTS_FROM_FIELDS->inc($player_id, -$move->field_points);
+            $this->stats->PLAYER_POINTS_FROM_ZIGGURATS->inc(
                 $player_id,
                 -$move->ziggurat_points
             );
@@ -770,7 +771,7 @@ class Game extends \Bga\GameFramework\Table
         // $this->reloadPlayersBasicInfos();
 
         // Init game statistics.
-        Stats::initAll(array_keys($players));
+        $this->stats->initAll(array_keys($players));
 
         // Create the game.
         $model = new Model($this->ps, 0);

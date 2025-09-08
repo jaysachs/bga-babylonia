@@ -6,11 +6,12 @@ use PHPUnit\Framework\TestCase;
 
 use Bga\Games\babylonia\{
     Stats,
+    // StatsImpl
 };
 
-class SImpl {
+class SImpl /* implements StatsImpl */ {
     public $vals = [];
-    public function initStat($cat, $name, $value, $player_id = null) {
+    public function initStat(string $cat, string $name, mixed $value, int $player_id = 0): void {
         if ($player_id === null) {
             $this->vals[$name] = $value;
         } else {
@@ -21,7 +22,7 @@ class SImpl {
         }
     }
 
-    public function incStat($delta, $name, $player_id = null) {
+    public function incStat(mixed $delta, string $name, int $player_id = 0): void {
         if ($player_id === null) {
             $this->vals[$name] += $delta;
         } else {
@@ -29,7 +30,7 @@ class SImpl {
         }
     }
 
-    public function setStat($value, $name, $player_id = null) {
+    public function setStat($value, $name, $player_id = 0): void {
         if ($player_id === null) {
             $this->vals[$name] = $value;
         } else {
@@ -37,7 +38,7 @@ class SImpl {
         }
     }
 
-    public function getStat($name, $player_id = null) {
+    public function getStat($name, $player_id = 0): mixed {
         if ($player_id === null) {
             return $vals[$name];
         }
@@ -49,16 +50,17 @@ final class StatsTest extends TestCase
 {
     public function testInit(): void
     {
-        Stats::init(new SImpl());
-        Stats::initAll([1,2,3]);
+        $stats = new Stats(new SImpl());
+        $stats->initAll([1,2,3]);
         $this->assertTrue(true);
     }
 
     public function testSetGet(): void
     {
-        Stats::init(new SImpl(), [0, 2]);
-        Stats::PLAYER_NUMBER_TURNS->set(2, 4);
+        $stats = new Stats(new SImpl());
+        $stats->initAll([0, 2]);
+        $stats->PLAYER_NUMBER_TURNS->set(2, 4);
 
-        $this->assertEquals(4, Stats::PLAYER_NUMBER_TURNS->get(2));
+        $this->assertEquals(4, $stats->PLAYER_NUMBER_TURNS->get(2));
     }
 }
