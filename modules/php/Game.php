@@ -64,7 +64,7 @@ class Game extends \Bga\GameFramework\Table /* implements \Bga\Games\babylonia\S
     public function actPlayPiece(int $handpos, int $row, int $col): void
     {
         $player_id = $this->activePlayerId();
-        $model = new Model($this->ps, $player_id);
+        $model = $this->model();
         $move = $model->playPiece($handpos, new RowCol($row, $col));
         $points = $move->points();
         $piece = $move->piece->value;
@@ -106,8 +106,7 @@ class Game extends \Bga\GameFramework\Table /* implements \Bga\Games\babylonia\S
 
     public function actDonePlayPieces(): void
     {
-        $player_id = $this->activePlayerId();
-        $model = new Model($this->ps, $player_id);
+        $model = $this->model();
         if (!$model->canEndTurn()) {
             throw new \BgaUserException("Attempt to end turn but less than 2 pieces played");
         }
@@ -116,7 +115,7 @@ class Game extends \Bga\GameFramework\Table /* implements \Bga\Games\babylonia\S
             "donePlayed",
             clienttranslate('${player_name} finishes playing pieces'),
             [
-                "player_id" => $player_id,
+                "player_id" => $this->activePlayerId(),
                 "player_name" => $this->getActivePlayerName(),
             ]
         );
@@ -126,7 +125,7 @@ class Game extends \Bga\GameFramework\Table /* implements \Bga\Games\babylonia\S
 
     public function argPlayPieces(): array
     {
-        $model = new Model($this->ps, $this->activePlayerId());
+        $model = $this->model();
 
         return [
             "allowedMoves" => $model->getAllowedMoves(),
@@ -143,7 +142,7 @@ class Game extends \Bga\GameFramework\Table /* implements \Bga\Games\babylonia\S
      */
     public function getGameProgression()
     {
-        $model = new Model($this->ps, $this->activePlayerId());
+        $model = $this->model();
         $player_infos = $model->allPlayerInfo();
         $total_pieces = 30 * count($player_infos);
         $remaining_pieces = 0;
@@ -155,7 +154,7 @@ class Game extends \Bga\GameFramework\Table /* implements \Bga\Games\babylonia\S
 
     public function stCityScoring(): void
     {
-        $model = new Model($this->ps, $this->activePlayerId());
+        $model = $this->model();
         $cityhex = $model->board()->hexAt($this->rowColBeingScored());
         // grab this, as it will change underneath when the model scores it.
         $city = $cityhex->piece->value;
@@ -224,7 +223,7 @@ class Game extends \Bga\GameFramework\Table /* implements \Bga\Games\babylonia\S
 
     public function stZigguratScoring(): void
     {
-        $model = new Model($this->ps, $this->activePlayerId());
+        $model = $this->model();
         $zighex = $model->board()->hexAt($this->rowColBeingScored());
 
         $scored_zig = $model->scoreZiggurat($zighex->rc);
@@ -263,8 +262,7 @@ class Game extends \Bga\GameFramework\Table /* implements \Bga\Games\babylonia\S
 
     public function argSelectZigguratCard(): array
     {
-        $player_id = $this->activePlayerId();
-        $model = new Model($this->ps, $player_id);
+        $model = $this->model();
         $zcards = $model->components()->availableZigguratCards();
         return [
             "hex" => $this->rowColBeingScored(),
@@ -280,7 +278,7 @@ class Game extends \Bga\GameFramework\Table /* implements \Bga\Games\babylonia\S
     public function actSelectZigguratCard(string $zctype): void
     {
         $player_id = $this->activePlayerId();
-        $model = new Model($this->ps, $player_id);
+        $model = $this->model();
         $selection =
             $model->selectZigguratCard(ZigguratCardType::from($zctype));
         $this->stats->PLAYER_ZIGGURAT_CARDS->inc($player_id);
@@ -316,7 +314,7 @@ class Game extends \Bga\GameFramework\Table /* implements \Bga\Games\babylonia\S
 
     public function stAutoScoringHexSelection(): void
     {
-        $model = new Model($this->ps, $this->activePlayerId());
+        $model = $this->model();
         $rcs = $model->locationsRequiringScoring();
         if (count($rcs) == 0) {
             $this->gamestate->nextState("done");
@@ -328,7 +326,7 @@ class Game extends \Bga\GameFramework\Table /* implements \Bga\Games\babylonia\S
 
     public function argSelectHexToScore(): array
     {
-        $model = new Model($this->ps, $this->activePlayerId());
+        $model = $this->model();
         $rcs = $model->locationsRequiringScoring();
         return ["hexes" => $rcs];
     }
@@ -336,7 +334,7 @@ class Game extends \Bga\GameFramework\Table /* implements \Bga\Games\babylonia\S
     public function actSelectHexToScore(int $row, int $col): void
     {
         $player_id = $this->activePlayerId();
-        $model = new Model($this->ps, $player_id);
+        $model = $this->model();
         $rc = new RowCol($row, $col);
         $hex = $model->board()->hexAt($rc);
         $msg = $this->optionEnabled(TableOption::AUTOMATED_SCORING_SELECTION)
@@ -364,9 +362,12 @@ class Game extends \Bga\GameFramework\Table /* implements \Bga\Games\babylonia\S
         }
     }
 
+    private function model() : Model {
+        return new Model($this->ps, $this->activePlayerId());
+    }
+
     public function stEndOfTurnScoring(): void
     {
-
         // switch back to player on turn if necessary.
         $player_on_turn = $this->playerOnTurn();
         if ($this->activePlayerId() != $player_on_turn) {
@@ -374,8 +375,7 @@ class Game extends \Bga\GameFramework\Table /* implements \Bga\Games\babylonia\S
             $this->giveExtraTime($player_on_turn);
         }
 
-        $model = new Model($this->ps, $this->activePlayerId());
-        $rcs = $model->locationsRequiringScoring();
+        $rcs = $this->model()->locationsRequiringScoring();
 
         $this->setNextPlayerToBeActive(0);
 
@@ -411,7 +411,7 @@ class Game extends \Bga\GameFramework\Table /* implements \Bga\Games\babylonia\S
     public function stFinishTurn(): void
     {
         $player_id = $this->activePlayerId();
-        $model = new Model($this->ps, $player_id);
+        $model = $this->model();
 
         $result = $model->finishTurn();
         if ($result->gameOver()) {
@@ -489,7 +489,7 @@ class Game extends \Bga\GameFramework\Table /* implements \Bga\Games\babylonia\S
     public function actUndoPlay()
     {
         $player_id = $this->activePlayerId();
-        $model = new Model($this->ps, $player_id);
+        $model = $this->model();
         $move = $model->undo();
 
         if ($move->piece->isHidden()) {
@@ -531,7 +531,7 @@ class Game extends \Bga\GameFramework\Table /* implements \Bga\Games\babylonia\S
     {
         if ($take_extra_turn) {
             $player_id = $this->activePlayerId();
-            $model = new Model($this->ps, $player_id);
+            $model = $this->model();
             $model->useExtraTurnCard();
             $this->notify->all(
                 "extraTurnUsed",
@@ -809,8 +809,7 @@ class Game extends \Bga\GameFramework\Table /* implements \Bga\Games\babylonia\S
                         // and have surrounded one or more ziggurats / cities.
                         // the game cannot progress properly. So choose one
                         // randomly.
-                        $player_id = $this->activePlayerId();
-                        $model = new Model($this->ps, $player_id);
+                        $model = $this->model();
                         $rcs = $model->locationsRequiringScoring();
                         if (count($rcs) > 0) {
                             $rc = array_shift($rcs);
