@@ -102,7 +102,6 @@ $machinestates = [
         ->type(StateType::GAME)
         ->description('')
         ->action('stEndOfTurnScoring')
-        ->args('argSelectHexToScore')
         ->updateGameProgression(true)
         ->transitions([
             'selectHex' => STATE_PLAYER_SELECT_SCORING_HEX,
