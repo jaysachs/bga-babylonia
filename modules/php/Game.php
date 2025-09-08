@@ -153,35 +153,10 @@ class Game extends \Bga\GameFramework\Table /* implements \Bga\Games\babylonia\S
         return intval(100 - ($remaining_pieces * 100) / $total_pieces);
     }
 
-    private function scoreZiggurat(Model $model, Hex $zighex): int
+    public function stCityScoring(): void
     {
-        $scored_zig = $model->scoreZiggurat($zighex->rc);
-        $winner = $scored_zig->captured_by;
-        if ($winner == 0) {
-            $winner_name = 'noone';
-            $msg = clienttranslate('${city} at (${row},${col}) scored, no winner');
-        } else {
-            $winner_name = $this->getPlayerNameById($winner);
-            $msg = clienttranslate('${city} at (${row},${col}) scored, winner is ${player_name}');
-        }
-        $this->notify->all(
-            "zigguratScored",
-            $msg,
-            [
-                "row" => $zighex->rc->row,
-                "col" => $zighex->rc->col,
-                "winner_hexes" => $scored_zig->winnerRowCols(),
-                "other_hexes" => $scored_zig->othersRowCols(),
-                "player_name" => $winner_name,
-                "player_id" => $winner,
-                "city" => "ziggurat",
-            ]
-        );
-        return $winner;
-    }
-
-    private function scoreCity(Model $model, Hex $cityhex): void
-    {
+        $model = new Model($this->ps, $this->activePlayerId());
+        $cityhex = $model->board()->hexAt($this->rowColBeingScored());
         // grab this, as it will change underneath when the model scores it.
         $city = $cityhex->piece->value;
         $scored_city = $model->scoreCity($cityhex->rc);
@@ -237,18 +212,7 @@ class Game extends \Bga\GameFramework\Table /* implements \Bga\Games\babylonia\S
                 "details" => $details,
             ]
         );
-    }
-
-    public function stAutoScoringHexSelection(): void
-    {
-        $model = new Model($this->ps, $this->playerOnTurn());
-        $rcs = $model->locationsRequiringScoring();
-        if (count($rcs) == 0) {
-            $this->gamestate->nextState("done");
-            return;
-        }
-        $rc = array_shift($rcs);
-        $this->actSelectHexToScore($rc->row, $rc->col);
+        $this->gamestate->nextState("cityScored");
     }
 
     public function argZigguratScoring(): array
@@ -260,15 +224,40 @@ class Game extends \Bga\GameFramework\Table /* implements \Bga\Games\babylonia\S
 
     public function stZigguratScoring(): void
     {
-        $next_player_id = $this->nextPlayerToBeActive();
-        if ($next_player_id != 0) {
-            if ($next_player_id != $this->activePlayerId()) {
-                $this->gamestate->changeActivePlayer($next_player_id);
-                $this->giveExtraTime($next_player_id);
-            }
-            $this->gamestate->nextState("selectZiggurat");
+        $model = new Model($this->ps, $this->activePlayerId());
+        $zighex = $model->board()->hexAt($this->rowColBeingScored());
+
+        $scored_zig = $model->scoreZiggurat($zighex->rc);
+        $winner = $scored_zig->captured_by;
+        if ($winner == 0) {
+            $winner_name = 'noone';
+            $msg = clienttranslate('${city} at (${row},${col}) scored, no winner');
         } else {
-            $this->gamestate->nextState("next");
+            $winner_name = $this->getPlayerNameById($winner);
+            $msg = clienttranslate('${city} at (${row},${col}) scored, winner is ${player_name}');
+        }
+        $this->notify->all(
+            "zigguratScored",
+            $msg,
+            [
+                "row" => $zighex->rc->row,
+                "col" => $zighex->rc->col,
+                "winner_hexes" => $scored_zig->winnerRowCols(),
+                "other_hexes" => $scored_zig->othersRowCols(),
+                "player_name" => $winner_name,
+                "player_id" => $winner,
+                "city" => "ziggurat",
+            ]
+        );
+
+        if ($winner != 0) {
+            if ($winner != $this->activePlayerId()) {
+                $this->gamestate->changeActivePlayer($winner);
+                $this->giveExtraTime($winner);
+            }
+            $this->gamestate->nextState("selectZigguratCard");
+        } else {
+            $this->gamestate->nextState("noWinner");
         }
     }
 
@@ -325,6 +314,18 @@ class Game extends \Bga\GameFramework\Table /* implements \Bga\Games\babylonia\S
         $this->gamestate->nextState("cardSelected");
     }
 
+    public function stAutoScoringHexSelection(): void
+    {
+        $model = new Model($this->ps, $this->activePlayerId());
+        $rcs = $model->locationsRequiringScoring();
+        if (count($rcs) == 0) {
+            $this->gamestate->nextState("done");
+            return;
+        }
+        $rc = array_shift($rcs);
+        $this->actSelectHexToScore($rc->row, $rc->col);
+    }
+
     public function argSelectHexToScore(): array
     {
         $model = new Model($this->ps, $this->activePlayerId());
@@ -354,16 +355,10 @@ class Game extends \Bga\GameFramework\Table /* implements \Bga\Games\babylonia\S
         );
         $this->setRowColBeingScored($rc);
 
-        $next_player = 0;
         if ($hex->piece->isCity()) {
-            $this->scoreCity($model, $hex);
             $this->stats->PLAYER_CITY_SCORING_TRIGGERED->inc($player_id);
             $this->gamestate->nextState("citySelected");
         } else if ($hex->piece->isZiggurat()) {
-            $next_player = $this->scoreZiggurat($model, $hex);
-            if ($next_player != 0) {
-                $this->setNextPlayerToBeActive($next_player);
-            }
             $this->stats->PLAYER_ZIGGURAT_SCORING_TRIGGERED->inc($player_id);
             $this->gamestate->nextState("zigguratSelected");
         }
@@ -371,14 +366,15 @@ class Game extends \Bga\GameFramework\Table /* implements \Bga\Games\babylonia\S
 
     public function stEndOfTurnScoring(): void
     {
-        $player_id = $this->activePlayerId();
+
+        // switch back to player on turn if necessary.
         $player_on_turn = $this->playerOnTurn();
-        if ($player_id != $player_on_turn) {
+        if ($this->activePlayerId() != $player_on_turn) {
             $this->gamestate->changeActivePlayer($player_on_turn);
             $this->giveExtraTime($player_on_turn);
-            $player_id = $player_on_turn;
         }
-        $model = new Model($this->ps, $player_id);
+
+        $model = new Model($this->ps, $this->activePlayerId());
         $rcs = $model->locationsRequiringScoring();
 
         $this->setNextPlayerToBeActive(0);
@@ -415,15 +411,6 @@ class Game extends \Bga\GameFramework\Table /* implements \Bga\Games\babylonia\S
     public function stFinishTurn(): void
     {
         $player_id = $this->activePlayerId();
-        $player_on_turn = $this->playerOnTurn();
-        if ($player_on_turn != 0) {
-            if ($player_on_turn != $player_id) {
-                $this->giveExtraTime($player_on_turn);
-                $this->gamestate->changeActivePlayer($player_on_turn);
-                $player_id = $player_on_turn;
-            }
-        }
-
         $model = new Model($this->ps, $player_id);
 
         $result = $model->finishTurn();

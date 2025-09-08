@@ -52,15 +52,16 @@
 
 if (!defined('STATE_PLAYER_PLAY_PIECES')) { // guard since this included multiple times
     define('STATE_PLAYER_PLAY_PIECES', 2);
-    define('STATE_END_OF_TURN_SCORING', 3);
-    define('STATE_PLAYER_SELECT_SCORING_HEX', 4);
-    define('STATE_PLAYER_SELECT_ZIGGURAT_CARD', 5);
-    define('STATE_FINISH_TURN', 6);
-    define('STATE_ZIGGURAT_SCORING', 7);
-    define('STATE_START_TURN', 8);
-    define('STATE_PLAYER_EXTRA_TURN', 9);
-    define('STATE_NEXT_PLAYER', 10);
-    define('STATE_AUTO_SCORING_HEX_SELECTION', 11);
+    define('STATE_END_OF_TURN_SCORING', 12);
+    define('STATE_PLAYER_SELECT_SCORING_HEX', 32);
+    define('STATE_PLAYER_SELECT_ZIGGURAT_CARD', 42);
+    define('STATE_FINISH_TURN', 52);
+    define('STATE_ZIGGURAT_SCORING', 62);
+    define('STATE_CITY_SCORING', 72);
+    define('STATE_START_TURN', 82);
+    define('STATE_PLAYER_EXTRA_TURN', 92);
+    define('STATE_NEXT_PLAYER', 102);
+    define('STATE_AUTO_SCORING_HEX_SELECTION', 112);
 }
 
 use Bga\GameFramework\GameStateBuilder;
@@ -106,7 +107,7 @@ $machinestates = [
         ->description('')
         ->action('stAutoScoringHexSelection')
         ->transitions([
-            'citySelected' => STATE_END_OF_TURN_SCORING,
+            'citySelected' => STATE_CITY_SCORING,
             'zigguratSelected' => STATE_ZIGGURAT_SCORING,
         ])
         ->build(),
@@ -122,10 +123,22 @@ $machinestates = [
         ])
         ->updateGameProgression(true)
         ->transitions([
-            'citySelected' => STATE_END_OF_TURN_SCORING,
+            'citySelected' => STATE_CITY_SCORING,
             'zigguratSelected' => STATE_ZIGGURAT_SCORING,
             // no 'zombiePass' since we need to act on the zombie
             //  player's behalf to properly progress the game.
+        ])
+        ->build(),
+
+    STATE_CITY_SCORING => GameStateBuilder::create()
+        ->name('cityScoring')
+        ->type(StateType::GAME)
+        ->description('')
+        ->action('stCityScoring')
+        // ->args('argCityScoring')
+        ->updateGameProgression(true)
+        ->transitions([
+            'cityScored' => STATE_END_OF_TURN_SCORING,
         ])
         ->build(),
 
@@ -137,8 +150,8 @@ $machinestates = [
         ->args('argZigguratScoring')
         ->updateGameProgression(true)
         ->transitions([
-            'selectZiggurat' => STATE_PLAYER_SELECT_ZIGGURAT_CARD,
-            'next' => STATE_END_OF_TURN_SCORING,
+            'selectZigguratCard' => STATE_PLAYER_SELECT_ZIGGURAT_CARD,
+            'noWinner' => STATE_END_OF_TURN_SCORING,
         ])
         ->build(),
 
