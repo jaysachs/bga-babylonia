@@ -40,8 +40,6 @@ class Game extends \Bga\GameFramework\Table /* implements \Bga\Games\babylonia\S
     /** @var string */
     private const GLOBAL_PLAYER_ON_TURN = 'player_on_turn';
     /** @var string */
-    private const GLOBAL_NEXT_PLAYER_TO_BE_ACTIVE = 'next_player_to_be_active';
-    /** @var string */
     private const GLOBAL_ROW_COL_BEING_SCORED = 'row_col_being_scored';
 
     private PersistentStore $ps;
@@ -53,8 +51,7 @@ class Game extends \Bga\GameFramework\Table /* implements \Bga\Games\babylonia\S
 
         $this->initGameStateLabels([
             Game::GLOBAL_PLAYER_ON_TURN => 10,
-            Game::GLOBAL_NEXT_PLAYER_TO_BE_ACTIVE => 11,
-            Game::GLOBAL_ROW_COL_BEING_SCORED => 12,
+            Game::GLOBAL_ROW_COL_BEING_SCORED => 11,
         ]);
 
         $this->stats = new Stats($this);
@@ -377,8 +374,6 @@ class Game extends \Bga\GameFramework\Table /* implements \Bga\Games\babylonia\S
 
         $rcs = $this->model()->locationsRequiringScoring();
 
-        $this->setNextPlayerToBeActive(0);
-
         if (count($rcs) == 0) {
             $this->gamestate->nextState("done");
             return;
@@ -459,8 +454,6 @@ class Game extends \Bga\GameFramework\Table /* implements \Bga\Games\babylonia\S
             ]
         );
 
-        $this->setNextPlayerToBeActive(0);
-
         if ($model->components()->hasUnusedZigguratCard($player_id, ZigguratCardtype::EXTRA_TURN)
         ) {
             $this->gamestate->nextState("extraTurn");
@@ -470,19 +463,18 @@ class Game extends \Bga\GameFramework\Table /* implements \Bga\Games\babylonia\S
         $this->gamestate->nextState("nextPlayer");
     }
 
-    private function turnToNextPlayer(): void
+    public function stStartTurn()
     {
-        $this->activeNextPlayer();
         $player_id = $this->activePlayerId();
         $this->stats->PLAYER_NUMBER_TURNS->inc($player_id);
         $this->giveExtraTime($player_id);
         $this->setPlayerOnTurn($player_id);
-        $this->setNextPlayerToBeActive(0);
+        $this->gamestate->nextState("play");
     }
 
     public function stNextPlayer()
     {
-        $this->turnToNextPlayer();
+        $this->activeNextPlayer();
         $this->gamestate->nextState("done");
     }
 
@@ -615,22 +607,6 @@ class Game extends \Bga\GameFramework\Table /* implements \Bga\Games\babylonia\S
     {
         $this->setGameStateValue(Game::GLOBAL_PLAYER_ON_TURN, $player_id);
     }
-
-    private function nextPlayerToBeActive(): int
-    {
-        return intval(
-            $this->getGameStateValue(Game::GLOBAL_NEXT_PLAYER_TO_BE_ACTIVE)
-        );
-    }
-
-    private function setNextPlayerToBeActive(int $player_id)
-    {
-        $this->setGameStateValue(
-            Game::GLOBAL_NEXT_PLAYER_TO_BE_ACTIVE,
-            $player_id
-        );
-    }
-
 
     /*
      * Gather all information about current game situation (visible by
@@ -770,7 +746,7 @@ class Game extends \Bga\GameFramework\Table /* implements \Bga\Games\babylonia\S
         );
 
         // Activate first player once everything has been initialized and ready.
-        $this->turnToNextPlayer();
+        $this->activeNextPlayer();
     }
 
     private function optionEnabled(TableOption $option): bool

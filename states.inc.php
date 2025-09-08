@@ -50,24 +50,34 @@
 
 //    !! It is not a good idea to modify this file when a game is running !!
 
-if (!defined('STATE_PLAYER_PLAY_PIECES')) { // guard since this included multiple times
-    define('STATE_PLAYER_PLAY_PIECES', 2);
-    define('STATE_END_OF_TURN_SCORING', 12);
+if (!defined('STATE_START_TURN')) { // guard since this included multiple times
+    define('STATE_START_TURN', 2);
+    define('STATE_PLAYER_PLAY_PIECES', 12);
+    define('STATE_END_OF_TURN_SCORING', 22);
     define('STATE_PLAYER_SELECT_SCORING_HEX', 32);
     define('STATE_PLAYER_SELECT_ZIGGURAT_CARD', 42);
     define('STATE_FINISH_TURN', 52);
     define('STATE_ZIGGURAT_SCORING', 62);
     define('STATE_CITY_SCORING', 72);
-    define('STATE_START_TURN', 82);
-    define('STATE_PLAYER_EXTRA_TURN', 92);
-    define('STATE_NEXT_PLAYER', 102);
-    define('STATE_AUTO_SCORING_HEX_SELECTION', 112);
+    define('STATE_PLAYER_EXTRA_TURN', 82);
+    define('STATE_NEXT_PLAYER', 92);
+    define('STATE_AUTO_SCORING_HEX_SELECTION', 102);
 }
 
 use Bga\GameFramework\GameStateBuilder;
 use Bga\GameFramework\StateType;
 
 $machinestates = [
+
+    STATE_START_TURN => GameStateBuilder::create()
+        ->name('startTurn')
+        ->type(StateType::GAME)
+        ->description('')
+        ->action('stStartTurn')
+        ->transitions([
+            'play' => STATE_PLAYER_PLAY_PIECES,
+        ])
+        ->build(),
 
     STATE_PLAYER_PLAY_PIECES => GameStateBuilder::create()
         ->name('playPieces')
@@ -192,7 +202,7 @@ $machinestates = [
         ->action('stNextPlayer')
         ->updateGameProgression(true)
         ->transitions([
-            'done' => STATE_PLAYER_PLAY_PIECES,
+            'done' => STATE_START_TURN,
         ])
         ->build(),
 
@@ -206,7 +216,7 @@ $machinestates = [
         ])
         ->updateGameProgression(true)
         ->transitions([
-            'extraTurn' => STATE_PLAYER_PLAY_PIECES,
+            'extraTurn' => STATE_START_TURN,
             'nextPlayer' => STATE_NEXT_PLAYER,
             'zombiePass' => STATE_NEXT_PLAYER,
         ])
