@@ -30,7 +30,7 @@ namespace Bga\Games\babylonia;
 class ZigguratCard
 {
     public function __construct(
-        public ZigguratCardType $type,
+        public readonly ZigguratCardType $type,
         public int $owning_player_id = 0,
         public bool $used = false
     ) {}
