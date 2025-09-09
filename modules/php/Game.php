@@ -783,10 +783,16 @@ class Game extends \Bga\GameFramework\Table /* implements \Bga\Games\babylonia\S
         }
 
         $pieces = $model->hand()->pieces();
-        do {
-            $handpos = bga_rand(0, count($pieces) - 1);
-        } while ($pieces[$handpos]->isEmpty());
+        // Need to not choose empty hand positions.
+        $pos = [];
+        foreach ($pieces as $i => $piece) {
+            if (!$piece->isEmpty()) {
+                $pos[] = $i;
+            }
+        }
+        $handpos = $pos[bga_rand(0, count($pos) - 1)];
 
+        // Find empty land spaces. River play is so situational that we just don't do it.
         $rcs = [];
         $model->board()->visitAll(function (Hex $hex) use (&$rcs): void {
             if ($hex->piece->isEmpty() && !$hex->isWater()) {
