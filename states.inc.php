@@ -156,7 +156,6 @@ $machinestates = [
         ->type(StateType::GAME)
         ->description('')
         ->action('stZigguratScoring')
-        ->args('argZigguratScoring')
         ->updateGameProgression(true)
         ->transitions([
             'selectZigguratCard' => STATE_PLAYER_SELECT_ZIGGURAT_CARD,

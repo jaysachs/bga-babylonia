@@ -211,13 +211,6 @@ class Game extends \Bga\GameFramework\Table /* implements \Bga\Games\babylonia\S
         $this->gamestate->nextState("cityScored");
     }
 
-    public function argZigguratScoring(): array
-    {
-        return [
-            "hex" => $this->rowColBeingScored(),
-        ];
-    }
-
     public function stZigguratScoring(): void
     {
         $model = $this->model();
