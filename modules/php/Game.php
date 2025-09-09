@@ -749,6 +749,66 @@ class Game extends \Bga\GameFramework\Table /* implements \Bga\Games\babylonia\S
         return $this->tableOptions->get($option->value) > 0;
     }
 
+    private function zombieActSelectHexToScore()
+    {
+        // if a player goes zombie when they are on turn
+        // and have surrounded one or more ziggurats / cities.
+        // the game cannot progress properly. So choose one
+        // randomly.
+        $model = $this->model();
+        $rcs = $model->locationsRequiringScoring();
+        if (count($rcs) > 0) {
+            $rc = array_shift($rcs);
+            $this->actSelectHexToScore($rc->row, $rc->col);
+        }
+    }
+
+    private function zombieActSelectZigguratCard()
+    {
+        $model = $this->model();
+        $zcards = $model->components()->availableZigguratCards();
+        // We could be slightly smarter and grab in order:
+        //   10pts, river, hand7?, ...
+        $this->shuffle($zcards);
+        $this->actSelectZigguratCard($zcards[0]->type->value);
+    }
+
+    private function zombieActPlayPieces()
+    {
+        // For now, play randomly but legally
+        $model = $this->model();
+        if ($model->canEndTurn()) {
+            $this->actDonePlayPieces();
+            return;
+        }
+
+        $pieces = $model->hand()->pieces();
+        do {
+            $handpos = bga_rand(0, count($pieces) - 1);
+        } while ($pieces[$handpos]->isEmpty());
+
+        $rcs = [];
+        $model->board()->visitAll(function (Hex $hex) use (&$rcs): void {
+            if ($hex->piece->isEmpty() && !$hex->isWater()) {
+                $rcs[] = $hex->rc;
+            }
+        });
+        $this->shuffle($rcs);
+        $this->actPlayPiece($handpos, $rcs[0]->row, $rcs[0]->col);
+
+        // TODO better choices:
+        //   1) win a city or ziggurat
+        //   2) next to an appropriate city
+        //   3) next to a ziggurat
+        //   4) anywhere open
+        //  Maybe see if have enough farmers to do > 2 to take ziggurat
+    }
+
+    private function zombieActChooseExtraTurn()
+    {
+        $this->actChooseExtraTurn(true);
+    }
+
     /**
      * This method is called each time it is the turn of a player who
      * has quit the game (= "zombie" player).  You can do whatever you
@@ -774,72 +834,8 @@ class Game extends \Bga\GameFramework\Table /* implements \Bga\Games\babylonia\S
         $state_name = $state["name"];
 
         if ($state["type"] === "activeplayer") {
-            switch ($state_name) {
-                case "selectHexToScore": {
-                    // This is the only truly required state to handle. The rest
-                    //   can violate the rules and do nothing via zombiePass.
-
-                    // if a player goes zombie when they are on turn
-                    // and have surrounded one or more ziggurats / cities.
-                    // the game cannot progress properly. So choose one
-                    // randomly.
-                    $model = $this->model();
-                    $rcs = $model->locationsRequiringScoring();
-                    if (count($rcs) > 0) {
-                        $rc = array_shift($rcs);
-                        $this->actSelectHexToScore($rc->row, $rc->col);
-                    }
-                    break;
-                }
-                case "selectZigguratCard": {
-                    $model = $this->model();
-                    $zcards = $model->components()->availableZigguratCards();
-                    // We could be slightly smarter and grab in order:
-                    //   10pts, river, hand7?, ...
-                    $this->shuffle($zcards);
-                    $this->actSelectZigguratCard($zcards[0]->type->value);
-                    break;
-                }
-                case "chooseExtraTurn": {
-                    $this->actChooseExtraTurn(true);
-                    break;
-                }
-                case "playPieces": {
-                    // For now, play randomly but legally
-                    $model = $this->model();
-                    if ($model->canEndTurn()) {
-                        $this->actDonePlayPieces();
-                        break;
-                    }
-
-                    $pieces = $model->hand()->pieces();
-                    do {
-                        $handpos = bga_rand(0, count($pieces) - 1);
-                    } while ($pieces[$handpos]->isEmpty());
-
-                    $rcs = [];
-                    $model->board()->visitAll(function (Hex $hex) use (&$rcs) : void {
-                        if ($hex->piece->isEmpty()) {
-                            $rcs[] = $hex->rc;
-                        }
-                    });
-                    $this->shuffle($rcs);
-                    $this->actPlayPiece($handpos, $rcs[0]->row, $rcs[0]->col);
-
-                    // TODO better choices:
-                    //   1) win a city or ziggurat
-                    //   2) next to an appropriate city
-                    //   3) next to a ziggurat
-                    //   4) anywhere open
-                    //  Maybe see if have enough farmers to do > 2 to take ziggurat
-                    break;
-                }
-                default: {
-                    // This should never happen.
-                    throw new \feException("Zombie mode not supported at this game state: \"{$state_name}\".");
-                }
-            }
-
+            $fname = "zombieAct" . ucfirst($state_name);
+            $this->$fname();
             return;
         }
 
