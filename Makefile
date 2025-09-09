@@ -11,7 +11,11 @@ PSALM_CONFIG=psalm.xml
 JS=babylonia.js
 COLORMAP=src/colormap.ts
 
-build: $(STATS) $(COLORMAP)
+.PHONY: build test psalm psalm-info deploy clean
+
+build: $(JS) $(STATS)
+
+$(JS): $(COLORMAP) src/*.ts
 	npm run build:ts
 
 $(STATS): $(GENSTATS) stats.json
@@ -27,7 +31,7 @@ $(STUBS): $(WORK) _ide_helper.php Makefile
 	mkdir -p $(WORK)/module/table
 	perl -p -e 's/  exit/\/\/ exit/;' -e 's/APP_GAMEMODULE_PATH = ""/APP_GAMEMODULE_PATH = "work\/"/' _ide_helper.php > $(STUBS)
 
-test: build $(STUBS)
+test: $(JS) $(STUBS)
 	phpunit --bootstrap misc/autoload.php misc --testdox --display-warnings --display-deprecations --display-notices
 
 psalm: build $(STUBS) $(PSALM_CONFIG)
@@ -38,12 +42,6 @@ psalm-info: build $(STUBS) $(PSALM_CONFIG)
 
 deploy: test
 	$(SYNC) -u vagabond -g babylonia -s $(ROOT)/babylonia
-
-stubs: $(STUBS)
-
-colormap: $(COLORMAP)
-
-stats: $(STATS)
 
 # TODO: should this remove colormap and stats as well?
 clean:
