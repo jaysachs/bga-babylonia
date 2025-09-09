@@ -93,7 +93,6 @@ $machinestates = [
         ->transitions([
             'playPieces' => STATE_PLAYER_PLAY_PIECES,
             'done' => STATE_END_OF_TURN_SCORING,
-            'zombiePass' => STATE_END_OF_TURN_SCORING,
         ])
         ->build(),
 
@@ -134,8 +133,6 @@ $machinestates = [
         ->transitions([
             'citySelected' => STATE_CITY_SCORING,
             'zigguratSelected' => STATE_ZIGGURAT_SCORING,
-            // no 'zombiePass' since we need to act on the zombie
-            //  player's behalf to properly progress the game.
         ])
         ->build(),
 
@@ -175,7 +172,6 @@ $machinestates = [
         ->updateGameProgression(true)
         ->transitions([
             'cardSelected' => STATE_END_OF_TURN_SCORING,
-            'zombiePass' => STATE_END_OF_TURN_SCORING,
         ])
         ->build(),
 
@@ -216,7 +212,6 @@ $machinestates = [
         ->transitions([
             'extraTurn' => STATE_START_TURN,
             'nextPlayer' => STATE_NEXT_PLAYER,
-            'zombiePass' => STATE_NEXT_PLAYER,
         ])
         ->build(),
 ];

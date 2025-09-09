@@ -31,6 +31,8 @@ require_once(APP_GAMEMODULE_PATH . "module/table/table.game.php");
 
 require_once("Stats.php");
 
+include("/var/tournoi/release/games/babylonia/999999-9999/" . "states.inc.php");
+
 class Game extends \Bga\GameFramework\Table /* implements \Bga\Games\babylonia\StatsImpl */
 {
     // Used during scoring ziggurats in case the scoring of a ziggurat
@@ -773,24 +775,69 @@ class Game extends \Bga\GameFramework\Table /* implements \Bga\Games\babylonia\S
 
         if ($state["type"] === "activeplayer") {
             switch ($state_name) {
-                case 'selectHexToScore': {
-                        // If a player goes zombie when they are on turn
-                        // and have surrounded one or more ziggurats / cities.
-                        // the game cannot progress properly. So choose one
-                        // randomly.
-                        $model = $this->model();
-                        $rcs = $model->locationsRequiringScoring();
-                        if (count($rcs) > 0) {
-                            $rc = array_shift($rcs);
-                            $this->actSelectHexToScore($rc->row, $rc->col);
+                case "selectHexToScore": {
+                    // This is the only truly required state to handle. The rest
+                    //   can violate the rules and do nothing via zombiePass.
+
+                    // if a player goes zombie when they are on turn
+                    // and have surrounded one or more ziggurats / cities.
+                    // the game cannot progress properly. So choose one
+                    // randomly.
+                    $model = $this->model();
+                    $rcs = $model->locationsRequiringScoring();
+                    if (count($rcs) > 0) {
+                        $rc = array_shift($rcs);
+                        $this->actSelectHexToScore($rc->row, $rc->col);
+                    }
+                    break;
+                }
+                case "selectZigguratCard": {
+                    $model = $this->model();
+                    $zcards = $model->components()->availableZigguratCards();
+                    // We could be slightly smarter and grab in order:
+                    //   10pts, river, hand7?, ...
+                    $this->shuffle($zcards);
+                    $this->actSelectZigguratCard($zcards[0]->type->value);
+                    break;
+                }
+                case "chooseExtraTurn": {
+                    $this->actChooseExtraTurn(true);
+                    break;
+                }
+                case "playPieces": {
+                    // For now, play randomly but legally
+                    $model = $this->model();
+                    if ($model->canEndTurn()) {
+                        $this->actDonePlayPieces();
+                        break;
+                    }
+
+                    $pieces = $model->hand()->pieces();
+                    do {
+                        $handpos = bga_rand(0, count($pieces) - 1);
+                    } while ($pieces[$handpos]->isEmpty());
+
+                    $rcs = [];
+                    $model->board()->visitAll(function (Hex $hex) use (&$rcs) : void {
+                        if ($hex->piece->isEmpty()) {
+                            $rcs[] = $hex->rc;
                         }
-                        break;
-                    }
-                // TODO: player may need to select ziggurat card
+                    });
+                    $this->shuffle($rcs);
+                    $this->actPlayPiece($handpos, $rcs[0]->row, $rcs[0]->col);
+
+                    // TODO better choices:
+                    //   1) win a city or ziggurat
+                    //   2) next to an appropriate city
+                    //   3) next to a ziggurat
+                    //   4) anywhere open
+                    //  Maybe see if have enough farmers to do > 2 to take ziggurat
+                    break;
+                }
                 default: {
-                        $this->gamestate->nextState("zombiePass");
-                        break;
-                    }
+                    // This should never happen.
+                    throw new \feException("Zombie mode not supported at this game state: \"{$state_name}\".");
+                }
             }
 
             return;
