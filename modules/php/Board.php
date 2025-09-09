@@ -381,7 +381,7 @@ END;
     }
 
     /**
-     * @return Hex[]
+     * @return array<int, Hex>
      */
     public function neighbors(Hex $hex, ?\Closure $matching = null): array
     {
