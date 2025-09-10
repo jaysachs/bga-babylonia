@@ -111,10 +111,6 @@ class BaseGame<T extends Gamedatas> extends GameGui<T> {
     return undefined;
   }
 
-  protected playParallel(anims: Promise<any>[]): Promise<any> {
-    return this.animationManager.playParallel([(i: number) => anims[i]!]);
-  }
-
   // Returns the index of the given element among its parent's child elements
   // Returns 0 if no parent.
   protected indexInParent(el: Element): number {

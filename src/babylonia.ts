@@ -1,3 +1,5 @@
+type AnimationList = (() => Promise<any>)[];
+
 interface RowCol { row: number, col: number };
 interface PlayerData {
   player_id: number;
@@ -224,7 +226,7 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
     if (animateBoardInitialPlacement) {
       const inParallel = true;
       const duration = inParallel ? 500 : 125;
-      let anims: (() => Promise<any>)[] = [];
+      let anims: AnimationList = [];
       for (const hex of boardData) {
         const hexDiv = this.html.hexDiv(hex);
         boardDiv.appendChild(hexDiv);
@@ -700,21 +702,21 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
 
     let handPosDiv = this.handPosDiv(args.handpos);
 
-    let anims: Promise<any>[] = [];
+    let anims: AnimationList = [];
     let hexDiv = $(IDS.hexDiv(args));
     let pieceDiv = hexDiv.firstElementChild as HTMLElement;
 
     // restore piece value, e.g. if it was originally hidden
     pieceDiv.setAttribute(Attrs.PIECE, this.pieceVal(args.original_piece, this.player_id));
-    anims.push(this.animationManager.slideAndAttach(pieceDiv, handPosDiv));
+    anims.push(() => this.animationManager.slideAndAttach(pieceDiv, handPosDiv));
 
     if (args.captured_piece != Piece.EMPTY) {
       let field = this.createPieceDiv(args.captured_piece, 0);
       hexDiv.appendChild(field);
-      anims.push(this.animationManager.slideIn(field, $(IDS.handcount(args.player_id)), {}));
+      anims.push(() => this.animationManager.slideIn(field, $(IDS.handcount(args.player_id)), {}));
     }
 
-    await this.playParallel(anims).then(() => {
+    await this.animationManager.playParallel(anims).then(() => {
       handPosDiv.classList.add(CSS.PLAYABLE);
       this.handCounters[args.player_id]!.incValue(1);
       this.scoreCtrl[args.player_id]!.incValue(-args.points);
@@ -739,21 +741,21 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
     }
 
     let hexDiv = $(IDS.hexDiv(args));
-    let anims: Promise<any>[] = [];
+    let anims: AnimationList = [];
 
     if (args.captured_piece != Piece.EMPTY) {
       let field = this.createPieceDiv(args.captured_piece, 0);
       hexDiv.appendChild(field);
-      anims.push(this.animationManager.slideIn(field, $(IDS.handcount(args.player_id)), {}));
+      anims.push(() => this.animationManager.slideIn(field, $(IDS.handcount(args.player_id)), {}));
     }
 
-    anims.push(this.animationManager.slideOutAndDestroy(
+    anims.push(() => this.animationManager.slideOutAndDestroy(
       hexDiv.firstElementChild as HTMLElement,
       $(IDS.handcount(args.player_id)),
       {}
      ));
 
-    await this.playParallel(anims).then(() => {
+    await this.animationManager.playParallel(anims).then(() => {
       this.handCounters[args.player_id]!.incValue(1);
       this.scoreCtrl[args.player_id]!.incValue(-args.points);
     });
@@ -774,7 +776,7 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
       touched_ziggurats: RowCol[];
     }
   ): Promise<void> {
-    let anims: Promise<any>[] = [];
+    let anims: AnimationList = [];
 
     const hexDiv = this.hexDiv(args);
 
@@ -785,13 +787,13 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
         console.error("attempt to capture a field that is not there");
       }
       // TODO: consider capturing to player board
-      anims.push(this.animationManager.slideOutAndDestroy(field, $(IDS.handcount(args.player_id)), {}));
+      anims.push(() => this.animationManager.slideOutAndDestroy(field, $(IDS.handcount(args.player_id)), {}));
     }
 
     if (this.isCurrentPlayerActive()) {
       const handPosDiv = this.handPosDiv(args.handpos);
       const pieceDiv = handPosDiv.firstElementChild as HTMLElement;
-      anims.push(
+      anims.push(() =>
         this.animationManager.slideAndAttach(pieceDiv, hexDiv)
           // play into river, piece is hidden
           .then(() => pieceDiv.setAttribute(Attrs.PIECE, this.pieceVal(args.piece, this.player_id)))
@@ -800,14 +802,15 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
       // for non-active player, need to create it first
       let div = this.createPieceDiv(args.piece, args.player_id);
       hexDiv.appendChild(div);
-      anims.push(this.animationManager.slideIn(div, $(IDS.handcount(args.player_id))));
+      anims.push(() => this.animationManager.slideIn(div, $(IDS.handcount(args.player_id))));
     }
     // animate the ziggurat scoring, if any
     if (args.ziggurat_points > 0) {
       args.touched_ziggurats.forEach(this.markHexSelected.bind(this));
-      anims.push(this.playParallel(
+      // TODO: since it's parallel, just flatten into the anims list?
+      anims.push(() => this.animationManager.playParallel(
         args.touched_ziggurats.map((rc: RowCol) =>
-          this.animationManager.displayScoring(
+          () => this.animationManager.displayScoring(
               this.hexDiv(rc),
               1,
               this.gamedatas.players[this.player_id]!.color,
@@ -816,14 +819,14 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
       ));
     }
 
-    await this.playParallel(anims);
+    await this.animationManager.playParallel(anims);
 
     this.updateHandCount(args);
     this.scoreCtrl[args.player_id]!.incValue(args.points);
   }
 
   private async notif_handRefilled(args: { hand: string[] }): Promise<void> {
-    const anims: Promise<void>[] = [];
+    const anims: AnimationList = [];
     const pid = this.player_id;
     const hand = $(IDS.HAND);
     let handPosDiv = hand.firstElementChild;
@@ -838,7 +841,7 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
         if (newPiece && newPiece != Piece.EMPTY) {
           pieceDiv = this.createPieceDiv(newPiece, pid);
           handPosDiv?.appendChild(pieceDiv);
-          anims.push(this.animationManager.slideIn(pieceDiv, $(IDS.poolcount(pid))));
+          anims.push(() => this.animationManager.slideIn(pieceDiv, $(IDS.poolcount(pid))));
         }
       } else {
          let pt = pieceDiv.getAttribute(Attrs.PIECE);
@@ -850,7 +853,7 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
       }
       handPosDiv = handPosDiv!.nextElementSibling;
     }
-    await this.playParallel(anims);
+    await this.animationManager.playParallel(anims);
   }
 
   private async notif_extraTurnUsed(args: { card: string; used: boolean; }): Promise<void> {
