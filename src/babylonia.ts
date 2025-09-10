@@ -814,7 +814,7 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
               this.hexDiv(rc),
               1,
               this.gamedatas.players[this.player_id]!.color,
-              { duration: 2000, easing: 'ease-in-out', extraClass: 'bbl_city_scoring' })
+              { extraClass: 'bbl_city_scoring' })
             .then(() => args.touched_ziggurats.forEach(this.unmarkHexSelected.bind(this))))
       ));
     }
@@ -967,7 +967,7 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
           hex,
           details.network_points,
           this.gamedatas.players[playerId]!.color,
-          { duration: 2500, easing: 'ease-in-out', extraClass: 'bbl_city_scoring' });
+          { extraClass: 'bbl_city_scoring' });
         details.network_locations.forEach(
           (rc: RowCol) => {
             let cl = this.hexDiv(rc).classList;
