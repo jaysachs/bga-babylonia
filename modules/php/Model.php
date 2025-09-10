@@ -39,23 +39,21 @@ class Model
     private ?Components $_components = null;
     private ?Scorer $_scorer = null;
 
-    public function __construct(private PersistentStore $ps, private int $player_id) {}
+    public function __construct(private PersistentStore $ps, private Stats $stats, private int $player_id) {}
 
     /** @param int[] $player_ids */
-    public function createNewGame(array $player_ids, bool $use_advanced_ziggurats): void
+    public static function createNewGame(PersistentStore $ps, array $player_ids, bool $use_advanced_ziggurats): void
     {
-        $this->_board = Board::forPlayerCount(count($player_ids));
-        $this->ps->insertBoard($this->_board);
+        $ps->insertBoard(Board::forPlayerCount(count($player_ids)));
 
         foreach ($player_ids as $player_id) {
             $hand = Hand::new();
             $pool = Pool::new();
-            $this->refill($hand, $pool);
-            $this->ps->upsertHand($player_id, $hand);
-            $this->ps->upsertPool($player_id, $pool);
+            Model::refill($hand, $pool);
+            $ps->upsertHand($player_id, $hand);
+            $ps->upsertPool($player_id, $pool);
         }
-        $this->_components = Components::forNewGame($use_advanced_ziggurats);
-        $this->ps->insertComponents($this->_components);
+        $ps->insertComponents(Components::forNewGame($use_advanced_ziggurats));
     }
 
     private function scorer(): Scorer
@@ -285,6 +283,17 @@ class Model
         $this->ps->incPlayerScore($move->player_id, $move->points());
         $this->ps->updateHand($move->player_id, $move->handpos, Piece::EMPTY);
 
+        if ($move->captured_piece->isField()) {
+            $this->stats->PLAYER_FIELDS_CAPTURED->inc($this->player_id);
+        }
+        if ($move->piece->isHidden()) {
+            $this->stats->PLAYER_RIVER_SPACES_PLAYED->inc($this->player_id);
+        }
+        if ($move->points() > 0) {
+            $this->stats->PLAYER_POINTS_FROM_FIELDS->inc($this->player_id, $move->field_points);
+            $this->stats->PLAYER_POINTS_FROM_ZIGGURATS->inc($this->player_id, $move->ziggurat_points);
+        }
+
         return $move;
     }
 
@@ -297,7 +306,7 @@ class Model
         return $result;
     }
 
-    private function refill(Hand $hand, Pool $pool): void
+    private static function refill(Hand $hand, Pool $pool): void
     {
         while ($hand->size() < $hand->limit() && !$pool->isEmpty()) {
             $hand->replenish($pool->take());
@@ -306,7 +315,7 @@ class Model
 
     private function refillHand(): void
     {
-        $this->refill($this->hand(), $this->pool());
+        Model::refill($this->hand(), $this->pool());
     }
 
     /* return true if game should end */
@@ -323,6 +332,12 @@ class Model
         );
         if ($result->gameOver()) {
             $this->resolveAnyTies();
+            if ($result->less_than_two_remaining_cities) {
+                $this->stats->TABLE_GAME_END_BY_CITY_CAPTURES->set(true);
+            }
+            if ($result->pieces_exhausted) {
+                $this->stats->TABLE_GAME_END_BY_POOL_EXHAUSTION->set(true);
+            }
             return $result;
         }
 
@@ -346,6 +361,19 @@ class Model
             }
         }
         $this->ps->updateAuxScores($aux_scores);
+    }
+
+    public function selectScoringHex(RowCol $rc): void {
+        $hex = $this->board()->hexAt($rc);
+        $hexes = $this->locationsRequiringScoring();
+        if (array_search($hex, $hexes) === false) {
+            throw new \BgaUserException("hex {$hex} is not scoreable");
+        }
+        if ($hex->piece->isCity()) {
+            $this->stats->PLAYER_CITY_SCORING_TRIGGERED->inc($this->player_id);
+        } else if ($hex->piece->isZiggurat()) {
+            $this->stats->PLAYER_ZIGGURAT_SCORING_TRIGGERED->inc($this->player_id);
+        }
     }
 
     public function scoreZiggurat(RowCol $rc): HexWinner
@@ -379,14 +407,17 @@ class Model
         }
         $scoredCity = $this->scorer()->computeCityScores($hex);
         $playerInfos = $this->allPlayerInfo();
-
+        $captured_by = $scoredCity->hex_winner->captured_by;
         // Increase captured_city_count for capturing player, if any
-        if ($scoredCity->hex_winner->captured_by > 0) {
-            $playerInfos[$scoredCity->hex_winner->captured_by]->captured_city_count++;
+        if ($captured_by > 0) {
+            $this->stats->PLAYER_CITIES_CAPTURED->inc($captured_by);
+            $playerInfos[$captured_by]->captured_city_count++;
         }
         // Give players points for connected pieces
         foreach ($playerInfos as $pid => $pi) {
             $pi->score += $scoredCity->pointsForPlayer($pid);
+            $this->stats->PLAYER_POINTS_FROM_CITY_NETWORKS->inc($pid, $scoredCity->networkPointsForPlayer($pid));
+            $this->stats->PLAYER_POINTS_FROM_CAPTURED_CITIES->inc($pid, $scoredCity->capturePointsForPlayer($pid));
         }
 
         $_unused = $hex->captureCity();
@@ -494,6 +525,19 @@ class Model
             $this->ps->upsertHand($this->player_id, $this->hand());
         }
         $this->ps->updateZigguratCard($card);
+        $this->stats->PLAYER_ZIGGURAT_CARDS->inc($this->player_id);
+        $stat = match ($card->type) {
+            ZigguratCardType::PLUS_10 => $this->stats->PLAYER_ZIGGURAT_CARD_1_CHOSEN,
+            ZigguratCardType::EXTRA_TURN => $this->stats->PLAYER_ZIGGURAT_CARD_2_CHOSEN,
+            ZigguratCardType::HAND_SIZE_7 => $this->stats->PLAYER_ZIGGURAT_CARD_3_CHOSEN,
+            ZigguratCardType::NOBLES_3_KINDS => $this->stats->PLAYER_ZIGGURAT_CARD_4_CHOSEN,
+            ZigguratCardType::NOBLE_WITH_3_FARMERS => $this->stats->PLAYER_ZIGGURAT_CARD_5_CHOSEN,
+            ZigguratCardType::NOBLES_IN_FIELDS => $this->stats->PLAYER_ZIGGURAT_CARD_6_CHOSEN,
+            ZigguratCardType::EXTRA_CITY_POINTS => $this->stats->PLAYER_ZIGGURAT_CARD_7_CHOSEN,
+            ZigguratCardType::FREE_CENTER_LAND_CONNECTS => $this->stats->PLAYER_ZIGGURAT_CARD_8_CHOSEN,
+            ZigguratCardType::FREE_RIVER_CONNECTS => $this->stats->PLAYER_ZIGGURAT_CARD_9_CHOSEN,
+        };
+        $stat->set($this->player_id, true);
         return new ZigguratCardSelection($card, $points);
     }
 
@@ -526,6 +570,21 @@ class Model
         // This seems OK since this is the main entry point and we
         // haven't retrieve the player info yet.
         $this->ps->incPlayerScore($move->player_id, -$move->points());
+
+        if ($move->piece->isHidden()) {
+            $this->stats->PLAYER_RIVER_SPACES_PLAYED->inc($this->player_id, -1);
+        }
+        if ($move->captured_piece->isField()) {
+            $this->stats->PLAYER_FIELDS_CAPTURED->inc($this->player_id, -1);
+        }
+        if ($move->points() > 0) {
+            $this->stats->PLAYER_POINTS_FROM_FIELDS->inc($this->player_id, -$move->field_points);
+            $this->stats->PLAYER_POINTS_FROM_ZIGGURATS->inc(
+                $this->player_id,
+                -$move->ziggurat_points
+            );
+        }
+
         return $move;
     }
 }
