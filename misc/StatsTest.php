@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 use PHPUnit\Framework\TestCase;
 
+require_once('modules/php/Stats.php');
+
 use Bga\Games\babylonia\{
     Stats,
-    // StatsImpl
+    StatsImpl
 };
 
-class SImpl /* implements StatsImpl */ {
+class SImpl implements StatsImpl {
     public $vals = [];
     public function initStat(string $cat, string $name, mixed $value, int $player_id = 0): void {
         if ($player_id === null) {

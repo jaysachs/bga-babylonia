@@ -3,6 +3,8 @@
 declare(strict_types=1);
 use PHPUnit\Framework\TestCase;
 
+require_once("modules/php/Stats.php");
+
 use Bga\Games\babylonia\ {
         Board,
         Components,
@@ -18,12 +20,13 @@ use Bga\Games\babylonia\ {
         RowCol,
         ScoredCity,
         Stats,
+        StatsImpl,
         TurnProgress,
         ZigguratCard,
         ZigguratCardType,
 };
 
-class TestStatsImpl /* implements StatsImpl */ {
+class TestStatsImpl implements StatsImpl {
     private array $stats = [];
     public function incStat(mixed $delta, string $name, ?int $player_id = null) : void {
         $key = $player_id === null ? '@' . $name : $name . $player_id;

@@ -55,7 +55,7 @@ class Game extends \Bga\GameFramework\Table /* implements \Bga\Games\babylonia\S
         ]);
 
         $this->ps = new PersistentStore(new DefaultDb());
-        $this->stats = new Stats($this);
+        $this->stats = Stats::createForGame($this);
     }
 
     public function actPlayPiece(int $handpos, int $row, int $col): void
@@ -568,7 +568,7 @@ class Game extends \Bga\GameFramework\Table /* implements \Bga\Games\babylonia\S
         // WARNING: We must only return information visible by the
         // current player.
 
-        $model = new Model($this->ps, new Stats($this), $this->currentPlayerId());
+        $model = new Model($this->ps, Stats::createForGame($this), $this->currentPlayerId());
 
         $player_data = [];
         foreach ($model->allPlayerInfo() as $pid => $pi) {
