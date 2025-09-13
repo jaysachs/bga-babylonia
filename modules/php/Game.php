@@ -31,7 +31,7 @@ require_once(APP_GAMEMODULE_PATH . "module/table/table.game.php");
 
 require_once("Stats.php");
 
-class Game extends \Bga\GameFramework\Table /* implements \Bga\Games\babylonia\StatsImpl */
+class Game extends \Bga\GameFramework\Table
 {
     // Used during scoring ziggurats in case the scoring of a ziggurat
     //  means another player needs to choose a card; this global holds
@@ -97,6 +97,7 @@ class Game extends \Bga\GameFramework\Table /* implements \Bga\Games\babylonia\S
         if (!$model->canEndTurn()) {
             throw new \BgaUserException("Attempt to end turn but less than 2 pieces played");
         }
+        $model->donePlayPieces();
 
         $this->notify->all(
             "donePlayed",
@@ -297,10 +298,8 @@ class Game extends \Bga\GameFramework\Table /* implements \Bga\Games\babylonia\S
 
     public function actSelectHexToScore(int $row, int $col): void
     {
-        $player_id = $this->activePlayerId();
         $model = $this->createModel();
-        $rc = new RowCol($row, $col);
-        $hex = $model->board()->hexAt($rc);
+        $hex = $model->selectScoringHex(new RowCol($row, $col));
         $msg = $this->optionEnabled(TableOption::AUTOMATED_SCORING_SELECTION)
             ? clienttranslate('${city} at (${row},${col}) is selected to be scored')
             : clienttranslate('${player_name} chose ${city} at (${row},${col}}) to score');
@@ -308,14 +307,14 @@ class Game extends \Bga\GameFramework\Table /* implements \Bga\Games\babylonia\S
             "scoringSelection",
             $msg,
             [
-                "player_id" => $player_id,
+                "player_id" => $this->activePlayerId(),
                 "player_name" => $this->getActivePlayerName(),
-                "row" => $rc->row,
-                "col" => $rc->col,
+                "row" => $hex->rc->row,
+                "col" => $hex->rc->col,
                 "city" => $hex->piece->value,
             ]
         );
-        $this->setRowColBeingScored($rc);
+        $this->setRowColBeingScored($hex->rc);
         if ($hex->piece->isCity()) {
             $this->gamestate->nextState("citySelected");
         } else if ($hex->piece->isZiggurat()) {
@@ -324,7 +323,7 @@ class Game extends \Bga\GameFramework\Table /* implements \Bga\Games\babylonia\S
     }
 
     private function createModel(): Model {
-        return new Model($this->ps, $this->stats, $this->activePlayerId());
+        return new Model($this->ps, new GameStatsImpl($this), $this->activePlayerId());
     }
 
     public function stEndOfTurnScoring(): void
@@ -336,7 +335,8 @@ class Game extends \Bga\GameFramework\Table /* implements \Bga\Games\babylonia\S
             $this->giveExtraTime($player_on_turn);
         }
 
-        $rcs = $this->createModel()->locationsRequiringScoring();
+        $model = $this->createModel();
+        $rcs = $model->locationsRequiringScoring();
 
         if (count($rcs) == 0) {
             $this->gamestate->nextState("done");
@@ -568,7 +568,7 @@ class Game extends \Bga\GameFramework\Table /* implements \Bga\Games\babylonia\S
         // WARNING: We must only return information visible by the
         // current player.
 
-        $model = new Model($this->ps, Stats::createForGame($this), $this->currentPlayerId());
+        $model = new Model($this->ps, new GameStatsImpl($this), $this->currentPlayerId());
 
         $player_data = [];
         foreach ($model->allPlayerInfo() as $pid => $pi) {

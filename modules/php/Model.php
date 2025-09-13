@@ -38,8 +38,30 @@ class Model
     private ?Pool $_pool = null;
     private ?Components $_components = null;
     private ?Scorer $_scorer = null;
+    private Stats $stats;
+    private ?Stats $savedStats;
+    private RecordingStatsImpl $rsImpl;
 
-    public function __construct(private PersistentStore $ps, private Stats $stats, private int $player_id) {}
+    public function __construct(private PersistentStore $ps, private StatsImpl $statsImpl, private int $player_id) {
+        $this->stats = new Stats($statsImpl);
+    }
+
+    private function setStatsRecordingMode() {
+        $this->rsImpl = new RecordingStatsImpl($this->statsImpl);
+        $this->savedStats = $this->stats;
+        $this->stats = new Stats($this->rsImpl);
+    }
+
+    /** @return array<int,StatOp> */
+    private function endStatsRecordingMode() : array {
+        $this->stats = $this->savedStats;
+        return $this->rsImpl->getOperations();
+    }
+
+    /** @param array<int, StatOp> $statOps */
+    private function applyDeferredStats(array $statOps) : void {
+        $this->statsImpl->applyAll($statOps);
+    }
 
     /** @param int[] $player_ids */
     public static function createNewGame(PersistentStore $ps, array $player_ids, bool $use_advanced_ziggurats): void
@@ -219,6 +241,7 @@ class Model
 
     public function playPiece(int $handpos, RowCol $rc): ElaboratedMove
     {
+        $this->setStatsRecordingMode();
         // also retrieve ziggurat cards held
 
         $piece = $this->hand()->play($handpos);
@@ -271,7 +294,6 @@ class Model
         $this->turnProgress()->addMove($move);
 
         // update the database
-        $this->ps->insertMove($move);
         $this->ps->updateHex($move->rc, $move->piece, $move->player_id);
         // NOTE: we update the DB but not the player info
         // This is OK at present because this is a top-level entry point
@@ -294,6 +316,7 @@ class Model
             $this->stats->PLAYER_POINTS_FROM_ZIGGURATS->inc($this->player_id, $move->ziggurat_points);
         }
 
+        $this->ps->insertMove($move, $this->endStatsRecordingMode());
         return $move;
     }
 
@@ -316,6 +339,11 @@ class Model
     private function refillHand(): void
     {
         Model::refill($this->hand(), $this->pool());
+    }
+
+    public function donePlayPieces(): void {
+        $statOps = $this->ps->deleteAllMoves($this->player_id);
+        $this->applyDeferredStats($statOps);
     }
 
     /* return true if game should end */
@@ -341,7 +369,6 @@ class Model
             return $result;
         }
 
-        $this->ps->deleteAllMoves($this->player_id);
         return $result;
     }
 
@@ -363,7 +390,7 @@ class Model
         $this->ps->updateAuxScores($aux_scores);
     }
 
-    public function selectScoringHex(RowCol $rc): void {
+    public function selectScoringHex(RowCol $rc): Hex {
         $hex = $this->board()->hexAt($rc);
         $hexes = $this->locationsRequiringScoring();
         if (array_search($hex, $hexes) === false) {
@@ -374,6 +401,7 @@ class Model
         } else if ($hex->piece->isZiggurat()) {
             $this->stats->PLAYER_ZIGGURAT_SCORING_TRIGGERED->inc($this->player_id);
         }
+        return $hex;
     }
 
     public function scoreZiggurat(RowCol $rc): HexWinner
@@ -570,21 +598,6 @@ class Model
         // This seems OK since this is the main entry point and we
         // haven't retrieve the player info yet.
         $this->ps->incPlayerScore($move->player_id, -$move->points());
-
-        if ($move->piece->isHidden()) {
-            $this->stats->PLAYER_RIVER_SPACES_PLAYED->inc($this->player_id, -1);
-        }
-        if ($move->captured_piece->isField()) {
-            $this->stats->PLAYER_FIELDS_CAPTURED->inc($this->player_id, -1);
-        }
-        if ($move->points() > 0) {
-            $this->stats->PLAYER_POINTS_FROM_FIELDS->inc($this->player_id, -$move->field_points);
-            $this->stats->PLAYER_POINTS_FROM_ZIGGURATS->inc(
-                $this->player_id,
-                -$move->ziggurat_points
-            );
-        }
-
         return $move;
     }
 }

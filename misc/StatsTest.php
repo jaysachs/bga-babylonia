@@ -7,13 +7,14 @@ use PHPUnit\Framework\TestCase;
 require_once('modules/php/Stats.php');
 
 use Bga\Games\babylonia\{
+    AbstractStatsImpl,
     Stats,
     StatsImpl
 };
 
-class SImpl implements StatsImpl {
+class SImpl extends AbstractStatsImpl {
     public $vals = [];
-    public function initStat(string $cat, string $name, mixed $value, int $player_id = 0): void {
+    public function initStat(string $cat, string $name, mixed $value, ?int $player_id = 0): void {
         if ($player_id === null) {
             $this->vals[$name] = $value;
         } else {
@@ -24,7 +25,7 @@ class SImpl implements StatsImpl {
         }
     }
 
-    public function incStat(mixed $delta, string $name, int $player_id = 0): void {
+    public function incStat(mixed $delta, string $name, ?int $player_id = 0): void {
         if ($player_id === null) {
             $this->vals[$name] += $delta;
         } else {
@@ -32,7 +33,7 @@ class SImpl implements StatsImpl {
         }
     }
 
-    public function setStat($value, $name, $player_id = 0): void {
+    public function setStat($value, $name, ?int $player_id = 0): void {
         if ($player_id === null) {
             $this->vals[$name] = $value;
         } else {
@@ -40,7 +41,7 @@ class SImpl implements StatsImpl {
         }
     }
 
-    public function getStat($name, $player_id = 0): mixed {
+    public function getStat($name, ?int $player_id = 0): mixed {
         if ($player_id === null) {
             return $vals[$name];
         }

@@ -55,6 +55,18 @@ CREATE TABLE IF NOT EXISTS `turn_progress` (
   PRIMARY KEY (`seq_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
+CREATE TABLE IF NOT EXISTS `turn_progress_stats` (
+  `turn_progress_seq_id` int(10) unsigned NOT NULL,
+  `seq_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `op` varchar(3) NOT NULL,
+  `stat_name` varchar(40) NOT NULL,
+  `player_id` int(10) unsigned,
+  `val` varchar(20),
+  `orig_val` varchar(20),
+  PRIMARY KEY (`seq_id`),
+  FOREIGN KEY (`turn_progress_seq_id`) REFERENCES `turn_progress` (`seq_id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+
 CREATE TABLE IF NOT EXISTS `ziggurat_cards` (
   -- which player holds it; if 0 still available
   `player_id` int(10) unsigned,

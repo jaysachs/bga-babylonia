@@ -165,11 +165,20 @@ class PersistentStore
         }
     }
 
-    public function deleteAllMoves(int $player_id): void
+    /** @return array<int,StatOp> */
+    public function deleteAllMoves(int $player_id): array
     {
+        $rows = $this->db->getObjectList("SELECT op, stat_name, player_id, val, orig_val FROM turn_progress_stats ORDER BY seq_id");
+        $statOps = [];
+        foreach ($rows as $row) {
+            $pid = intval($row["player_id"]);
+            if ($pid == 0) { $pid = null; }
+            $statOps[] = new StatOp(OpType::from($row["op"]), $row["stat_name"], $pid, $row["val"], $row["orig_val"]);
+        }
         $sql = "DELETE FROM turn_progress
                 WHERE player_id=$player_id";
         $this->db->execute($sql);
+        return $statOps;
     }
 
     public function deleteSingleMove(Move $move): void
@@ -227,7 +236,8 @@ class PersistentStore
         $this->db->execute($sql);
     }
 
-    public function insertMove(Move $move): void
+    /** @param array<int, StatOp> $statOps */
+    public function insertMove(Move $move, array $statOps): void
     {
         $captured_piece = $move->captured_piece->value;
         $piece = $move->piece->value;
@@ -243,6 +253,22 @@ class PersistentStore
                        '$captured_piece', $move->field_points,
                        $move->ziggurat_points)";
         $this->db->execute($sql);
+
+        if (count($statOps) > 0) {
+            $seq_id = $this->db->getSingleFieldList("SELECT MAX(seq_id) FROM turn_progress")[0];
+
+            $rows = [];
+            foreach ($statOps as $op) {
+                $val = "{$op->value}";
+                $orig = "{$op->orig}";
+                $optype = $op->op_type->value;
+                $pid = $op->player_id;
+                $rows[] = "($seq_id, NULL, $pid, '$optype', '$op->name', '$val', '$orig')";
+            }
+            $sql = "INSERT INTO turn_progress_stats(turn_progress_seq_id, seq_id, player_id, op, stat_name, val, orig_val) VALUES "
+                . implode(',', $rows);
+            $this->db->execute($sql);
+        }
     }
 
     public function retrieveTurnProgress(int $player_id): TurnProgress

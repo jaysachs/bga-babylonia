@@ -6,6 +6,7 @@ use PHPUnit\Framework\TestCase;
 require_once("modules/php/Stats.php");
 
 use Bga\Games\babylonia\ {
+        AbstractStatsImpl,
         Board,
         Components,
         Db,
@@ -26,7 +27,7 @@ use Bga\Games\babylonia\ {
         ZigguratCardType,
 };
 
-class TestStatsImpl implements StatsImpl {
+class TestStatsImpl extends AbstractStatsImpl {
     private array $stats = [];
     public function incStat(mixed $delta, string $name, ?int $player_id = null) : void {
         $key = $player_id === null ? '@' . $name : $name . $player_id;
@@ -115,7 +116,7 @@ class TestStore extends PersistentStore {
     public function retrieveHand(int $player_id): Hand {
         return $this->hand;
     }
-    public function insertMove(Move $move): void {
+    public function insertMove(Move $move, array $statOps): void {
         // $this->turnProgress->addMove($move);
     }
     public function updateZigguratCard(ZigguratCard $card): void {
@@ -143,7 +144,7 @@ final class ModelTest extends TestCase
         $this->simpl = new TestStatsImpl();
         $this->ps = new TestStore();
         $this->ps->setBoard(Board::forPlayerCount(2));
-        $this->model = new Model($this->ps, new Stats($this->simpl), 1);
+        $this->model = new Model($this->ps, $this->simpl, 1);
     }
 
     private function setMap(string $map): void {
