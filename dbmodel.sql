@@ -62,7 +62,6 @@ CREATE TABLE IF NOT EXISTS `turn_progress_stats` (
   `stat_name` varchar(40) NOT NULL,
   `player_id` int(10) unsigned,
   `val` varchar(20),
-  `orig_val` varchar(20),
   PRIMARY KEY (`seq_id`),
   FOREIGN KEY (`turn_progress_seq_id`) REFERENCES `turn_progress` (`seq_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;

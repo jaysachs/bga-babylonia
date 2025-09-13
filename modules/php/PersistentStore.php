@@ -168,12 +168,12 @@ class PersistentStore
     /** @return array<int,StatOp> */
     public function deleteAllMoves(int $player_id): array
     {
-        $rows = $this->db->getObjectList("SELECT op, stat_name, player_id, val, orig_val FROM turn_progress_stats ORDER BY seq_id");
+        $rows = $this->db->getObjectList("SELECT op, stat_name, player_id, val FROM turn_progress_stats ORDER BY seq_id");
         $statOps = [];
         foreach ($rows as $row) {
             $pid = intval($row["player_id"]);
             if ($pid == 0) { $pid = null; }
-            $statOps[] = new StatOp(OpType::from($row["op"]), $row["stat_name"], $pid, $row["val"], $row["orig_val"]);
+            $statOps[] = new StatOp(OpType::from($row["op"]), $row["stat_name"], $pid, $row["val"]);
         }
         $sql = "DELETE FROM turn_progress
                 WHERE player_id=$player_id";
