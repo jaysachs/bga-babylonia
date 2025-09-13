@@ -42,7 +42,7 @@ class SImpl implements StatsImpl {
 
     public function getStat($name, ?int $player_id = 0): mixed {
         if ($player_id === null) {
-            return $vals[$name];
+            return $this->vals[$name];
         }
         return $this->vals[$name][$player_id];
     }
