@@ -30,6 +30,7 @@ $(WORK):
 $(STUBS): $(WORK) _ide_helper.php Makefile
 	mkdir -p $(WORK)/module/table
 	perl -p -e 's/  exit/\/\/ exit/;' -e 's/APP_GAMEMODULE_PATH = ""/APP_GAMEMODULE_PATH = "work\/"/' _ide_helper.php > $(STUBS)
+	cat _local_ide_helper.php >> $(STUBS)
 
 test: build $(STUBS)
 	phpunit --bootstrap misc/autoload.php misc --testdox --display-warnings --display-deprecations --display-notices
