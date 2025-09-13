@@ -4,7 +4,7 @@ ROOT=$(HOME)/projects/bga
 SYNC=$(ROOT)/bgautil/sync/bgasync.sh
 
 STATS=modules/php/Stats.php
-GENSTATS=../bgautil/genstats/genstats.php
+GENSTATS=$(ROOT)/bgautil/genstats/genstats.php
 WORK=work
 STUBS=$(WORK)/module/table/table.game.php
 PSALM_CONFIG=psalm.xml
