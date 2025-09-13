@@ -260,12 +260,11 @@ class PersistentStore
             $rows = [];
             foreach ($statOps as $op) {
                 $val = "{$op->value}";
-                $orig = "{$op->orig}";
                 $optype = $op->op_type->value;
                 $pid = $op->player_id;
-                $rows[] = "($seq_id, NULL, $pid, '$optype', '$op->name', '$val', '$orig')";
+                $rows[] = "($seq_id, NULL, $pid, '$optype', '$op->name', '$val')";
             }
-            $sql = "INSERT INTO turn_progress_stats(turn_progress_seq_id, seq_id, player_id, op, stat_name, val, orig_val) VALUES "
+            $sql = "INSERT INTO turn_progress_stats(turn_progress_seq_id, seq_id, player_id, op, stat_name, val) VALUES "
                 . implode(',', $rows);
             $this->db->execute($sql);
         }
