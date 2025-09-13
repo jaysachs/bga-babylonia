@@ -7,12 +7,11 @@ use PHPUnit\Framework\TestCase;
 require_once('modules/php/Stats.php');
 
 use Bga\Games\babylonia\{
-    AbstractStatsImpl,
     Stats,
     StatsImpl
 };
 
-class SImpl extends AbstractStatsImpl {
+class SImpl implements StatsImpl {
     public $vals = [];
     public function initStat(string $cat, string $name, mixed $value, ?int $player_id = 0): void {
         if ($player_id === null) {

@@ -60,7 +60,7 @@ class Model
 
     /** @param array<int, StatOp> $statOps */
     private function applyDeferredStats(array $statOps) : void {
-        $this->statsImpl->applyAll($statOps);
+        StatOp::applyAllTo($this->statsImpl, $statOps);
     }
 
     /** @param int[] $player_ids */

@@ -6,7 +6,6 @@ use PHPUnit\Framework\TestCase;
 require_once("modules/php/Stats.php");
 
 use Bga\Games\babylonia\ {
-        AbstractStatsImpl,
         Board,
         Components,
         Db,
@@ -27,7 +26,7 @@ use Bga\Games\babylonia\ {
         ZigguratCardType,
 };
 
-class TestStatsImpl extends AbstractStatsImpl {
+class TestStatsImpl implements StatsImpl {
     private array $stats = [];
     public function incStat(mixed $delta, string $name, ?int $player_id = null) : void {
         $key = $player_id === null ? '@' . $name : $name . $player_id;
