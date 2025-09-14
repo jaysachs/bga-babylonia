@@ -23,5 +23,5 @@
 23. ~~DONE Refactor Stats impls so a single impl is used, giving Stats "enterDeferredMode" and "applyAndExitDeferredMode() : StatOp[]" methods. This will clean up the stuff in Model about swapping out impls (and about accepting an impl in the constructor instead of the Stats object).~~
 23. Leftover highlighting of (city?) scoring hexes
 24. ~~DONE Slowness of animations esp in +1 ziggurat tiles animation~~
-25. Tooltips are lost for zig cards
+25. ~~DONE Tooltips are lost for zig cards~~
 26. Consider "average pieces played/turn" and "max played/turn" statistics.

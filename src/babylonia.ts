@@ -269,12 +269,12 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
       if (zcard.used) {
         zelem.setAttribute(Attrs.ZUSED, "");
       }
-      this.addTooltip(zelem.id, zcard.tooltip, '');
       if (zcard.owning_player_id != 0) {
         $(IDS.playerBoardZcards(zcard.owning_player_id)).appendChild(zelem);
       } else {
         nextSpot.appendChild(zelem);
       }
+      this.addTooltip(zelem.id, zcard.tooltip, '');
     }
   }
 
