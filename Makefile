@@ -7,13 +7,14 @@ STATS=modules/php/Stats.php
 GENSTATS=$(ROOT)/bgautil/genstats/genstats.php
 WORK=work
 STUBS=$(WORK)/module/table/table.game.php
+TESTSTUBS=$(WORK)/test/module/table/table.game.php
 PSALM_CONFIG=psalm.xml
 JS=babylonia.js
 COLORMAP=src/colormap.ts
 
 .PHONY: build test psalm psalm-info deploy clean
 
-build: $(JS) $(STATS)
+build: $(JS) $(STATS) $(STUBS)
 
 $(JS): $(COLORMAP) src/*.ts
 	npm run build:ts
@@ -27,12 +28,16 @@ $(COLORMAP): misc/colormap.php gameinfos.inc.php
 $(WORK):
 	mkdir $(WORK)
 
-$(STUBS): $(WORK) _ide_helper.php Makefile
+$(STUBS): $(WORK) _ide_helper.php Makefile _local_ide_helper.php
 	mkdir -p $(WORK)/module/table
 	perl -p -e 's/  exit/\/\/ exit/;' -e 's/APP_GAMEMODULE_PATH = ""/APP_GAMEMODULE_PATH = "work\/"/' _ide_helper.php > $(STUBS)
 	cat _local_ide_helper.php >> $(STUBS)
 
-test: build $(STUBS)
+$(TESTSTUBS): $(WORK) _ide_helper.php Makefile
+	mkdir -p $(WORK)/test/module/table
+	perl -p -e 's/  exit/\/\/ exit/;' -e 's/APP_GAMEMODULE_PATH = ""/APP_GAMEMODULE_PATH = "work\/"/' _ide_helper.php > $(TESTSTUBS)
+
+test: build $(TESTSTUBS)
 	phpunit --bootstrap misc/autoload.php misc --testdox --display-warnings --display-deprecations --display-notices
 
 psalm: build $(STUBS) $(PSALM_CONFIG)
