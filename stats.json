@@ -122,9 +122,9 @@
             "name": "Times ziggurat card 2 was used",
             "type": "int"
         },
-        "ziggurat_card_3_extra_points_gained": {
+        "ziggurat_card_3_used": {
             "id": 43,
-            "name": "Extra points gained from use of ziggurat card 3",
+            "name": "Times ziggurat card 3 was used",
             "type": "int"
         },
         "ziggurat_card_4_used": {
@@ -142,20 +142,25 @@
             "name": "Times ziggurat card 6 was used",
             "type": "int"
         },
-        "ziggurat_card_7_used": {
+        "ziggurat_card_7_extra_points_gained": {
             "id": 47,
-            "name": "Times ziggurat card 7 was used",
+            "name": "City points gained attributable to ziggurat card 3",
             "type": "int"
         },
         "ziggurat_card_8_used": {
             "id": 48,
-            "name": "Times ziggurat card 8 was used",
+            "name": "Network points attributable to ziggurat card 8",
             "type": "int"
         },
         "ziggurat_card_9_used": {
             "id": 49,
-            "name": "Times ziggurat card 9 was used",
+            "name": "Network points attributable to ziggurat card 9",
             "type": "int"
+        },
+        "average_pieces_played_per_turn": {
+            "id": 50,
+            "name": "Average number of pieces played per turn",
+            "type": "float"
         }
     }
 }

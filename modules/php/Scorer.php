@@ -113,7 +113,7 @@ class Scorer
                 ZigguratCardType::EXTRA_CITY_POINTS
             )) {
                 $extra_points = intval(floor($points / 2));
-                $this->stats->PLAYER_ZIGGURAT_CARD_3_EXTRA_POINTS_GAINED->inc($pid, $extra_points);
+                $this->stats->PLAYER_ZIGGURAT_CARD_7_EXTRA_POINTS_GAINED->inc($pid, $extra_points);
                 $points += $extra_points;
             }
             $result->captured_city_points[$pid] = $points;

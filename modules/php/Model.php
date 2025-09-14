@@ -570,6 +570,7 @@ class Model
         if ($card_type == ZigguratCardType::PLUS_10) {
             $card->used = true;
             $points = 10;
+            $this->stats->PLAYER_ZIGGURAT_CARD_1_USED->inc($this->player_id);
             $pi = $this->allPlayerInfo()[$this->player_id];
             $pi->score += $points;
             $this->ps->updatePlayer($pi);
@@ -604,6 +605,7 @@ class Model
             throw new \InvalidArgumentException(ZigguratCardType::EXTRA_TURN->value . " has already been used");
         }
         $card->used = true;
+        $this->stats->PLAYER_ZIGGURAT_CARD_2_USED->inc($this->player_id);
         $this->ps->updateZigguratCard($card);
     }
 
