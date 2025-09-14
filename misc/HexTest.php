@@ -86,12 +86,12 @@ final class HexTest extends TestCase
 
     public function test_toStringSucceeds() {
         $hex = Hex::land(new RowCol(4, 5));
-        $this->assertSame("LAND 4:5 empty(0)", "$hex");
+        $this->assertSame("LAND 4:5 empty(0) 0 UNKNOWN", "$hex");
         $hex->placeDevelopment(Piece::FIELD_5);
-        $this->assertSame("LAND 4:5 field_5(0)", "$hex");
+        $this->assertSame("LAND 4:5 field_5(0) 0 UNKNOWN", "$hex");
 
         $hex = Hex::land(new RowCol(4, 5));
         $hex->playPiece(Piece::PRIEST, 3);
-        $this->assertSame("LAND 4:5 priest(3)", "$hex");
+        $this->assertSame("LAND 4:5 priest(3) 0 UNKNOWN", "$hex");
     }
 }

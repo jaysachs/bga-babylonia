@@ -37,7 +37,7 @@ class Hex
 
     public function __toString(): string
     {
-        return sprintf("%s %s %s(%d)", $this->type->value, $this->rc, $this->piece->value, $this->player_id);
+        return sprintf("%s %s %s(%d) %d %s", $this->type->value, $this->rc, $this->piece->value, $this->player_id, $this->scored, $this->landmass->value);
     }
 
     public function __construct(
