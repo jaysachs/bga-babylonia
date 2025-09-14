@@ -13,7 +13,6 @@ use Bga\Games\babylonia\ {
         Scorer,
         ScoredCity,
         Stats,
-        TestStatsImpl,
 };
 
 final class ScorerTest extends TestCase
@@ -50,7 +49,7 @@ END;
         $this->scorer = new Scorer($this->board,
                                    $this->playerInfos(),
                                    new Components([]),
-                                   new Stats(new TestStatsImpl()));
+                                   Stats::createForTest());
     }
 
     private function hexWinner(int $r, int $c, int $captured_by): HexWinner {
