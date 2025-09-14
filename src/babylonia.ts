@@ -814,7 +814,7 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
               this.hexDiv(rc),
               1,
               this.gamedatas.players[this.player_id]!.color,
-              { extraClass: 'bbl_city_scoring' })
+              { extraClass: 'bbl_city_scoring', duration: 700 })
             .then(() => args.touched_ziggurats.forEach(this.unmarkHexSelected.bind(this))))
       ));
     }
