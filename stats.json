@@ -115,14 +115,12 @@
         "ziggurat_card_1_used": {
             "id": 41,
             "name": "Times ziggurat card 1 was used",
-            "type": "int",
-            "display": "limited"
+            "type": "int"
         },
         "ziggurat_card_2_used": {
             "id": 42,
             "name": "Times ziggurat card 2 was used",
-            "type": "int",
-            "display": "limited"
+            "type": "int"
         },
         "ziggurat_card_3_extra_points_gained": {
             "id": 43,
@@ -132,38 +130,32 @@
         "ziggurat_card_4_used": {
             "id": 44,
             "name": "Times ziggurat card 4 was used",
-            "type": "int",
-            "display": "limited"
+            "type": "int"
         },
         "ziggurat_card_5_used": {
             "id": 45,
             "name": "Times ziggurat card 5 was used",
-            "type": "int",
-            "display": "limited"
+            "type": "int"
         },
         "ziggurat_card_6_used": {
             "id": 46,
             "name": "Times ziggurat card 6 was used",
-            "type": "int",
-            "display": "limited"
+            "type": "int"
         },
         "ziggurat_card_7_used": {
             "id": 47,
             "name": "Times ziggurat card 7 was used",
-            "type": "int",
-            "display": "limited"
+            "type": "int"
         },
         "ziggurat_card_8_used": {
             "id": 48,
             "name": "Times ziggurat card 8 was used",
-            "type": "int",
-            "display": "limited"
+            "type": "int"
         },
         "ziggurat_card_9_used": {
             "id": 49,
             "name": "Times ziggurat card 9 was used",
-            "type": "int",
-            "display": "limited"
+            "type": "int"
         }
     }
 }
