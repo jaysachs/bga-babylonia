@@ -536,6 +536,7 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
         this.setClientState('client_noPlaysLeft', {
           descriptionmyturn: _('${you} must end your turn'),
         });
+        this.setPlayablePieces();
       } else {
         this.setClientState('client_selectPieceOrEndTurn', {
           descriptionmyturn: _('${you} may select a piece to play or end your turn'),
