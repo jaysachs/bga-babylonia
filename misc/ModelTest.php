@@ -115,13 +115,11 @@ final class ModelTest extends TestCase
 {
     private Model $model;
     private TestStore $ps;
-    private TestStatsImpl $simpl;
 
     protected function setUp(): void {
-        $this->simpl = new TestStatsImpl();
         $this->ps = new TestStore();
         $this->ps->setBoard(Board::forPlayerCount(2));
-        $this->model = new Model($this->ps, $this->simpl, 1);
+        $this->model = new Model($this->ps, Stats::createForTest([1, 2]), 1);
     }
 
     private function setMap(string $map): void {

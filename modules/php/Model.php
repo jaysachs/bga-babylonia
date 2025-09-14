@@ -60,29 +60,8 @@ class Model
     private ?Pool $_pool = null;
     private ?Components $_components = null;
     private ?Scorer $_scorer = null;
-    private Stats $stats;
-    private ?Stats $savedStats;
-    private RecordingStatsImpl $rsImpl;
 
-    public function __construct(private PersistentStore $ps, private StatsImpl $statsImpl, private int $player_id) {
-        $this->stats = new Stats($statsImpl);
-    }
-
-    private function setStatsRecordingMode() {
-        $this->rsImpl = new RecordingStatsImpl($this->statsImpl);
-        $this->savedStats = $this->stats;
-        $this->stats = new Stats($this->rsImpl);
-    }
-
-    /** @return array<int,StatOp> */
-    private function endStatsRecordingMode() : array {
-        $this->stats = $this->savedStats;
-        return $this->rsImpl->getOperations();
-    }
-
-    /** @param array<int, StatOp> $statOps */
-    private function applyDeferredStats(array $statOps) : void {
-        StatOp::applyAllTo($this->statsImpl, $statOps);
+    public function __construct(private PersistentStore $ps, private Stats $stats, private int $player_id) {
     }
 
     /** @param int[] $player_ids */
@@ -272,8 +251,7 @@ class Model
 
     public function playPiece(int $handpos, RowCol $rc): ElaboratedMove
     {
-        $this->setStatsRecordingMode();
-        // also retrieve ziggurat cards held
+        $this->stats->enterDeferredMode();
 
         $piece = $this->hand()->play($handpos);
         $hex = $this->board()->hexAt($rc);
@@ -363,7 +341,7 @@ class Model
             $this->stats->PLAYER_POINTS_FROM_ZIGGURATS->inc($this->player_id, $move->ziggurat_points);
         }
 
-        $this->ps->insertMove($move, $this->endStatsRecordingMode());
+        $this->ps->insertMove($move, $this->stats->exitDeferredMode());
         return $move;
     }
 
@@ -390,7 +368,7 @@ class Model
 
     public function donePlayPieces(): void {
         $statOps = $this->ps->deleteAllMoves($this->player_id);
-        $this->applyDeferredStats($statOps);
+        $this->stats->applyAll($statOps);
     }
 
     /* return true if game should end */

@@ -323,7 +323,7 @@ class Game extends \Bga\GameFramework\Table
     }
 
     private function createModel(): Model {
-        return new Model($this->ps, new GameStatsImpl($this), $this->activePlayerId());
+        return new Model($this->ps, $this->stats, $this->activePlayerId());
     }
 
     public function stEndOfTurnScoring(): void
@@ -568,7 +568,7 @@ class Game extends \Bga\GameFramework\Table
         // WARNING: We must only return information visible by the
         // current player.
 
-        $model = new Model($this->ps, new GameStatsImpl($this), $this->currentPlayerId());
+        $model = new Model($this->ps, $this->stats, $this->currentPlayerId());
 
         $player_data = [];
         foreach ($model->allPlayerInfo() as $pid => $pi) {
