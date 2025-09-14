@@ -147,12 +147,12 @@
             "name": "City points gained attributable to ziggurat card 3",
             "type": "int"
         },
-        "ziggurat_card_8_used": {
+        "ziggurat_card_8_points": {
             "id": 48,
             "name": "Network points attributable to ziggurat card 8",
             "type": "int"
         },
-        "ziggurat_card_9_used": {
+        "ziggurat_card_9_points": {
             "id": 49,
             "name": "Network points attributable to ziggurat card 9",
             "type": "int"

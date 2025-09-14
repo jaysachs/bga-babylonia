@@ -72,22 +72,42 @@ class Scorer
         $hexWinner = $this->computeHexWinner($hex);
         $result = ScoredCity::makeEmpty($hexWinner, array_keys($this->player_infos));
         foreach (array_keys($this->player_infos) as $pid) {
-            $this->computeNetwork($result, $pid);
+            $this->computeNetwork($result, $pid, null);
         }
         $this->computeCapturedCityPoints($result);
+
+        $no_zc8_result = ScoredCity::makeEmpty($hexWinner, array_keys($this->player_infos));
+        foreach (array_keys($this->player_infos) as $pid) {
+            $this->computeNetwork($no_zc8_result, $pid, ZigguratCardType::FREE_RIVER_CONNECTS);
+        }
+
+        $no_zc9_result = ScoredCity::makeEmpty($hexWinner, array_keys($this->player_infos));
+        foreach (array_keys($this->player_infos) as $pid) {
+            $this->computeNetwork($no_zc9_result, $pid, ZigguratCardType::FREE_CENTER_LAND_CONNECTS);
+        }
+        foreach ($this->player_infos as $pid => $_) {
+            $r8 = $result->networkPointsForPlayer($pid) - $no_zc8_result->networkPointsForPlayer($pid);
+            if ($r8 > 0) {
+                $this->stats->PLAYER_ZIGGURAT_CARD_8_POINTS->inc($pid, $r8);
+            }
+            $r9 = $result->networkPointsForPlayer($pid) - $no_zc9_result->networkPointsForPlayer($pid);
+            if ($r9 > 0) {
+                $this->stats->PLAYER_ZIGGURAT_CARD_9_POINTS->inc($pid, $r9);
+            }
+        }
 
         return $result;
     }
 
-    private function computeNetwork(ScoredCity $result, int $pid): void
+    private function computeNetwork(ScoredCity $result, int $pid, ?ZigguratCardType $ignored_zcard): void
     {
         $this->board->bfs(
             $result->hex_winner->hex->rc,
-            function (Hex $h) use (&$result, $pid): bool {
+            function (Hex $h) use (&$result, $pid, $ignored_zcard): bool {
                 if ($h == $result->hex_winner->hex) {
                     return true;
                 }
-                $player_id = $this->networkOwnerOf($h);
+                $player_id = $this->networkOwnerOf($h, $ignored_zcard);
                 if ($player_id != $pid) {
                     return false;
                 }
@@ -120,19 +140,19 @@ class Scorer
         }
     }
 
-    private function networkOwnerOf(Hex $h): int /* player_id */
+    private function networkOwnerOf(Hex $h, ?ZigguratCardType $ignored_zcard): int /* player_id */
     {
         if ($h->player_id > 0) {
             return $h->player_id;
         }
         if ($h->isWater()) {
-            return $this->components->zigguratCardOwner(
-                ZigguratCardType::FREE_RIVER_CONNECTS
-            );
+            if ($ignored_zcard != ZigguratCardType::FREE_RIVER_CONNECTS) {
+                return $this->components->zigguratCardOwner(ZigguratCardType::FREE_RIVER_CONNECTS);
+            }
         } else if ($h->landmass == Landmass::CENTER) {
-            return $this->components->zigguratCardOwner(
-                ZigguratCardType::FREE_CENTER_LAND_CONNECTS
-            );
+            if ($ignored_zcard != ZigguratCardType::FREE_CENTER_LAND_CONNECTS) {
+                return $this->components->zigguratCardOwner(ZigguratCardType::FREE_CENTER_LAND_CONNECTS);
+            }
         }
         return 0;
     }
