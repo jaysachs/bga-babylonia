@@ -25,7 +25,29 @@
 
 declare(strict_types=1);
 
-namespace Bga\Games\babylonia;
+namespace Bga\Games\babylonia\ModelImpl {
+
+class PlayAllowedResult {
+    private function __construct(public ?array $ziggurat_cards_used, public ?string $reason) {}
+
+    static function success(array $ziggurat_cards_used): PlayAllowedResult {
+        return new PlayAllowedResult($ziggurat_cards_used, null);
+    }
+
+    static function failure(string $reason): PlayAllowedResult {
+        return new PlayAllowedResult(null, $reason);
+    }
+
+    function isAllowed(): bool {
+        return $this->ziggurat_cards_used !== null;
+    }
+}
+
+}
+
+namespace Bga\Games\babylonia {
+
+use Bga\Games\babylonia\ModelImpl\PlayAllowedResult;
 
 class Model
 {
@@ -85,7 +107,8 @@ class Model
                 new Scorer(
                     $this->board(),
                     $this->allPlayerInfo(),
-                    $this->components()
+                    $this->components(),
+                    $this->stats
                 );
         }
         return $this->_scorer;
@@ -151,8 +174,9 @@ class Model
         return $this->_turn_progress;
     }
 
-    public function isPlayAllowed(Piece $piece, Hex $hex): bool
+    public function checkPlay(Piece $piece, Hex $hex): PlayAllowedResult
     {
+        $zcardsUsed = [];
         if ($hex->piece->isField()) {
             if ($piece->isFarmer()) {
                 // ensure player has at least one noble adjacent.
@@ -161,32 +185,37 @@ class Model
                         && $h->piece->isNoble();
                 };
                 if (count($this->board()->neighbors($hex, $is_noble)) == 0) {
-                    return false;
+                    return PlayAllowedResult::failure("can't place farmer in field with no adjacent nobles");
                 }
             } else if (!$this->components()->hasUnusedZigguratCard(
                 $this->player_id,
                 ZigguratCardType::NOBLES_IN_FIELDS
             )) {
-                return false;
+                    return PlayAllowedResult::failure("can't place nobles in field without ziggurat card");
+            } else {
+                $zcardsUsed[] = ZigguratCardType::NOBLES_IN_FIELDS;
             }
         } else if ($hex->piece != Piece::EMPTY) {
-            return false;
+            return PlayAllowedResult::failure("can't place in occupied non-field space");
         }
 
         // if 0 or 1 moves made, can play in any valid hex
         if (count($this->turnProgress()->moves) < 2) {
-            return true;
+            return PlayAllowedResult::success($zcardsUsed);
         }
 
         // extra moves can not go in water
         if ($hex->isWater()) {
-            return false;
+            return PlayAllowedResult::failure("can't place extra moves in river");
         }
 
         $non_land_farmer_played =
             !$this->turnProgress()->allMovesFarmersOnLand($this->board());
         if ($piece->isFarmer()) {
-            return !$non_land_farmer_played;
+            if ($non_land_farmer_played) {
+                return PlayAllowedResult::failure("can't place extra farmers unless all previous moves were farmers onto land");
+            }
+            return PlayAllowedResult::success($zcardsUsed);
         }
         if (
             !$non_land_farmer_played
@@ -196,7 +225,8 @@ class Model
                 ZigguratCardType::NOBLE_WITH_3_FARMERS
             )
         ) {
-            return true;
+            $zcardsUsed[]= ZigguratCardType::NOBLE_WITH_3_FARMERS;
+            return PlayAllowedResult::success($zcardsUsed);
         }
 
         $nobles_played = $this->turnProgress()->uniqueNoblesPlayed();
@@ -208,10 +238,11 @@ class Model
                 ZigguratCardType::NOBLES_3_KINDS
             )
         ) {
-            return true;
+            $zcardsUsed[] = ZigguratCardType::NOBLES_3_KINDS;
+            return PlayAllowedResult::success($zcardsUsed);
         }
 
-        return false;
+        return PlayAllowedResult::failure("cannot place extra nobles");
     }
 
     /*
@@ -227,7 +258,7 @@ class Model
         $this->board()->visitAll(function (Hex $hex) use (&$result, &$hand): void {
             foreach (Piece::playerPieces() as $piece) {
                 if ($hand->contains($piece)) {
-                    if ($this->isPlayAllowed($piece, $hex)) {
+                    if ($this->checkPlay($piece, $hex)->isAllowed()) {
                         if (!isset($result[$piece->value])) {
                             $result[$piece->value] = [];
                         }
@@ -246,9 +277,9 @@ class Model
 
         $piece = $this->hand()->play($handpos);
         $hex = $this->board()->hexAt($rc);
-        if (!$this->isPlayAllowed($piece, $hex)) {
-            $pv = $piece->value;
-            throw new \InvalidArgumentException("Illegal to play $pv to $rc by $this->player_id");
+        $result = $this->checkPlay($piece, $hex);
+        if (!$result->isAllowed()) {
+            throw new \InvalidArgumentException("Illegal to play $piece->value to $rc by player $this->player_id");
         }
 
         $originalPiece = $piece;
@@ -304,6 +335,22 @@ class Model
         //   }
         $this->ps->incPlayerScore($move->player_id, $move->points());
         $this->ps->updateHand($move->player_id, $move->handpos, Piece::EMPTY);
+
+        foreach ($result->ziggurat_cards_used as $zctype) {
+            switch ($zctype) {
+                case ZigguratCardType::NOBLE_WITH_3_FARMERS:
+                    $this->stats->PLAYER_ZIGGURAT_CARD_5_USED->inc($this->player_id);
+                    break;
+                case ZigguratCardType::NOBLES_3_KINDS:
+                    $this->stats->PLAYER_ZIGGURAT_CARD_4_USED->inc($this->player_id);
+                    break;
+                case ZigguratCardType::NOBLES_IN_FIELDS:
+                    $this->stats->PLAYER_ZIGGURAT_CARD_6_USED->inc($this->player_id);
+                    break;
+                default:
+                    error_log("Unexpected used ziggurat card during move: $zctype->value");
+            }
+        }
 
         if ($move->captured_piece->isField()) {
             $this->stats->PLAYER_FIELDS_CAPTURED->inc($this->player_id);
@@ -392,8 +439,8 @@ class Model
 
     public function selectScoringHex(RowCol $rc): Hex {
         $hex = $this->board()->hexAt($rc);
-        $hexes = $this->locationsRequiringScoring();
-        if (array_search($hex, $hexes) === false) {
+        $lrs = $this->locationsRequiringScoring();
+        if (array_search($hex->rc, $lrs) === false) {
             throw new \BgaUserException("hex {$hex} is not scoreable");
         }
         if ($hex->piece->isCity()) {
@@ -415,7 +462,7 @@ class Model
         }
 
         if (!$this->hexRequiresScoring($hex)) {
-            throw new \InvalidArgumentException("{$hex} is not ready to be scored");
+            throw new \InvalidArgumentException("ziggurat at {$hex} is not ready to be scored");
         }
         $hex->scored = true;
         $this->ps->updateHex($hex->rc, null, null, true);
@@ -513,7 +560,7 @@ class Model
         }, $result);
     }
 
-    private function hexRequiresScoring(Hex $hex): bool
+    function hexRequiresScoring(Hex $hex): bool
     {
         if (($hex->piece->isZiggurat() && !$hex->scored)
             || $hex->piece->isCity()
@@ -521,8 +568,8 @@ class Model
             $missing = $this->board()->neighbors(
                 $hex,
                 function (Hex $nh): bool {
-                    return $nh->piece == Piece::EMPTY
-                        && $nh->type == HexType::LAND;
+                    return $nh->piece === Piece::EMPTY
+                        && $nh->type === HexType::LAND;
                 }
             );
             return (count($missing) == 0);
@@ -600,4 +647,6 @@ class Model
         $this->ps->incPlayerScore($move->player_id, -$move->points());
         return $move;
     }
+}
+
 }

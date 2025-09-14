@@ -20,33 +20,12 @@ use Bga\Games\babylonia\ {
         RowCol,
         ScoredCity,
         Stats,
-        StatsImpl,
+        // StatsImpl,
+        TestStatsImpl,
         TurnProgress,
         ZigguratCard,
         ZigguratCardType,
 };
-
-class TestStatsImpl implements StatsImpl {
-    private array $stats = [];
-    public function incStat(mixed $delta, string $name, ?int $player_id = null) : void {
-        $key = $player_id === null ? '@' . $name : $name . $player_id;
-        @ $this->stats[$key] += $delta;
-    }
-    public function setStat(mixed $val, string $name, ?int $player_id = null) : void {
-        $key = $player_id === null ? '@' . $name : $name . $player_id;
-        $this->stats[$key] = $val;
-    }
-
-    // for now, these two are not used in the tests
-    public function getStat(string $name, ?int $player_id = null): mixed {
-        $key = $player_id === null ? '@' . $name : $name . $player_id;
-        return @ $this->stats[$key];
-    }
-    public function initStat(string $type, string $name, mixed $val, ?int $player_id = null): void {
-        $key = $player_id === null ? '@' . $name : $name . $player_id;
-        $this->stats[$key] = $val;
-    }
-}
 
 class TestDb implements Db {
     /** @return string[][] */
@@ -247,26 +226,26 @@ END;
         s-3
     END;
 
-    public function testIsPlayAllowedFirstPieceOfTurn_allowed() {
+    public function testcheckPlayFirstPieceOfTurn_allowed() {
         $this->setMap(ModelTest::MAP4);
 
-        $this->assertTrue($this->model->isPlayAllowed(Piece::MERCHANT, $this->ps->hex(2,0)));
-        $this->assertTrue($this->model->isPlayAllowed(Piece::HIDDEN, $this->ps->hex(4,2)));
-        $this->assertTrue($this->model->isPlayAllowed(Piece::FARMER, $this->ps->hex(4,2)));
-        $this->assertTrue($this->model->isPlayAllowed(Piece::SERVANT, $this->ps->hex(6,2)));
+        $this->assertTrue($this->model->checkPlay(Piece::MERCHANT, $this->ps->hex(2,0))->isAllowed());
+        $this->assertTrue($this->model->checkPlay(Piece::HIDDEN, $this->ps->hex(4,2))->isAllowed());
+        $this->assertTrue($this->model->checkPlay(Piece::FARMER, $this->ps->hex(4,2))->isAllowed());
+        $this->assertTrue($this->model->checkPlay(Piece::SERVANT, $this->ps->hex(6,2))->isAllowed());
     }
 
-    public function testIsPlayAllowedFirstPieceOfTurn_forbidden() {
+    public function testcheckPlayFirstPieceOfTurn_forbidden() {
         $this->setMap(ModelTest::MAP4);
 
         // not on a city
-        $this->assertFalse($this->model->isPlayAllowed(Piece::MERCHANT, $this->ps->hex(1,1)));
+        $this->assertFalse($this->model->checkPlay(Piece::MERCHANT, $this->ps->hex(1,1))->isAllowed());
         // not on a ziggurat
-        $this->assertFalse($this->model->isPlayAllowed(Piece::SERVANT, $this->ps->hex(3,1)));
+        $this->assertFalse($this->model->checkPlay(Piece::SERVANT, $this->ps->hex(3,1))->isAllowed());
         // not on a friendly piece
-        $this->assertFalse($this->model->isPlayAllowed(Piece::SERVANT, $this->ps->hex(4,0)));
+        $this->assertFalse($this->model->checkPlay(Piece::SERVANT, $this->ps->hex(4,0))->isAllowed());
         // not on an opponent piece
-        $this->assertFalse($this->model->isPlayAllowed(Piece::SERVANT, $this->ps->hex(5,1)));
+        $this->assertFalse($this->model->checkPlay(Piece::SERVANT, $this->ps->hex(5,1))->isAllowed());
     }
 
     const MAP5 = <<<'END'
@@ -289,11 +268,11 @@ END;
         $m3 = $this->model->playPiece(2, new RowCol(7, 1));
         $m4 = $this->model->playPiece(4, new RowCol(6, 2));
         // if we had another farmer, it would be allowed
-        $this->assertTrue($this->model->isPlayAllowed(Piece::FARMER, $this->ps->hex(2, 4)));
+        $this->assertTrue($this->model->checkPlay(Piece::FARMER, $this->ps->hex(2, 4))->isAllowed());
         // but only a farmer
-        $this->assertFalse($this->model->isPlayAllowed(Piece::SERVANT, $this->ps->hex(2, 4)));
+        $this->assertFalse($this->model->checkPlay(Piece::SERVANT, $this->ps->hex(2, 4))->isAllowed());
         // also, can't play an extra farmer into the water
-        $this->assertFalse($this->model->isPlayAllowed(Piece::FARMER, $this->ps->hex(4, 2)));
+        $this->assertFalse($this->model->checkPlay(Piece::FARMER, $this->ps->hex(4, 2))->isAllowed());
     }
 
 
@@ -305,12 +284,12 @@ END;
 
     public function testPlayPiecesOnFields_noAdjacentNoble() {
         $this->setMap(ModelTest::MAP6);
-        $this->assertFalse($this->model->isPlayAllowed(Piece::FARMER, $this->ps->hex(1,1)));
+        $this->assertFalse($this->model->checkPlay(Piece::FARMER, $this->ps->hex(1,1))->isAllowed());
     }
 
     public function testPlayPiecesOnFields_nobleNoZigguratCard() {
         $this->setMap(ModelTest::MAP6);
-        $this->assertFalse($this->model->isPlayAllowed(Piece::SERVANT, $this->ps->hex(1,1)));
+        $this->assertFalse($this->model->checkPlay(Piece::SERVANT, $this->ps->hex(1,1))->isAllowed());
     }
 
     public function testPlayPiecesOnFields_onlyAdjacentFarmer() {
@@ -318,27 +297,28 @@ END;
         $this->ps->setHand([Piece::FARMER]);
         // An adjacent farmer doesn't help
         $m1 = $this->model->playPiece(0, new RowCol(2, 0));
-        $this->assertFalse($this->model->isPlayAllowed(Piece::FARMER, $this->ps->hex(1,1)));
+        $this->assertFalse($this->model->checkPlay(Piece::FARMER, $this->ps->hex(1,1))->isAllowed());
     }
 
     public function testPlayPiecesOnFields_adjacentHiddenNobleInWater() {
         $this->setMap(ModelTest::MAP6);
         $this->ps->setHand([Piece::SERVANT]);
         $m2 = $this->model->playPiece(0, new RowCol(2, 2));
-        $this->assertFalse($this->model->isPlayAllowed(Piece::FARMER, $this->ps->hex(1,1)));
+        $this->assertFalse($this->model->checkPlay(Piece::FARMER, $this->ps->hex(1,1))->isAllowed());
     }
 
     public function testPlayPiecesOnFields_adjacentNobleOnLand() {
         $this->setMap(ModelTest::MAP6);
         $this->ps->setHand([Piece::SERVANT]);
         $m3 = $this->model->playPiece(0, new RowCol(0, 2));
-        $this->assertTrue($this->model->isPlayAllowed(Piece::FARMER, $this->ps->hex(1,1)));
+        $this->assertTrue($this->model->checkPlay(Piece::FARMER, $this->ps->hex(1,1))->isAllowed());
     }
 
     public function testPlayPiecesOnFields_loneNobleWithZigguratCard() {
         $this->setMap(ModelTest::MAP6);
         $this->model->selectZigguratCard(ZigguratCardType::NOBLES_IN_FIELDS);
-        $this->assertTrue($this->model->isPlayAllowed(Piece::SERVANT, $this->ps->hex(1,1)));
+        $result = $this->model->checkPlay(Piece::SERVANT, $this->ps->hex(1,1));
+        $this->assertEquals([ZigguratCardType::NOBLES_IN_FIELDS], $result->ziggurat_cards_used);
     }
 
     public function testPlayPieces_threeNoblesOnLand() {
@@ -347,11 +327,15 @@ END;
         $this->ps->setHand([Piece::SERVANT, Piece::MERCHANT, Piece::PRIEST, Piece::FARMER, Piece::MERCHANT]);
         $this->model->playPiece(0, new RowCol(0, 0));
         $this->model->playPiece(1, new RowCol(2, 0));
-        $this->assertTrue($this->model->isPlayAllowed(Piece::PRIEST, $this->ps->hex(0, 2)));
-        $this->assertFalse($this->model->isPlayAllowed(Piece::SERVANT, $this->ps->hex(0, 2)));
-        $this->assertFalse($this->model->isPlayAllowed(Piece::FARMER, $this->ps->hex(0, 2)));
+
+        $result = $this->model->checkPlay(Piece::PRIEST, $this->ps->hex(0, 2));
+
+        $this->assertTrue($result->isAllowed());
+        $this->assertEquals([ZigguratCardType::NOBLES_3_KINDS], $result->ziggurat_cards_used);
+        $this->assertFalse($this->model->checkPlay(Piece::SERVANT, $this->ps->hex(0, 2))->isAllowed());
+        $this->assertFalse($this->model->checkPlay(Piece::FARMER, $this->ps->hex(0, 2))->isAllowed());
         $this->model->playPiece(2, new RowCol(0, 2));
-        $this->assertFalse($this->model->isPlayAllowed(PIECE::PRIEST, $this->ps->hex(1,3)));
+        $this->assertFalse($this->model->checkPlay(PIECE::PRIEST, $this->ps->hex(1,3))->isAllowed());
     }
 
     public function testPlayPieces_threeNoblesOneInWater() {
@@ -360,8 +344,25 @@ END;
         $this->ps->setHand([Piece::SERVANT, Piece::MERCHANT, Piece::PRIEST, Piece::FARMER, Piece::MERCHANT]);
         $this->model->playPiece(0, new RowCol(0, 0));
         $this->model->playPiece(1, new RowCol(2, 2));
-        $this->assertFalse($this->model->isPlayAllowed(Piece::PRIEST, $this->ps->hex(0, 2)));
-        $this->assertFalse($this->model->isPlayAllowed(Piece::SERVANT, $this->ps->hex(0, 2)));
-        $this->assertFalse($this->model->isPlayAllowed(Piece::FARMER, $this->ps->hex(0, 2)));
+        $this->assertFalse($this->model->checkPlay(Piece::PRIEST, $this->ps->hex(0, 2))->isAllowed());
+        $this->assertFalse($this->model->checkPlay(Piece::SERVANT, $this->ps->hex(0, 2))->isAllowed());
+        $this->assertFalse($this->model->checkPlay(Piece::FARMER, $this->ps->hex(0, 2))->isAllowed());
+    }
+
+    const MAP8 = <<<'END'
+        XXX   XXX  XXX
+           C.S   XXX
+        p-2   ===   f-2
+           ZZZ   C.P
+        p-1   ===   s-2
+           f-2   m-1
+        C.M   ---
+           p-3
+        s-3
+    END;
+
+    public function testRequiresScoring() {
+        $this->setMap(ModelTest::MAP8);
+        $this->assertTrue($this->model->hexRequiresScoring($this->model->board()->hexAt(new RowCol(3, 1))));
     }
 }

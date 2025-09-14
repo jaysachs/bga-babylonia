@@ -12,6 +12,8 @@ use Bga\Games\babylonia\ {
         RowCol,
         Scorer,
         ScoredCity,
+        Stats,
+        TestStatsImpl,
 };
 
 final class ScorerTest extends TestCase
@@ -47,7 +49,8 @@ END;
         $this->board = Board::fromTestMap($map);
         $this->scorer = new Scorer($this->board,
                                    $this->playerInfos(),
-                                   new Components([]));
+                                   new Components([]),
+                                   new Stats(new TestStatsImpl()));
     }
 
     private function hexWinner(int $r, int $c, int $captured_by): HexWinner {
@@ -170,11 +173,10 @@ C.M   h-3   ---   ---
 m-3   ---   ===   ---
 END;
     public function testComputeHexWinnerNoWinner(): void {
-        $board = Board::fromTestMap(ScorerTest::MAP3);
-        $scorer = new Scorer($board, $this->playerInfos(), new Components([]));
+        $this->doSetup(ScorerTest::MAP3);
 
-        $this->assertEquals(0, $scorer->computeHexWinner(
-            $board->hexAt(new RowCol(3, 1)))->captured_by);
+        $this->assertEquals(0, $this->scorer->computeHexWinner(
+            $this->board->hexAt(new RowCol(3, 1)))->captured_by);
     }
 
 

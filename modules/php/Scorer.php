@@ -34,7 +34,8 @@ class Scorer
     public function __construct(
         private Board $board,
         private array $player_infos,
-        private Components $components
+        private Components $components,
+        private Stats $stats
     ) {}
 
     public function computeHexWinner(Hex $hex): HexWinner
@@ -111,7 +112,9 @@ class Scorer
             if ($pid == $this->components->zigguratCardOwner(
                 ZigguratCardType::EXTRA_CITY_POINTS
             )) {
-                $points += intval(floor($points / 2));
+                $extra_points = intval(floor($points / 2));
+                $this->stats->PLAYER_ZIGGURAT_CARD_3_EXTRA_POINTS_GAINED->inc($pid, $extra_points);
+                $points += $extra_points;
             }
             $result->captured_city_points[$pid] = $points;
         }

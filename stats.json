@@ -124,11 +124,10 @@
             "type": "int",
             "display": "limited"
         },
-        "ziggurat_card_3_used": {
+        "ziggurat_card_3_extra_points_gained": {
             "id": 43,
-            "name": "Times ziggurat card 3 was used",
-            "type": "int",
-            "display": "limited"
+            "name": "Extra points gained from use of ziggurat card 3",
+            "type": "int"
         },
         "ziggurat_card_4_used": {
             "id": 44,
