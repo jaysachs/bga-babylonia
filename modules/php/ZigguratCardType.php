@@ -29,6 +29,7 @@ namespace Bga\Games\babylonia;
 
 enum ZigguratCardType: string
 {
+    // These are in order of numbering 1-9
     case PLUS_10 = 'zc_10pts';
     case EXTRA_TURN = 'zc_xturn';
     case HAND_SIZE_7 = 'zc_hand7';
