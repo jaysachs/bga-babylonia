@@ -314,6 +314,9 @@ class Model
         $this->ps->incPlayerScore($move->player_id, $move->points());
         $this->ps->updateHand($move->player_id, $move->handpos, Piece::EMPTY);
 
+        /**
+         * @psalm-suppress PossiblyNullIterator
+         */
         foreach ($result->ziggurat_cards_used as $zctype) {
             switch ($zctype) {
                 case ZigguratCardType::NOBLE_WITH_3_FARMERS:
