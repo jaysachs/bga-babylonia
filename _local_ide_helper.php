@@ -1,6 +1,7 @@
 
 namespace PHPUnit\Framework {
     class TestCase {
+        protected function expectException(mixed $e) { }
         protected function assertNull(mixed $a) { }
         protected function assertTrue(bool $t) { }
         protected function assertFalse(bool $t) { }
