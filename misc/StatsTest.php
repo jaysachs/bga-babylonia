@@ -8,7 +8,7 @@ require_once('modules/php/Stats.php');
 
 use Bga\Games\babylonia\{
     Stats,
-    StatsImpl
+    TestStatsImpl
 };
 
 
