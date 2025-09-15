@@ -430,9 +430,10 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
         { autoclick: true }
       );
 
-      this.statusBar.addActionButton(_('Cancel'), () => {
-        this.toggleZcardSelected(e);
-      });
+      this.statusBar.addActionButton(
+        _('Cancel'),
+        () => this.toggleZcardSelected(e),
+        { color: "secondary"});
     };
     let removeButtons = () => {
       this.popActionBarTitle();
@@ -558,7 +559,8 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
     if (this.playStateArgs.canUndo) {
       this.statusBar.addActionButton(
         _('Undo'),
-        () => { this.setClientState('client_undo', { }); this.bgaPerformAction('actUndoPlay'); }
+        () => { this.setClientState('client_undo', { }); this.bgaPerformAction('actUndoPlay'); },
+        { color: "alert" }
       );
     }
   }
@@ -608,7 +610,8 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
           () => {
             this.unselectAllHandPieces();
             this.setStatusBarForPlayState();
-          });
+          },
+        { color: "secondary"});
       }
     } else {
       this.setStatusBarForPlayState();
