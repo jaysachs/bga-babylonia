@@ -1045,8 +1045,4 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
     }
     return { log, args };
   }
-
-  private async notif_debug(args: any) {
-    console.log(args);
-  }
 }

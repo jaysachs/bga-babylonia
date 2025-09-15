@@ -165,4 +165,9 @@ class BaseGame<T extends Gamedatas> extends GameGui<T> {
     titleEl.innerHTML = this.savedActionBarTitles.pop()!;
     return orig;
   }
+
+  protected async notif_debug(args: any) {
+    console.log(args);
+  }
+
 }
