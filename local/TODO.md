@@ -19,9 +19,9 @@
 19. For zcards in log and status bar, make more readable and/or add tooltips.
 20. ~~DONE Clean up activeplayer / player-on-turn logic.~~
 21. ~~DONE Re-think how statistics are done. Currently it's all in Game.php, based on results from Model. It gets messier and messier the more detailed stats we want to accumulate. Instead, we could accumulate stat changes in Model, make that available as an accessor, and then use that in Game to persist stat changes. Also,to make things easier to undo, we should also store stat changes in the turn_progress table; on turn "commit", update the stats, but not until then. (Post-activity things in the turn, e.g. related to scoring, would just be committed). Maybe even do this with a fancy reflection "decorator" on act and st functions in Game.php?~~
-22. When no more plays allowed, mark all hand pieces unplayable; reset on refill.
+22. ~~DONE When no more plays allowed, mark all hand pieces unplayable; reset on refill.~~
 23. ~~DONE Refactor Stats impls so a single impl is used, giving Stats "enterDeferredMode" and "applyAndExitDeferredMode() : StatOp[]" methods. This will clean up the stuff in Model about swapping out impls (and about accepting an impl in the constructor instead of the Stats object).~~
-23. Leftover highlighting of (city?) scoring hexes
+23. ~~DONE Leftover highlighting of (city?) scoring hexes~~
 24. ~~DONE Slowness of animations esp in +1 ziggurat tiles animation~~
 25. ~~DONE Tooltips are lost for zig cards~~
-26. Consider "average pieces played/turn" and "max played/turn" statistics.
+26. ~~DONE Consider "average pieces played/turn" and "max played/turn" statistics.~~
