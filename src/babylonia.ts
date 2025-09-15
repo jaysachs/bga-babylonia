@@ -18,6 +18,7 @@ class Attrs {
   static readonly ZTYPE : string = 'bbl_ztype';
   static readonly ZUSED : string = 'bbl_zused';
   static readonly PIECE : string = 'bbl_piece';
+  static readonly TT_PROCESSED : string = 'bbl_tt_processed';
 }
 
 class Piece {
@@ -156,11 +157,20 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
   private playStateArgs: PlayState | null = null;
   private html: Html = new Html({});
   private playerIdToColorIndex: Record<number, number> = {};
+  private zcardTooltips: string[] = [];
 
   private setupHandlers(): void {
     $(IDS.HAND).addEventListener('click', this.onHandClicked.bind(this));
     $(IDS.BOARD).addEventListener('click', this.onBoardClicked.bind(this));
     $(IDS.AVAILABLE_ZCARDS).addEventListener('click', this.onZcardClicked.bind(this));
+  }
+
+  private addTooltipsToLog() {
+    const item_elements : Element[] = Array.from(dojo.query(`[${Attrs.ZTYPE}]:not([${Attrs.TT_PROCESSED}])`));
+    item_elements.forEach(ele => {
+      ele.setAttribute(Attrs.TT_PROCESSED, '');  // prevents tooltips being re-added to previous log entries
+      this.addTooltip(ele.id, this.zcardTooltips[ele.getAttribute(Attrs.ZTYPE)!], '');
+    });
   }
 
   override setup(gamedatas: BGamedatas) {
@@ -205,9 +215,12 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
       (notif: any) => (notif.args.player_id == this.player_id));
 
     // if a ziggurat card is being chosen
+    // TODO: should this be done in the state watcher?
     if (gamedatas.current_scoring_hex) {
       this.markHexSelected(gamedatas.current_scoring_hex);
     }
+
+    dojo.connect(this.notifqueue, 'addToLog', () => this.addTooltipsToLog());
 
     console.log('Game setup done');
   }
@@ -274,6 +287,7 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
       } else {
         nextSpot.appendChild(zelem);
       }
+      this.zcardTooltips[zcard.type] = zcard.tooltip;
       this.addTooltip(zelem.id, zcard.tooltip, '');
     }
   }
@@ -422,7 +436,13 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
     const zt = e.getAttribute(Attrs.ZTYPE);
     let addButtons = () => {
       this.pushActionBarTitle(this.format_string_recursive(
-        _('Select ziggurat card ${zcard}?'), { zcard: zt }));
+        _('Select ziggurat card ${zcard}?'), { zcard: zt! }));
+      const elem = document.querySelector(`#pagemaintitletext [${Attrs.ZTYPE}]`);
+      if (elem) {
+        this.addTooltip(elem.id, this.zcardTooltips[elem.getAttribute(Attrs.ZTYPE)!], '');
+      } else {
+        console.error("Could not find just-added action bar title element?!");
+      }
       this.statusBar.addActionButton(_('Confirm'),
         () => {
           this.bgaPerformAction('actSelectZigguratCard', { zctype: zt });
@@ -1002,10 +1022,11 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
   }
 
   ///////
+  private zcardSalt: number = 0;
   readonly special_log_args = {
     piece: (args: any) => `<span class='log-element' ${Attrs.PIECE}='${this.pieceVal(args.piece, args.player_id)}'></span>`,
     city: (args: any) => `<span class='log-element' ${Attrs.PIECE}='${this.pieceVal(args.city, 0)}'></span>`,
-    zcard: (args: any) => `<span class='log-element' ${Attrs.ZTYPE}='${args.zcard}'></span>`,
+    zcard: (args: any) => `<span class='log-element' id='logzcard_${this.zcardSalt++}' ${Attrs.ZTYPE}='${args.zcard}'></span>`,
     original_piece: (args: any) => `<span class='log-element' ${Attrs.PIECE}='${this.pieceVal(args.original_piece, args.player_id)}'></span>`,
   };
 
