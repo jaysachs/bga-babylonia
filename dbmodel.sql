@@ -67,6 +67,7 @@ CREATE TABLE IF NOT EXISTS `turn_progress_stats` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 CREATE TABLE IF NOT EXISTS `ziggurat_cards` (
+  `seq_id` int(10) unsigned NOT NULL,
   -- which player holds it; if 0 still available
   `player_id` int(10) unsigned,
   -- whether the one-shot power was activated

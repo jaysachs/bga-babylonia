@@ -367,13 +367,13 @@ class PersistentStore
     public function insertComponents(Components $components): void
     {
         $sql_values = [];
-        foreach ($components->allZigguratCards() as &$zc) {
+        foreach ($components->allZigguratCards() as $i => &$zc) {
             $used = $this->boolValue($zc->used);
             $type = $zc->type->value;
-            $sql_values[] = "('$type', $used, $zc->owning_player_id)";
+            $sql_values[] = "($i, '$type', $used, $zc->owning_player_id)";
         }
         $values = implode(',', $sql_values);
-        $sql = "INSERT INTO ziggurat_cards (card_type, used, player_id)
+        $sql = "INSERT INTO ziggurat_cards (seq_id, card_type, used, player_id)
                 VALUES $values";
         $this->db->execute($sql);
     }
@@ -381,7 +381,8 @@ class PersistentStore
     public function retrieveComponents(): Components
     {
         $sql = "SELECT card_type, player_id, used
-                FROM ziggurat_cards";
+                FROM ziggurat_cards
+                ORDER BY seq_id";
         $data = $this->db->getObjectList($sql);
 
         $cards = [];
