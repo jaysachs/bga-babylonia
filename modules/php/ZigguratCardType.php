@@ -55,9 +55,8 @@ enum ZigguratCardType: string
         if ($use_advanced) {
             $ziggurats[] = ZigguratCardType::FREE_CENTER_LAND_CONNECTS;
             $ziggurats[] = ZigguratCardType::FREE_RIVER_CONNECTS;
-            shuffle($ziggurats);
-            array_pop($ziggurats);
-            array_pop($ziggurats);
+            array_splice($ziggurats, bga_rand(0, 8), 1);
+            array_splice($ziggurats, bga_rand(0, 7), 1);
         }
         return $ziggurats;
     }
