@@ -320,13 +320,13 @@ class Model
         foreach ($result->ziggurat_cards_used as $zctype) {
             switch ($zctype) {
                 case ZigguratCardType::NOBLE_WITH_3_FARMERS:
-                    $this->stats->PLAYER_ZIGGURAT_CARD_5_USED->inc($this->player_id);
+                    $this->stats->PLAYER_ZC_USED_NOBLE_WITH_3_FARMERS->inc($this->player_id);
                     break;
                 case ZigguratCardType::NOBLES_3_KINDS:
-                    $this->stats->PLAYER_ZIGGURAT_CARD_4_USED->inc($this->player_id);
+                    $this->stats->PLAYER_ZC_USED_NOBLES_3_KINDS->inc($this->player_id);
                     break;
                 case ZigguratCardType::NOBLES_IN_FIELDS:
-                    $this->stats->PLAYER_ZIGGURAT_CARD_6_USED->inc($this->player_id);
+                    $this->stats->PLAYER_ZC_USED_NOBLES_IN_FIELDS->inc($this->player_id);
                     break;
                 default:
                     error_log("Unexpected used ziggurat card during move: $zctype->value");
@@ -368,7 +368,7 @@ class Model
     {
         Model::refill($this->hand(), $this->pool());
         if ($this->hand()->size() > Hand::DEFAULT_SIZE) {
-            $this->stats->PLAYER_ZIGGURAT_CARD_3_USED->inc($this->player_id);
+            $this->stats->PLAYER_ZC_USED_HAND_SIZE_7->inc($this->player_id);
         }
     }
 
@@ -585,7 +585,7 @@ class Model
         if ($card_type == ZigguratCardType::PLUS_10) {
             $card->used = true;
             $points = 10;
-            $this->stats->PLAYER_ZIGGURAT_CARD_1_USED->inc($this->player_id);
+            $this->stats->PLAYER_ZC_USED_PLUS_10->inc($this->player_id);
             $pi = $this->allPlayerInfo()[$this->player_id];
             $pi->score += $points;
             $this->ps->updatePlayer($pi);
@@ -596,15 +596,15 @@ class Model
         $this->ps->updateZigguratCard($card);
         $this->stats->PLAYER_ZIGGURAT_CARDS->inc($this->player_id);
         $stat = match ($card->type) {
-            ZigguratCardType::PLUS_10 => $this->stats->PLAYER_ZIGGURAT_CARD_1_CHOSEN,
-            ZigguratCardType::EXTRA_TURN => $this->stats->PLAYER_ZIGGURAT_CARD_2_CHOSEN,
-            ZigguratCardType::HAND_SIZE_7 => $this->stats->PLAYER_ZIGGURAT_CARD_3_CHOSEN,
-            ZigguratCardType::NOBLES_3_KINDS => $this->stats->PLAYER_ZIGGURAT_CARD_4_CHOSEN,
-            ZigguratCardType::NOBLE_WITH_3_FARMERS => $this->stats->PLAYER_ZIGGURAT_CARD_5_CHOSEN,
-            ZigguratCardType::NOBLES_IN_FIELDS => $this->stats->PLAYER_ZIGGURAT_CARD_6_CHOSEN,
-            ZigguratCardType::EXTRA_CITY_POINTS => $this->stats->PLAYER_ZIGGURAT_CARD_7_CHOSEN,
-            ZigguratCardType::FREE_CENTER_LAND_CONNECTS => $this->stats->PLAYER_ZIGGURAT_CARD_8_CHOSEN,
-            ZigguratCardType::FREE_RIVER_CONNECTS => $this->stats->PLAYER_ZIGGURAT_CARD_9_CHOSEN,
+            ZigguratCardType::PLUS_10 => $this->stats->PLAYER_ZC_CHOSEN_PLUS_10,
+            ZigguratCardType::EXTRA_TURN => $this->stats->PLAYER_ZC_CHOSEN_EXTRA_TURN,
+            ZigguratCardType::HAND_SIZE_7 => $this->stats->PLAYER_ZC_CHOSEN_HAND_SIZE_7,
+            ZigguratCardType::NOBLES_3_KINDS => $this->stats->PLAYER_ZC_CHOSEN_NOBLES_3_KINDS,
+            ZigguratCardType::NOBLE_WITH_3_FARMERS => $this->stats->PLAYER_ZC_CHOSEN_NOBLE_WITH_3_FARMERS,
+            ZigguratCardType::NOBLES_IN_FIELDS => $this->stats->PLAYER_ZC_CHOSEN_NOBLES_IN_FIELDS,
+            ZigguratCardType::EXTRA_CITY_POINTS => $this->stats->PLAYER_ZC_CHOSEN_EXTRA_CITY_POINTS,
+            ZigguratCardType::EMPTY_CENTER_LAND_CONNECTS => $this->stats->PLAYER_ZC_CHOSEN_EMPTY_CENTER_LAND,
+            ZigguratCardType::EMPTY_RIVER_CONNECTS => $this->stats->PLAYER_ZC_CHOSEN_EMPTY_RIVER,
         };
         $stat->set($this->player_id, true);
         return new ZigguratCardSelection($card, $points);
@@ -620,7 +620,7 @@ class Model
             throw new \InvalidArgumentException(ZigguratCardType::EXTRA_TURN->value . " has already been used");
         }
         $card->used = true;
-        $this->stats->PLAYER_ZIGGURAT_CARD_2_USED->inc($this->player_id);
+        $this->stats->PLAYER_ZC_USED_EXTRA_TURN->inc($this->player_id);
         $this->ps->updateZigguratCard($card);
     }
 

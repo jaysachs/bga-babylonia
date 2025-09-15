@@ -37,8 +37,8 @@ enum ZigguratCardType: string
     case NOBLE_WITH_3_FARMERS = 'zc_3farmers';
     case NOBLES_IN_FIELDS = 'zc_fields';
     case EXTRA_CITY_POINTS = 'zc_citypts';
-    case FREE_CENTER_LAND_CONNECTS = 'zc_land';
-    case FREE_RIVER_CONNECTS = 'zc_river';
+    case EMPTY_CENTER_LAND_CONNECTS = 'zc_land';
+    case EMPTY_RIVER_CONNECTS = 'zc_river';
 
     /** @return ZigguratCardType[] */
     public static function sevenTypes(bool $use_advanced = false): array
@@ -53,8 +53,8 @@ enum ZigguratCardType: string
             ZigguratCardType::EXTRA_CITY_POINTS
         ];
         if ($use_advanced) {
-            $ziggurats[] = ZigguratCardType::FREE_CENTER_LAND_CONNECTS;
-            $ziggurats[] = ZigguratCardType::FREE_RIVER_CONNECTS;
+            $ziggurats[] = ZigguratCardType::EMPTY_CENTER_LAND_CONNECTS;
+            $ziggurats[] = ZigguratCardType::EMPTY_RIVER_CONNECTS;
             array_splice($ziggurats, bga_rand(0, 8), 1);
             array_splice($ziggurats, bga_rand(0, 7), 1);
         }
@@ -78,9 +78,9 @@ enum ZigguratCardType: string
             clienttranslate("From now on you can place the Nobles in the Crop Fields, even without having one of your Clan Tokens next to those Crop Fields."),
             ZigguratCardType::EXTRA_CITY_POINTS =>
             clienttranslate("From now on, when the Cities are scored, you will receive 1 additional point for every two Cities that you have in front of you."),
-            ZigguratCardType::FREE_CENTER_LAND_CONNECTS =>
+            ZigguratCardType::EMPTY_CENTER_LAND_CONNECTS =>
             clienttranslate("From now on all the free land hexagons of the central area between the 2 rivers serve to connect your Clan Tokens."),
-            ZigguratCardType::FREE_RIVER_CONNECTS =>
+            ZigguratCardType::EMPTY_RIVER_CONNECTS =>
             clienttranslate("From now on all the free river hexagons serve to connect your Clan Tokens."),
             default => ""
         };

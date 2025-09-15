@@ -76,24 +76,24 @@ class Scorer
         }
         $this->computeCapturedCityPoints($result);
 
-        $no_zc8_result = ScoredCity::makeEmpty($hexWinner, array_keys($this->player_infos));
+        $no_zc_land_result = ScoredCity::makeEmpty($hexWinner, array_keys($this->player_infos));
         foreach (array_keys($this->player_infos) as $pid) {
-            $this->computeNetwork($no_zc8_result, $pid, ZigguratCardType::FREE_CENTER_LAND_CONNECTS);
+            $this->computeNetwork($no_zc_land_result, $pid, ZigguratCardType::EMPTY_CENTER_LAND_CONNECTS);
         }
 
-        $no_zc9_result = ScoredCity::makeEmpty($hexWinner, array_keys($this->player_infos));
+        $no_zc_river_result = ScoredCity::makeEmpty($hexWinner, array_keys($this->player_infos));
         foreach (array_keys($this->player_infos) as $pid) {
-            $this->computeNetwork($no_zc9_result, $pid, ZigguratCardType::FREE_RIVER_CONNECTS);
+            $this->computeNetwork($no_zc_river_result, $pid, ZigguratCardType::EMPTY_RIVER_CONNECTS);
         }
 
         foreach ($this->player_infos as $pid => $_) {
-            $r8 = $result->networkPointsForPlayer($pid) - $no_zc8_result->networkPointsForPlayer($pid);
+            $r8 = $result->networkPointsForPlayer($pid) - $no_zc_land_result->networkPointsForPlayer($pid);
             if ($r8 > 0) {
-                $this->stats->PLAYER_ZIGGURAT_CARD_8_POINTS->inc($pid, $r8);
+                $this->stats->PLAYER_ZC_POINTS_EMPTY_CENTER_LAND->inc($pid, $r8);
             }
-            $r9 = $result->networkPointsForPlayer($pid) - $no_zc9_result->networkPointsForPlayer($pid);
+            $r9 = $result->networkPointsForPlayer($pid) - $no_zc_river_result->networkPointsForPlayer($pid);
             if ($r9 > 0) {
-                $this->stats->PLAYER_ZIGGURAT_CARD_9_POINTS->inc($pid, $r9);
+                $this->stats->PLAYER_ZC_POINTS_EMPTY_RIVER->inc($pid, $r9);
             }
         }
 
@@ -134,7 +134,7 @@ class Scorer
                 ZigguratCardType::EXTRA_CITY_POINTS
             )) {
                 $extra_points = intval(floor($points / 2));
-                $this->stats->PLAYER_ZIGGURAT_CARD_7_EXTRA_POINTS_GAINED->inc($pid, $extra_points);
+                $this->stats->PLAYER_ZC_POINTS_EXTRA_CITY->inc($pid, $extra_points);
                 $points += $extra_points;
             }
             $result->captured_city_points[$pid] = $points;
@@ -147,12 +147,12 @@ class Scorer
             return $h->player_id;
         }
         if ($h->isWater()) {
-            if ($ignored_zcard != ZigguratCardType::FREE_RIVER_CONNECTS) {
-                return $this->components->zigguratCardOwner(ZigguratCardType::FREE_RIVER_CONNECTS);
+            if ($ignored_zcard != ZigguratCardType::EMPTY_RIVER_CONNECTS) {
+                return $this->components->zigguratCardOwner(ZigguratCardType::EMPTY_RIVER_CONNECTS);
             }
         } else if ($h->landmass == Landmass::CENTER) {
-            if ($ignored_zcard != ZigguratCardType::FREE_CENTER_LAND_CONNECTS) {
-                return $this->components->zigguratCardOwner(ZigguratCardType::FREE_CENTER_LAND_CONNECTS);
+            if ($ignored_zcard != ZigguratCardType::EMPTY_CENTER_LAND_CONNECTS) {
+                return $this->components->zigguratCardOwner(ZigguratCardType::EMPTY_CENTER_LAND_CONNECTS);
             }
         }
         return 0;

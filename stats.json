@@ -67,92 +67,93 @@
             "name": "Captured fields",
             "type": "int"
         },
-        "ziggurat_card_1_chosen": {
+
+        "zc_chosen_plus_10": {
             "id": 31,
             "name": "Ziggurat card 1 chosen",
             "type": "bool"
         },
-        "ziggurat_card_2_chosen": {
+        "zc_chosen_extra_turn": {
             "id": 32,
             "name": "Ziggurat card 2 chosen",
             "type": "bool"
         },
-        "ziggurat_card_3_chosen": {
+        "zc_chosen_hand_size_7": {
             "id": 33,
             "name": "Ziggurat card 3 chosen",
             "type": "bool"
         },
-        "ziggurat_card_4_chosen": {
+        "zc_chosen_nobles_3_kinds": {
             "id": 34,
             "name": "Ziggurat card 4 chosen",
             "type": "bool"
         },
-        "ziggurat_card_5_chosen": {
+        "zc_chosen_noble_with_3_farmers": {
             "id": 35,
             "name": "Ziggurat card 5 chosen",
             "type": "bool"
         },
-        "ziggurat_card_6_chosen": {
+        "zc_chosen_nobles_in_fields": {
             "id": 36,
             "name": "Ziggurat card 6 chosen",
             "type": "bool"
         },
-        "ziggurat_card_7_chosen": {
+        "zc_chosen_extra_city_points": {
             "id": 37,
             "name": "Ziggurat card 7 chosen",
             "type": "bool"
         },
-        "ziggurat_card_8_chosen": {
+        "zc_chosen_empty_center_land": {
             "id": 38,
             "name": "Ziggurat card 8 chosen",
             "type": "bool"
         },
-        "ziggurat_card_9_chosen": {
+        "zc_chosen_empty_river": {
             "id": 39,
             "name": "Ziggurat card 9 chosen",
             "type": "bool"
         },
-        "ziggurat_card_1_used": {
+        "zc_used_plus_10": {
             "id": 41,
             "name": "Times ziggurat card 1 was used",
             "type": "int"
         },
-        "ziggurat_card_2_used": {
+        "zc_used_extra_turn": {
             "id": 42,
             "name": "Times ziggurat card 2 was used",
             "type": "int"
         },
-        "ziggurat_card_3_used": {
+        "zc_used_hand_size_7": {
             "id": 43,
             "name": "Times ziggurat card 3 was used",
             "type": "int"
         },
-        "ziggurat_card_4_used": {
+        "zc_used_nobles_3_kinds": {
             "id": 44,
             "name": "Times ziggurat card 4 was used",
             "type": "int"
         },
-        "ziggurat_card_5_used": {
+        "zc_used_noble_with_3_farmers": {
             "id": 45,
             "name": "Times ziggurat card 5 was used",
             "type": "int"
         },
-        "ziggurat_card_6_used": {
+        "zc_used_nobles_in_fields": {
             "id": 46,
             "name": "Times ziggurat card 6 was used",
             "type": "int"
         },
-        "ziggurat_card_7_extra_points_gained": {
+        "zc_points_extra_city": {
             "id": 47,
             "name": "City points gained attributable to ziggurat card 7",
             "type": "int"
         },
-        "ziggurat_card_8_points": {
+        "zc_points_empty_center_land": {
             "id": 48,
             "name": "Network points attributable to ziggurat card 8",
             "type": "int"
         },
-        "ziggurat_card_9_points": {
+        "zc_points_empty_river": {
             "id": 49,
             "name": "Network points attributable to ziggurat card 9",
             "type": "int"
