@@ -7,7 +7,7 @@
 7. ~~DONE Make ziggurat card choices from the status bar (optionally also let choosing from the display). Then can have the confirm countdown.~~
 8. ~~DONE When scoring ziggurats, briefly highlight ("blink") the adjacent pieces, clearly identifying the winner.~~
 9. ~~DONE During city scoring, highlight the adjacent pieces & winner before capturing the piece.~~
-10.~~NOT MY BUG Consider timed confirm for manual selection of scored hexes.~~
+10. ~~NOT MY BUG Consider timed confirm for manual selection of scored hexes.~~
 11. Optimize the representation / payload for allowed moves. In particular, consider not sending RowCol as objects but instead their string rep (e.g. "3_8"). The FE only needs the separate row col when constructing the grid, and when sending actions back (though could also use the string format there too).
 12. ~~DONE Thorough manual testing of manual scoring hex selection.~~
 13. ~~DONE For manual scoring hex selection, automate if just one possibility.~~
@@ -25,4 +25,4 @@
 24. ~~DONE Slowness of animations esp in +1 ziggurat tiles animation~~
 25. ~~DONE Tooltips are lost for zig cards~~
 26. ~~DONE Consider "average pieces played/turn" and "max played/turn" statistics.~~
-27. Standardize ziggurat cards ID / attributes on card number (but maybe keep enum names -- not string rep -- as mnemonics? hmm. what about stats?)
+27. ~~DONE Standardize ziggurat cards ID / attributes on card number (but maybe keep enum names -- not string rep -- as mnemonics? hmm. what about stats?)--
