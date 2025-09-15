@@ -983,8 +983,8 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
 
     let dest = (args.player_id != 0)
       ? $(IDS.citycount(args.player_id))
-      // TODO: find a location for 'off the board' but not to any player?
-      : undefined;
+      // TODO: find a better location for 'off the board' but not to any player?
+      : this.getGameAreaElement();
 
     await this.animationManager.slideOutAndDestroy(
       hex.firstElementChild as HTMLElement, dest, {}).then(() => {
@@ -994,7 +994,8 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
           this.scoreCtrl[playerId]!.incValue(details.capture_points);
           this.updateCapturedCityCount(details);
         }
-      }).then(() => this.popActionBarTitle());
+      }).then(() => this.popActionBarTitle())
+        .then(() => hex.classList.remove(CSS.SELECTED));
   }
 
   ///////
