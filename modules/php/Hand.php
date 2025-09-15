@@ -29,11 +29,12 @@ namespace Bga\Games\babylonia;
 
 class Hand
 {
+    public const DEFAULT_SIZE = 5;
 
     /** @param Piece[] $pieces */
     public function __construct(private array $pieces) {}
 
-    public static function new(int $size = 5): Hand
+    public static function new(int $size = Hand::DEFAULT_SIZE): Hand
     {
         $pieces = [];
         for ($i = 0; $i < $size; $i++) {
