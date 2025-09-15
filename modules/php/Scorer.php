@@ -78,13 +78,14 @@ class Scorer
 
         $no_zc8_result = ScoredCity::makeEmpty($hexWinner, array_keys($this->player_infos));
         foreach (array_keys($this->player_infos) as $pid) {
-            $this->computeNetwork($no_zc8_result, $pid, ZigguratCardType::FREE_RIVER_CONNECTS);
+            $this->computeNetwork($no_zc8_result, $pid, ZigguratCardType::FREE_CENTER_LAND_CONNECTS);
         }
 
         $no_zc9_result = ScoredCity::makeEmpty($hexWinner, array_keys($this->player_infos));
         foreach (array_keys($this->player_infos) as $pid) {
-            $this->computeNetwork($no_zc9_result, $pid, ZigguratCardType::FREE_CENTER_LAND_CONNECTS);
+            $this->computeNetwork($no_zc9_result, $pid, ZigguratCardType::FREE_RIVER_CONNECTS);
         }
+
         foreach ($this->player_infos as $pid => $_) {
             $r8 = $result->networkPointsForPlayer($pid) - $no_zc8_result->networkPointsForPlayer($pid);
             if ($r8 > 0) {
