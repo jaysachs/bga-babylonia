@@ -144,7 +144,7 @@
         },
         "ziggurat_card_7_extra_points_gained": {
             "id": 47,
-            "name": "City points gained attributable to ziggurat card 3",
+            "name": "City points gained attributable to ziggurat card 7",
             "type": "int"
         },
         "ziggurat_card_8_points": {
