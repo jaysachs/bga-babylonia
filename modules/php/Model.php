@@ -367,6 +367,9 @@ class Model
     private function refillHand(): void
     {
         Model::refill($this->hand(), $this->pool());
+        if ($this->hand()->size() > 5) {
+            $this->stats->PLAYER_ZIGGURAT_CARD_3_USED->inc($this->player_id);
+        }
     }
 
     public function donePlayPieces(): void {
