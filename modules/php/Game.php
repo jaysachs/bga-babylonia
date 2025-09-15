@@ -803,4 +803,8 @@ class Game extends \Bga\GameFramework\Table
 
         throw new \feException("Zombie mode not supported at this game state: \"{$state_name}\".");
     }
+
+    public function debug_randomZig(bool $advanced): void {
+        $this->notify->all("debug", "hey", array_map(function ($z) { return $z->type->value; }, Components::forNewGame($advanced)->allZigguratCards()));
+    }
 }
