@@ -119,7 +119,7 @@ class PlayPieces extends AbstractState
         // For now, play randomly but legally
         $model = $this->createModel($playerId);
         if ($model->canEndTurn()) {
-            return FinishTurn::class;
+            return EndOfTurnScoring::class;
         }
 
         $pieces = $model->hand()->pieces();

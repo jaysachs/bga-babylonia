@@ -43,7 +43,8 @@ class SelectExtraTurn extends AbstractState
             );
             return StartTurn::class;
         } else {
-            return NextPlayer::class;
+            $this->activeNextPlayer();
+            return StartTurn::class;
         }
     }
 

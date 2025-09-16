@@ -70,6 +70,7 @@ class FinishTurn extends AbstractState
             return SelectExtraTurn::class;
         }
 
-        return NextPlayer::class;
+        $this->activeNextPlayer();
+        return StartTurn::class;
     }
 }
