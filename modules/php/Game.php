@@ -38,12 +38,12 @@ class Game extends \Bga\GameFramework\Table
     //  the ID of the "primary" player, i.e. who should become active
     //  once the ziggurat card is selected.
     /** @var string */
-    private const GLOBAL_PLAYER_ON_TURN = 'player_on_turn';
+    public const GLOBAL_PLAYER_ON_TURN = 'player_on_turn';
     /** @var string */
-    private const GLOBAL_ROW_COL_BEING_SCORED = 'row_col_being_scored';
+    public const GLOBAL_ROW_COL_BEING_SCORED = 'row_col_being_scored';
 
-    private PersistentStore $ps;
-    private Stats $stats;
+    protected PersistentStore $ps;
+    protected Stats $stats;
 
     public function __construct()
     {
@@ -56,70 +56,6 @@ class Game extends \Bga\GameFramework\Table
 
         $this->ps = new PersistentStore(new DefaultDb());
         $this->stats = Stats::createForGame($this);
-    }
-
-    public function actPlayPiece(int $handpos, int $row, int $col): void
-    {
-        $player_id = $this->activePlayerId();
-        $model = $this->createModel();
-        $move = $model->playPiece($handpos, new RowCol($row, $col));
-        $points = $move->points();
-        $piece = $move->piece->value;
-        $msg = ($points > 0)
-            ? clienttranslate('${player_name} plays ${piece} to (${row},${col}) scoring ${points}')
-            : clienttranslate('${player_name} plays ${piece} to (${row},${col})');
-
-        $this->notify->all(
-            "piecePlayed",
-            $msg,
-            [
-                "player_id" => $player_id,
-                "player_name" => $this->getActivePlayerName(),
-                "piece" => $piece,
-                "handpos" => $handpos,
-                "row" => $row,
-                "col" => $col,
-                "captured_piece" => $move->captured_piece->value,
-                "points" => $points,
-                "ziggurat_points" => $move->ziggurat_points,
-                "field_points" => $move->field_points,
-                "hand_size" => $model->hand()->size(),
-                "touched_ziggurats" => $move->touched_ziggurats,
-            ]
-        );
-
-        $this->gamestate->nextState("playPieces");
-    }
-
-    public function actDonePlayPieces(): void
-    {
-        $model = $this->createModel();
-        if (!$model->canEndTurn()) {
-            throw new \BgaUserException("Attempt to end turn but less than 2 pieces played");
-        }
-        $model->donePlayPieces();
-
-        $this->notify->all(
-            "donePlayed",
-            clienttranslate('${player_name} finishes playing pieces'),
-            [
-                "player_id" => $this->activePlayerId(),
-                "player_name" => $this->getActivePlayerName(),
-            ]
-        );
-
-        $this->gamestate->nextState("done");
-    }
-
-    public function argPlayPieces(): array
-    {
-        $model = $this->createModel();
-
-        return [
-            "allowedMoves" => $model->getAllowedMoves(),
-            "canEndTurn" => $model->canEndTurn(),
-            "canUndo" => $model->canUndo(),
-        ];
     }
 
     /**
@@ -140,348 +76,8 @@ class Game extends \Bga\GameFramework\Table
         return intval(100 - ($remaining_pieces * 100) / $total_pieces);
     }
 
-    public function stCityScoring(): void
-    {
-        $model = $this->createModel();
-        $cityhex = $model->board()->hexAt($this->rowColBeingScored());
-        // grab this, as it will change underneath when the model scores it.
-        $city = $cityhex->piece->value;
-        $scored_city = $model->scoreCity($cityhex->rc);
-        $captured_by = $scored_city->hex_winner->captured_by;
-        if ($captured_by > 0) {
-            $msg = clienttranslate('${city} at (${row},${col}) scored, captured by ${player_name}');
-        } else {
-            $msg = clienttranslate('${city} at (${row},${col}) scored, uncaptured');
-        }
-        $capturer_name =
-            $captured_by > 0 ? $this->getPlayerNameById($captured_by) : "noone";
-
-        $player_infos = $model->allPlayerInfo();
-
-        $details = [];
-        foreach ($player_infos as $pid => $pi) {
-            $points = $scored_city->pointsForPlayer($pid);
-            $details[$pid] = [
-                "player_id" => $pid,
-                "player_name" => $this->getPlayerNameById($pid),
-                "captured_city_count" => $pi->captured_city_count,
-                "scored_locations" => $scored_city->scoringLocationsForPlayer($pid),
-                "network_locations" => $scored_city->networkLocationsForPlayer($pid),
-                "network_points" => $scored_city->networkPointsForPlayer($pid),
-                "capture_points" => $scored_city->capturePointsForPlayer($pid),
-                "score" => $pi->score,
-            ];
-            if ($points > 0) {
-                // TODO: should we notify/log each player's point change?
-                // $details[$pid]["message"] =
-                //     clienttranslate('${' . $pnk2 . '} scored ${points}');
-                // $details[$pid][$pnk] = $this->getPlayerNameById($pid);
-            }
-        }
-
-        // FIXME: need to better distinguish unset.
-        $this->setRowColBeingScored(new RowCol(0, 0));
-
-        $this->notify->all(
-            "cityScored",
-            $msg,
-            [
-                "city" => $city,
-                "row" => $cityhex->rc->row,
-                "col" => $cityhex->rc->col,
-                "winner_hexes" => $scored_city->hex_winner->winnerRowCols(),
-                "other_hexes" => $scored_city->hex_winner->othersRowCols(),
-                "player_name" => $capturer_name,
-                "player_id" => $captured_by,
-                "details" => $details,
-            ]
-        );
-        $this->gamestate->nextState("cityScored");
-    }
-
-    public function stZigguratScoring(): void
-    {
-        $model = $this->createModel();
-        $zighex = $model->board()->hexAt($this->rowColBeingScored());
-
-        $scored_zig = $model->scoreZiggurat($zighex->rc);
-        $winner = $scored_zig->captured_by;
-        if ($winner == 0) {
-            $winner_name = 'noone';
-            $msg = clienttranslate('${city} at (${row},${col}) scored, no winner');
-        } else {
-            $winner_name = $this->getPlayerNameById($winner);
-            $msg = clienttranslate('${city} at (${row},${col}) scored, winner is ${player_name}');
-        }
-        $this->notify->all(
-            "zigguratScored",
-            $msg,
-            [
-                "row" => $zighex->rc->row,
-                "col" => $zighex->rc->col,
-                "winner_hexes" => $scored_zig->winnerRowCols(),
-                "other_hexes" => $scored_zig->othersRowCols(),
-                "player_name" => $winner_name,
-                "player_id" => $winner,
-                "city" => "ziggurat",
-            ]
-        );
-
-        if ($winner != 0) {
-            if ($winner != $this->activePlayerId()) {
-                $this->gamestate->changeActivePlayer($winner);
-                $this->giveExtraTime($winner);
-            }
-            $this->gamestate->nextState("selectZigguratCard");
-        } else {
-            $this->gamestate->nextState("noWinner");
-        }
-    }
-
-    public function argSelectZigguratCard(): array
-    {
-        $model = $this->createModel();
-        $zcards = $model->components()->availableZigguratCards();
-        return [
-            "hex" => $this->rowColBeingScored(),
-            "available_cards" => array_map(
-                function ($z): string {
-                    return $z->type->value;
-                },
-                $model->components()->availableZigguratCards()
-            ),
-        ];
-    }
-
-    public function actSelectZigguratCard(string $zctype): void
-    {
-        $player_id = $this->activePlayerId();
-        $model = $this->createModel();
-        $selection =
-            $model->selectZigguratCard(ZigguratCardType::from($zctype));
-        $this->notify->all(
-            "zigguratCardSelection",
-            clienttranslate('${player_name} chose ziggurat card ${zcard}'),
-            [
-                "player_id" => $player_id,
-                "player_name" => $this->getActivePlayerName(),
-                "zcard" => $selection->card->type->value,
-                "cardused" => $selection->card->used,
-                "points" => $selection->points,
-                "score" => $model->allPlayerInfo()[$player_id]->score,
-                "hex" => $this->rowColBeingScored(),
-            ]
-        );
-        // FIXME: need to better distinguish unset.
-        $this->setRowColBeingScored(new RowCol(0, 0));
-        $this->gamestate->nextState("cardSelected");
-    }
-
-    public function stAutoScoringHexSelection(): void
-    {
-        $model = $this->createModel();
-        $rcs = $model->locationsRequiringScoring();
-        if (count($rcs) == 0) {
-            $this->gamestate->nextState("done");
-            return;
-        }
-        $rc = array_shift($rcs);
-        $this->actSelectHexToScore($rc->row, $rc->col);
-    }
-
-    public function argSelectHexToScore(): array
-    {
-        $model = $this->createModel();
-        $rcs = $model->locationsRequiringScoring();
-        return ["hexes" => $rcs];
-    }
-
-    public function actSelectHexToScore(int $row, int $col): void
-    {
-        $model = $this->createModel();
-        $hex = $model->selectScoringHex(new RowCol($row, $col));
-        $msg = $this->optionEnabled(TableOption::AUTOMATED_SCORING_SELECTION)
-            ? clienttranslate('${city} at (${row},${col}) is selected to be scored')
-            : clienttranslate('${player_name} chose ${city} at (${row},${col}}) to score');
-        $this->notify->all(
-            "scoringSelection",
-            $msg,
-            [
-                "player_id" => $this->activePlayerId(),
-                "player_name" => $this->getActivePlayerName(),
-                "row" => $hex->rc->row,
-                "col" => $hex->rc->col,
-                "city" => $hex->piece->value,
-            ]
-        );
-        $this->setRowColBeingScored($hex->rc);
-        if ($hex->piece->isCity()) {
-            $this->gamestate->nextState("citySelected");
-        } else if ($hex->piece->isZiggurat()) {
-            $this->gamestate->nextState("zigguratSelected");
-        }
-    }
-
     private function createModel(): Model {
         return new Model($this->ps, $this->stats, $this->activePlayerId());
-    }
-
-    public function stEndOfTurnScoring(): void
-    {
-        // switch back to player on turn if necessary.
-        $player_on_turn = $this->playerOnTurn();
-        if ($this->activePlayerId() != $player_on_turn) {
-            $this->gamestate->changeActivePlayer($player_on_turn);
-            $this->giveExtraTime($player_on_turn);
-        }
-
-        $model = $this->createModel();
-        $rcs = $model->locationsRequiringScoring();
-
-        if (count($rcs) == 0) {
-            $this->gamestate->nextState("done");
-            return;
-        }
-        if (count($rcs) == 1) {
-            $this->gamestate->nextState("automatedHexSelection");
-            // TODO: is this useful/needed?
-            // $this->notify->all(
-            //     "automatedScoringSingle",
-            //     clienttranslate('Single hex requiring scoring selected automatically')
-            // );
-            return;
-        }
-
-        if ($this->optionEnabled(TableOption::AUTOMATED_SCORING_SELECTION)) {
-            $this->gamestate->nextState("automatedHexSelection");
-            return;
-        }
-
-        $this->notify->all(
-            "scoringHexChoice",
-            clienttranslate('${player_name} must select a hex to score'),
-            [
-                "player_name" => $this->getActivePlayerName(),
-            ]
-        );
-        $this->gamestate->nextState("selectHex");
-    }
-
-    public function stFinishTurn(): void
-    {
-        $player_id = $this->activePlayerId();
-        $model = $this->createModel();
-
-        $result = $model->finishTurn();
-        if ($result->gameOver()) {
-            $this->notify->all(
-                "gameEnded",
-                clienttranslate('Game has ended'),
-                [
-                    "player_id" => $player_id,
-                    "player_name" => $this->getActivePlayerName(),
-                ]
-            );
-            $this->gamestate->nextState("endGame");
-            return;
-        }
-
-        $this->notify->player(
-            $player_id,
-            "handRefilled",
-            clienttranslate("You refilled your hand"),
-            [
-                "player_id" => $player_id,
-                'hand' => array_map(
-                    function ($p) {
-                        return $p->value;
-                    },
-                    $model->hand()->pieces()
-                ),
-            ]
-        );
-
-        $this->notify->all(
-            "turnFinished",
-            clienttranslate('${player_name} finished their turn'),
-            [
-                "player_id" => $player_id,
-                "player_name" => $this->getActivePlayerName(),
-                "hand_size" => $model->hand()->size(),
-                "pool_size" => $model->pool()->size(),
-            ]
-        );
-
-        if ($model->components()->hasUnusedZigguratCard($player_id, ZigguratCardtype::EXTRA_TURN)
-        ) {
-            $this->gamestate->nextState("extraTurn");
-            return;
-        }
-
-        $this->gamestate->nextState("nextPlayer");
-    }
-
-    public function stStartTurn()
-    {
-        $player_id = $this->activePlayerId();
-        $this->stats->PLAYER_NUMBER_TURNS->inc($player_id);
-        $this->giveExtraTime($player_id);
-        $this->setPlayerOnTurn($player_id);
-        $this->gamestate->nextState("play");
-    }
-
-    public function stNextPlayer()
-    {
-        $this->activeNextPlayer();
-        $this->gamestate->nextState("done");
-    }
-
-    public function actUndoPlay()
-    {
-        $player_id = $this->activePlayerId();
-        $model = $this->createModel();
-        $move = $model->undo();
-        $args = [
-            "player_name" => $this->getActivePlayerName(),
-            "player_id" => $this->activePlayerId(),
-            "row" => $move->rc->row,
-            "col" => $move->rc->col,
-            "piece" => $move->piece->value,
-            "captured_piece" => $move->captured_piece->value,
-            "points" => $move->points(),
-            "handpos" => $move->handpos,
-            "original_piece" => $move->original_piece->value,
-        ];
-
-        $this->notify->player($this->activePlayerId(), "undoMoveActive", clienttranslate('${player_name} undid their move'), $args);
-        unset($args["handpos"]);
-        unset($args["original_piece"]);
-
-        $this->notify->all("undoMove", clienttranslate('${player_name} undid their move'), $args);
-
-        $this->gamestate->nextState("playPieces");
-    }
-
-    public function actChooseExtraTurn(bool $take_extra_turn)
-    {
-        if ($take_extra_turn) {
-            $player_id = $this->activePlayerId();
-            $model = $this->createModel();
-            $model->useExtraTurnCard();
-            $this->notify->all(
-                "extraTurnUsed",
-                clienttranslate('${player_name} is taking an extra turn'),
-                [
-                    "player_id" => $player_id,
-                    "player_name" => $this->getActivePlayerName(),
-                    "card" => ZigguratCardType::EXTRA_TURN->value,
-                    "cardused" => true,
-                ]
-            );
-            $this->gamestate->nextState("extraTurn");
-        } else {
-            $this->gamestate->nextState("nextPlayer");
-        }
     }
 
     /**
@@ -543,12 +139,12 @@ class Game extends \Bga\GameFramework\Table
         $this->setGameStateValue(Game::GLOBAL_ROW_COL_BEING_SCORED, $rc->asKey());
     }
 
-    private function playerOnTurn(): int
+    protected function playerOnTurn(): int
     {
         return intval($this->getGameStateValue(Game::GLOBAL_PLAYER_ON_TURN));
     }
 
-    private function setPlayerOnTurn(int $player_id)
+    protected function setPlayerOnTurn(int $player_id)
     {
         $this->setGameStateValue(Game::GLOBAL_PLAYER_ON_TURN, $player_id);
     }
@@ -631,7 +227,7 @@ class Game extends \Bga\GameFramework\Table
     /**
      * @param $arr string[]
      */
-    private function shuffle(&$arr): void
+    public function shuffle(&$arr): void
     {
         $e = sizeof($arr) - 1;
         for ($i = 0; $i < $e; ++$i) {
@@ -699,108 +295,8 @@ class Game extends \Bga\GameFramework\Table
         return $this->tableOptions->get($option->value) > 0;
     }
 
-    private function zombieActSelectHexToScore()
-    {
-        // if a player goes zombie when they are on turn
-        // and have surrounded one or more ziggurats / cities.
-        // the game cannot progress properly. So choose one
-        // randomly.
-        $model = $this->createModel();
-        $rcs = $model->locationsRequiringScoring();
-        if (count($rcs) > 0) {
-            $rc = array_shift($rcs);
-            $this->actSelectHexToScore($rc->row, $rc->col);
-        }
-    }
-
-    private function zombieActSelectZigguratCard()
-    {
-        $model = $this->createModel();
-        $zcards = $model->components()->availableZigguratCards();
-        // We could be slightly smarter and grab in order:
-        //   10pts, river, hand7?, ...
-        $this->shuffle($zcards);
-        $this->actSelectZigguratCard($zcards[0]->type->value);
-    }
-
-    private function zombieActPlayPieces()
-    {
-        // For now, play randomly but legally
-        $model = $this->createModel();
-        if ($model->canEndTurn()) {
-            $this->actDonePlayPieces();
-            return;
-        }
-
-        $pieces = $model->hand()->pieces();
-        // Need to not choose empty hand positions.
-        $pos = [];
-        foreach ($pieces as $i => $piece) {
-            if (!$piece->isEmpty()) {
-                $pos[] = $i;
-            }
-        }
-        $handpos = $pos[bga_rand(0, count($pos) - 1)];
-
-        // Find empty land spaces. River play is so situational that we just don't do it.
-        $rcs = [];
-        $model->board()->visitAll(function (Hex $hex) use (&$rcs): void {
-            if ($hex->piece->isEmpty() && !$hex->isWater()) {
-                $rcs[] = $hex->rc;
-            }
-        });
-        $this->shuffle($rcs);
-        $this->actPlayPiece($handpos, $rcs[0]->row, $rcs[0]->col);
-
-        // TODO better choices:
-        //   1) win a city or ziggurat
-        //   2) next to an appropriate city
-        //   3) next to a ziggurat
-        //   4) anywhere open
-        //  Maybe see if have enough farmers to do > 2 to take ziggurat
-    }
-
-    private function zombieActChooseExtraTurn()
-    {
-        $this->actChooseExtraTurn(true);
-    }
-
-    /**
-     * This method is called each time it is the turn of a player who
-     * has quit the game (= "zombie" player).  You can do whatever you
-     * want in order to make sure the turn of this player ends
-     * appropriately (ex: pass).
-     *
-     * Important: your zombie code will be called when the player
-     * leaves the game. This action is triggered from the main site
-     * and propagated to the gameserver from a server, not from a
-     * browser.  As a consequence, there is no current player
-     * associated to this action. In your zombieTurn function, you
-     * must _never_ use `getCurrentPlayerId()` or
-     * `getCurrentPlayerName()`, otherwise it will fail with a "Not
-     * logged" error message.
-     *
-     * @param array{ type: string, name: string } $state
-     * @param int $active_player
-     * @return void
-     * @throws feException if the zombie mode is not supported at this game state.
-     */
     protected function zombieTurn(array $state, int $active_player): void
     {
-        $state_name = $state["name"];
-
-        if ($state["type"] === "activeplayer") {
-            $fname = "zombieAct" . ucfirst($state_name);
-            $this->$fname();
-            return;
-        }
-
-        // Make sure player is in a non-blocking status for role turn.
-        if ($state["type"] === "multipleactiveplayer") {
-            $this->gamestate->setPlayerNonMultiactive($active_player, '');
-            return;
-        }
-
-        throw new \feException("Zombie mode not supported at this game state: \"{$state_name}\".");
+        // why is this still needed?
     }
 }
