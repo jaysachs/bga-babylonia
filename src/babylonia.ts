@@ -404,7 +404,7 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
       case 'client_pickHexToPlay':
         this.playSelectedPiece(event);
         break;
-      case 'selectHexToScore':
+      case 'SelectScoringHex':
         this.selectHexToScore(event);
         break;
     }
@@ -417,7 +417,7 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
     if (!this.isCurrentPlayerActive()) {
       return false;
     }
-    if (this.currentState != 'selectZigguratCard') {
+    if (this.currentState != 'SelectZigguratCard') {
       return false;
     }
 
@@ -657,7 +657,7 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
     this.scoreCtrl[player.player_id]!.setValue(player.score);
   }
 
-  private onUpdateActionButtons_chooseExtraTurn(): void {
+  private onUpdateActionButtons_SelectExtraTurn(): void {
     this.statusBar.addActionButton(
       _('Take your one-time extra turn'),
       () => this.bgaPerformAction('actChooseExtraTurn', {
@@ -670,24 +670,24 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
       }));
   }
 
-  private onUpdateActionButtons_endOfTurnScoring(): void {
+  private onUpdateActionButtons_EndOfTurnScoring(): void {
     this.markAllHexesUnplayable();
   }
 
-  private onUpdateActionButtons_selectZigguratCard(): void {
+  private onUpdateActionButtons_SelectZigguratCard(): void {
     // TODO: do better than this?
     const div = $(IDS.AVAILABLE_ZCARDS);
     div.scrollIntoView(false);
     //  div.classList.add(CSS.SELECTING);
   }
 
-  private onUpdateActionButtons_playPieces(args: PlayState): void {
+  private onUpdateActionButtons_PlayPieces(args: PlayState): void {
     this.playStateArgs = args;
     this.setStatusBarForPlayState();
     this.markAllHexesUnplayable();
   }
 
-  private onUpdateActionButtons_selectHexToScore(args: { hexes: RowCol[] }): void {
+  private onUpdateActionButtons_SelectScoringHex(args: { hexes: RowCol[] }): void {
     this.markHexesPlayable(args.hexes);
   }
 

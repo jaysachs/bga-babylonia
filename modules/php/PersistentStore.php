@@ -27,13 +27,51 @@ declare(strict_types=1);
 
 namespace Bga\Games\babylonia;
 
+use  Bga\GameFramework\Db\Globals;
+
 class PersistentStore
 {
-    public function __construct(private Db $db) {}
+    // Used during scoring ziggurats in case the scoring of a ziggurat
+    //  means another player needs to choose a card; this global holds
+    //  the ID of the "primary" player, i.e. who should become active
+    //  once the ziggurat card is selected.
+    /** @var string */
+    public const GLOBAL_PLAYER_ON_TURN = 'player_on_turn';
+    /** @var string */
+    public const GLOBAL_ROW_COL_BEING_SCORED = 'row_col_being_scored';
+
+
+    public function __construct(private Db $db, private Globals $globals) {}
 
     private function boolValue(bool $b): string
     {
         return $b ? 'TRUE' : 'FALSE';
+    }
+
+        // TODO: move global storage into PersistentStore
+    //   and then these kinds of methods move onto the Model.
+    public function rowColBeingScored(): ?RowCol
+    {
+        $v = $this->globals->get(PersistentStore::GLOBAL_ROW_COL_BEING_SCORED);
+        if ($v == 0) {
+            return null;
+        }
+        return RowCol::fromKey(intval($v));
+    }
+
+    public function setRowColBeingScored(RowCol $rc)
+    {
+        $this->globals->set(PersistentStore::GLOBAL_ROW_COL_BEING_SCORED, $rc->asKey());
+    }
+
+    public function playerOnTurn(): int
+    {
+        return intval($this->globals->get(PersistentStore::GLOBAL_PLAYER_ON_TURN));
+    }
+
+    public function setPlayerOnTurn(int $player_id)
+    {
+        $this->globals->set(PersistentStore::GLOBAL_PLAYER_ON_TURN, $player_id);
     }
 
     public function retrieveBoard(): Board

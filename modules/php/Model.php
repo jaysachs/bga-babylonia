@@ -373,12 +373,12 @@ class Model
     }
 
     public function donePlayPieces(): void {
-        $numplayed = count($this->turnProgress()->moves);
-
         // adjust avg pieces player per turn statistic
         $pid = $this->player_id;
-        $numturns = $this->stats->PLAYER_NUMBER_TURNS->get($pid);
-        $sum = $this->stats->PLAYER_AVERAGE_PIECES_PLAYED_PER_TURN->get($pid) * ($numturns - 1);
+
+        $numplayed = floatval(count($this->turnProgress()->moves));
+        $numturns = floatval($this->stats->PLAYER_NUMBER_TURNS->get($pid));
+        $sum = $this->stats->PLAYER_AVERAGE_PIECES_PLAYED_PER_TURN->get($pid) * ($numturns - 1.0);
         $this->stats->PLAYER_AVERAGE_PIECES_PLAYED_PER_TURN->set($pid, ($sum + $numplayed) / $numturns);
 
         // delete turn progress, but apply any deferred stats

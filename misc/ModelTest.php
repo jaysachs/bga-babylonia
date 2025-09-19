@@ -26,6 +26,12 @@ use Bga\Games\babylonia\ {
         ZigguratCardType,
 };
 
+use Bga\GameFramework\Db\Globals;
+
+
+class TestGlobals extends Globals {}
+
+
 class TestDb implements Db {
     /** @return string[][] */
     public function getObjectList(string $sql): array {
@@ -61,8 +67,8 @@ class TestStore extends PersistentStore {
     }
 
     public function __construct() {
+        PersistentStore::__construct(new TestDb(), new TestGlobals());
         $this->hand = Hand::new();
-        PersistentStore::__construct(new TestDb());
         for ($i = 1; $i <= 3; $i++) {
             $this->player_infos[$i] = new PlayerInfo($i, 0, 0, 0, 5, 25);
         }
