@@ -42,7 +42,7 @@ abstract class AbstractState extends GameState
     protected Stats $stats;
 
     function __construct(
-        protected Game $game,
+        private Game $game,
         int $id,
         StateType $type,
         ?string $description = '',
