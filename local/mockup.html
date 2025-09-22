@@ -1,0 +1,364 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:og="http://ogp.me/ns#"
+      xmlns:fb="http://www.facebook.com/2008/fbml"
+      xml:lang="en" lang="en" dir="ltr" class="notranslate" translate="no" >
+<head>
+<link rel="stylesheet" type="text/css" href="https://studio.boardgamearena.com:8084/data/themereleases/250918-1534/css/common.css"/>
+<link rel="stylesheet" type="text/css" href="https://studio.boardgamearena.com:8084/data/themereleases/250918-1534/css/gameserver.css"/>
+<link rel="stylesheet" type="text/css" href="https://studio.boardgamearena.com:8084/data/themereleases/current/css/libraries.css?2"/>
+<link rel="stylesheet" type="text/css" href="../babylonia.css"/>
+
+<link rel="manifest" href="/manifest.json" />
+
+
+
+
+<title>babylonia Mockup</title>
+
+</head>
+<body id="ebd-body" class="tundra game_interface training_mode no_time_limit playmode_realtime desktop_version ">
+
+
+<div id="overall-content" style="--bga-game-zoom: 0.982421875;" class="gamestate_client_noPlaysLeft">
+
+
+    <div id="topbar" class="ingame  topbar_new_version hide-alpha-banner">
+
+        <div id="topbar_content" class="flex rtl:row-reverse">
+            <div class="topbar_left_content flex items-center">
+                <div id="site-logo" class="mx-1.5" style="position: inherit;">
+                    <a id="logoicon" class="block h-full py-1" href="https://studio.boardgamearena.com/table?table=779594"><img id="logoiconimg" src="https://studio.boardgamearena.com:8084/data/themereleases/250918-1534/img/logo/logo.png" alt="Logo" style="position: relative;"></a>
+                    <a id="logoicon_inprogress" href="https://studio.boardgamearena.com/table?table=779594" style="display:none"><img id="logoiconimg_inprogress" src="https://studio.boardgamearena.com:8084/data/themereleases/250918-1534/img/logo/waiting.gif"></a>
+                    <div id="inprogress"><span id="inprogress_inner"></span></div>
+                </div>
+                <div id="tableinfos" class="mx-1.5 flex flex-col justify-around h-full" style="position: relative;left:0;">
+
+                    <div id="table_ref_item_table_id" class="table_ref_item">Table #779594</div>
+                    <div class="table_ref_item">Move #<span id="move_nbr">3</span></div>
+                    <div class="table_ref_item">Progression <span id="pr_gameprogression">3</span>%</div>
+                </div>
+
+            </div>
+
+
+            <div class="topbar_middle_content flex justify-center" style="max-height: 62px;">
+                <div id="alpha_beta_banner" class="h-full flex hide-banner hidden">
+                    <div class="alpha-beta-banner__triangle-corner relative">
+                        <a target="_blank" href="/faq?anchor=faq_playing_alphabeta" aria-label="Link to the F.A.Q." class="alpha-beta-banner__label desktop:hidden uppercase text-white absolute bold text-lg m-auto" style="color: white;"></a>
+                    </div>
+                    <div class="alpha-beta-banner__icon mb-2 mt-auto desktop:my-auto h-6 desktop:h-12">
+                        <a target="_blank" href="/faq?anchor=faq_playing_alphabeta" aria-label="Link to the F.A.Q.">
+
+                        </a>
+                    </div>
+                    <div class="alpha-beta-banner__infos px-2 text-white my-auto">
+                        <span class="bold hidden text-lg desktop:block" style="text-wrap:nowrap"></span>
+                        <div class="alpha-beta-banner__description text-xs hidden max-w-sm desktop:max-w-md w-full"><a class="bold text-bga-blue " target="_blank" href="/faq?anchor=faq_playing_alphabeta" aria-label="Link to the F.A.Q."> []</a></div>
+                    </div>
+                </div>
+                <div id="current_header_infos_wrap" class="flex-grow h-full">
+                    <div id="inactiveplayerpanel" style="display: none;">
+                        <div id="inactiveplayermessage" style="margin: auto;">
+                        </div>
+                    </div>
+
+                    <div id="reflexiontime" style="display: flex;" class="flex items-center h-full">
+                        <div id="reflexiontimevalues" class="min-w-max" style="margin-left: auto;margin-right: auto;padding-top:0px">
+                                <span id="its_your_turn" style="visibility: visible;">It's your turn!<br></span>
+                                <span id="reflexiontime_value">89 days</span>
+                                <div id="wouldlikethink"><a href="#" id="wouldlikethink_button" style="display: inline; opacity: 1;">I would like to think a little, thank you</a></div>
+                        </div>
+                    </div>
+                    <span id="previously_on" style="margin-left: auto;margin-right: auto;">Previously on babylonia #779594 ... <span id="skip_last_moves" class="smalltext">(<a href="/babylonia?table=779594">[Skip last moves replay]</a>)</span></span>
+                    <div id="archivecontrol"></div>
+                </div>
+
+            </div>
+
+
+
+            <div id="upperrightmenu" class="flex self-center justify-end" style="position: relative;">
+
+                <div class="upperrightmenu_item">
+                    <a id="toggleSound" class="globalaction globalaction_sound" href="#" onclick="return false;" style="top: 0" ;=""><i id="toggleSound_icon" class="fa visible_if_logged fa-lg fa-volume-off"></i></a>
+                    <div id="soundControls" class="soundControlsHidden">
+                        <input type="range" orient="vertical" min="0" max="100" value="50" class="soundVolumeSlider" id="soundVolumeControl">
+                    </div>
+                </div>
+                <div class="upperrightmenu_item flex justify-center self-center">
+                    <a id="globalaction_fullscreen" class="globalaction globalaction_fullscreen icon20 icon20_fullscreen_white self-center" href="#" style="top:0px"></a>
+                </div>
+                <div class="upperrightmenu_item flex justify-center" style="display:none">
+                    <a id="globalaction_3d" class="globalaction globalaction_3d self-center" style="top:0px" href="#">3D</a>
+                </div>
+                <div id="ingame_menu_notes_wrap" class="upperrightmenu_item flex justify-center self-center" style="display:none;">
+                    <a id="ingame_menu_notes" class="icon32 icon32_notes self-center top-0" href="#"></a>
+                </div>
+
+
+                <div id="ingame_menu" class="upperrightmenu_item">
+                    <div id="ingame_menu_wheel" style="margin: auto">
+                        <i class="fa fa-bars fa-lg"></i>
+                    </div>
+                </div>
+
+            </div>
+
+        </div><!-- topbar content -->
+    </div>
+
+
+
+    <div id="leftright_page_wrapper" class="bgagame-babylonia">
+
+
+        <div id="left-side-wrapper">
+
+
+          <div id="left-side">
+                <div id="overall-header" style="display:none"></div>
+
+                <div id="page-title" class="roundedbox bga-game-zoom">
+
+                    <div id="pagemaintitle_wrap" class="roundedboxinner" style="display: block;">
+
+                        <div id="maintitlebar_content">
+                            <div style="display:inline-block; position:relative;width:100%;">
+                                <img id="synchronous_notif_icon" src="https://studio.boardgamearena.com:8084/data/themereleases/250918-1534/img/logo/waiting.gif" style="display: none; width: 22px; height: 22px; position: absolute; left: -30px;" class="imgtext">
+                                <div class="textalign" id="active_player_statusbar" style="display: inline-block;">
+                                    <img class="textalign_inner" src="https://studio.boardgamearena.com:8084/data/themereleases/250918-1534/img/layout/active_player.gif" alt="" id="active_player_statusbar_icon" style="width:32px; height: 32px;">
+                                    <div class="icon20 icon20_night this_is_night"></div>
+                                </div>
+                                <span id="pagemaintitletext"><span class="playername" style="color: #f9c29a;">You</span> must end your turn</span><div id="generalactions"><button type="button" class="action-button bgabutton bgabutton_blue">End turn</button><button type="button" class="action-button bgabutton bgabutton_red">Undo</button></div>
+                                <span id="gotonexttable_wrap">&nbsp;
+                                    <a id="go_to_next_table_inactive_player" class="bgabutton bgabutton_red" href="https://studio.boardgamearena.com/play?from=779594"><span id="go_to_next_player_label">Go to next table</span> <i class="fa fa-arrow-right" aria-hidden="true"></i></a>
+                                    <a id="go_to_next_table_active_player" class="bgabutton bgabutton_gray" href="https://studio.boardgamearena.com/play?from=779594&amp;dontplay=779594" style="margin-left:10px"><i class="fa fa-arrow-right" aria-hidden="true"></i></a>
+                                </span>
+                                <span id="undoredo_wrap">&nbsp;
+                                    <a href="#" id="undo_button"><i class="fa fa-undo"></i></a>
+                                    <a href="#" id="redo_button"><i class="fa fa-repeat"></i></a>
+                                </span>
+		                        <a href="#" id="ai_not_playing" style="display: none;">[The AI is not playing... click here to relaunch it!]</a>
+		                        &nbsp;<a href="#" id="skip_player_turn" class="bgabutton bgabutton_red" style="display: none;">Skip turn of players out of time</a>
+
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+
+                <div id="page-content" class="game-content bga-game-zoom">
+
+
+                    <div id="pagesection_gameview" style="overflow: visible; display: block;">
+
+                     <div id="game_play_area_wrap">
+                      <div id="game_play_area" style="min-width: 0px;">
+
+
+    <div id="bbl_main">
+      <div id="bbl_hand_container">
+        <div id="bbl_hand"><div class="bbl_unplayable"><div bbl_piece="priest_3"></div></div><div class="bbl_unplayable"><div bbl_piece="merchant_3"></div></div><div class="bbl_unplayable"></div><div class="bbl_unplayable"></div><div class="bbl_unplayable"><div bbl_piece="farmer_3"></div></div></div>
+      </div>
+      <div id="bbl_board_container">
+        <div id="bbl_board"><div id="bbl_hex_0_8" style="top: 9px; left: 476.736px;" class=""></div><div id="bbl_hex_1_1" style="top: 40.5004px; left: 92.8419px;" class=""></div><div id="bbl_hex_1_7" style="top: 40.5004px; left: 421.894px;" class=""></div><div id="bbl_hex_2_0" style="top: 72.0008px; left: 38px;" class=""></div><div id="bbl_hex_2_2" style="top: 72.0008px; left: 147.684px;" class=""></div><div id="bbl_hex_2_4" style="top: 72.0008px; left: 257.368px;" class=""></div><div id="bbl_hex_2_6" style="top: 72.0008px; left: 367.052px;" class=""></div><div id="bbl_hex_2_8" style="top: 72.0008px; left: 476.736px;" class=""></div><div id="bbl_hex_3_1" style="top: 103.501px; left: 92.8419px;" class=""><div bbl_piece="ziggurat"></div></div><div id="bbl_hex_3_3" style="top: 103.501px; left: 202.526px;"><div bbl_piece="city_m"></div></div><div id="bbl_hex_3_5" style="top: 103.501px; left: 312.21px;" class=""></div><div id="bbl_hex_3_7" style="top: 103.501px; left: 421.894px;" class=""></div><div id="bbl_hex_4_0" style="top: 135.002px; left: 38px;" class=""></div><div id="bbl_hex_4_2" style="top: 135.002px; left: 147.684px;" class=""></div><div id="bbl_hex_4_4" style="top: 135.002px; left: 257.368px;" class=""></div><div id="bbl_hex_4_6" style="top: 135.002px; left: 367.052px;"><div bbl_piece="field_5"></div></div><div id="bbl_hex_4_8" style="top: 135.002px; left: 476.736px;" class=""></div><div id="bbl_hex_5_1" style="top: 166.502px; left: 92.8419px;" class=""><div bbl_piece="merchant_3"></div></div><div id="bbl_hex_5_3" style="top: 166.502px; left: 202.526px;" class=""></div><div id="bbl_hex_5_5" style="top: 166.502px; left: 312.21px;" class=""></div><div id="bbl_hex_5_7" style="top: 166.502px; left: 421.894px;" class=""></div><div id="bbl_hex_5_9" style="top: 166.502px; left: 531.577px;" class=""></div><div id="bbl_hex_6_0" style="top: 198.002px; left: 38px;"><div bbl_piece="city_ms"></div></div><div id="bbl_hex_6_2" style="top: 198.002px; left: 147.684px;" class=""></div><div id="bbl_hex_6_4" style="top: 198.002px; left: 257.368px;" class=""></div><div id="bbl_hex_6_6" style="top: 198.002px; left: 367.052px;" class=""></div><div id="bbl_hex_6_8" style="top: 198.002px; left: 476.736px;"><div bbl_piece="city_sp"></div></div><div id="bbl_hex_6_10" style="top: 198.002px; left: 586.419px;" class=""></div><div id="bbl_hex_7_1" style="top: 229.503px; left: 92.8419px;" class=""></div><div id="bbl_hex_7_3" style="top: 229.503px; left: 202.526px;" class=""></div><div id="bbl_hex_7_5" style="top: 229.503px; left: 312.21px;"><div bbl_piece="city_mp"></div></div><div id="bbl_hex_7_7" style="top: 229.503px; left: 421.894px;" class=""></div><div id="bbl_hex_7_9" style="top: 229.503px; left: 531.577px;" class=""></div><div id="bbl_hex_8_0" style="top: 261.003px; left: 38px;" class=""></div><div id="bbl_hex_8_2" style="top: 261.003px; left: 147.684px;" class=""></div><div id="bbl_hex_8_4" style="top: 261.003px; left: 257.368px;" class=""></div><div id="bbl_hex_8_6" style="top: 261.003px; left: 367.052px;" class=""></div><div id="bbl_hex_8_8" style="top: 261.003px; left: 476.736px;" class=""><div bbl_piece="servant_3"></div></div><div id="bbl_hex_8_10" style="top: 261.003px; left: 586.419px;" class=""></div><div id="bbl_hex_9_1" style="top: 292.504px; left: 92.8419px;"><div bbl_piece="city_p"></div></div><div id="bbl_hex_9_3" style="top: 292.504px; left: 202.526px;" class=""></div><div id="bbl_hex_9_5" style="top: 292.504px; left: 312.21px;" class=""></div><div id="bbl_hex_9_7" style="top: 292.504px; left: 421.894px;" class=""></div><div id="bbl_hex_9_9" style="top: 292.504px; left: 531.577px;"><div bbl_piece="city_s"></div></div><div id="bbl_hex_10_0" style="top: 324.004px; left: 38px;" class=""></div><div id="bbl_hex_10_2" style="top: 324.004px; left: 147.684px;" class=""></div><div id="bbl_hex_10_4" style="top: 324.004px; left: 257.368px;"><div bbl_piece="field_X"></div></div><div id="bbl_hex_10_6" style="top: 324.004px; left: 367.052px;" class=""></div><div id="bbl_hex_10_8" style="top: 324.004px; left: 476.736px;" class=""></div><div id="bbl_hex_10_10" style="top: 324.004px; left: 586.419px;" class=""></div><div id="bbl_hex_11_1" style="top: 355.504px; left: 92.8419px;" class=""></div><div id="bbl_hex_11_3" style="top: 355.504px; left: 202.526px;" class=""></div><div id="bbl_hex_11_5" style="top: 355.504px; left: 312.21px;" class=""></div><div id="bbl_hex_11_7" style="top: 355.504px; left: 421.894px;" class=""></div><div id="bbl_hex_11_9" style="top: 355.504px; left: 531.577px;" class=""></div><div id="bbl_hex_12_0" style="top: 387.005px; left: 38px;"><div bbl_piece="city_mp"></div></div><div id="bbl_hex_12_2" style="top: 387.005px; left: 147.684px;" class=""></div><div id="bbl_hex_12_4" style="top: 387.005px; left: 257.368px;" class=""></div><div id="bbl_hex_12_6" style="top: 387.005px; left: 367.052px;"><div bbl_piece="field_X"></div></div><div id="bbl_hex_12_8" style="top: 387.005px; left: 476.736px;"><div bbl_piece="ziggurat"></div></div><div id="bbl_hex_12_10" style="top: 387.005px; left: 586.419px;" class=""></div><div id="bbl_hex_13_1" style="top: 418.505px; left: 92.8419px;" class=""></div><div id="bbl_hex_13_3" style="top: 418.505px; left: 202.526px;" class=""></div><div id="bbl_hex_13_5" style="top: 418.505px; left: 312.21px;" class=""></div><div id="bbl_hex_13_7" style="top: 418.505px; left: 421.894px;" class=""></div><div id="bbl_hex_13_9" style="top: 418.505px; left: 531.577px;" class=""></div><div id="bbl_hex_14_0" style="top: 450.006px; left: 38px;" class=""></div><div id="bbl_hex_14_2" style="top: 450.006px; left: 147.684px;"><div bbl_piece="city_ms"></div></div><div id="bbl_hex_14_4" style="top: 450.006px; left: 257.368px;"><div bbl_piece="field_X"></div></div><div id="bbl_hex_14_6" style="top: 450.006px; left: 367.052px;" class=""></div><div id="bbl_hex_14_8" style="top: 450.006px; left: 476.736px;" class=""></div><div id="bbl_hex_14_10" style="top: 450.006px; left: 586.419px;" class=""></div><div id="bbl_hex_15_1" style="top: 481.506px; left: 92.8419px;" class=""></div><div id="bbl_hex_15_3" style="top: 481.506px; left: 202.526px;" class=""></div><div id="bbl_hex_15_5" style="top: 481.506px; left: 312.21px;" class=""></div><div id="bbl_hex_15_7" style="top: 481.506px; left: 421.894px;" class=""></div><div id="bbl_hex_15_9" style="top: 481.506px; left: 531.577px;" class=""></div><div id="bbl_hex_16_0" style="top: 513.006px; left: 38px;" class=""></div><div id="bbl_hex_16_2" style="top: 513.006px; left: 147.684px;" class=""></div><div id="bbl_hex_16_4" style="top: 513.006px; left: 257.368px;" class=""></div><div id="bbl_hex_16_6" style="top: 513.006px; left: 367.052px;" class=""></div><div id="bbl_hex_16_8" style="top: 513.006px; left: 476.736px;"><div bbl_piece="city_m"></div></div><div id="bbl_hex_17_1" style="top: 544.507px; left: 92.8419px;" class=""></div><div id="bbl_hex_17_3" style="top: 544.507px; left: 202.526px;" class=""></div><div id="bbl_hex_17_5" style="top: 544.507px; left: 312.21px;" class=""></div><div id="bbl_hex_17_7" style="top: 544.507px; left: 421.894px;" class=""></div><div id="bbl_hex_17_9" style="top: 544.507px; left: 531.577px;" class=""></div><div id="bbl_hex_18_0" style="top: 576.007px; left: 38px;" class=""></div><div id="bbl_hex_18_2" style="top: 576.007px; left: 147.684px;"><div bbl_piece="ziggurat"></div></div><div id="bbl_hex_18_4" style="top: 576.007px; left: 257.368px;" class=""></div><div id="bbl_hex_18_6" style="top: 576.007px; left: 367.052px;" class=""></div><div id="bbl_hex_18_8" style="top: 576.007px; left: 476.736px;" class=""></div><div id="bbl_hex_19_1" style="top: 607.508px; left: 92.8419px;" class=""></div><div id="bbl_hex_19_3" style="top: 607.508px; left: 202.526px;" class=""></div><div id="bbl_hex_19_5" style="top: 607.508px; left: 312.21px;"><div bbl_piece="field_6"></div></div><div id="bbl_hex_19_7" style="top: 607.508px; left: 421.894px;"><div bbl_piece="city_p"></div></div><div id="bbl_hex_19_9" style="top: 607.508px; left: 531.577px;" class=""></div><div id="bbl_hex_20_0" style="top: 639.008px; left: 38px;" class=""></div><div id="bbl_hex_20_2" style="top: 639.008px; left: 147.684px;" class=""></div><div id="bbl_hex_20_4" style="top: 639.008px; left: 257.368px;" class=""></div><div id="bbl_hex_20_6" style="top: 639.008px; left: 367.052px;" class=""></div><div id="bbl_hex_20_8" style="top: 639.008px; left: 476.736px;" class=""></div><div id="bbl_hex_20_10" style="top: 639.008px; left: 586.419px;" class=""></div><div id="bbl_hex_21_1" style="top: 670.508px; left: 92.8419px;"><div bbl_piece="field_7"></div></div><div id="bbl_hex_21_3" style="top: 670.508px; left: 202.526px;" class=""></div><div id="bbl_hex_21_5" style="top: 670.508px; left: 312.21px;" class=""></div><div id="bbl_hex_21_7" style="top: 670.508px; left: 421.894px;" class=""></div><div id="bbl_hex_21_9" style="top: 670.508px; left: 531.577px;" class=""></div><div id="bbl_hex_22_2" style="top: 702.009px; left: 147.684px;" class=""></div><div id="bbl_hex_22_4" style="top: 702.009px; left: 257.368px;"><div bbl_piece="city_s"></div></div><div id="bbl_hex_22_6" style="top: 702.009px; left: 367.052px;" class=""></div><div id="bbl_hex_22_8" style="top: 702.009px; left: 476.736px;"><div bbl_piece="city_sp"></div></div><div id="bbl_hex_22_10" style="top: 702.009px; left: 586.419px;" class=""></div></div>
+        <span id="bbl_vars"></span>
+      </div>
+      <div id="bbl_available_zcards_container" class="whiteblock">
+        <div>Ziggurat Cards</div>
+        <div id="bbl_available_zcards"><div><div id="bbl_zc_10pts" bbl_ztype="zc_10pts" bbl_tt_processed=""></div></div><div><div id="bbl_zc_xturn" bbl_ztype="zc_xturn" bbl_tt_processed=""></div></div><div><div id="bbl_zc_hand7" bbl_ztype="zc_hand7" bbl_tt_processed=""></div></div><div><div id="bbl_zc_3nobles" bbl_ztype="zc_3nobles" bbl_tt_processed=""></div></div><div><div id="bbl_zc_3farmers" bbl_ztype="zc_3farmers" bbl_tt_processed=""></div></div><div><div id="bbl_zc_fields" bbl_ztype="zc_fields" bbl_tt_processed=""></div></div><div><div id="bbl_zc_citypts" bbl_ztype="zc_citypts" bbl_tt_processed=""></div></div></div>
+      </div>
+   </div>
+</div><!-- game_play_area -->
+                <div id="arena_cannot_play_mask"></div>
+              </div><!-- game_play_area_wrap -->
+
+                <div class="clear"></div>
+
+          </div><!-- page-content -->
+
+        </div><!-- pagesection_gameview -->
+      </div><!-- left-side -->
+  </div><!-- left-side-wrapper -->
+
+
+        <div id="right-side">
+            <div id="right-side-first-part" class="bga-game-zoom">
+
+                <div id="controls3d_wrap" class="roundedbox player-board">
+
+                    <div id="controls3d">
+                        <div id="controls3d_img"></div>
+                         <div id="c3dLeft" class="button3d control3d_command"></div>
+                         <span id="c3dUp" class="button3d  control3d_command"></span>
+                         <span id="c3dRight" class="button3d control3d_command"></span>
+                         <span id="c3dDown" class="button3d  control3d_command"></span>
+
+                         <span id="c3dAngleUp" class="button3d  control3d_command"></span>
+                         <span id="c3dAngleDown" class="button3d control3d_command"></span>
+                         <span id="c3dRotateL" class="button3d control3d_command"></span>
+                         <span id="c3dRotateR" class="button3d  control3d_command"></span>
+
+                         <span id="c3dZoomIn" class=" control3d_command"><i class="fa fa-search-plus fa-2x"></i></span>
+                         <span id="c3dZoomOut" class=" control3d_command"><i class="fa fa-search-minus fa-2x"></i></span>
+                    </div>
+
+                    <p id="tooltip3d">
+                        Note: 3D is experimental
+                    </p>
+
+                </div>
+
+
+                <div id="player_boards"><div id="overall_player_board_2405406" class="player-board current-player-board">
+                        <div class="player_board_inner" id="player_board_inner_f9c29a">
+                                <div class="emblemwrap is_premium" id="avatarwrap_2405406" style="display: none;">
+                                    <img src="https://studio.boardgamearena.com:8084/data/avatar/default_32.jpg" alt="" class="avatar emblem" id="avatar_2405406">
+                                    <div class="emblempremium" id="f9b45b66-9465-4ce0-80ea-f2ba966e2465"></div>
+                                </div>
+                                <div id="rtc_placeholder_2405406" class="rtc_placeholder"></div>
+
+                                <div class="emblemwrap" id="avatar_active_wrap_2405406" style="display: block;">
+                                    <img src="https://studio.boardgamearena.com:8084/data/themereleases/250918-1534/img/layout/active_player.gif" alt="" class="avatar avatar_active" id="avatar_active_2405406">
+                                    <div class="icon20 icon20_night this_is_night"></div>
+                                </div>
+
+                                <div class="player-name" id="player_name_2405406">
+                                	<a href="https://studio.boardgamearena.com/player?id=2405406" style="color: #f9c29a" target="_blank">vagabond0</a>
+                                	<i id="player_2405406_status" class="fa fa-circle status_online player_status"></i>
+                                	<div class="bga-flag" data-country="US"></div>
+                                </div>
+                                <div id="player_board_2405406" class="player_board_content">
+                                    <div class="player_score">
+                                        <span id="player_score_2405406" class="player_score_value">1</span> <i class="fa fa-star" id="icon_point_2405406"></i>
+                                        <span class="player_elo_wrap">• <div class="gamerank gamerank_average "><span class="icon20 icon20_rankw "></span> <span class="gamerank_value" id="player_elo_2405406">155</span></div></span>
+                                        <span id="timeToThink_2405406" class="timeToThink" style="color: inherit;">89 days</span>
+                                    </div>
+                                    <div class="player_showcursor" id="player_showcursor_2405406"><input type="checkbox" checked="checked" class="player_hidecursor" id="player_hidecursor_2405406"> Show cursor <i class="fa fa-hand-pointer-o" style="color:#f9c29a"></i></div>
+                                    <div class="player_table_status" id="player_table_status_2405406" style="display: none;"></div>
+                                    <div class="player-board-game-specific-content">
+      <div>
+        <span class="bbl_pb_hand_label_3"></span>
+        <span id="bbl_handcount_2405406" class="">3</span>
+      </div>
+      <div>
+        <span class="bbl_pb_pool_label_3"></span>
+        <span id="bbl_poolcount_2405406">25</span>
+      </div>
+      <div>
+        <span class="bbl_pb_citycount_label"></span>
+        <span id="bbl_citycount_2405406">0</span>
+      </div>
+      <div id="bbl_zcards_2405406" class="bbl_pb_zcards">
+        <span class="bbl_pb_zcard_label"></span>
+      </div>
+</div>
+                                </div>
+                                <div id="current_player_board">
+
+                                </div>
+                                <div id="player_panel_content_f9c29a" class="player_panel_content">
+                                </div>
+                        </div>
+                    </div><div id="overall_player_board_2405407" class="player-board" style="border-color: #76a89b">
+                        <div class="player_board_inner" id="player_board_inner_76a89b">
+                            <div class="emblemwrap is_premium" id="avatarwrap_2405407">
+                                <img src="https://studio.boardgamearena.com:8084/data/avatar/default_32.jpg" alt="vagabond1" class="avatar emblem" id="avatar_2405407">
+                                <div class="emblempremium" id="f3def4aa-f795-4f24-811c-bdcaeb3303fb"></div>
+                            </div>
+                            <div id="rtc_placeholder_2405407" class="rtc_placeholder"></div>
+
+                            <div class="emblemwrap" id="avatar_active_wrap_2405407" style="display:none">
+                                <img src="https://studio.boardgamearena.com:8084/data/themereleases/250918-1534/img/layout/active_player.gif" alt="" class="avatar avatar_active" id="avatar_active_2405407">
+                                <div class="icon20 icon20_night this_is_night"></div>
+                            </div>
+                            <div class="player-name" id="player_name_2405407">
+                            	<a href="https://studio.boardgamearena.com/player?id=2405407" style="color: #76a89b" target="_blank">vagabond1</a>
+                            	<a href="/1/babylonia?table=779594&amp;testuser=2405407" target="_blank" class="expressswitch">
+                                	<img src="https://studio.boardgamearena.com:8084/data/themereleases/250918-1534/img/layout/seemore.png" alt="see more">
+                                </a>
+                            	<i id="player_2405407_status" class="fa fa-circle status_offline player_status"></i>
+                            	<div class="bga-flag" data-country="US" title="United States of America"></div>
+                            </div>
+                            <div id="player_board_2405407" class="player_board_content">
+                                <div class="player_score">
+                                    <span id="player_score_2405407" class="player_score_value">0</span> <i class="fa fa-star" id="icon_point_2405407"></i>
+                                    <span class="player_elo_wrap">• <div class="gamerank gamerank_average "><span class="icon20 icon20_rankw "></span> <span class="gamerank_value" id="player_elo_2405407">107</span></div></span>
+                                    <span id="timeToThink_2405407" class="timeToThink">90 days</span>
+                                </div>
+                                <div class="player_showcursor" id="player_showcursor_2405407"><input type="checkbox" checked="checked" class="player_hidecursor" id="player_hidecursor_2405407"> Show cursor <i class="fa fa-hand-pointer-o" style="color:#76a89b"></i></div>
+                                <div class="player_table_status" id="player_table_status_2405407" style="display: none;"></div>
+                                <div class="player-board-game-specific-content">
+      <div>
+        <span class="bbl_pb_hand_label_2"></span>
+        <span id="bbl_handcount_2405407">5</span>
+      </div>
+      <div>
+        <span class="bbl_pb_pool_label_2"></span>
+        <span id="bbl_poolcount_2405407">25</span>
+      </div>
+      <div>
+        <span class="bbl_pb_citycount_label"></span>
+        <span id="bbl_citycount_2405407">0</span>
+      </div>
+      <div id="bbl_zcards_2405407" class="bbl_pb_zcards">
+        <span class="bbl_pb_zcard_label"></span>
+      </div>
+</div>
+                            </div>
+                            <div id="player_panel_content_76a89b" class="player_panel_content">
+                            </div>
+                        </div>
+                    </div>
+
+
+
+
+                </div><!-- player_boards -->
+
+                <div id="spectatorbox_wrapper">
+                    <div class="player-board" id="spectatorbox" style="display: block;">
+                        <div class="player_board_inner">
+                            <div id="spectatorlist"><span>Spectators: <span style="white-space: nowrap"><span id="visitor_player_2405408" class="visitor_player">Test spectator</span>
+                        <a href="/1/babylonia?table=779594&amp;testuser=2405408" target="_blank" class="expressswitch">
+                            <img src="https://studio.boardgamearena.com:8084/data/themereleases/250918-1534/img/layout/seemore.png" alt="see more">
+                        </a>
+                    <a href="#" style="display:none" id="ban_spectator_2405408" data-spectator-id="2405408" class="ban_spectator"><i class="fa fa-times" aria-hidden="true"></i></a></span></span></div>
+                        </div>
+                    </div>
+                </div>
+
+
+            </div><!-- right-side-first-part -->
+            <div id="right-side-second-part">
+
+                <div id="concede_alternate_button">Resign</div>
+                <div id="abandon_alternate_button">Abandon</div>
+
+                <div id="logs_wrap">
+                    <div id="chatinput"></div>
+                    <div id="chatlogs">
+                    </div>
+                    <div id="logs" style="display: block;"><div class="log  log_replayable" id="log_2" style="height: auto; display: block; color: rgb(0, 0, 0);"><div class="roundedbox"><!--PNS--><span class="playername" style="color:#f9c29a;">vagabond0</span><!--PNE--> plays <span class="log-element" bbl_piece="merchant_3"></span> to (5,1) scoring 1</div></div><div class="log  log_replayable" id="log_1" style="height: auto; display: block; color: rgb(0, 0, 0);"><div class="roundedbox"><!--PNS--><span class="playername" style="color:#f9c29a;">vagabond0</span><!--PNE--> plays <span class="log-element" bbl_piece="servant_3"></span> to (8,8)</div><div class="timestamp">9/22/2025 09:08 AM</div></div><div class="log " id="log_0" style="height: auto; display: block; color: rgb(0, 0, 0);"><div class="roundedbox"><b>Did you know?</b><br>If the game seems stopped or buggy, please <b>refresh</b> the webpage or <b>press F5</b>.</div></div>
+                        <div id="seemorelogs"><a id="seemorelogs_btn" href="#" onclick="return false"></a>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div> <!-- right side -->
+
+  </div><!-- leftright_page_wrapper -->
+
+
+    <div class="clear"></div>
+
+    <div id="dd_stock" style="display:none;">
+
+    </div>
+
+
+</body>
+</html>
