@@ -275,8 +275,6 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
   private setupZcards(zcards: Zcard[]): void {
     const available = $(IDS.AVAILABLE_ZCARDS);
     for (let zcard of zcards) {
-      let nextSpot = this.createDiv();
-      available.appendChild(nextSpot);
       const zelem = this.createDiv({ id: IDS.zcard(zcard.type) });
       zelem.setAttribute(Attrs.ZTYPE, zcard.type);
       if (zcard.used) {
@@ -285,7 +283,7 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
       if (zcard.owning_player_id != 0) {
         $(IDS.playerBoardZcards(zcard.owning_player_id)).appendChild(zelem);
       } else {
-        nextSpot.appendChild(zelem);
+        available.appendChild(zelem);
       }
       this.zcardTooltips[zcard.type] = zcard.tooltip;
       this.addTooltip(zelem.id, zcard.tooltip, '');
@@ -459,12 +457,11 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
       this.popActionBarTitle();
       this.statusBar.removeActionButtons();
     };
-    const epar = e.parentElement!;
     let alreadySelected = document.querySelector(`#${IDS.AVAILABLE_ZCARDS} > .${CSS.SELECTED}`);
-    epar.classList.toggle(CSS.SELECTED);
+    e.classList.toggle(CSS.SELECTED);
     if (alreadySelected == null) {
       addButtons();
-    } else if (alreadySelected == epar) {
+    } else if (alreadySelected == e) {
       // remove confirm and cancel buttons from action bar
       removeButtons();
     } else {
@@ -949,8 +946,8 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
   ): Promise<void> {
     this.scoreCtrl[args.player_id]!.toValue(args.score);
     const zelem = $(IDS.zcard(args.zcard));
-    zelem.parentElement!.classList.remove(CSS.SELECTED);
-    await this.animationManager.slideAndAttach(zelem, $(IDS.playerBoardZcards(args.player_id)));
+    zelem.classList.remove(CSS.SELECTED);
+    this.animationManager.slideAndAttach(zelem, $(IDS.playerBoardZcards(args.player_id)));
   }
 
   private async notif_cityScored(

@@ -108,7 +108,7 @@ function selectZCard(event) {
     let e = event.target;
     let z = e.getAttribute('bbl_ztype');
     if (!z) { return; }
-    let c = e.parentElement.classList;
+    let c = e.classList;
     if (c.contains('bbl_unplayable')) { return; }
     if (!c.contains("bbl_selected")) {
         document.querySelectorAll('#bbl_available_zcards > .bbl_selected').forEach(

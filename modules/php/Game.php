@@ -233,4 +233,21 @@ class Game extends \Bga\GameFramework\Table
     protected function zombieTurn(array $state, int $active_player): void
     {
     }
+
+    public function debug_zc(string $zctype): void {
+        $active_player_id = intval($this->getActivePlayerId());
+        $this->notify->all(
+            "zigguratCardSelection",
+            clienttranslate('${player_name} chose ziggurat card ${zcard}'),
+            [
+                "player_id" => $active_player_id,
+                "player_name" => $this->getPlayerNameById($active_player_id),
+                "zcard" => $zctype,
+                "cardused" => false,
+                "points" => 0,
+                // "score" => 0,
+                // "hex" => $this->ps->rowColBeingScored(),
+            ]
+        );
+    }
 }

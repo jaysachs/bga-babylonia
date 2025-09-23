@@ -46,10 +46,6 @@
     margin-bottom: 10px;
 }
 
-#bbl_vars {
-    display: none;
-}
-
 #bbl_board {
     font-size: 0;
     background: url(img/mapb.jpg) no-repeat center;
@@ -259,14 +255,12 @@
  */
 /* button.action-button[bbl_ztype], */
 [bbl_ztype] {
-    background-size: 1000% 100%;
+    background-size: 900% 100%;
     background-image: url(img/zcards.png);
 
-    /* TODO: not sure computing these based on hex size is right */
-    height: calc((var(--bbl-hex-height) - 4px) * 2.37);
-    /* 135px; */
-    width: calc((var(--bbl-hex-height) - 4px) * 1.58);
-    /* 90px; */
+    height: calc(var(--bbl-board-width) * 0.13);
+    width: calc(var(--bbl-board-width) * 0.1);
+
 }
 
 [bbl_ztype=""] {
@@ -274,7 +268,7 @@
 }
 
 [bbl_zused] {
-    background-image: repeating-linear-gradient(45deg, rgb(127 127 127 / 80%), rgb(127 127 127 / 80%) 1px, transparent 1px, transparent 2px),
+    background-image: repeating-linear-gradient(45deg, rgb(127 127 127 / 90%), rgb(127 127 127 / 80%) 2px, transparent 2px, transparent 4px),
         url(img/zcards.png);
 }
 
@@ -366,50 +360,36 @@
     opacity: 0.45;
 }
 
-/* available ziggurat cards zone (TODO: "panel") */
-
+/* available ziggurat cards panel */
 
 #bbl_available_zcards_container {
+    width: calc(var(--bbl-board-width));
     border-width: 1px;
     border-style: solid;
     border-radius: 10px;
     clip-path: rect(auto auto auto auto round 10px);
-}
-
-#bbl_available_zcards_container>div {
     font-style: italic;
 }
 
 #bbl_available_zcards {
-    /*    clip-path: rect(auto auto auto auto round 10px); */
-    /*    background-color: #F8E6D0; */
-    position: relative;
     display: flex;
     justify-content: center;
 }
 
 #bbl_available_zcards>div {
     border-style: solid;
-    border-width: 3px;
-    border-color: #F8E6D0;
+    border-width: 5px;
+    border-color: transparent;
+    clip-path: padding-box;
+    margin: 8px;
+    display: inline-block;
 }
 
 #bbl_available_zcards>div.bbl_selected {
     border-color: green;
-    border-width: 5px;
-    margin: 8px;
+    clip-path: margin-box;
 }
 
-
-#bbl_available_zcards>div {
-    display: inline-block;
-    /* TODO: not sure computing these based on hex size is right */
-    height: calc((var(--bbl-hex-height) - 4px) * 2.37);
-    /* 135px; */
-    width: calc((var(--bbl-hex-height) - 4px) * 1.58);
-    /* 90px; */
-    margin: 10px;
-}
 
 #bbl_available_zcards.bbl_selecting>div[bbl_ztype] {
     cursor: pointer;

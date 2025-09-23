@@ -153,19 +153,19 @@
                             populateBoard();
                           </script>
                         </div>
-                        <span id="bbl_vars"></span>
                       </div>
-                      <div id="bbl_available_zcards_container" class="whiteblock">
+                      <div id="bbl_available_zcards_container" style="width:1000px" class="whiteblock">
                         <div>Ziggurat Cards</div>
-                        <div id="bbl_available_zcards" onclick="selectZCard(event)">
-                          <div><div id="bbl_zc_10pts" bbl_ztype="zc_10pts" bbl_tt_processed=""></div></div>
-                          <div><div id="bbl_zc_xturn" bbl_ztype="zc_xturn" bbl_tt_processed=""></div></div>
-                          <div><div id="bbl_zc_hand7" bbl_ztype="zc_hand7" bbl_tt_processed=""></div></div>
-                          <div><div id="bbl_zc_3nobles" bbl_ztype="zc_3nobles" bbl_tt_processed=""></div></div>
-                          <div><div id="bbl_zc_3farmers" bbl_ztype="zc_3farmers" bbl_tt_processed=""></div></div><div><div id="bbl_zc_fields" bbl_ztype="zc_fields" bbl_tt_processed=""></div></div>
-                          <div><div id="bbl_zc_citypts" bbl_ztype="zc_citypts" bbl_tt_processed=""></div></div>
-                          <div bbl_ztype='zc_citypts' style="margin: 8px; border-width: 5px; padding: -5px; clip-path: padding-box; border-color: rgba(0,0,0,0)"></div>
-                          <div bbl_ztype='zc_citypts' style="margin: 8px; border-width: 5px; padding: -5px; clip-path: margin-box; border-color: green"></div>
+                        <div id="bbl_available_zcards" class="bbl_selecting" onclick="selectZCard(event)">
+                          <div id="bbl_zc_10pts" bbl_ztype="zc_10pts" bbl_tt_processed=""></div>
+                          <div id="bbl_zc_xturn" bbl_ztype="zc_xturn" bbl_tt_processed=""></div>
+                          <!--
+                              <div id="bbl_zc_hand7" bbl_ztype="zc_hand7" bbl_tt_processed=""></div>
+                              -->
+                          <div id="bbl_zc_3nobles" bbl_zzused="true" bbl_ztype="zc_3nobles" bbl_tt_processed=""></div>
+                          <div id="bbl_zc_3farmers" bbl_ztype="zc_3farmers" bbl_tt_processed=""></div>
+                          <div id="bbl_zc_fields" bbl_ztype="zc_fields" bbl_tt_processed=""></div>
+                          <div id="bbl_zc_citypts" bbl_ztype="zc_citypts" bbl_tt_processed=""></div>
                         </div>
                       </div>
                     </div><!-- bbl_main -->
@@ -234,6 +234,7 @@
                       </div>
                       <div id="bbl_zcards_2405406" class="bbl_pb_zcards">
                         <span class="bbl_pb_zcard_label"></span>
+                        <div id="bbl_zc_hand7" bbl_ztype="zc_hand7" bbl_tt_processed=""></div>
                       </div>
                     </div>
                   </div>
