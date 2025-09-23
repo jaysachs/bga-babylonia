@@ -947,7 +947,9 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
     this.scoreCtrl[args.player_id]!.toValue(args.score);
     const zelem = $(IDS.zcard(args.zcard));
     zelem.classList.remove(CSS.SELECTED);
-    this.animationManager.slideAndAttach(zelem, $(IDS.playerBoardZcards(args.player_id)));
+    const newElem = zelem.cloneNode();
+    const dest = $(IDS.playerBoardZcards(args.player_id));
+    await this.animationManager.slideOutAndDestroy(zelem, dest, {}).then(() => dest.appendChild(newElem));
   }
 
   private async notif_cityScored(
