@@ -170,7 +170,7 @@ namespace Bga\GameFramework {
          * 
          * @param $nextStateId the first real game state, just after the setup (default 2).
          */
-        public static function gameSetup(int $nextStateId = 2): self
+        public static function gameSetup(int|string $nextStateId = 2): self
         {
             return self::create();
         }
