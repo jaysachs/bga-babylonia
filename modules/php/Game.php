@@ -233,11 +233,6 @@ class Game extends \Bga\GameFramework\Table
         return $this->tableOptions->get($option->value) > 0;
     }
 
-    // TODO: delete when possible.
-    protected function zombieTurn(array $state, int $active_player): void
-    {
-    }
-
     public function debug_zc(string $zctype): void {
         $active_player_id = intval($this->getActivePlayerId());
         $this->notify->all(
