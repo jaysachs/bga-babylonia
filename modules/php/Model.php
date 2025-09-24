@@ -27,9 +27,13 @@ declare(strict_types=1);
 
 namespace Bga\Games\babylonia\ModelImpl {
 
+use Bga\Games\babylonia\ZigguratCardType;
+
 class PlayAllowedResult {
+    /** @param array<ZigguratCardType> $ziggurat_cards_used */
     private function __construct(public ?array $ziggurat_cards_used, public ?string $reason) {}
 
+    /** @param array<ZigguratCardType> $ziggurat_cards_used */
     static function success(array $ziggurat_cards_used): PlayAllowedResult {
         return new PlayAllowedResult($ziggurat_cards_used, null);
     }
