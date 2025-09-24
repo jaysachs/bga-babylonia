@@ -321,7 +321,7 @@ END;
         $this->setMap(ModelTest::MAP6);
         $this->model->selectZigguratCard(ZigguratCardType::NOBLES_IN_FIELDS);
         $result = $this->model->checkPlay(Piece::SERVANT, $this->ps->hex(1,1));
-        $this->assertEquals([ZigguratCardType::NOBLES_IN_FIELDS], $result->ziggurat_cards_used);
+        $this->assertEquals([ZigguratCardType::NOBLES_IN_FIELDS], $result->activatedCards());
     }
 
     public function testPlayPieces_threeNoblesOnLand() {
@@ -334,7 +334,7 @@ END;
         $result = $this->model->checkPlay(Piece::PRIEST, $this->ps->hex(0, 2));
 
         $this->assertTrue($result->isAllowed());
-        $this->assertEquals([ZigguratCardType::NOBLES_3_KINDS], $result->ziggurat_cards_used);
+        $this->assertEquals([ZigguratCardType::NOBLES_3_KINDS], $result->activatedCards());
         $this->assertFalse($this->model->checkPlay(Piece::SERVANT, $this->ps->hex(0, 2))->isAllowed());
         $this->assertFalse($this->model->checkPlay(Piece::FARMER, $this->ps->hex(0, 2))->isAllowed());
         $this->model->playPiece(2, new RowCol(0, 2));

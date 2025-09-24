@@ -30,20 +30,25 @@ namespace Bga\Games\babylonia\ModelImpl {
 use Bga\Games\babylonia\ZigguratCardType;
 
 class PlayAllowedResult {
-    /** @param array<ZigguratCardType> $ziggurat_cards_used */
-    private function __construct(public ?array $ziggurat_cards_used, public ?string $reason) {}
+    /** @param array<ZigguratCardType> $ziggurat_cards_activated */
+    private function __construct(private ?array $ziggurat_cards_activated, public ?string $reason) {}
 
-    /** @param array<ZigguratCardType> $ziggurat_cards_used */
-    static function success(array $ziggurat_cards_used): PlayAllowedResult {
-        return new PlayAllowedResult($ziggurat_cards_used, null);
+    /** @param array<ZigguratCardType> $ziggurat_cards_activated */
+    static function success(array $ziggurat_cards_activated): PlayAllowedResult {
+        return new PlayAllowedResult($ziggurat_cards_activated, null);
     }
 
     static function failure(string $reason): PlayAllowedResult {
         return new PlayAllowedResult(null, $reason);
     }
 
+    /** @return array<ZigguratCardType> */
+    function activatedCards(): array {
+        return $this->ziggurat_cards_activated ?? [];
+    }
+
     function isAllowed(): bool {
-        return $this->ziggurat_cards_used !== null;
+        return $this->ziggurat_cards_activated !== null;
     }
 }
 
@@ -318,10 +323,7 @@ class Model
         $this->ps->incPlayerScore($move->player_id, $move->points());
         $this->ps->updateHand($move->player_id, $move->handpos, Piece::EMPTY);
 
-        /**
-         * @psalm-suppress PossiblyNullIterator
-         */
-        foreach ($result->ziggurat_cards_used as $zctype) {
+        foreach ($result->activatedCards() as $zctype) {
             switch ($zctype) {
                 case ZigguratCardType::NOBLE_WITH_3_FARMERS:
                     $this->stats->PLAYER_ZC_USED_NOBLE_WITH_3_FARMERS->inc($this->player_id);
