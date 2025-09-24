@@ -27,6 +27,8 @@ declare(strict_types=1);
 
 namespace Bga\Games\babylonia;
 
+use Bga\Games\babylonia\States\StartTurn;
+
 require_once(APP_GAMEMODULE_PATH . "module/table/table.game.php");
 
 require_once("Stats.php");
@@ -179,7 +181,7 @@ class Game extends \Bga\GameFramework\Table
      *  launched. In this method, you must setup the game according to
      *  the game rules, so that the game is ready to be played.
      */
-    protected function setupNewGame($players, $options = [])
+    protected function setupNewGame($players, $options = []): mixed
     {
         // Set the colors of the players with HTML color code.The
         // number of colors defined here must correspond to the
@@ -222,6 +224,8 @@ class Game extends \Bga\GameFramework\Table
 
         // Activate first player once everything has been initialized and ready.
         $this->activeNextPlayer();
+
+        return StartTurn::class;
     }
 
     function optionEnabled(TableOption $option): bool
