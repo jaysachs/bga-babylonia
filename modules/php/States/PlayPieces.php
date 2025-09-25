@@ -74,7 +74,6 @@ class PlayPieces extends AbstractState
             $msg,
             [
                 "player_id" => $active_player_id,
-                "player_name" => $this->getPlayerNameById($active_player_id),
                 "piece" => $piece,
                 "handpos" => $handpos,
                 "row" => $row,
@@ -104,7 +103,6 @@ class PlayPieces extends AbstractState
             clienttranslate('${player_name} finishes playing pieces'),
             [
                 "player_id" => $active_player_id,
-                "player_name" => $this->getPlayerNameById($active_player_id),
             ]
         );
 
@@ -117,7 +115,6 @@ class PlayPieces extends AbstractState
         $model = $this->createModel($active_player_id);
         $move = $model->undo();
         $args = [
-            "player_name" => $this->getPlayerNameById($active_player_id),
             "player_id" => $active_player_id,
             "row" => $move->rc->row,
             "col" => $move->rc->col,

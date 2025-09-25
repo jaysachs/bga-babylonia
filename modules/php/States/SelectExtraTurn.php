@@ -57,7 +57,6 @@ class SelectExtraTurn extends AbstractState
                 clienttranslate('${player_name} is taking an extra turn'),
                 [
                     "player_id" => $active_player_id,
-                    "player_name" => $this->getPlayerNameById($active_player_id),
                     "card" => ZigguratCardType::EXTRA_TURN->value,
                     "cardused" => true,
                 ]

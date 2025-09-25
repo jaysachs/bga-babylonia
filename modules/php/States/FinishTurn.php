@@ -49,7 +49,6 @@ class FinishTurn extends AbstractState
                 clienttranslate('Game has ended'),
                 [
                     "player_id" => $active_player_id,
-                    "player_name" => $this->getPlayerNamebyId($active_player_id),
                 ]
             );
             // TODO: is there a nicer thing to put here?
@@ -76,7 +75,6 @@ class FinishTurn extends AbstractState
             clienttranslate('${player_name} finished their turn'),
             [
                 "player_id" => $active_player_id,
-                "player_name" => $this->getPlayerNameById($active_player_id),
                 "hand_size" => $model->hand()->size(),
                 "pool_size" => $model->pool()->size(),
             ]

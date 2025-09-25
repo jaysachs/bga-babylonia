@@ -49,7 +49,6 @@ class ScoreZiggurat extends AbstractState
             $winner_name = 'noone';
             $msg = clienttranslate('${city} at (${row},${col}) scored, no winner');
         } else {
-            $winner_name = $this->getPlayerNameById($winner);
             $msg = clienttranslate('${city} at (${row},${col}) scored, winner is ${player_name}');
         }
         $this->notify->all(
@@ -60,7 +59,6 @@ class ScoreZiggurat extends AbstractState
                 "col" => $zighex->rc->col,
                 "winner_hexes" => $scored_zig->winnerRowCols(),
                 "other_hexes" => $scored_zig->othersRowCols(),
-                "player_name" => $winner_name,
                 "player_id" => $winner,
                 "city" => "ziggurat",
             ]

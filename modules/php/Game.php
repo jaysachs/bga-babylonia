@@ -49,6 +49,13 @@ class Game extends \Bga\GameFramework\Table
 
         $this->ps = new PersistentStore(new DefaultDb(), $this->globals);
         $this->stats = Stats::createForGame($this);
+
+        $this->notify->addDecorator(function(string $message, array $args): array {
+            if (isset($args['player_id']) && !isset($args['player_name']) && str_contains($message, '${player_name}')) {
+                $args['player_name'] = $this->getPlayerNameById($args['player_id']);
+            }
+            return $args;
+        });
     }
 
     /**

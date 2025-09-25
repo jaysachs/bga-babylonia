@@ -70,10 +70,6 @@ abstract class AbstractState extends GameState
         return $this->game->optionEnabled($option);
     }
 
-    protected function getPlayerNameById(int $player_id): string {
-        return $this->game->getPlayerNameById($player_id);
-    }
-
     protected function giveExtraTime(int $player_id, ?int $specificTime = null): void {
         $this->game->giveExtraTime($player_id, $specificTime);
     }

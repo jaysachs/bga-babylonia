@@ -45,14 +45,6 @@ class ScoreCity extends AbstractState
         // grab this, as it will change underneath when the model scores it.
         $city = $cityhex->piece->value;
         $scored_city = $model->scoreCity($cityhex->rc);
-        $captured_by = $scored_city->hex_winner->captured_by;
-        if ($captured_by > 0) {
-            $msg = clienttranslate('${city} at (${row},${col}) scored, captured by ${player_name}');
-        } else {
-            $msg = clienttranslate('${city} at (${row},${col}) scored, uncaptured');
-        }
-        $capturer_name =
-            $captured_by > 0 ? $this->getPlayerNameById($captured_by) : "noone";
 
         $player_infos = $model->allPlayerInfo();
 
@@ -61,7 +53,6 @@ class ScoreCity extends AbstractState
             $points = $scored_city->pointsForPlayer($pid);
             $details[$pid] = [
                 "player_id" => $pid,
-                "player_name" => $this->getPlayerNameById($pid),
                 "captured_city_count" => $pi->captured_city_count,
                 "scored_locations" => $scored_city->scoringLocationsForPlayer($pid),
                 "network_locations" => $scored_city->networkLocationsForPlayer($pid),
@@ -80,6 +71,12 @@ class ScoreCity extends AbstractState
         // FIXME: need to better distinguish unset.
         $this->ps->setRowColBeingScored(new RowCol(0, 0));
 
+        $captured_by = $scored_city->hex_winner->captured_by;
+        if ($captured_by > 0) {
+            $msg = clienttranslate('${city} at (${row},${col}) scored, captured by ${player_name}');
+        } else {
+            $msg = clienttranslate('${city} at (${row},${col}) scored, uncaptured');
+        }
         $this->notify->all(
             "cityScored",
             $msg,
@@ -89,7 +86,6 @@ class ScoreCity extends AbstractState
                 "col" => $cityhex->rc->col,
                 "winner_hexes" => $scored_city->hex_winner->winnerRowCols(),
                 "other_hexes" => $scored_city->hex_winner->othersRowCols(),
-                "player_name" => $capturer_name,
                 "player_id" => $captured_by,
                 "details" => $details,
             ]

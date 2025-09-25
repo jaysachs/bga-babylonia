@@ -73,7 +73,6 @@ class SelectZigguratCard extends AbstractState
             clienttranslate('${player_name} chose ziggurat card ${zcard}'),
             [
                 "player_id" => $active_player_id,
-                "player_name" => $this->getPlayerNameById($active_player_id),
                 "zcard" => $selection->card->type->value,
                 "cardused" => $selection->card->used,
                 "points" => $selection->points,
