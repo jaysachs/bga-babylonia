@@ -47,7 +47,6 @@ class PlayPieces extends AbstractState
         );
     }
 
-    #[\Override]
     public function getArgs(int $active_player_id): array
     {
         $model = $this->createModel($active_player_id);

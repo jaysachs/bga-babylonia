@@ -47,7 +47,6 @@ class SelectZigguratCard extends AbstractState
         );
     }
 
-    #[\Override]
     function getArgs(int $active_player_id): array
     {
         $model = $this->createModel($active_player_id);
