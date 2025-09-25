@@ -45,6 +45,7 @@ class EndOfTurnScoring extends AbstractState
         if ($active_player_id != $player_on_turn) {
             $this->gamestate->changeActivePlayer($player_on_turn);
             $this->giveExtraTime($player_on_turn);
+            $active_player_id = $player_on_turn;
         }
 
         $model = $this->createModel($active_player_id);
