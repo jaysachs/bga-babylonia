@@ -84,11 +84,15 @@ class RowCol
 
     public function asKey(): int
     {
-        return $this->row * 100000 + $this->col;
+        return $this->row * 100000 + $this->col * 10 + 1;
     }
 
     public static function fromKey(int $key): RowCol
     {
-        return new RowCol(intval($key / 100000), $key % 100000);
+        if ($key == 0) {
+            throw new \InvalidArgumentException("0 is not a valid key for a RowCol");
+        }
+        $key--;
+        return new RowCol(intval($key / 100000), ($key % 100000) / 10);
     }
 }

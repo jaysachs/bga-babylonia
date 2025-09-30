@@ -69,7 +69,7 @@ class ScoreCity extends AbstractState
         }
 
         // FIXME: need to better distinguish unset.
-        $this->ps->setRowColBeingScored(new RowCol(0, 0));
+        $this->ps->setRowColBeingScored(null);
 
         $captured_by = $scored_city->hex_winner->captured_by;
         if ($captured_by > 0) {

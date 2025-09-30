@@ -59,9 +59,9 @@ class PersistentStore
         return RowCol::fromKey(intval($v));
     }
 
-    public function setRowColBeingScored(RowCol $rc): void
+    public function setRowColBeingScored(?RowCol $rc): void
     {
-        $this->globals->set(PersistentStore::GLOBAL_ROW_COL_BEING_SCORED, $rc->asKey());
+        $this->globals->set(PersistentStore::GLOBAL_ROW_COL_BEING_SCORED, $rc === null ? 0 : $rc->asKey());
     }
 
     public function playerOnTurn(): int

@@ -80,8 +80,7 @@ class SelectZigguratCard extends AbstractState
                 "hex" => $this->ps->rowColBeingScored(),
             ]
         );
-        // FIXME: need to better distinguish unset.
-        $this->ps->setRowColBeingScored(new RowCol(0, 0));
+        $this->ps->setRowColBeingScored(null);
         return EndOfTurnScoring::class;
     }
 

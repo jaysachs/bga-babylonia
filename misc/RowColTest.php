@@ -13,7 +13,6 @@ final class RowColTest extends TestCase
     {
         $rc = new RowCol(0, 0);
         $k = $rc->asKey();
-        $this->assertSame(0, $k);
         $rc2 = RowCol::fromKey($k);
         $this->assertEquals($rc, $rc2);
     }
