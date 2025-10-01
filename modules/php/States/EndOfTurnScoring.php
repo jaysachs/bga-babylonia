@@ -48,6 +48,8 @@ class EndOfTurnScoring extends AbstractState
             $active_player_id = $player_on_turn;
         }
 
+        $this->ps->setRowColBeingScored(null);
+
         $model = $this->createModel($active_player_id);
         $rcs = $model->locationsRequiringScoring();
 

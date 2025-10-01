@@ -814,6 +814,7 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
     if (this.isCurrentPlayerActive()) {
       const handPosDiv = this.handPosDiv(args.handpos);
       const pieceDiv = handPosDiv.firstElementChild as HTMLElement;
+      pieceDiv.replaceChild
       anims.push(() =>
         this.animationManager.slideAndAttach(pieceDiv, hexDiv)
           // play into river, piece is hidden
@@ -920,7 +921,8 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
       winner_hexes: RowCol[];
       other_hexes: RowCol[];
     }): Promise<void> {
-    await this.indicateNeighbors(args.winner_hexes, args.other_hexes).then(() => this.unmarkHexSelected(args));
+      // slight subtlety here; if there is a winner, leave the hex selected until after the cards is selected
+      await this.indicateNeighbors(args.winner_hexes, args.other_hexes).then(() => { if (!args.player_id) this.unmarkHexSelected(args) });
     // TODO: consider better visual treatments
   }
 
@@ -949,6 +951,7 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
     zelem.classList.remove(CSS.SELECTED);
     const newElem = zelem.cloneNode();
     const dest = $(IDS.playerBoardZcards(args.player_id));
+    this.unmarkHexSelected(args.hex);
     await this.animationManager.slideOutAndDestroy(zelem, dest, {}).then(() => dest.appendChild(newElem));
   }
 
@@ -1017,7 +1020,7 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
           this.updateCapturedCityCount(details);
         }
       }).then(() => this.popActionBarTitle())
-        .then(() => hex.classList.remove(CSS.SELECTED));
+        .then(() => this.unmarkHexSelected(args));
   }
 
   ///////

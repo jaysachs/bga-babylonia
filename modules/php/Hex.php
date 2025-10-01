@@ -49,6 +49,10 @@ class Hex
         public Landmass $landmass = Landmass::UNKNOWN
     ) {}
 
+    public function clone(): Hex {
+        return new Hex($this->type, $this->rc, $this->piece, $this->player_id, $this->scored, $this->landmass);
+    }
+
     public function equals(Hex $other): bool
     {
         return $this->type == $other->type

@@ -29,25 +29,74 @@ namespace Bga\Games\babylonia\States;
 
 use Bga\GameFramework\StateType;
 use Bga\Games\babylonia\Game;
+use Bga\Games\babylonia\HexWinner;
+use Bga\Games\babylonia\Model;
+use Bga\Games\babylonia\Piece;
 use Bga\Games\babylonia\RowCol;
+use Bga\Games\babylonia\ScoredCity;
 
-class ScoreCity extends AbstractState
+class ScoreHex extends AbstractState
 {
     function __construct(Game $game)
     {
         parent::__construct(game: $game, id: 7, type: StateType::GAME);
     }
 
-    function onEnteringState(int $active_player_id): mixed
-    {
+    private function sendNotify(HexWinner $hexWinner, array $data) {
+        $player_id = $hexWinner->captured_by;
+        $rc = $hexWinner->hex->rc;
+        $piece = $hexWinner->hex->piece;
+        $data = array_merge($data, [
+            "row" =>  $rc->row,
+            "col" => $rc->col,
+            "winner_hexes" => $hexWinner->winnerRowCols(),
+            "other_hexes" => $hexWinner->othersRowCols(),
+            "player_id" => $player_id,
+            "city" => $piece->value,
+        ]);
+        if ($player_id == 0) {
+            $msg = clienttranslate('${city} at (${row},${col}) scored, no winner');
+        } else {
+            $msg = clienttranslate('${city} at (${row},${col}) scored, winner is ${player_name}');
+        }
+        if ($piece->isZiggurat()) {
+            $this->notify->all("zigguratScored", $msg, $data);
+        } else {
+            $this->notify->all("cityScored", $msg, $data);
+        }
+    }
+
+    function onEnteringState(int $active_player_id): mixed {
         $model = $this->createModel($active_player_id);
-        $cityhex = $model->board()->hexAt($this->ps->rowColBeingScored());
-        // grab this, as it will change underneath when the model scores it.
-        $city = $cityhex->piece->value;
-        $scored_city = $model->scoreCity($cityhex->rc);
+        $rc = $this->ps->rowColBeingScored();
+        // TODO: verify it is scoreable in the Model
 
+        if ($model->board()->hexAt($rc)->piece->isZiggurat()) {
+            $scored_zig = $model->scoreZiggurat($rc);
+
+            $this->sendNotify($scored_zig, []);
+
+            $winner = $scored_zig->captured_by;
+            if ($winner != 0) {
+                if ($winner != $active_player_id) {
+                    $this->gamestate->changeActivePlayer($winner);
+                    $this->giveExtraTime($winner);
+                }
+                return SelectZigguratCard::class;
+            } else {
+                return EndOfTurnScoring::class;
+            }
+        } else {
+            $scored_city = $model->scoreCity($rc);
+
+            $this->sendNotify($scored_city->hex_winner, [ "details" => $this->computeCityScoringDetails($model, $scored_city) ]);
+
+            return EndOfTurnScoring::class;
+        }
+    }
+
+    private function computeCityScoringDetails(Model $model, ScoredCity $scored_city): array {
         $player_infos = $model->allPlayerInfo();
-
         $details = [];
         foreach ($player_infos as $pid => $pi) {
             $points = $scored_city->pointsForPlayer($pid);
@@ -67,29 +116,6 @@ class ScoreCity extends AbstractState
                 // $details[$pid][$pnk] = $this->getPlayerNameById($pid);
             }
         }
-
-        // FIXME: need to better distinguish unset.
-        $this->ps->setRowColBeingScored(null);
-
-        $captured_by = $scored_city->hex_winner->captured_by;
-        if ($captured_by > 0) {
-            $msg = clienttranslate('${city} at (${row},${col}) scored, captured by ${player_name}');
-        } else {
-            $msg = clienttranslate('${city} at (${row},${col}) scored, uncaptured');
-        }
-        $this->notify->all(
-            "cityScored",
-            $msg,
-            [
-                "city" => $city,
-                "row" => $cityhex->rc->row,
-                "col" => $cityhex->rc->col,
-                "winner_hexes" => $scored_city->hex_winner->winnerRowCols(),
-                "other_hexes" => $scored_city->hex_winner->othersRowCols(),
-                "player_id" => $captured_by,
-                "details" => $details,
-            ]
-        );
-        return EndOfTurnScoring::class;
+        return $details;
     }
 }

@@ -66,12 +66,6 @@ abstract class AbstractScoringSelection extends AbstractState
             ]
         );
         $this->ps->setRowColBeingScored($hex->rc);
-        if ($hex->piece->isCity()) {
-            return ScoreCity::class;
-        } else if ($hex->piece->isZiggurat()) {
-            return ScoreZiggurat::class;
-        }
-        // TODO: throw exception
-        return null; // PlayerSelectScoringHex::class
+        return ScoreHex::class;
     }
 }

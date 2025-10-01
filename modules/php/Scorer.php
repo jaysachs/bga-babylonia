@@ -64,7 +64,7 @@ class Scorer
                 $captured_by = 0;
             }
         }
-        return new HexWinner($hex, $captured_by, $neighbors);
+        return new HexWinner($hex->clone(), $captured_by, $neighbors);
     }
 
     public function computeCityScores(Hex $hex): ScoredCity

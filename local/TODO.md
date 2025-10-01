@@ -25,4 +25,5 @@
 24. ~~DONE Slowness of animations esp in +1 ziggurat tiles animation~~
 25. ~~DONE Tooltips are lost for zig cards~~
 26. ~~DONE Consider "average pieces played/turn" and "max played/turn" statistics.~~
-27. ~~DONE Standardize ziggurat cards ID / attributes on card number (but maybe keep enum names -- not string rep -- as mnemonics? hmm. what about stats?)--
+27. ~~DONE Standardize ziggurat cards ID / attributes on card number (but maybe keep enum names -- not string rep -- as mnemonics? hmm. what about stats?)~~
+28. ~~DONE Combine ScoreZiggurat and ScoreCity states into a single ScoreHex state with just one action.~~
