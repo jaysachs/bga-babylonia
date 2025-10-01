@@ -31,8 +31,6 @@ use Bga\GameFramework\StateType;
 use Bga\Games\babylonia\Game;
 use Bga\Games\babylonia\HexWinner;
 use Bga\Games\babylonia\Model;
-use Bga\Games\babylonia\Piece;
-use Bga\Games\babylonia\RowCol;
 use Bga\Games\babylonia\ScoredCity;
 
 class ScoreHex extends AbstractState
