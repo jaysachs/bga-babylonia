@@ -37,7 +37,21 @@ class ScoreHex extends AbstractState
 {
     function __construct(Game $game)
     {
-        parent::__construct(game: $game, id: 7, type: StateType::GAME);
+        parent::__construct(
+            game: $game,
+            id: 7,
+            type: StateType::GAME,
+            description: clienttranslate('${city} at ${row},${col} scoring'));
+    }
+
+    public function getArgs(): array {
+        $rc = $this->ps->rowColBeingScored();
+        $model = $this->createModel(0);
+        return [
+            "row" => $rc->row,
+            "col" => $rc->col,
+            "city" => $model->board()->hexAt($rc)->piece->value,
+        ];
     }
 
     private function sendNotify(HexWinner $hexWinner, array $data) {
