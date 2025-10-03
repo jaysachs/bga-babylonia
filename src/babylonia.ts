@@ -973,8 +973,6 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
       }[];
     }
   ): Promise<void> {
-    this.pushActionBarTitle(this.format_string(_("City at ${row},${col} scoring"),
-                                               {"row": `${args.row}`, "col": `${args.col}`}));
     const hex = $(IDS.hexDiv(args));
 
     let aa = this.bgaAnimationsActive();
@@ -1019,8 +1017,7 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
           this.scoreCtrl[playerId]!.incValue(details.capture_points);
           this.updateCapturedCityCount(details);
         }
-      }).then(() => this.popActionBarTitle())
-        .then(() => this.unmarkHexSelected(args));
+      }).then(() => this.unmarkHexSelected(args));
   }
 
   ///////
