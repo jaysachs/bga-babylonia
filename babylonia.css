@@ -500,7 +500,7 @@ div.bbl_pb_zcards>div {
  *   particularly images for pieces
  */
 
-.log-element[bbl_piece] {
+.log [bbl_piece] {
     height: 1.0em;
     width: 1.15em;
     display: inline-block;
@@ -509,7 +509,7 @@ div.bbl_pb_zcards>div {
     background-color: transparent;
 }
 
-.log-element[bbl_ztype] {
+.log [bbl_ztype] {
     display: inline-block;
     height: 1.0em;
     width: 0.67em;
