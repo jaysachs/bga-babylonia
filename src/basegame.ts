@@ -154,7 +154,7 @@ class BaseGame<T extends Gamedatas> extends GameGui<T> {
     const titleEl = $('pagemaintitletext');
     const orig = titleEl.innerHTML;
     this.savedActionBarTitles.push(orig);
-    titleEl.innerHTML = titleHTML;
+    this.statusBar.setTitle(titleHTML);
     return orig;
   }
 
@@ -162,7 +162,7 @@ class BaseGame<T extends Gamedatas> extends GameGui<T> {
   protected popActionBarTitle(): string {
     const titleEl = $('pagemaintitletext');
     const orig = titleEl.innerHTML;
-    titleEl.innerHTML = this.savedActionBarTitles.pop()!;
+    this.statusBar.setTitle(this.savedActionBarTitles.pop()!);
     return orig;
   }
 
