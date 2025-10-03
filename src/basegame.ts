@@ -167,7 +167,7 @@ class BaseGame<T extends Gamedatas> extends GameGui<T> {
   }
 
   protected async notif_debug(args: any) {
-    console.log(args);
+    console.log("debug", args);
   }
 
 }
