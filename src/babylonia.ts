@@ -431,10 +431,12 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
   }
 
   private toggleZcardSelected(e: Element) {
-    const zt = e.getAttribute(Attrs.ZTYPE);
+    const zt = e.getAttribute(Attrs.ZTYPE)!;
     let addButtons = () => {
-      this.pushActionBarTitle(this.format_string_recursive(
-        _('Select ziggurat card ${zcard}?'), { zcard: zt! }));
+      // let title = this.bgaFormatText(_('Select ziggurat card ${zcard}?'), { zcard: zt }).log;
+      let title = this.format_string_recursive(_('Select ziggurat card ${zcard}?'), { zcard: zt });
+
+      this.pushActionBarTitle(title);
       const elem = document.querySelector(`#pagemaintitletext [${Attrs.ZTYPE}]`);
       if (elem) {
         this.addTooltip(elem.id, this.zcardTooltips[elem.getAttribute(Attrs.ZTYPE)!], '');
@@ -442,9 +444,7 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
         console.error("Could not find just-added action bar title element?!");
       }
       this.statusBar.addActionButton(_('Confirm'),
-        () => {
-          this.bgaPerformAction('actSelectZigguratCard', { zctype: zt });
-        },
+        () => this.bgaPerformAction('actSelectZigguratCard', { zctype: zt }),
         { autoclick: true }
       );
 
@@ -651,7 +651,7 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
     this.updateHandCount(player, false);
     this.updatePoolCount(player, false);
     this.updateCapturedCityCount(player, false);
-    this.scoreCtrl[player.player_id]!.setValue(player.score);
+    this.scoreCtrl[playerId]!.setValue(player.score);
   }
 
   private onUpdateActionButtons_SelectExtraTurn(): void {
