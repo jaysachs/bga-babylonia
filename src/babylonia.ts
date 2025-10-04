@@ -433,10 +433,9 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
   private toggleZcardSelected(e: Element) {
     const zt = e.getAttribute(Attrs.ZTYPE)!;
     let addButtons = () => {
-      // let title = this.bgaFormatText(_('Select ziggurat card ${zcard}?'), { zcard: zt }).log;
-      let title = this.format_string_recursive(_('Select ziggurat card ${zcard}?'), { zcard: zt });
-
-      this.pushActionBarTitle(title);
+      let {log, args} = this.bgaFormatText(_('Select ziggurat card ${zcard}?'), { zcard: zt });
+      this.statusBar.setTitle(this.format_string(log, args));
+      // this is a little smelly
       const elem = document.querySelector(`#pagemaintitletext [${Attrs.ZTYPE}]`);
       if (elem) {
         this.addTooltip(elem.id, this.zcardTooltips[elem.getAttribute(Attrs.ZTYPE)!], '');
@@ -454,8 +453,8 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
         { color: "secondary"});
     };
     let removeButtons = () => {
-      this.popActionBarTitle();
-      this.statusBar.removeActionButtons();
+      this.restoreServerGameState();
+      // this.statusBar.removeActionButtons();
     };
     let alreadySelected = document.querySelector(`#${IDS.AVAILABLE_ZCARDS} > .${CSS.SELECTED}`);
     e.classList.toggle(CSS.SELECTED);

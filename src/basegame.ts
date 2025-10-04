@@ -147,25 +147,6 @@ class BaseGame<T extends Gamedatas> extends GameGui<T> {
     return div;
   }
 
-  private savedActionBarTitles: string[] = [];
-
-  // Saves the current title text on the stack, sets the title text and returns the original.
-  protected pushActionBarTitle(titleHTML: string): string {
-    const titleEl = $('pagemaintitletext');
-    const orig = titleEl.innerHTML;
-    this.savedActionBarTitles.push(orig);
-    this.statusBar.setTitle(titleHTML);
-    return orig;
-  }
-
-  // Sets title text to top of saved stack, returns current title text
-  protected popActionBarTitle(): string {
-    const titleEl = $('pagemaintitletext');
-    const orig = titleEl.innerHTML;
-    this.statusBar.setTitle(this.savedActionBarTitles.pop()!);
-    return orig;
-  }
-
   protected async notif_debug(args: any) {
     console.log("debug", args);
   }
