@@ -432,7 +432,7 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
 
   private toggleZcardSelected(e: Element) {
     const zt = e.getAttribute(Attrs.ZTYPE)!;
-    let addButtons = () => {
+    let promptForConfirmation = () => {
       let {log, args} = this.bgaFormatText(_('Select ziggurat card ${zcard}?'), { zcard: zt });
       this.statusBar.setTitle(this.format_string(log, args));
       // this is a little smelly
@@ -452,23 +452,21 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
         () => this.toggleZcardSelected(e),
         { color: "secondary"});
     };
-    let removeButtons = () => {
-      this.restoreServerGameState();
-      // this.statusBar.removeActionButtons();
-    };
+    let cancel = () => this.restoreServerGameState();
+
     let alreadySelected = document.querySelector(`#${IDS.AVAILABLE_ZCARDS} > .${CSS.SELECTED}`);
     e.classList.toggle(CSS.SELECTED);
     if (alreadySelected == null) {
-      addButtons();
+      promptForConfirmation();
     } else if (alreadySelected == e) {
       // remove confirm and cancel buttons from action bar
-      removeButtons();
+      cancel();
     } else {
       alreadySelected.classList.toggle(CSS.SELECTED);
       // buttons should already be in right state but we need to change the title bar text.
       // (We also can't reset the timer.) So we remove & add.
-      removeButtons();
-      addButtons();
+      cancel();
+      promptForConfirmation();
     }
   }
 
