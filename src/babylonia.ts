@@ -74,7 +74,7 @@ class Html {
   readonly hdelta = 0.75 * this.width + 2.0;
   readonly vdelta = 1.0 * this.height + 2.0;
 
-  constructor(private colorIndexMap: Record<number, number>) { }
+  constructor(private playerIdToColorIndex: Record<number, number>) { }
 
   public hexDiv(rc: RowCol): HTMLElement {
     let top = this.vstart + rc.row * this.vdelta / 2;
@@ -88,7 +88,7 @@ class Html {
   }
 
   public player_board_ext(player_id: number): string {
-    let color_index = this.colorIndexMap[player_id];
+    let color_index = this.playerIdToColorIndex[player_id];
     return `
       <div>
         <span class='bbl_pb_hand_label_${color_index}'></span>
