@@ -38,6 +38,7 @@ class BaseGame<T extends Gamedatas> extends GameGui<T> {
     console.log("Checking dynamic state change methods");
     let wiredUp: string[] = [];
     let wrong: string[] = [];
+    let maybe: string[] = [];
     Object.keys(Object.getPrototypeOf(this)).forEach((meth) => {
         if (meth.startsWith('onEnteringState_')) {
           let s = meth.substring(16);
@@ -47,18 +48,27 @@ class BaseGame<T extends Gamedatas> extends GameGui<T> {
             wiredUp.push(meth);
           }
         }
-        if (meth.startsWith('onUpdateActionButtons_')) {
+        else if (meth.startsWith('onUpdateActionButtons_')) {
           let s = meth.substring(22);
           if (!stateNames.find((v) => v == s)) {
             wrong.push(meth);
           } else {
             wiredUp.push(meth);
           }
+        } else {
+          stateNames.forEach((s) => {
+            if (meth.endsWith(`_${s}`) && meth.startsWith("on")) {
+              maybe.push(meth);
+            }
+          });
         }
       }
     );
     if (wrong.length > 0) {
       throw new Error("Found state-change methods that do not correspond to a state: " + wrong);
+    }
+    if (maybe.length > 0) {
+      console.warn("possible misnamed to-be-wired methods:", maybe);
     }
     console.log("Wired up state change methods", wiredUp);
   }
