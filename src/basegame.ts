@@ -34,33 +34,28 @@ class BaseGame<T extends Gamedatas> extends GameGui<T> {
   }
 
   private autowireStateChangeMethods() {
-    let stateNames = Object.entries(this.gamedatas.gamestates).map(([id,gs]) => gs.name);
     console.log("Checking dynamic state change methods");
+    const stateNames = Object.entries(this.gamedatas.gamestates).map(([id,gs]) => gs.name);
+    const maybeMatch = new RegExp('^on[A-Z][A-Za-z0-9_]*_(' + stateNames.join('|') + ')$');
     let wiredUp: string[] = [];
     let wrong: string[] = [];
     let maybe: string[] = [];
     Object.keys(Object.getPrototypeOf(this)).forEach((meth) => {
         if (meth.startsWith('onEnteringState_')) {
-          let s = meth.substring(16);
-          if (!stateNames.find((v) => v == s)) {
+          if (stateNames.indexOf(meth.substring(16)) < 0) {
             wrong.push(meth);
           } else {
             wiredUp.push(meth);
           }
         }
         else if (meth.startsWith('onUpdateActionButtons_')) {
-          let s = meth.substring(22);
-          if (!stateNames.find((v) => v == s)) {
+          if (stateNames.indexOf(meth.substring(22)) < 0) {
             wrong.push(meth);
           } else {
             wiredUp.push(meth);
           }
-        } else {
-          stateNames.forEach((s) => {
-            if (meth.endsWith(`_${s}`) && meth.startsWith("on")) {
-              maybe.push(meth);
-            }
-          });
+        } else if (maybeMatch.test(meth)) {
+          maybe.push(meth);
         }
       }
     );
