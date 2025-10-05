@@ -364,10 +364,23 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
     if (hex == null) {
       return;
     }
+    let div = this.hexDiv(hex);
+    let piece = div.firstElementChild!.getAttribute(Attrs.PIECE);
+    div.classList.add(CSS.SELECTED);
     this.setClientState('client_hexpicked', {});
-    this.bgaPerformAction('actSelectHexToScore', hex).then(() => {
-      this.unmarkHexPlayable(hex);
+    let {log, args} = this.bgaFormatText(_('Score ${city} at (${row},${col})?'), {
+      row: hex.row, col: hex.col, city: piece,
     });
+    this.statusBar.setTitle(this.format_string(log, args));
+    this.statusBar.addActionButton(_('Confirm'),
+      () => this.bgaPerformAction('actSelectHexToScore', hex).then(() => this.unmarkHexPlayable(hex)),
+      { autoclick: true });
+    this.statusBar.addActionButton(_('Cancel'),
+      () => {
+        div.classList.remove(CSS.SELECTED);
+        this.restoreServerGameState();
+      },
+      { color: "secondary" });
   }
 
   private playSelectedPiece(event: Event): void {
