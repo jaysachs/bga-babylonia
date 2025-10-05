@@ -85,16 +85,6 @@ class BaseGame<T extends Gamedatas> extends GameGui<T> {
     // };
   }
 
-  createHtml(divstr: string, location?: string): HTMLElement {
-    const tempHolder = document.createElement('div');
-    tempHolder.innerHTML = divstr;
-    const div = tempHolder.firstElementChild!;
-    if (location) {
-      $(location).appendChild(div);
-    }
-    return div as HTMLElement;
-  }
-
   /**
    *
    * @param {string} methodName
