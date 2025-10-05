@@ -23,7 +23,6 @@ class BaseGame<T extends Gamedatas> extends GameGui<T> {
     this.currentPlayerWasActive = false;
   }
 
-  // state hooks
   override setup(gamedatas: T) {
     console.log('Starting game setup', gameui);
     this.gamedatas = gamedatas;
@@ -31,6 +30,37 @@ class BaseGame<T extends Gamedatas> extends GameGui<T> {
     this.animationManager = new BgaAnimations.Manager({
       animationsActive: () => this.bgaAnimationsActive(),
     });
+    this.autowireStateChangeMethods();
+  }
+
+  private autowireStateChangeMethods() {
+    let stateNames = Object.entries(this.gamedatas.gamestates).map(([id,gs]) => gs.name);
+    console.log("Checking dynamic state change methods");
+    let wiredUp: string[] = [];
+    let wrong: string[] = [];
+    Object.keys(Object.getPrototypeOf(this)).forEach((meth) => {
+        if (meth.startsWith('onEnteringState_')) {
+          let s = meth.substring(16);
+          if (!stateNames.find((v) => v == s)) {
+            wrong.push(meth);
+          } else {
+            wiredUp.push(meth);
+          }
+        }
+        if (meth.startsWith('onUpdateActionButtons_')) {
+          let s = meth.substring(22);
+          if (!stateNames.find((v) => v == s)) {
+            wrong.push(meth);
+          } else {
+            wiredUp.push(meth);
+          }
+        }
+      }
+    );
+    if (wrong.length > 0) {
+      throw new Error("Found state-change methods that do not correspond to a state: " + wrong);
+    }
+    console.log("Wired up state change methods", wiredUp);
   }
 
   override bgaPerformAction(action: string, args?: any, params?: { lock?: boolean; checkAction?: boolean; checkPossibleActions?: boolean; }): Promise<any> {
