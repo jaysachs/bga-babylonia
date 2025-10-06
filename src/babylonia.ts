@@ -235,39 +235,31 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
     const boardDiv = $(IDS.BOARD);
 
     const animateBoardInitialPlacement = true;
+    const inParallel = false;
+    const duration = inParallel ? 800 : 200;
+    let anims: AnimationList = [];
 
-    if (animateBoardInitialPlacement) {
-      const inParallel = true;
-      const duration = inParallel ? 500 : 125;
-      let anims: AnimationList = [];
-      for (const hex of boardData) {
-        const hexDiv = this.html.hexDiv(hex);
-        boardDiv.appendChild(hexDiv);
-        if (hex.piece != null && hex.piece != Piece.EMPTY) {
-          let pieceDiv = this.createPieceDiv(hex.piece, hex.board_player)
-          if (hex.board_player == 0) {
-            hexDiv.appendChild(pieceDiv);
-          } else {
-            anims.push(() => {
-              hexDiv.appendChild(pieceDiv);
-              return this.animationManager.slideIn(pieceDiv, $(IDS.handcount(hex.board_player)), { duration: duration });
-            });
-          }
+    for (const hex of boardData) {
+      const hexDiv = this.html.hexDiv(hex);
+      boardDiv.appendChild(hexDiv);
+      if (hex.piece != null && hex.piece != Piece.EMPTY) {
+        let pieceDiv = this.createPieceDiv(hex.piece, hex.board_player)
+        if (!animateBoardInitialPlacement || hex.board_player == 0) {
+          hexDiv.appendChild(pieceDiv);
+        } else {
+          anims.push(() => {
+            $(IDS.handcount(hex.board_player)).appendChild(pieceDiv);
+            return this.animationManager.slideAndAttach(pieceDiv, hexDiv, { duration: duration, fromPlaceholder: 'off' });
+          });
         }
       }
+    }
+
+    if (animateBoardInitialPlacement) {
       if (inParallel) {
         await this.animationManager.playParallel(anims);
       } else {
         await this.animationManager.playSequentially(anims);
-      }
-    } else {
-      for (const hex of boardData) {
-        const hexDiv = this.html.hexDiv(hex);
-        boardDiv.appendChild(hexDiv);
-        if (hex.piece != null && hex.piece != Piece.EMPTY) {
-          let pieceDiv = this.createPieceDiv(hex.piece, hex.board_player)
-          hexDiv.appendChild(pieceDiv);
-        }
       }
     }
   }
