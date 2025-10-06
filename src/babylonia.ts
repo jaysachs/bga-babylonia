@@ -816,17 +816,18 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
     if (this.isCurrentPlayerActive()) {
       const handPosDiv = this.handPosDiv(args.handpos);
       const pieceDiv = handPosDiv.firstElementChild as HTMLElement;
-      pieceDiv.replaceChild
       anims.push(() =>
         this.animationManager.slideAndAttach(pieceDiv, hexDiv)
           // play into river, piece is hidden
           .then(() => pieceDiv.setAttribute(Attrs.PIECE, this.pieceVal(args.piece, this.player_id)))
       );
     } else {
-      // for non-active player, need to create it first
-      let div = this.createPieceDiv(args.piece, args.player_id);
-      hexDiv.appendChild(div);
-      anims.push(() => this.animationManager.slideIn(div, $(IDS.handcount(args.player_id))));
+      anims.push(() => {
+        // for non-active player, need to create it first
+        let div = this.createPieceDiv(args.piece, args.player_id);
+        $(IDS.handcount(args.player_id)).appendChild(div);
+        return this.animationManager.slideAndAttach(div, hexDiv, { fromPlaceholder: 'off' });
+      });
     }
     // animate the ziggurat scoring, if any
     if (args.ziggurat_points > 0) {
@@ -863,9 +864,12 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
       let pieceDiv = handPosDiv!.firstElementChild as HTMLElement;
       if (!pieceDiv) {
         if (newPiece && newPiece != Piece.EMPTY) {
-          pieceDiv = this.createPieceDiv(newPiece, pid);
-          handPosDiv?.appendChild(pieceDiv);
-          anims.push(() => this.animationManager.slideIn(pieceDiv, $(IDS.poolcount(pid))));
+          let destDiv = handPosDiv! as HTMLElement;
+          anims.push(() => {
+            pieceDiv = this.createPieceDiv(newPiece, pid);
+            $(IDS.poolcount(pid)).appendChild(pieceDiv);
+            return this.animationManager.slideAndAttach(pieceDiv, destDiv, { fromPlaceholder: 'off' })
+          });
         }
       } else {
          let pt = pieceDiv.getAttribute(Attrs.PIECE);
@@ -875,7 +879,7 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
            console.error("piece from args", newPiece, "not matches hand", pieceDiv);
          }
       }
-      handPosDiv = handPosDiv!.nextElementSibling;
+      handPosDiv = handPosDiv!.nextElementSibling as (HTMLElement | null);
     }
     await this.animationManager.playParallel(anims);
   }
