@@ -735,8 +735,10 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
 
     if (args.captured_piece != Piece.EMPTY) {
       let field = this.createPieceDiv(args.captured_piece, 0);
-      hexDiv.appendChild(field);
-      anims.push(() => this.animationManager.slideIn(field, $(IDS.handcount(args.player_id)), {}));
+      anims.push(() => {
+        $(IDS.handcount(args.player_id)).appendChild(field);
+        return this.animationManager.slideAndAttach(field, hexDiv, { fromPlaceholder: 'off' });
+      })
     }
 
     await this.animationManager.playParallel(anims).then(() => {
@@ -768,8 +770,10 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
 
     if (args.captured_piece != Piece.EMPTY) {
       let field = this.createPieceDiv(args.captured_piece, 0);
-      hexDiv.appendChild(field);
-      anims.push(() => this.animationManager.slideIn(field, $(IDS.handcount(args.player_id)), {}));
+      anims.push(() => {
+        $(IDS.handcount(args.player_id)).appendChild(field);
+        return this.animationManager.slideAndAttach(field, hexDiv, { fromPlaceholder: 'off' });
+      })
     }
 
     anims.push(() => this.animationManager.slideOutAndDestroy(
