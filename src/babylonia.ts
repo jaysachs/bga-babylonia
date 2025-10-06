@@ -206,7 +206,7 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
     console.log('setting up handlers');
     this.setupHandlers();
 
-    this.bgaSetupPromiseNotifications();
+    this.bgaSetupPromiseNotifications({ logger: console.log });
 
     // Active player gets their own undo notification with private data,
     //   so ignore the generic undo notification.
