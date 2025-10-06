@@ -731,9 +731,11 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
 
     // restore piece value, e.g. if it was originally hidden
     pieceDiv.setAttribute(Attrs.PIECE, this.pieceVal(args.original_piece, this.player_id));
+    // slide the played piece back to the hand
     anims.push(() => this.animationManager.slideAndAttach(pieceDiv, handPosDiv));
 
     if (args.captured_piece != Piece.EMPTY) {
+      // slide the previously captured field back
       let field = this.createPieceDiv(args.captured_piece, 0);
       anims.push(() => {
         $(IDS.handcount(args.player_id)).appendChild(field);
@@ -769,6 +771,7 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
     let anims: AnimationList = [];
 
     if (args.captured_piece != Piece.EMPTY) {
+      // replace the field that was captured
       let field = this.createPieceDiv(args.captured_piece, 0);
       anims.push(() => {
         $(IDS.handcount(args.player_id)).appendChild(field);
@@ -776,11 +779,12 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
       })
     }
 
+    // move the played piece back to hand area
     anims.push(() => this.animationManager.slideOutAndDestroy(
       hexDiv.firstElementChild as HTMLElement,
       $(IDS.handcount(args.player_id)),
       {}
-     ));
+    ));
 
     await this.animationManager.playParallel(anims).then(() => {
       this.handCounters[args.player_id]!.incValue(1);
@@ -813,7 +817,7 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
       if (!field) { // or field is not F567X
         console.error("attempt to capture a field that is not there");
       }
-      // TODO: consider capturing to player board
+      // slide the captured field to the player board
       anims.push(() => this.animationManager.slideOutAndDestroy(field, $(IDS.handcount(args.player_id)), {}));
     }
 
@@ -821,13 +825,14 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
       const handPosDiv = this.handPosDiv(args.handpos);
       const pieceDiv = handPosDiv.firstElementChild as HTMLElement;
       anims.push(() =>
+        // slide piece from hand to hex
         this.animationManager.slideAndAttach(pieceDiv, hexDiv)
-          // play into river, piece is hidden
+          // play into river, piece is hidden, so use the value from the args not the hand
           .then(() => pieceDiv.setAttribute(Attrs.PIECE, this.pieceVal(args.piece, this.player_id)))
       );
     } else {
       anims.push(() => {
-        // for non-active player, need to create it first
+        // slide piece from hand count to hex
         let div = this.createPieceDiv(args.piece, args.player_id);
         $(IDS.handcount(args.player_id)).appendChild(div);
         return this.animationManager.slideAndAttach(div, hexDiv, { fromPlaceholder: 'off' });
