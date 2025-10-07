@@ -360,10 +360,9 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
     let piece = div.firstElementChild!.getAttribute(Attrs.PIECE);
     div.classList.add(CSS.SELECTED);
     this.setClientState('client_hexpicked', {});
-    let {log, args} = this.bgaFormatText(_('Score ${city} at (${row},${col})?'), {
+    this.statusBar.setTitle(_('Score ${city} at (${row},${col})?'), {
       row: hex.row, col: hex.col, city: piece,
     });
-    this.statusBar.setTitle(this.format_string(log, args));
     this.statusBar.addActionButton(_('Confirm'),
       () => this.bgaPerformAction('actSelectHexToScore', hex).then(() => this.unmarkHexPlayable(hex)),
       { autoclick: true });
@@ -438,8 +437,7 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
   private toggleZcardSelected(e: Element) {
     const zt = e.getAttribute(Attrs.ZTYPE)!;
     let promptForConfirmation = () => {
-      let {log, args} = this.bgaFormatText(_('Select ziggurat card ${zcard}?'), { zcard: zt });
-      this.statusBar.setTitle(this.format_string(log, args));
+      this.statusBar.setTitle(_('Select ziggurat card ${zcard}?'), { zcard: zt });
       // this is a little smelly
       const elem = document.querySelector(`#pagemaintitletext [${Attrs.ZTYPE}]`);
       if (elem) {
