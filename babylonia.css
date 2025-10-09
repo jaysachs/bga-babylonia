@@ -105,6 +105,10 @@
     background: url(img/sprites.png) 0% -500% / 700% 700%;
 }
 
+#pagemaintitletext .log-element[bbl_piece] {
+    vertical-align: middle;
+}
+
 [bbl_piece] {
     clip-path: none;
     background-image: url(img/sprites.png);
