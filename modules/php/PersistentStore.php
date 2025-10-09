@@ -36,20 +36,22 @@ class PersistentStore
     //  the ID of the "primary" player, i.e. who should become active
     //  once the ziggurat card is selected.
     /** @var string */
-    public const GLOBAL_PLAYER_ON_TURN = 'player_on_turn';
+    private const GLOBAL_PLAYER_ON_TURN = 'player_on_turn';
     /** @var string */
-    public const GLOBAL_ROW_COL_BEING_SCORED = 'row_col_being_scored';
-
+    private const GLOBAL_ROW_COL_BEING_SCORED = 'row_col_being_scored';
 
     public function __construct(private Db $db, private Globals $globals) {}
+
+    public function initializeGlobals(\Closure $initFn): void {
+        $initFn([PersistentStore::GLOBAL_PLAYER_ON_TURN => 10,
+                 PersistentStore::GLOBAL_ROW_COL_BEING_SCORED => 11]);
+    }
 
     private function boolValue(bool $b): string
     {
         return $b ? 'TRUE' : 'FALSE';
     }
 
-        // TODO: move global storage into PersistentStore
-    //   and then these kinds of methods move onto the Model.
     public function rowColBeingScored(): ?RowCol
     {
         $v = $this->globals->get(PersistentStore::GLOBAL_ROW_COL_BEING_SCORED);

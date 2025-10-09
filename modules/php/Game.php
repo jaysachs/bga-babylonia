@@ -42,12 +42,8 @@ class Game extends \Bga\GameFramework\Table
     {
         parent::__construct();
 
-        $this->initGameStateLabels([
-            PersistentStore::GLOBAL_PLAYER_ON_TURN => 10,
-            PersistentStore::GLOBAL_ROW_COL_BEING_SCORED => 11,
-        ]);
-
         $this->ps = new PersistentStore(new DefaultDb(), $this->globals);
+        $this->ps->initializeGlobals(function(array $ids) { $this->initGameStateLabels($ids); } );
         $this->stats = Stats::createForGame($this);
 
         $this->notify->addDecorator(function(string $message, array $args): array {
