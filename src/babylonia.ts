@@ -438,13 +438,10 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
     const zt = e.getAttribute(Attrs.ZTYPE)!;
     let promptForConfirmation = () => {
       this.statusBar.setTitle(_('Select ziggurat card ${zcard}?'), { zcard: zt });
-      // this is a little smelly
-      const elem = document.querySelector(`#pagemaintitletext [${Attrs.ZTYPE}]`);
-      if (elem) {
-        this.addTooltip(elem.id, this.zcardTooltips[elem.getAttribute(Attrs.ZTYPE)!], '');
-      } else {
-        console.error("Could not find just-added action bar title element?!");
-      }
+      // this is a little bit of encapsulation breakage ...
+      //   would be nice if this happened automatically.
+      this.addTooltipsToLog();
+
       this.statusBar.addActionButton(_('Confirm'),
         () => this.bgaPerformAction('actSelectZigguratCard', { zctype: zt }),
         { autoclick: true }
