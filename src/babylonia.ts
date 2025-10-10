@@ -1033,10 +1033,10 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
   ///////
   private zcardSalt: number = 0;
   readonly special_log_args = {
-    piece: (args: any) => `<span class='log-element' ${Attrs.PIECE}='${this.pieceVal(args.piece, args.player_id)}'></span>`,
-    city: (args: any) => `<span class='log-element' ${Attrs.PIECE}='${this.pieceVal(args.city, 0)}'></span>`,
-    zcard: (args: any) => `<span class='log-element' id='logzcard_${this.zcardSalt++}' ${Attrs.ZTYPE}='${args.zcard}'></span>`,
-    original_piece: (args: any) => `<span class='log-element' ${Attrs.PIECE}='${this.pieceVal(args.original_piece, args.player_id)}'></span>`,
+    piece: (args: any) => `<span ${Attrs.PIECE}='${this.pieceVal(args.piece, args.player_id)}'></span>`,
+    city: (args: any) => `<span ${Attrs.PIECE}='${this.pieceVal(args.city, 0)}'></span>`,
+    zcard: (args: any) => `<span id='logzcard_${this.zcardSalt++}' ${Attrs.ZTYPE}='${args.zcard}'></span>`,
+    original_piece: (args: any) => `<span ${Attrs.PIECE}='${this.pieceVal(args.original_piece, args.player_id)}'></span>`,
   };
 
   override bgaFormatText(log: string, args: any): {log: string, args: any } {

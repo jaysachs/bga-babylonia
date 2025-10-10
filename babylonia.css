@@ -105,7 +105,7 @@
     background: url(img/sprites.png) 0% -500% / 700% 700%;
 }
 
-#pagemaintitletext .log-element[bbl_piece] {
+#pagemaintitletext span[bbl_piece] {
     vertical-align: middle;
 }
 
@@ -533,7 +533,7 @@ div.bbl_pb_zcards>div {
 }
 
 
-#pagemaintitletext .log-element[bbl_ztype] {
+#pagemaintitletext span[bbl_ztype] {
     display: inline-block;
     height: 5.0em;
     width: 3.33em;
