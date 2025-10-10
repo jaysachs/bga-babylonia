@@ -59,7 +59,6 @@ class IDS {
 
 class CSS {
   static readonly IN_NETWORK = 'bbl_in_network';
-  static readonly SELECTING = 'bbl_selecting';
   static readonly SELECTED = 'bbl_selected';
   static readonly PLAYABLE = 'bbl_playable';
   static readonly UNPLAYABLE = 'bbl_unplayable';
@@ -190,7 +189,7 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
     }
 
     console.log('setting the the game board');
-    this.setupGameBoard(gamedatas.board, gamedatas.player_data);
+    this.setupGameBoard(gamedatas.board);
 
     console.log('setting up player hand', gamedatas.hand);
     gamedatas.hand.forEach((piece, i) => {
@@ -231,7 +230,7 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
     return e;
   }
 
-  private async setupGameBoard(boardData: Hex[], playersData: PlayerData[]): Promise<void> {
+  private async setupGameBoard(boardData: Hex[]): Promise<void> {
     const boardDiv = $(IDS.BOARD);
 
     const animateBoardInitialPlacement = true;
@@ -525,7 +524,7 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
 
   private setPlayablePieces(): void {
     const hand = $(IDS.HAND);
-    hand.childNodes.forEach((child : HTMLElement, p : number) => {
+    hand.childNodes.forEach((child : HTMLElement) => {
       const cl = child.classList;
       if (this.allowedMovesFor(child.firstElementChild).length > 0) {
         cl.add(CSS.PLAYABLE);
