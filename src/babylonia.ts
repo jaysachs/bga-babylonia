@@ -232,8 +232,8 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
   private async setupGameBoard(boardData: Hex[]): Promise<void> {
     const boardDiv = $(IDS.BOARD);
 
-    const animateBoardInitialPlacement = true;
-    const inParallel = false;
+    const animateBoardInitialPlacement = false;
+    const inParallel = true;
     const duration = inParallel ? 800 : 200;
     let anims: AnimationList = [];
 
