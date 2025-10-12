@@ -115,7 +115,6 @@ class Html {
       </div>
       <div id='${IDS.BOARD_CONTAINER}'>
         <div id='${IDS.BOARD}'></div>
-        <span id='bbl_vars'></span>
       </div>
       <div id='${IDS.AVAILABLE_ZCARDS_CONTAINER}' class="whiteblock">
         <div>${_('Ziggurat Cards')}</div>
