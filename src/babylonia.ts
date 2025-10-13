@@ -723,7 +723,7 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
     let pieceDiv = hexDiv.firstElementChild as HTMLElement;
 
     // restore piece value, e.g. if it was originally hidden
-    pieceDiv.setAttribute(Attrs.PIECE, this.pieceVal(args.original_piece, this.player_id));
+    pieceDiv.setAttribute(Attrs.PIECE, this.pieceVal(args.original_piece, args.player_id));
     // slide the played piece back to the hand
     anims.push(() => this.animationManager.slideAndAttach(pieceDiv, handPosDiv));
 
@@ -821,7 +821,7 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
         // slide piece from hand to hex
         this.animationManager.slideAndAttach(pieceDiv, hexDiv)
           // play into river, piece is hidden, so use the value from the args not the hand
-          .then(() => pieceDiv.setAttribute(Attrs.PIECE, this.pieceVal(args.piece, this.player_id)))
+          .then(() => pieceDiv.setAttribute(Attrs.PIECE, this.pieceVal(args.piece, args.player_id)))
       );
     } else {
       anims.push(() => {
@@ -840,7 +840,7 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
           () => this.animationManager.displayScoring(
               this.hexDiv(rc),
               1,
-              this.gamedatas.players[this.player_id]!.color,
+              this.gamedatas.players[args.player_id]!.color,
               { extraClass: 'bbl_city_scoring', duration: 700 })
             .then(() => args.touched_ziggurats.forEach(this.unmarkHexSelected.bind(this))))
       ));
