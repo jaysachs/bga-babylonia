@@ -159,7 +159,6 @@ class BaseGame<T extends Gamedatas> extends GameGui<T> {
       if (settings.id) {
         div.id = settings.id;
       }
-      // $(IDS.BOARD).appendChild(div);
       if (settings.className) {
         div.className = settings.className;
       }
