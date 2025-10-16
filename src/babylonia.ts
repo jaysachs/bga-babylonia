@@ -164,8 +164,8 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
   }
 
   private addTooltipsToLog() {
-    const item_elements : Element[] = Array.from(dojo.query(`[${Attrs.ZTYPE}]:not([${Attrs.TT_PROCESSED}])`));
-    item_elements.forEach(ele => {
+    const elements = document.querySelectorAll(`[${Attrs.ZTYPE}]:not([${Attrs.TT_PROCESSED}])`);
+    elements.forEach(ele => {
       ele.setAttribute(Attrs.TT_PROCESSED, '');  // prevents tooltips being re-added to previous log entries
       this.addTooltip(ele.id, this.zcardTooltips[ele.getAttribute(Attrs.ZTYPE)!], '');
     });
@@ -218,7 +218,8 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
       this.markHexSelected(gamedatas.current_scoring_hex);
     }
 
-    dojo.connect(this.notifqueue, 'addToLog', () => this.addTooltipsToLog());
+    dojo.connect(this.notifqueue, 'addToLog', this.addTooltipsToLog.bind(this));
+    // this.notifqueue.addEventListener('addToLog', this.addTooltipsToLog.bind(this));
 
     console.log('Game setup done');
   }
