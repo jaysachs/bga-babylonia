@@ -958,6 +958,7 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
     this.scoreCtrl[args.player_id]!.toValue(args.score);
     const zelem = $(IDS.zcard(args.zcard));
     zelem.classList.remove(CSS.SELECTED);
+    zelem.removeAttribute(Attrs.TT_PROCESSED);
     const newElem = zelem.cloneNode();
     const dest = $(IDS.playerBoardZcards(args.player_id));
     this.unmarkHexSelected(args.hex);
