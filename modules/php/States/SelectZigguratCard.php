@@ -76,7 +76,6 @@ class SelectZigguratCard extends AbstractState
                 "zcard" => $selection->card->type->value,
                 "cardused" => $selection->card->used,
                 "points" => $selection->points,
-                "score" => $model->allPlayerInfo()[$active_player_id]->score,
                 "hex" => $this->ps->rowColBeingScored(),
             ]
         );

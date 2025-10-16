@@ -951,18 +951,21 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
       zcard: string;
       player_id: number;
       cardused: boolean;
-      score: number;
+      points: number;
       hex: RowCol;
     }
   ): Promise<void> {
-    this.scoreCtrl[args.player_id]!.toValue(args.score);
+    this.unmarkHexSelected(args.hex);
+    const dest = $(IDS.playerBoardZcards(args.player_id));
     const zelem = $(IDS.zcard(args.zcard));
     zelem.classList.remove(CSS.SELECTED);
-    zelem.removeAttribute(Attrs.TT_PROCESSED);
-    const newElem = zelem.cloneNode();
-    const dest = $(IDS.playerBoardZcards(args.player_id));
-    this.unmarkHexSelected(args.hex);
-    await this.animationManager.slideOutAndDestroy(zelem, dest, {}).then(() => dest.appendChild(newElem));
+    await this.animationManager.slideAndAttach(zelem, dest, { toPlaceholder: 'off' })
+        .then(() => {
+          this.scoreCtrl[args.player_id]!.incValue(args.points);
+          if (args.cardused) {
+            zelem.setAttribute(Attrs.ZUSED, "true");
+          }
+        });
   }
 
   private async notif_cityScored(
