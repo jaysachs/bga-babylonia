@@ -66,16 +66,14 @@ class CSS {
 }
 
 class Html {
-  readonly hstart = 38.0; // this is related to board width but not sure how
-  readonly vstart = 9.0; // depends on board size too
-  readonly height = 768 / 12.59;
-  readonly width = this.height * 1.155;
-  readonly hdelta = 0.75 * this.width + 2.0;
-  readonly vdelta = 1.0 * this.height + 2.0;
+  static readonly hstart = 38.0; // this is related to board width but not sure how
+  static readonly vstart = 9.0; // depends on board size too
+  static readonly height = 768 / 12.59;
+  static readonly width = this.height * 1.155;
+  static readonly hdelta = 0.75 * this.width + 2.0;
+  static readonly vdelta = 1.0 * this.height + 2.0;
 
-  constructor(private playerIdToColorIndex: Record<number, number>) { }
-
-  public hexDiv(rc: RowCol): HTMLElement {
+  public static hexDiv(rc: RowCol): HTMLElement {
     let top = this.vstart + rc.row * this.vdelta / 2;
     let left = this.hstart + rc.col * this.hdelta;
     let div = document.createElement('div') as HTMLElement;
@@ -86,8 +84,7 @@ class Html {
     return div;
   }
 
-  public player_board_ext(player_id: number): string {
-    let color_index = this.playerIdToColorIndex[player_id];
+  public static player_board_ext(player_id: number, color_index: number): string {
     return `
       <div>
         <span class='bbl_pb_hand_label_${color_index}'></span>
@@ -107,7 +104,7 @@ class Html {
 `;
   }
 
-  public base_html(): string {
+  public static base_html(): string {
     return `
     <div id='bbl_main'>
       <div id='bbl_hand_container'>
@@ -153,7 +150,6 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
   private cityCounters: Counter[] = [];
   private selectedHandDiv: Element | null = null;
   private playStateArgs: PlayState | null = null;
-  private html: Html = new Html({});
   private playerIdToColorIndex: Record<number, number> = {};
   private zcardTooltips: string[] = [];
 
@@ -178,7 +174,6 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
     for (const playerId in gamedatas.players) {
       this.playerIdToColorIndex[playerId] = colorIndexMap[gamedatas.players[playerId]!.color]!;
     }
-    this.html = new Html(this.playerIdToColorIndex);
 
     this.setupGameHtml();
 
@@ -239,7 +234,7 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
     let anims: AnimationList = [];
 
     for (const hex of boardData) {
-      const hexDiv = this.html.hexDiv(hex);
+      const hexDiv = Html.hexDiv(hex);
       boardDiv.appendChild(hexDiv);
       if (hex.piece != null && hex.piece != Piece.EMPTY) {
         let pieceDiv = this.createPieceDiv(hex.piece, hex.board_player)
@@ -283,7 +278,7 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
   }
 
   private setupGameHtml(): void {
-    this.getGameAreaElement().insertAdjacentHTML('beforeend', this.html.base_html());
+    this.getGameAreaElement().insertAdjacentHTML('beforeend', Html.base_html());
   }
 
   private updateCounter(counter: Counter, value: number, animate: boolean) {
@@ -637,7 +632,7 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
     const playerId = player.player_id;
     console.log('Setting up board for player ' + playerId);
     this.getPlayerPanelElement(playerId)
-      .insertAdjacentHTML('beforeend', this.html.player_board_ext(playerId));
+      .insertAdjacentHTML('beforeend', Html.player_board_ext(playerId, this.playerIdToColorIndex[playerId]!));
     //    create counters per player
     this.handCounters[playerId] = new ebg.counter();
     this.handCounters[playerId]!.create(IDS.handcount(playerId));
