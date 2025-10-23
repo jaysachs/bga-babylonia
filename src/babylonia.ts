@@ -176,7 +176,9 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
     this.setupGameHtml();
 
     console.log('setting up player boards', gamedatas.player_data);
-    gamedatas.player_data.forEach(this.setupPlayerBoard.bind(this));
+    for (let pd of gamedatas.player_data) {
+      this.setupPlayerBoard(pd);
+    }
 
     console.log('setting the the game board');
     this.setupGameBoard(gamedatas.board);
@@ -624,7 +626,8 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
     return false;
   }
 
-  private setupPlayerBoard(playerId: number, player: PlayerData): void {
+  private setupPlayerBoard(player: PlayerData): void {
+    const playerId = player.player_id;
     console.log('Setting up board for player ' + playerId);
     this.getPlayerPanelElement(playerId)
       .insertAdjacentHTML('beforeend', Html.player_board_ext(playerId, this.playerIdToColorIndex[playerId]!));
