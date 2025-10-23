@@ -167,19 +167,19 @@ class Model
         $zcardsUsed = [];
         if ($hex->piece->isField()) {
             if ($piece->isFarmer()) {
-                // ensure player has at least one noble adjacent.
-                $is_noble = function (Hex $h): bool {
+                // ensure player has at least one non-hidden piece adjacent.
+                $is_non_hidden = function (Hex $h): bool {
                     return $h->player_id == $this->player_id
-                        && $h->piece->isNoble();
+                        && !$h->piece->isHidden();
                 };
-                if (count($this->board()->neighbors($hex, $is_noble)) == 0) {
-                    return PlayAllowedResult::failure("can't place farmer in field with no adjacent nobles");
+                if (count($this->board()->neighbors($hex, $is_non_hidden)) == 0) {
+                    return PlayAllowedResult::failure("can't place farmer in field with no adjacent unhidden piece");
                 }
             } else if (!$this->components()->hasUnusedZigguratCard(
                 $this->player_id,
                 ZigguratCardType::NOBLES_IN_FIELDS
             )) {
-                    return PlayAllowedResult::failure("can't place nobles in field without ziggurat card");
+                return PlayAllowedResult::failure("can't place nobles in field without ziggurat card");
             } else {
                 $zcardsUsed[] = ZigguratCardType::NOBLES_IN_FIELDS;
             }

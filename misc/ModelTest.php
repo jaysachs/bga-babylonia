@@ -285,7 +285,7 @@ END;
         ---   ===   ---
     END;
 
-    public function testPlayPiecesOnFields_noAdjacentNoble() {
+    public function testPlayPiecesOnFields_noAdjacentPiece() {
         $this->setMap(ModelTest::MAP6);
         $this->assertFalse($this->model->checkPlay(Piece::FARMER, $this->ps->hex(1,1))->isAllowed());
     }
@@ -298,9 +298,8 @@ END;
     public function testPlayPiecesOnFields_onlyAdjacentFarmer() {
         $this->setMap(ModelTest::MAP6);
         $this->ps->setHand([Piece::FARMER]);
-        // An adjacent farmer doesn't help
         $m1 = $this->model->playPiece(0, new RowCol(2, 0));
-        $this->assertFalse($this->model->checkPlay(Piece::FARMER, $this->ps->hex(1,1))->isAllowed());
+        $this->assertTrue($this->model->checkPlay(Piece::FARMER, $this->ps->hex(1,1))->isAllowed());
     }
 
     public function testPlayPiecesOnFields_adjacentHiddenNobleInWater() {
