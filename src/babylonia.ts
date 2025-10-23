@@ -225,7 +225,7 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
   }
 
   private createPieceDiv(piece: string, player_id?: number) : HTMLElement {
-    let e = this.createDiv();
+    let e = document.createElement('div');
     e.setAttribute(Attrs.PIECE, this.pieceVal(piece, player_id || 0));
     return e;
   }
@@ -266,7 +266,8 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
   private setupZcards(zcards: Zcard[]): void {
     const available = $(IDS.AVAILABLE_ZCARDS);
     for (let zcard of zcards) {
-      const zelem = this.createDiv({ id: IDS.zcard(zcard.type) });
+      const zelem = document.createElement('div');
+      zelem.id = IDS.zcard(zcard.type);
       zelem.setAttribute(Attrs.ZTYPE, zcard.type);
       if (zcard.used) {
         zelem.setAttribute(Attrs.ZUSED, "");
@@ -318,7 +319,7 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
   private handPosDiv(i: number): HTMLElement {
     const hand = $(IDS.HAND);
     while (i >= hand.childElementCount) {
-      hand.appendChild(this.createDiv());
+      hand.appendChild(document.createElement('div'));
     }
     return $(IDS.HAND).childNodes.item(i)! as HTMLElement;
   }
@@ -861,7 +862,7 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
     for (let newPiece of args.hand) {
       if (!handPosDiv) {
         // dynamically expand hand if 7 size hand is chosen
-        handPosDiv = this.createDiv();
+        handPosDiv = document.createElement('div');
         hand.appendChild(handPosDiv);
       }
       let pieceDiv = handPosDiv!.firstElementChild as HTMLElement;

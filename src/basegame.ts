@@ -149,28 +149,6 @@ class BaseGame<T extends Gamedatas> extends GameGui<T> {
     throw new Error("element not found among its parent's children: ${el}");
   }
 
-  protected createDiv(settings?: {
-    id?: string,
-    attrs?: Record<string, string> | null;
-    className?: string | null;
-  }): HTMLElement {
-    const div = document.createElement('div');
-    if (settings) {
-      if (settings.id) {
-        div.id = settings.id;
-      }
-      if (settings.className) {
-        div.className = settings.className;
-      }
-      if (settings.attrs) {
-        for (const name in settings.attrs) {
-          div.setAttribute(name, settings.attrs[name]!);
-        }
-      }
-    }
-    return div;
-  }
-
   protected async notif_debug(args: any) {
     console.log("debug", args);
   }
