@@ -7,7 +7,6 @@ interface PlayerData {
   pool_size: number;
   captured_city_count: number;
   score: number;
-  color: string;
 }
 interface Hex extends RowCol {
   board_player: number;
@@ -80,7 +79,6 @@ class Html {
     div.id = IDS.hexDiv(rc);
     div.style.top = `${top}px`;
     div.style.left = `${left}px`;
-    // div.style = `top:${top}px; left:${left}px;`;
     return div;
   }
 
@@ -178,9 +176,7 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
     this.setupGameHtml();
 
     console.log('setting up player boards', gamedatas.player_data);
-    for (const playerId in gamedatas.player_data) {
-      this.setupPlayerBoard(gamedatas.player_data[playerId]!);
-    }
+    gamedatas.player_data.forEach(this.setupPlayerBoard.bind(this));
 
     console.log('setting the the game board');
     this.setupGameBoard(gamedatas.board);
@@ -628,8 +624,7 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
     return false;
   }
 
-  private setupPlayerBoard(player: PlayerData): void {
-    const playerId = player.player_id;
+  private setupPlayerBoard(playerId: number, player: PlayerData): void {
     console.log('Setting up board for player ' + playerId);
     this.getPlayerPanelElement(playerId)
       .insertAdjacentHTML('beforeend', Html.player_board_ext(playerId, this.playerIdToColorIndex[playerId]!));
