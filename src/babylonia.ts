@@ -176,8 +176,8 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
     this.setupGameHtml();
 
     console.log('setting up player boards', gamedatas.player_data);
-    for (let pd of gamedatas.player_data) {
-      this.setupPlayerBoard(pd);
+    for (let pid in gamedatas.player_data) {
+      this.setupPlayerBoard(gamedatas.player_data[pid]!);
     }
 
     console.log('setting the the game board');
