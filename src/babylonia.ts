@@ -197,11 +197,11 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
     console.log('setting up handlers');
     this.setupHandlers();
 
-    this.bgaSetupPromiseNotifications({ logger: console.log });
+    this.bgaSetupPromiseNotifications({ logger: console.log, onEnd: this.addTooltipsToLog.bind(this) });
 
     // Active player gets their own undo notification with private data,
     //   so ignore the generic undo notification.
-    (this.notifqueue as any).setIgnoreNotificationCheck(
+    this.notifqueue.setIgnoreNotificationCheck(
       'undoMove',
       (notif: any) => (notif.args.player_id == this.player_id));
 
@@ -210,10 +210,6 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
     if (gamedatas.current_scoring_hex) {
       this.markHexSelected(gamedatas.current_scoring_hex);
     }
-
-    dojo.connect((this.notifqueue as any), 'addToLog', this.addTooltipsToLog.bind(this));
-    // this.notifqueue.addEventListener('addToLog', this.addTooltipsToLog.bind(this));
-
     console.log('Game setup done');
   }
 
