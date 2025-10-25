@@ -84,8 +84,8 @@ CREATE TABLE IF NOT EXISTS `board` (
   `hextype` varchar(8) NOT NULL,
    -- one of: CITY_{P,S,M,MS,MP,SP,MSP}, FIELD_{5,6,7,X}, ZIGGURAT,
    -- or a played piece: FARMER, MERCHANT, PRIEST, SERVANT
-   -- note that "inverted" will be based on hextype and we'll sanitize played pieces
-   --   to PLAIN before returning to client
+   -- note that "hidden" will be based on hextype and we'll sanitize played pieces
+   --   to HIDDEN before returning to client
   `piece` varchar(8) DEFAULT NULL,
   `scored` boolean DEFAULT FALSE,
   `player_id` int(10) unsigned DEFAULT NULL,
