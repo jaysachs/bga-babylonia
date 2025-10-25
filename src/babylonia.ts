@@ -25,10 +25,8 @@ class Piece {
 }
 
 class IDS {
-  static readonly AVAILABLE_ZCARDS_CONTAINER: string = 'bbl_available_zcards_container';
   static readonly AVAILABLE_ZCARDS: string = 'bbl_available_zcards';
   static readonly BOARD = 'bbl_board';
-  static readonly BOARD_CONTAINER = 'bbl_board_container';
   static readonly HAND = 'bbl_hand';
 
   static handcount(playerId: number): string {
@@ -108,10 +106,10 @@ class Html {
       <div id='bbl_hand_container'>
         <div id='${IDS.HAND}'></div>
       </div>
-      <div id='${IDS.BOARD_CONTAINER}'>
+      <div id='bbl_board_container'>
         <div id='${IDS.BOARD}'></div>
       </div>
-      <div id='${IDS.AVAILABLE_ZCARDS_CONTAINER}' class="whiteblock">
+      <div id='bbl_available_zcards_container' class="whiteblock">
         <div>${_('Ziggurat Cards')}</div>
         <div id='${IDS.AVAILABLE_ZCARDS}'></div>
       </div>
