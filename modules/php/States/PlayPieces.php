@@ -27,6 +27,7 @@ declare(strict_types=1);
 
 namespace Bga\Games\babylonia\States;
 
+use Bga\GameFramework\NotificationMessage;
 use Bga\GameFramework\StateType;
 use Bga\GameFramework\States\PossibleAction;
 use Bga\Games\babylonia\Game;
@@ -114,21 +115,21 @@ class PlayPieces extends AbstractState
     {
         $model = $this->createModel($active_player_id);
         $move = $model->undo();
-        $args = [
+
+        $this->notify->all("undoMove", clienttranslate('${player_name} undid their move'), [
             "player_id" => $active_player_id,
             "row" => $move->rc->row,
             "col" => $move->rc->col,
             "piece" => $move->piece->value,
             "captured_piece" => $move->captured_piece->value,
             "points" => $move->points(),
-            "handpos" => $move->handpos,
-            "original_piece" => $move->original_piece->value,
-        ];
-
-        $this->notify->player($active_player_id, "undoMoveActive", clienttranslate('${player_name} undid their move'), $args);
-        unset($args["handpos"]);
-        unset($args["original_piece"]);
-        $this->notify->all("undoMove", clienttranslate('${player_name} undid their move'), $args);
+            "_private" => [
+                $active_player_id => new NotificationMessage(clienttranslate('You undid your move from ${row},${col} returning ${_private.original_piece} to your hand'), [
+                    "handpos" => $move->handpos,
+                    "original_piece" => $move->original_piece->value,
+                ])
+            ]
+        ]);
 
         return PlayPieces::class;
     }

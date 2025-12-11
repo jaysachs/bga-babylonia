@@ -197,12 +197,6 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
 
     this.bgaSetupPromiseNotifications({ logger: console.log, onEnd: this.addTooltipsToLog.bind(this) });
 
-    // Active player gets their own undo notification with private data,
-    //   so ignore the generic undo notification.
-    this.notifqueue.setIgnoreNotificationCheck(
-      'undoMove',
-      (notif: any) => (notif.args.player_id == this.player_id));
-
     // if a ziggurat card is being chosen
     // TODO: should this be done in the state watcher?
     if (gamedatas.current_scoring_hex) {
@@ -688,33 +682,23 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
     this.updatePoolCount(args);
   }
 
-  private async notif_undoMoveActive(
+  private async notif_undoMove(
     args: {
       player_id: number;
       points: number;
-      handpos: number;
       row: number;
       col: number;
-      original_piece: string;
+      _private: {
+        original_piece: string;
+        handpos: number;
+      };
       captured_piece: string;
       piece: string;
     }
   ): Promise<void> {
-    if (this.player_id != args.player_id) {
-      console.error('Non-active player got the undoMoveActive notification, ignoring');
-      return Promise.resolve();
-    }
-
-    let handPosDiv = this.handPosDiv(args.handpos);
-
     let anims: AnimationList = [];
     let hexDiv = $(IDS.hexDiv(args));
-    let pieceDiv = hexDiv.firstElementChild as HTMLElement;
-
-    // restore piece value, e.g. if it was originally hidden
-    pieceDiv.setAttribute(Attrs.PIECE, this.pieceVal(args.original_piece, args.player_id));
-    // slide the played piece back to the hand
-    anims.push(() => this.animationManager.slideAndAttach(pieceDiv, handPosDiv));
+    let isActivePlayer = this.player_id == args.player_id;
 
     if (args.captured_piece != Piece.EMPTY) {
       // slide the previously captured field back
@@ -725,50 +709,20 @@ class BabyloniaGame extends BaseGame<BGamedatas> {
       })
     }
 
-    await this.animationManager.playParallel(anims).then(() => {
-      handPosDiv.classList.add(CSS.PLAYABLE);
-      this.handCounters[args.player_id]!.incValue(1);
-      this.scoreCtrl[args.player_id]!.incValue(-args.points);
-    });
-  }
+    let pieceDiv = hexDiv.firstElementChild as HTMLElement;
+    let destDiv = isActivePlayer ? this.handPosDiv(args._private.handpos) : $(IDS.handcount(args.player_id));
 
-  private async notif_undoMove(
-    args: {
-      player_id: number;
-      points: number;
-      handpos: number;
-      row: number;
-      col: number;
-      original_piece: string;
-      captured_piece: string;
-      piece: string;
+    if (args._private.original_piece) {
+        // restore piece value, e.g. if it was originally hidden
+        pieceDiv.setAttribute(Attrs.PIECE, this.pieceVal(args._private.original_piece, args.player_id));
     }
-  ): Promise<void> {
-    if (this.player_id == args.player_id) {
-      console.error("active player should have undoMove filtered");
-      return Promise.resolve();
-    }
-
-    let hexDiv = $(IDS.hexDiv(args));
-    let anims: AnimationList = [];
-
-    if (args.captured_piece != Piece.EMPTY) {
-      // replace the field that was captured
-      let field = this.createPieceDiv(args.captured_piece, 0);
-      anims.push(() => {
-        $(IDS.handcount(args.player_id)).appendChild(field);
-        return this.animationManager.slideAndAttach(field, hexDiv, { fromPlaceholder: 'off' });
-      })
-    }
-
-    // move the played piece back to hand area
-    anims.push(() => this.animationManager.slideOutAndDestroy(
-      hexDiv.firstElementChild as HTMLElement,
-      $(IDS.handcount(args.player_id)),
-      {}
-    ));
+    // slide the played piece back to the hand
+    anims.push(() => this.animationManager.slideAndAttach(pieceDiv, destDiv));
 
     await this.animationManager.playParallel(anims).then(() => {
+      if (isActivePlayer) {
+         destDiv.classList.add(CSS.PLAYABLE);
+      }
       this.handCounters[args.player_id]!.incValue(1);
       this.scoreCtrl[args.player_id]!.incValue(-args.points);
     });
