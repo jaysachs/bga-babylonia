@@ -25,7 +25,7 @@
     },
 
     "files": [
-        "bga-framework.d.ts",
+        "work/bga-framework.d.ts",
         "src/bga-animations.d.ts",
         "src/colormap.ts",
         "src/basegame.ts",

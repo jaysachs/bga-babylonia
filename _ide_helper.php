@@ -1152,7 +1152,7 @@ namespace Bga\GameFramework {
          * @see mysql_affected_rows()
          * @see https://en.doc.boardgamearena.com/Main_game_logic:_yourgamename.game.php#Accessing_the_database
          */
-        final static public function DbAffectedRow(): int
+        final public static function DbAffectedRow(): int
         {
             return 0;
         }
@@ -1163,7 +1163,7 @@ namespace Bga\GameFramework {
          * @see mysql_insert_id()
          * @see https://en.doc.boardgamearena.com/Main_game_logic:_yourgamename.game.php#Accessing_the_database
          */
-        final static public function DbGetLastId(): int
+        final public static function DbGetLastId(): int
         {
             return 0;
         }
@@ -1173,7 +1173,7 @@ namespace Bga\GameFramework {
          *
          * @see https://en.doc.boardgamearena.com/Main_game_logic:_yourgamename.game.php#Accessing_the_database
          */
-        final static public function DbQuery(string $sql): null|\mysqli_result|bool
+        final public static function DbQuery(string $sql): null|\mysqli_result|bool
         {
             return null;
         }
@@ -1189,7 +1189,7 @@ namespace Bga\GameFramework {
          * @see mysql_real_escape_string()
          * @see https://en.doc.boardgamearena.com/Main_game_logic:_yourgamename.game.php#Accessing_the_database
          */
-        final static public function escapeStringForDB(string $string): string
+        final public static function escapeStringForDB(string $string): string
         {
             return ''; 
         }
@@ -1204,7 +1204,7 @@ namespace Bga\GameFramework {
          * @see Table::getCollectionFromDB
          * @see https://en.doc.boardgamearena.com/Main_game_logic:_yourgamename.game.php#Accessing_the_database
          */
-        final static public function getObjectListFromDB(string $sql, bool $bUniqueValue = false): array
+        final public static function getObjectListFromDB(string $sql, bool $bUniqueValue = false): array
         {
             return [];
         }
@@ -1215,7 +1215,7 @@ namespace Bga\GameFramework {
          * @throws \BgaSystemException Raise an exception if more than 1 row is returned.
          * @see https://en.doc.boardgamearena.com/Main_game_logic:_yourgamename.game.php#Accessing_the_database
          */
-        final static public function getUniqueValueFromDB(string $sql): mixed
+        final public static function getUniqueValueFromDB(string $sql): mixed
         {
             return null;
         }
@@ -1320,7 +1320,7 @@ namespace Bga\GameFramework {
          *
          * @see https://en.doc.boardgamearena.com/Main_game_logic:_yourgamename.game.php#Accessing_the_database
          */
-        final public function getCollectionFromDB(string $sql, bool $bSingleValue = false): array
+        final public static function getCollectionFromDB(string $sql, bool $bSingleValue = false): array
         {
             return [];
         }
@@ -1348,7 +1348,7 @@ namespace Bga\GameFramework {
          *
          * @see https://en.doc.boardgamearena.com/Main_game_logic:_yourgamename.game.php#Accessing_the_database
          */
-        final public function getDoubleKeyCollectionFromDB(string $sql, bool $bSingleValue = false): array
+        final public static function getDoubleKeyCollectionFromDB(string $sql, bool $bSingleValue = false): array
         {
             return [];
         }
@@ -1457,7 +1457,7 @@ namespace Bga\GameFramework {
          * @see Table::getCollectionFromDB()
          * @see https://en.doc.boardgamearena.com/Main_game_logic:_yourgamename.game.php#Accessing_the_database
          */
-        final public function getNonEmptyCollectionFromDB(string $sql): array
+        final public static function getNonEmptyCollectionFromDB(string $sql): array
         {
             return [];
         }
@@ -1470,7 +1470,7 @@ namespace Bga\GameFramework {
          * @see Table::getObjectFromDB()
          * @see https://en.doc.boardgamearena.com/Main_game_logic:_yourgamename.game.php#Accessing_the_database
          */
-        final public function getNonEmptyObjectFromDB(string $sql): array
+        final public static function getNonEmptyObjectFromDB(string $sql): array
         {
             return [];
         }
@@ -1482,7 +1482,7 @@ namespace Bga\GameFramework {
          * @throws \BgaSystemException if the query return more than one row.
          * @see https://en.doc.boardgamearena.com/Main_game_logic:_yourgamename.game.php#Accessing_the_database
          */
-        final public function getObjectFromDB(string $sql): array
+        final public static function getObjectFromDB(string $sql): array
         {
             return [];
         }
@@ -1588,6 +1588,8 @@ namespace Bga\GameFramework {
 
         /**
          * Return the value of statistic specified by $name. Useful when creating derivative statistics such as average.
+         *
+         * @deprecated use tableStats->get / playerStats->get
          * 
          * @param string $name the name of your statistic, as it has been defined in your stats.json file.
          * @param ?int $player_id the player to get the stat. If null, it will return the table stat.
@@ -1628,6 +1630,8 @@ namespace Bga\GameFramework {
         /**
          * Increment (or decrement) specified statistic value by `$inc` value. Same behavior as `Table::setStat()`
          * function.
+         *
+         * @deprecated use tableStats->inc / playerStats->inc
          * 
          * @param mixed $delta the value of the add to the current stat value.
          * @param string $name the name of your statistic, as it has been defined in your stats.json file.
@@ -1648,6 +1652,7 @@ namespace Bga\GameFramework {
          * statistics. As a consequence - if do not want statistic to be applied, do not init it, or call set or inc
          * on it.
          *
+         * @deprecated use tableStats->init / playerStats->init
          *
          * @param string $table_or_player must be set to "table" if this is a table statistic, or "player" if this is a player statistic.
          * @param string $name the name of your statistic, as it has been defined in your stats.json file.
@@ -1838,6 +1843,8 @@ namespace Bga\GameFramework {
 
         /**
          * Set a statistic `$name` to `$value`.
+         *
+         * @deprecated use tableStats->set / playerStats->set
          * 
          * @param mixed $value the value of the statistic.
          * @param string $name the name of your statistic, as it has been defined in your stats.json file.
@@ -1926,6 +1933,8 @@ namespace Bga\GameFramework {
 
         /**
          * Translation function using appropriate gettext domain.
+         * 
+         * @deprecated use clienttranslate instead.
          */
         protected function _(string $text): string
         {            
@@ -2691,6 +2700,54 @@ namespace Bga\GameFramework\Helpers {
          */
         public static function encode(mixed $obj): string {
             return '';
+        }
+    }
+}
+
+namespace Bga\GameFramework\GameResult {
+    class Player
+    {
+        public function __construct(
+            public int $id,
+            public string $name,
+            public string $color = '000000',
+            public ?int $score = null,
+            public ?int $scoreAux = null,
+        ) {}
+
+        /**
+         * @return Player
+         */
+        public static function fromPlayerDb(array $playerDb): self {
+            return new self(0, '');
+        }
+
+        /**
+         * @return Player[]
+         */
+        public static function fromPlayersDb(array $playersDb): array {
+            return [];
+        }
+    }
+
+    class GameResult
+    {
+
+        /**
+         * Score all players separately (no-team game).
+         *
+         * @param Player[] $players The players at this table. Currently, real players only.
+         * @param bool $reverseScore Whether negative scores should be rewarded
+         * @param bool $reverseScoreAux Whether auxiliary score ordering is reversed
+         *
+         * @return self
+         */
+        public static function individualRanking(
+            array $players,
+            bool $reverseScore = false,
+            bool $reverseScoreAux = false,
+        ) {
+            return new self();
         }
     }
 }
