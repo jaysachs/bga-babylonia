@@ -11,6 +11,7 @@ TESTSTUBS=$(WORK)/test/module/table/table.game.php
 PSALM_CONFIG=psalm.xml
 JS=babylonia.js
 COLORMAP=src/colormap.ts
+TS_STUBS=work/bga-framework.d.ts
 
 .PHONY: build test psalm psalm-info deploy clean
 
