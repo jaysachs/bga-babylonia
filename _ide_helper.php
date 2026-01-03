@@ -11,6 +11,13 @@ namespace Bga\GameFramework\Actions {
             public bool $enabled = true,
         ) {}
     }
+    
+    #[\Attribute]
+    class Debug {
+        public function __construct(
+            public bool $reload = false,
+        ) {}
+    }
 }
 
 namespace Bga\GameFramework\Actions\Types {
@@ -1035,6 +1042,11 @@ namespace Bga\GameFramework {
             public array $args = [],
         ) {}
     }
+    
+    abstract class Debug {
+        public function playUntil(callable $fn): void {
+        }
+    }
 
     abstract class Table
     {
@@ -1097,6 +1109,11 @@ namespace Bga\GameFramework {
          * Access the underlying PlayerCounter object for player_score_aux.
          */
         readonly public \Bga\GameFramework\Components\Counters\PlayerCounter $playerScoreAux;
+
+        /**
+         * Access the underlying Debug object.
+         */
+        readonly public \Bga\GameFramework\Debug $debug;
 
         /**
          * Default constructor.
@@ -2011,7 +2028,7 @@ namespace Bga\GameFramework {
          *
          * @return array<int, int>
          */
-        final protected function getPrevPlayerTable($players): array
+        final public function getPrevPlayerTable(): array
         {
             return [];
         }
@@ -2425,7 +2442,7 @@ namespace Bga\GameFramework\Components {
         /**
          * Get cards of a specific type in a specific location.
          */
-        function getCardsOfTypeInLocation(mixed $type, ?int $type_arg=null, string $location, ?int $location_arg = null ): array
+        function getCardsOfTypeInLocation(mixed $type, ?int $type_arg, string $location, ?int $location_arg = null ): array
         {
             return [];
         }
