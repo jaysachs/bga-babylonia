@@ -1,35 +1,48 @@
 {
-    "rootDir": ".",
+    // "rootDir": ".",
     "compilerOptions": {
-        "pretty": false,
+        // "pretty": false,
         // For some reason, setting true compiles but causing loading issues
-        "strict": false,
-        "strictNullChecks": true,
-        "noImplicitReturns": true,
-        "exactOptionalPropertyTypes": true,
-        "noPropertyAccessFromIndexSignature": true,
-        "noFallthroughCasesInSwitch": true,
-        "noUncheckedIndexedAccess": true,
-        "downlevelIteration": true,
-        "target": "es5",
-        "module": "none",
+        // "strict": false,
+        // "strictNullChecks": true,
+        // "noImplicitReturns": true,
+        // "exactOptionalPropertyTypes": true,
+        // "noPropertyAccessFromIndexSignature": true,
+        // "noFallthroughCasesInSwitch": true,
+        // "noUncheckedIndexedAccess": true,
+        // "downlevelIteration": true,
+
+        "target": "ES2020",
+        "module": "ES2022",
+        "moduleResolution": "node",
         "lib": ["dom", "esnext"],
         "sourceMap": false,
-        "outFile": "babylonia.js",
-        "noImplicitOverride": true,
-        "typeRoots": [
-            "src/types",
-            "./types",
-            "./node_modules/@types"
-        ]
-    },
+        "rootDir": "src",
+//        "strict": true
 
-    "files": [
-        "work/bga-framework.d.ts",
-        "src/bga-animations.d.ts",
-        "src/colormap.ts",
-        "src/basegame.ts",
-        "src/babylonia.ts",
-        "src/define.ts"
+        // "outFile": "zooloretto.js",
+        // "noImplicitOverride": true,
+        // "typeRoots": [
+        //     "src/types",
+        //     "./types",
+        //     "./node_modules/@types"
+        // ]
+    },
+    "include": [
+        "src/**/*.d.ts",
+        "src/**/*.ts"
     ]
+    // "files": [
+    //     "work/bga-framework.d.ts",
+    //     "src/bga-animations.d.ts",
+    //     "src/bga-score-sheet.d.ts",
+    //     "src/more-animations.ts",
+    //     "src/colormap.ts",
+    //     "src/html.ts",
+    //     "src/basegame.ts",
+    //     "src/flow.ts",
+    //     "src/zhtml.ts",
+    //     "src/zooloretto.ts",
+    //     "src/define.ts"
+    // ]
 }

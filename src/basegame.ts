@@ -1,36 +1,72 @@
-
-// @ts-ignore
-GameGui = /** @class */ (function () {
-  function GameGui() { }
-  return GameGui;
-})();
+import { BgaAnimations, AnimationManager } from './libs';
 
 /** Class that extends default bga core game class with more functionality
  */
 
-class BaseGame<T extends Gamedatas> extends GameGui<T> {
+type SpecialLogArgs = Record<string, (any) => HTMLElement>;
+
+export abstract class BaseGame<T extends Gamedatas> {
   protected currentState: string | null;
-  protected animationManager: AnimationManager;
   private pendingUpdate: boolean;
   private currentPlayerWasActive: boolean;
+  protected readonly animationManager: AnimationManager;
+  protected gamedatas: T;
+  public readonly bga: Bga<T>;
+  private readonly special_log_args: SpecialLogArgs;
 
-  constructor() {
-    super();
+  constructor(bga: Bga<T>, special_log_args: SpecialLogArgs) {
     console.log('game constructor');
+    this.bga = bga;
+    this.special_log_args = special_log_args;
+    this.animationManager = new BgaAnimations.Manager({
+      animationsActive: () => this.bgaAnimationsActive(),
+    });
 
     this.currentState = null;
     this.pendingUpdate = false;
     this.currentPlayerWasActive = false;
+}
+
+  protected bgaAnimationsActive(): boolean {
+    return this.bga.gameui.bgaAnimationsActive();
   }
 
-  override setup(gamedatas: T) {
+  setup(gamedatas: T) {
     console.log('Starting game setup', gameui);
     this.gamedatas = gamedatas;
     // create the animation manager, and bind it to the `game.bgaAnimationsActive()` function
-    this.animationManager = new BgaAnimations.Manager({
-      animationsActive: () => this.bgaAnimationsActive(),
-    });
     this.autowireStateChangeMethods();
+  }
+
+  bgaFormatText(log: string, args: any): { log: string, args: any } {
+    try {
+      const shadowParent = document.createElement('span');
+      if (log && args && !args.processed) {
+        args.processed = true;
+        for (const key in this.special_log_args) {
+          if (key in args) {
+            const e = this.special_log_args[key](args);
+            shadowParent.appendChild(e);
+            args[key] = shadowParent.getHTML();
+            e.remove();
+          }
+        }
+      }
+    } catch (e: any) {
+      console.error(log, args, 'Exception thrown', e.stack);
+    }
+    return { log, args };
+  }
+
+  /**
+  * Returns the index of the given element among its parent's child elements or -1 if no parent.
+  */
+  protected indexInParent(el: Element): number {
+    return Array.from(el.parentElement?.children ?? []).findIndex(e => e == el);
+  }
+
+  protected async notif_debug(args: any) {
+    console.log("debug", args);
   }
 
   private autowireStateChangeMethods() {
@@ -68,12 +104,12 @@ class BaseGame<T extends Gamedatas> extends GameGui<T> {
     console.log("Wired up state change methods", wiredUp);
   }
 
-  override bgaPerformAction(action: string, args?: any, params?: { lock?: boolean; checkAction?: boolean; checkPossibleActions?: boolean; }): Promise<any> {
+  bgaPerformAction(action: string, args?: any, params?: { lock?: boolean; checkAction?: boolean; checkPossibleActions?: boolean; }): Promise<any> {
     console.debug("action", action, args);
     return (this as any).inherited(arguments).then(() => console.debug("action completed", action, args));
   }
 
-  override onEnteringState(stateName: string, args: any) {
+  onEnteringState(stateName: string, args: any) {
     console.debug('onEnteringState: ' + stateName, args, this.debugStateInfo());
     this.currentState = stateName;
     // Call appropriate method
@@ -87,12 +123,12 @@ class BaseGame<T extends Gamedatas> extends GameGui<T> {
     }
   }
 
-  override onLeavingState(stateName: string) {
+  onLeavingState(stateName: string) {
     // console.debug('onLeavingState: ' + stateName, this.debugStateInfo());
     this.currentPlayerWasActive = false;
   }
 
-  override onUpdateActionButtons(stateName: string, args: any) {
+  onUpdateActionButtons(stateName: string, args: any) {
     if (this.currentState != stateName) {
       // delay firing this until onEnteringState is called so they always called in same order
       this.pendingUpdate = true;
@@ -135,22 +171,4 @@ class BaseGame<T extends Gamedatas> extends GameGui<T> {
     }
     return undefined;
   }
-
-  // Returns the index of the given element among its parent's child elements
-  // Returns 0 if no parent.
-  protected indexInParent(el: Element): number {
-    const parentEl = el.parentElement;
-    if (!parentEl) { return 0; }
-    for (let i = 0; i < parentEl.childElementCount; ++i) {
-      if (el == parentEl.children[i]) {
-        return i;
-      }
-    }
-    throw new Error("element not found among its parent's children: ${el}");
-  }
-
-  protected async notif_debug(args: any) {
-    console.log("debug", args);
-  }
-
 }

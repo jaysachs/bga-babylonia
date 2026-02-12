@@ -1,27 +1,27 @@
-
 #
 ROOT=$(HOME)/projects/bga
-SYNC=$(ROOT)/bgautil/sync/bgasync.sh
+GAME=babylonia
+SFTP=sftp://vagabond:@1.studio.boardgamearena.com:2022
 
 STATS=modules/php/Stats.php
 GENSTATS=$(ROOT)/bgautil/genstats/genstats.php
 WORK=work
 STUBS=$(WORK)/module/table/table.game.php
+TS_STUBS=src/bga-framework.d.ts
 TESTSTUBS=$(WORK)/test/module/table/table.game.php
-PSALM_CONFIG=psalm.xml
-JS=babylonia.js
+JS=modules/js/Game.js
 COLORMAP=src/colormap.ts
-TS_STUBS=work/bga-framework.d.ts
+PHPSTAN_LEVEL=10
 
-.PHONY: build test psalm psalm-info deploy clean
+.PHONY: build test phpstan deploy clean
 
-build: $(JS) $(STATS) $(STUBS)
+build: $(JS) $(STUBS) $(STATS)
 
-$(JS): $(COLORMAP) src/*.ts
+$(JS): $(COLORMAP) src/*.ts tsconfig.json $(TS_STUBS)
 	npm run build:ts
 
-$(STATS): $(GENSTATS) stats.json
-	php $(GENSTATS) babylonia > $(STATS)
+$(STATS): $(GENSTATS) stats.json Makefile
+	php $(GENSTATS) $(GAME)  > $(STATS)
 
 $(COLORMAP): misc/colormap.php gameinfos.inc.php
 	php misc/colormap.php > $(COLORMAP)
@@ -29,8 +29,8 @@ $(COLORMAP): misc/colormap.php gameinfos.inc.php
 $(WORK):
 	mkdir $(WORK)
 
-$(TS_STUBS): $(WORK) bga-framework.d.ts
-	perl -p -e 's/bRealtime: boolean;/bRealtime: boolean;\n  notifqueue: GameNotifQueue;\n/' bga-framework.d.ts > $(TS_STUBS)
+$(TS_STUBS): bga-framework.d.ts
+	cp bga-framework.d.ts $(TS_STUBS)
 
 $(STUBS): $(WORK) _ide_helper.php Makefile _local_ide_helper.php
 	mkdir -p $(WORK)/module/table
@@ -44,14 +44,11 @@ $(TESTSTUBS): $(WORK) _ide_helper.php Makefile
 test: build $(TESTSTUBS)
 	phpunit --bootstrap misc/autoload.php misc --testdox
 
-psalm: build $(STUBS) $(PSALM_CONFIG)
-	psalm -c $(PSALM_CONFIG) modules/php
-
-psalm-info: build $(STUBS) $(PSALM_CONFIG)
-	psalm --show-info=true -c $(PSALM_CONFIG) modules/php
+phpstan: build $(STUBS)
+	phpstan --autoload-file=$(STUBS) --level=$(PHPSTAN_LEVEL) --memory-limit=1G analyse modules/php modules/php/States misc/test/php
 
 deploy: test
-	$(SYNC) -u vagabond -g babylonia -s $(ROOT)/babylonia
+	lftp -e 'cd $(GAME); mirror -e -R --exclude .vscode/ --exclude .git/ --exclude work/ --exclude local/ --exclude bga-framework.d.ts --exclude node_modules/ --exclude _ide_helper.php; exit' $(SFTP)
 
 # TODO: should this remove colormap and stats as well?
 clean:
