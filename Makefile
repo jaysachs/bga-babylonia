@@ -45,7 +45,7 @@ test: build $(TESTSTUBS)
 	phpunit --bootstrap misc/autoload.php misc --testdox
 
 phpstan: build $(STUBS)
-	phpstan --autoload-file=$(STUBS) --level=$(PHPSTAN_LEVEL) --memory-limit=1G analyse modules/php modules/php/States misc/test/php
+	phpstan --autoload-file=$(STUBS) --level=$(PHPSTAN_LEVEL) --memory-limit=1G analyse modules/php modules/php/Utils modules/php/States misc/test/php
 
 deploy: test
 	lftp -e 'cd $(GAME); mirror -e -R --exclude .vscode/ --exclude .git/ --exclude work/ --exclude local/ --exclude bga-framework.d.ts --exclude node_modules/ --exclude _ide_helper.php; exit' $(SFTP)

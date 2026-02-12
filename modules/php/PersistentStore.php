@@ -27,7 +27,8 @@ declare(strict_types=1);
 
 namespace Bga\Games\babylonia;
 
-use  Bga\GameFramework\Db\Globals;
+use Bga\GameFramework\Db\Globals;
+use Bga\Games\babylonia\Utils\Db;
 
 class PersistentStore
 {

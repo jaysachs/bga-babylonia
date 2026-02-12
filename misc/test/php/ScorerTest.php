@@ -17,6 +17,7 @@ use Bga\Games\babylonia\ {
 
 final class ScorerTest extends TestCase
 {
+    /** @return array<int,PlayerInfo> */
     private function playerInfos(): array {
         return [
             1 => new PlayerInfo(1, 0, 3, 0, 0),
@@ -44,7 +45,7 @@ END;
         $this->assertEquals($expected, $actual);
     }
 
-    protected function doSetup(string $map) {
+    protected function doSetup(string $map): void {
         $this->board = Board::fromTestMap($map);
         $this->scorer = new Scorer($this->board,
                                    $this->playerInfos(),
@@ -54,7 +55,7 @@ END;
 
     private function hexWinner(int $r, int $c, int $captured_by): HexWinner {
         $hex = $this->hex($r, $c);
-        $neighbors = $this->board->neighbors($hex, function (&$hex): bool {
+        $neighbors = $this->board->neighbors($hex, function (Hex &$hex): bool {
             return $hex->piece->isPlayerPiece();
         });
 
@@ -65,7 +66,7 @@ END;
         return $this->board->hexAt(new RowCol($r, $c));
     }
 
-    private function runTest(ScoredCity $expected) {
+    private function runTest(ScoredCity $expected): void {
         $got = $this->scorer->computeCityScores($expected->hex_winner->hex);
         $this->assertEq($expected, $got);
     }

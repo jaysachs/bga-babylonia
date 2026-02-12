@@ -34,6 +34,7 @@ use Bga\Games\babylonia\Game;
 use Bga\Games\babylonia\RowCol;
 use Bga\Games\babylonia\ZigguratCardType;
 use Bga\Games\babylonia\Utils;
+use Bga\Games\babylonia\Utils\Arrays;
 
 class SelectZigguratCard extends AbstractState
 {
@@ -97,7 +98,7 @@ class SelectZigguratCard extends AbstractState
         $zcards = $model->components()->availableZigguratCards();
         // We could be slightly smarter and grab in order:
         //   10pts, river, hand7?, ...
-        Utils::shuffle($zcards);
+        Arrays::shuffle($zcards);
         return $this->actSelectZigguratCard($player_id, $zcards[0]->type->value);
     }
 }

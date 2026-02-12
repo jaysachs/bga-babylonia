@@ -27,32 +27,57 @@ declare(strict_types=1);
 
 namespace Bga\Games\babylonia;
 
+use Bga\GameFramework\Table;
 use Bga\Games\babylonia\States\StartTurn;
+use Bga\Games\babylonia\Utils\Arrays;
+use Bga\Games\babylonia\Utils\DefaultDb;
+use Bga\Games\babylonia\Utils\Log;
+use Bga\Games\babylonia\Utils\Logger;
 
 require_once(APP_GAMEMODULE_PATH . "module/table/table.game.php");
 
-require_once("Stats.php");
+class GameLogger implements Logger {
+	function __construct(private Table $table) { }
 
-class Game extends \Bga\GameFramework\Table
+	public function debug(string $msg): void {
+		$this->table->debug($msg);
+	}
+
+	public function dump(string $prefix, mixed $obj): void {
+		$this->table->dump($prefix, $obj);
+	}
+
+	public function error(string $msg): void {
+		$this->table->error($msg);
+	}
+
+	public function trace(string $msg): void {
+		$this->table->trace($msg);
+	}
+
+	public function warn(string $msg): void {
+		$this->table->warn($msg);
+	}
+}
+
+class Game extends Table
 {
+
+	public Stats $stats;
     private PersistentStore $ps;
-    private Stats $stats;
 
     public function __construct()
-    {
-        parent::__construct();
+	{
+		parent::__construct();
 
+		Log::setImpl(new GameLogger($this));
+		$logDecorator = new LogDecorator(\Closure::fromCallable($this->getPlayerNameById(...)));
+		$this->notify->addDecorator($logDecorator->playerNames(...));
+ 		$this->stats = Stats::createForGame($this);
         $this->ps = new PersistentStore(new DefaultDb(), $this->globals);
-        $this->ps->initializeGlobals(function(array $ids) { $this->initGameStateLabels($ids); } );
-        $this->stats = Stats::createForGame($this);
 
-        $this->notify->addDecorator(function(string $message, array $args): array {
-            if (isset($args['player_id']) && !isset($args['player_name']) && str_contains($message, '${player_name}')) {
-                $args['player_name'] = $this->getPlayerNameById($args['player_id']);
-            }
-            return $args;
-        });
-    }
+		$this->initGameStateLabels([]);
+	}
 
     /**
      * Compute and return the current game progression.
@@ -115,7 +140,7 @@ class Game extends \Bga\GameFramework\Table
      * - when a player refreshes the game page (F5)
      */
     /**
-     * @return array
+     * @return array<string,mixed>
      */
     protected function getAllDatas(): array
     {
@@ -185,8 +210,8 @@ class Game extends \Bga\GameFramework\Table
         // number of colors defined here must correspond to the
         // maximum number of players allowed for the gams.
         $gameinfos = $this->getGameinfos();
-        $default_colors = $gameinfos['player_colors'];
-        Utils::shuffle($default_colors);
+        $default_colors = array_values($gameinfos['player_colors']);
+        Arrays::shuffle($default_colors);
         $query_values = [];
         foreach ($players as $player_id => $player) {
             // Now you can access both $player_id and $player array
@@ -200,7 +225,7 @@ class Game extends \Bga\GameFramework\Table
         // Create players based on generic information.
         static::DbQuery(
             sprintf(
-                "INSERT INTO player (player_id, player_color, player_canal, player_name, player_avatar) VALUES %s",
+                "INSERT INTO player (player_id, player_color, player_name) VALUES %s",
                 implode(",", $query_values)
             )
         );

@@ -3,9 +3,9 @@
 /**
  *------
  * BGA framework: Gregory Isabelli & Emmanuel Colin & BoardGameArena
- * babylonia implementation : © Jay Sachs <vagabond@covariant.org>
+ * zooloretto implementation : © Jay Sachs <vagabond@covariant.org>
  *
- * Copyright 2024 Jay Sachs <vagabond@covariant.org>
+ * Copyright 2025 Jay Sachs <vagabond@covariant.org>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,33 +25,16 @@
 
 declare(strict_types=1);
 
-namespace Bga\Games\babylonia;
+namespace Bga\Games\babylonia\Utils;
 
 
-class DefaultDb implements Db
+interface Db
 {
-
-    public function __construct() {}
-
     /** @return list<array<string,string>> */
-    #[\Override]
-    public function getObjectList(string $sql): array
-    {
-        /** @phpstan-ignore return.type */
-        return Game::getObjectListFromDB($sql, false);
-    }
+    public function getObjectList(string $sql): array;
 
     /** @return list<string> */
-    #[\Override]
-    public function getSingleFieldList(string $sql): array
-    {
-        /** @phpstan-ignore return.type */
-        return Game::getObjectListFromDB($sql, true);
-    }
+    public function getSingleFieldList(string $sql): array;
 
-    #[\Override]
-    public function execute(string $sql): void
-    {
-        Game::DbQuery($sql);
-    }
+    public function execute(string $sql): void;
 }

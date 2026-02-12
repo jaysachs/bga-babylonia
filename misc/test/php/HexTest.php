@@ -74,7 +74,7 @@ final class HexTest extends TestCase
         $hex->playPiece(Piece::PRIEST, 1);
     }
 
-    public function test_isLandAndIsWaterSucceed() {
+    public function test_isLandAndIsWaterSucceed(): void {
         $hex = Hex::land(new RowCol(4, 5));
         $this->assertTrue($hex->isLand());
         $this->assertFalse($hex->isWater());
@@ -84,7 +84,7 @@ final class HexTest extends TestCase
         $this->assertFalse($hex->isLand());
     }
 
-    public function test_toStringSucceeds() {
+    public function test_toStringSucceeds(): void {
         $hex = Hex::land(new RowCol(4, 5));
         $this->assertSame("LAND 4:5 empty(0) false UNKNOWN", "$hex");
         $hex->placeDevelopment(Piece::FIELD_5);

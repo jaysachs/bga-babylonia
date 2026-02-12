@@ -30,10 +30,12 @@ namespace Bga\Games\babylonia\States;
 use Bga\GameFramework\NotificationMessage;
 use Bga\GameFramework\StateType;
 use Bga\GameFramework\States\PossibleAction;
+use Bga\GameFramework\UserException;
 use Bga\Games\babylonia\Game;
 use Bga\Games\babylonia\Hex;
 use Bga\Games\babylonia\RowCol;
 use Bga\Games\babylonia\Utils;
+use Bga\Games\babylonia\Utils\Arrays;
 
 class PlayPieces extends AbstractState
 {
@@ -96,7 +98,7 @@ class PlayPieces extends AbstractState
     {
         $model = $this->createModel($active_player_id);
         if (!$model->canEndTurn()) {
-            throw new \BgaUserException("Attempt to end turn but less than 2 pieces played");
+            throw new UserException("Attempt to end turn but less than 2 pieces played");
         }
         $model->donePlayPieces();
 
@@ -160,7 +162,7 @@ class PlayPieces extends AbstractState
                 $rcs[] = $hex->rc;
             }
         });
-        Utils::shuffle($rcs);
+        Arrays::shuffle($rcs);
         return $this->actPlayPiece($playerId, $handpos, $rcs[0]->row, $rcs[0]->col);
 
         // TODO better choices:

@@ -12,12 +12,12 @@ use Bga\Games\babylonia\{
 
 final class ComponentsTest extends TestCase
 {
-    private function typesOf(array /* ZigguratCard */ $cards): array /* ZigguratCardType */ {
-        return array_values(array_map(function ($z) { return $z->type; }, $cards));
-    }
-
-    private function filteredTypes(array /* ZigguratCardtype */ $types, array $to_remove): array /* ZigguratCardType */ {
-        return array_values(array_diff($types, $to_remove));
+    /**
+     * @param list<ZigguratCard> $cards
+     * @return list<ZigguratCardType>
+     */
+    private function typesOf(array $cards): array {
+        return array_map(function ($z) { return $z->type; }, $cards);
     }
 
     public function testBasic(): void
@@ -31,7 +31,11 @@ final class ComponentsTest extends TestCase
                             $comp->zigguratCardsOwnedBy(1));
     }
 
-    private function allTypesExcept(array $to_remove): array /* ZigguratCardType */ {
+    /**
+     * @param list<ZigguratCardType> $to_remove
+     * @return list<ZigguratCardType>
+     */
+    private function allTypesExcept(array $to_remove): array {
         $res = [];
         foreach (ZigguratCardType::sevenTypes() as $zt) {
             if (!in_array($zt, $to_remove)) {
