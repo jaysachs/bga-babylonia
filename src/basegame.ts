@@ -106,7 +106,7 @@ export abstract class BaseGame<T extends Gamedatas> {
 
   bgaPerformAction(action: string, args?: any, params?: { lock?: boolean; checkAction?: boolean; checkPossibleActions?: boolean; }): Promise<any> {
     console.debug("action", action, args);
-    return (this as any).inherited(arguments).then(() => console.debug("action completed", action, args));
+    return this.bga.actions.performAction(action, args, params ).then(() => console.debug("action completed", action, args));
   }
 
   onEnteringState(stateName: string, args: any) {

@@ -17,3 +17,4 @@ local/backup/
 local/vassalimgs/
 package-lock.json
 src/bga-framework.d.ts
+src/colormap.ts

@@ -1,3 +1,4 @@
+import { colorIndexMap } from './colormap';
 import { BaseGame } from './basegame';
 import { Html as BHtml, AttrLike } from './html';
 
@@ -180,7 +181,7 @@ interface PlayState {
 }
 
 /** Game class */
-class Game extends BaseGame<BGamedatas> {
+export class Game extends BaseGame<BGamedatas> {
   private handCounters: Counter[] = [];
   private poolCounters: Counter[] = [];
   private cityCounters: Counter[] = [];
