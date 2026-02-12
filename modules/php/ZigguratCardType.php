@@ -40,7 +40,7 @@ enum ZigguratCardType: string
     case EMPTY_CENTER_LAND_CONNECTS = 'zc_land';
     case EMPTY_RIVER_CONNECTS = 'zc_river';
 
-    /** @return ZigguratCardType[] */
+    /** @return list<ZigguratCardType> */
     public static function sevenTypes(bool $use_advanced = false): array
     {
         $ziggurats = [
@@ -82,7 +82,6 @@ enum ZigguratCardType: string
             clienttranslate("From now on all the free land hexagons of the central area between the 2 rivers serve to connect your Clan Tokens."),
             ZigguratCardType::EMPTY_RIVER_CONNECTS =>
             clienttranslate("From now on all the free river hexagons serve to connect your Clan Tokens."),
-            default => ""
         };
     }
 };

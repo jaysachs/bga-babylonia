@@ -41,7 +41,7 @@ class Components
     }
 
 
-    /** @param ZigguratCard[] $ziggurat_cards */
+    /** @param list<ZigguratCard> $ziggurat_cards */
     public function __construct(private array $ziggurat_cards) {}
 
     public function getOwnedCard(int $player_id, ZigguratCardType $type): ?ZigguratCard
@@ -54,13 +54,13 @@ class Components
         return null;
     }
 
-    /** @return ZigguratCard[] */
+    /** @return list<ZigguratCard> */
     public function &allZigguratCards(): array
     {
         return $this->ziggurat_cards;
     }
 
-    /** @return ZigguratCard[] */
+    /** @return list<ZigguratCard> */
     public function availableZigguratCards(): array
     {
         return $this->zigguratCardsOwnedBy(0);
@@ -85,7 +85,7 @@ class Components
         return 0;
     }
 
-    /** @return ZigguratCard[] */
+    /** @return list<ZigguratCard> */
     public function zigguratCardsOwnedBy(int $player_id): array
     {
         return array_values(

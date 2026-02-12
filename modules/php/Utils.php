@@ -29,10 +29,15 @@ namespace Bga\Games\babylonia;
 
 class Utils
 {
+    /**
+     * @template T
+     * @param array<int,T> $arr
+     */
     public static function shuffle(array &$arr): void
     {
         $e = sizeof($arr) - 1;
         for ($i = 0; $i < $e; ++$i) {
+            /** @phpstan-ignore argument.type */
             $j = random_int($i, $e);
             if ($j <> $i) {
                 $tmp = $arr[$j];

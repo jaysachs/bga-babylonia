@@ -38,8 +38,8 @@ abstract class AbstractScoringSelection extends AbstractState
         Game $game,
         int $id,
         StateType $type,
-        ?string $description = '',
-        ?string $descriptionMyTurn = '',
+        string $description = '',
+        string $descriptionMyTurn = '',
     ) {
         parent::__construct(
             game: $game,

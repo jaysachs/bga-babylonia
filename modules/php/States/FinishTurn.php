@@ -38,7 +38,7 @@ class FinishTurn extends AbstractState
         parent::__construct(game: $game, id: 12, type: StateType::GAME, updateGameProgression: true);
     }
 
-    function onEnteringState(int $active_player_id)
+    function onEnteringState(int $active_player_id): mixed
     {
         $model = $this->createModel($active_player_id);
 

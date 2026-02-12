@@ -27,6 +27,9 @@ declare(strict_types=1);
 
 namespace Bga\Games\babylonia;
 
+use Bga\GameFramework\SystemException;
+use Bga\GameFramework\UserException;
+
 class Pool
 {
 
@@ -64,7 +67,11 @@ class Pool
 
     public function take(): Piece
     {
-        $ix = random_int(0, count($this->pieces) - 1);
+        $c = count($this->pieces());
+        if ($c == 0) {
+            throw new SystemException("attempt to take piece from empty pool");
+        }
+        $ix = random_int(0, $c - 1);
         $result = $this->pieces[$ix];
         array_splice($this->pieces, $ix, 1);
         return $result;

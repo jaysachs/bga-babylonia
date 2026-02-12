@@ -93,6 +93,6 @@ class RowCol
             throw new \InvalidArgumentException("0 is not a valid key for a RowCol");
         }
         $key--;
-        return new RowCol(intval($key / 100000), ($key % 100000) / 10);
+        return new RowCol(intval($key / 100000), intval(($key % 100000) / 10));
     }
 }

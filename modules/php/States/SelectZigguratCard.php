@@ -29,6 +29,7 @@ namespace Bga\Games\babylonia\States;
 
 use Bga\GameFramework\StateType;
 use Bga\GameFramework\States\PossibleAction;
+use Bga\GameFramework\SystemException;
 use Bga\Games\babylonia\Game;
 use Bga\Games\babylonia\RowCol;
 use Bga\Games\babylonia\ZigguratCardType;
@@ -47,12 +48,20 @@ class SelectZigguratCard extends AbstractState
         );
     }
 
+    private function scoringHex(): RowCol {
+        $rc = $this->ps->rowColBeingScored();
+        if ($rc === null) {
+            throw new SystemException("In ScoreHex state but no rowcol selected for scoring");
+        }
+        return $rc;
+    }
+
+    /** @return array{hex:RowCol,available_cards:list<string>} */
     function getArgs(int $active_player_id): array
     {
         $model = $this->createModel($active_player_id);
-        $zcards = $model->components()->availableZigguratCards();
         return [
-            "hex" => $this->ps->rowColBeingScored(),
+            "hex" => $this->scoringHex(),
             "available_cards" => array_map(
                 function ($z): string {
                     return $z->type->value;
@@ -66,8 +75,7 @@ class SelectZigguratCard extends AbstractState
     public function actSelectZigguratCard(int $active_player_id, string $zctype): mixed
     {
         $model = $this->createModel($active_player_id);
-        $selection =
-            $model->selectZigguratCard(ZigguratCardType::from($zctype));
+        $selection = $model->selectZigguratCard(ZigguratCardType::from($zctype));
         $this->notify->all(
             "zigguratCardSelection",
             clienttranslate('${player_name} chose ziggurat card ${zcard}'),
@@ -76,14 +84,14 @@ class SelectZigguratCard extends AbstractState
                 "zcard" => $selection->card->type->value,
                 "cardused" => $selection->card->used,
                 "points" => $selection->points,
-                "hex" => $this->ps->rowColBeingScored(),
+                "hex" => $this->scoringHex(),
             ]
         );
         $this->ps->setRowColBeingScored(null);
         return EndOfTurnScoring::class;
     }
 
-    public function zombie($player_id): mixed
+    public function zombie(int $player_id): mixed
     {
         $model = $this->createModel($player_id);
         $zcards = $model->components()->availableZigguratCards();

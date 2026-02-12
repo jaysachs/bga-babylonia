@@ -45,8 +45,8 @@ abstract class AbstractState extends GameState
         private Game $game,
         int $id,
         StateType $type,
-        ?string $description = '',
-        ?string $descriptionMyTurn = '',
+        string $description = '',
+        string $descriptionMyTurn = '',
         bool $updateGameProgression = false
     ) {
         parent::__construct(

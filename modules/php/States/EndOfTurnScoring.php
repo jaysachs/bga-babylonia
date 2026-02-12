@@ -38,7 +38,7 @@ class EndOfTurnScoring extends AbstractState
         parent::__construct(game: $game, id: 5, type: StateType::GAME);
     }
 
-    function onEnteringState(int $active_player_id)
+    function onEnteringState(int $active_player_id): mixed
     {
         // switch back to player on turn if necessary.
         $player_on_turn = $this->ps->playerOnTurn();

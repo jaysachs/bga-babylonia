@@ -28,9 +28,11 @@ declare(strict_types=1);
 namespace Bga\Games\babylonia\States;
 
 use Bga\GameFramework\StateType;
+use Bga\GameFramework\SystemException;
 use Bga\Games\babylonia\Game;
 use Bga\Games\babylonia\HexWinner;
 use Bga\Games\babylonia\Model;
+use Bga\Games\babylonia\RowCol;
 use Bga\Games\babylonia\ScoredCity;
 
 class ScoreHex extends AbstractState
@@ -44,8 +46,17 @@ class ScoreHex extends AbstractState
             description: clienttranslate('${city} at ${row},${col} scoring'));
     }
 
-    public function getArgs(): array {
+    private function scoringHex(): RowCol {
         $rc = $this->ps->rowColBeingScored();
+        if ($rc === null) {
+            throw new SystemException("In ScoreHex state but no rowcol selected for scoring");
+        }
+        return $rc;
+    }
+
+    /** @return array{row:int,col:int,city:string} */
+    public function getArgs(): array {
+        $rc = $this->scoringHex();
         $model = $this->createModel(0);
         return [
             "row" => $rc->row,
@@ -54,7 +65,8 @@ class ScoreHex extends AbstractState
         ];
     }
 
-    private function sendNotify(HexWinner $hexWinner, array $data) {
+    /** @param array<string,mixed> $data */
+    private function sendNotify(HexWinner $hexWinner, array $data): void {
         $player_id = $hexWinner->captured_by;
         $rc = $hexWinner->hex->rc;
         $piece = $hexWinner->hex->piece;
@@ -80,7 +92,7 @@ class ScoreHex extends AbstractState
 
     function onEnteringState(int $active_player_id): mixed {
         $model = $this->createModel($active_player_id);
-        $rc = $this->ps->rowColBeingScored();
+        $rc = $this->scoringHex();
         // TODO: verify it is scoreable in the Model
 
         if ($model->board()->hexAt($rc)->piece->isZiggurat()) {
@@ -107,6 +119,17 @@ class ScoreHex extends AbstractState
         }
     }
 
+    /** @return array<int,
+     * array{
+     *  player_id:int,
+     *  captured_city_count:int,
+     *  scored_locations:list<RowCol>,
+     *  network_locations:list<RowCol>,
+     *  network_points:int,
+     *  capture_points:int,
+     *  score:int}
+     * >
+     */
     private function computeCityScoringDetails(Model $model, ScoredCity $scored_city): array {
         $player_infos = $model->allPlayerInfo();
         $details = [];

@@ -114,6 +114,9 @@ class Game extends \Bga\GameFramework\Table
      * - when the game starts
      * - when a player refreshes the game page (F5)
      */
+    /**
+     * @return array
+     */
     protected function getAllDatas(): array
     {
         // WARNING: We must only return information visible by the
@@ -131,9 +134,10 @@ class Game extends \Bga\GameFramework\Table
                 "pool_size" => $pi->pool_size
             ];
         }
+        /** @var list<array{row:int,col:int,hextype:string,piece:string,board_player:int}> */
         $board_data = [];
         $model->board()->visitAll(
-            function (&$hex) use (&$board_data) {
+            function (Hex &$hex) use (&$board_data) {
                 $board_data[] = [
                     "row" => $hex->rc->row,
                     "col" => $hex->rc->col,
@@ -173,6 +177,7 @@ class Game extends \Bga\GameFramework\Table
      * This method is called only once, when a new game is
      *  launched. In this method, you must setup the game according to
      *  the game rules, so that the game is ready to be played.
+     * @param array<string,int> $options
      */
     protected function setupNewGame($players, $options = []): mixed
     {
@@ -182,14 +187,13 @@ class Game extends \Bga\GameFramework\Table
         $gameinfos = $this->getGameinfos();
         $default_colors = $gameinfos['player_colors'];
         Utils::shuffle($default_colors);
+        $query_values = [];
         foreach ($players as $player_id => $player) {
             // Now you can access both $player_id and $player array
-            $query_values[] = vsprintf("('%s', '%s', '%s', '%s', '%s')", [
+            $query_values[] = vsprintf("('%s', '%s', '%s')", [
                 $player_id,
                 array_shift($default_colors),
-                $player["player_canal"],
                 addslashes($player["player_name"]),
-                addslashes($player["player_avatar"]),
             ]);
         }
 
@@ -206,7 +210,7 @@ class Game extends \Bga\GameFramework\Table
         // $this->reloadPlayersBasicInfos();
 
         // Init game statistics.
-        $this->stats->initAll(array_keys($players));
+        $this->stats->initAll();
 
         // Create the game.
         Model::createNewGame(

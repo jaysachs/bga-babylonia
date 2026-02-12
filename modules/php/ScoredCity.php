@@ -34,8 +34,8 @@ class ScoredCity
      * all are from player_id -> ...
      * @param HexWinner $hex_winner
      * @param array<int,int> $captured_city_points
-     * @param array<int,Hex[]> $scoringHexes,
-     * @param array<int,Hex[]> $networkHexes
+     * @param array<int,list<Hex>> $scoringHexes,
+     * @param array<int,list<Hex>> $networkHexes
      */
     public function __construct(
         public HexWinner $hex_winner,
@@ -100,21 +100,21 @@ class ScoredCity
         return $this->captured_city_points[$player_id];
     }
 
-    /** @return RowCol[] */
+    /** @return list<RowCol> */
     public function scoringLocationsForPlayer(int $player_id): array
     {
         return $this->toRowCol($this->scoringHexes[$player_id]);
     }
 
-    /** @return RowCol[] */
+    /** @return list<RowCol> */
     public function networkLocationsForPlayer(int $player_id): array
     {
         return $this->toRowCol($this->networkHexes[$player_id]);
     }
 
     /**
-     * @param Hex[] $hexes
-     * @return RowCol[]
+     * @param list<Hex> $hexes
+     * @return list<RowCol>
      */
     private function toRowCol(array &$hexes): array
     {

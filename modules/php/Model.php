@@ -233,11 +233,11 @@ class Model
         return PlayAllowedResult::failure("cannot place extra nobles");
     }
 
-    /*
+    /**
      * Returns an array ["piece" => [rc1, rc2,...], ...]
      * for piece types that are in hand
      *
-     * @return RowCol[]
+     * @return array<string,list<RowCol>>
      */
     public function getAllowedMoves(): array
     {
@@ -502,7 +502,7 @@ class Model
         return $scoredCity;
     }
 
-    /** @return RowCol[] */
+    /** @return list<RowCol> */
     public function locationsRequiringScoring(): array
     {
         $result = [];

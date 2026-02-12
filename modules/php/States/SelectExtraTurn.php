@@ -47,7 +47,7 @@ class SelectExtraTurn extends AbstractState
     }
 
     #[PossibleAction]
-    public function actChooseExtraTurn(int $active_player_id, bool $take_extra_turn)
+    public function actChooseExtraTurn(int $active_player_id, bool $take_extra_turn): mixed
     {
         if ($take_extra_turn) {
             $model = $this->createModel($active_player_id);

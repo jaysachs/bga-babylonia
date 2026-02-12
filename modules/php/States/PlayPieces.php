@@ -48,6 +48,7 @@ class PlayPieces extends AbstractState
         );
     }
 
+    /** @return array{allowedMoves:array<string,list<RowCol>>,canEndTurn:bool,canUndo:bool} */
     public function getArgs(int $active_player_id): array
     {
         $model = $this->createModel($active_player_id);

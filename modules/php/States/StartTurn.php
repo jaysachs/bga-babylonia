@@ -37,7 +37,7 @@ class StartTurn extends AbstractState
         parent::__construct(game: $game, id: 2, type: StateType::GAME);
     }
 
-    function onEnteringState(int $active_player_id) {
+    function onEnteringState(int $active_player_id): mixed {
         // the code to run when entering the state
         $this->stats->PLAYER_NUMBER_TURNS->inc($active_player_id);
         $this->giveExtraTime($active_player_id);

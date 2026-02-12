@@ -30,10 +30,10 @@ namespace Bga\Games\babylonia;
 
 interface Db
 {
-    /** @return string[][] */
+    /** @return list<array<string,string>> */
     public function getObjectList(string $sql): array;
 
-    /** @return string[] */
+    /** @return list<string> */
     public function getSingleFieldList(string $sql): array;
 
     public function execute(string $sql): void;
