@@ -34,8 +34,6 @@ use Bga\Games\babylonia\Utils\DefaultDb;
 use Bga\Games\babylonia\Utils\Log;
 use Bga\Games\babylonia\Utils\Logger;
 
-require_once(APP_GAMEMODULE_PATH . "module/table/table.game.php");
-
 class GameLogger implements Logger {
 	function __construct(private Table $table) { }
 

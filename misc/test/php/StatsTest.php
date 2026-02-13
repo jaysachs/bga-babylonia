@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 use PHPUnit\Framework\TestCase;
 
-require_once('modules/php/Stats.php');
-
 use Bga\Games\babylonia\{
     Stats
 };
