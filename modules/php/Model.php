@@ -56,6 +56,7 @@ class PlayAllowedResult {
 
 namespace Bga\Games\babylonia {
 
+use Bga\GameFramework\UserException;
 use Bga\Games\babylonia\ModelImpl\PlayAllowedResult;
 
 class Model
@@ -440,7 +441,7 @@ class Model
         $hex = $this->board()->hexAt($rc);
         $lrs = $this->locationsRequiringScoring();
         if (array_search($hex->rc, $lrs) === false) {
-            throw new \BgaUserException("hex {$hex} is not scoreable");
+            throw new UserException("hex {$hex} is not scoreable");
         }
         if ($hex->piece->isCity()) {
             $this->stats->PLAYER_CITY_SCORING_TRIGGERED->inc($this->player_id);
