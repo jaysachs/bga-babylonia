@@ -217,9 +217,7 @@ class PersistentStore
         foreach ($rows as $row) {
             $pid = intval($row["player_id"]);
             if ($pid == 0) { $pid = null; }
-            // FIXME: it may be an int or a bool. We need to know the stat type, and don't have it.
-            $val = floatval($row["val"]);
-            $statOps[] = new StatOp(OpType::from($row["op"]), $row["stat_name"], $pid, $val);
+            $statOps[] = new StatOp(OpType::from($row["op"]), $row["stat_name"], $pid, $row["val"]);
         }
         $sql = "DELETE FROM turn_progress
                 WHERE player_id=$player_id";
