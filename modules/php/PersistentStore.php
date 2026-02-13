@@ -55,6 +55,7 @@ class PersistentStore
 
     public function rowColBeingScored(): ?RowCol
     {
+        /** @var int|null */
         $v = $this->globals->get(PersistentStore::GLOBAL_ROW_COL_BEING_SCORED);
         if ($v == 0) {
             return null;
@@ -69,7 +70,9 @@ class PersistentStore
 
     public function playerOnTurn(): int
     {
-        return intval($this->globals->get(PersistentStore::GLOBAL_PLAYER_ON_TURN));
+        /** @var int|null */
+        $v = $this->globals->get(PersistentStore::GLOBAL_PLAYER_ON_TURN);
+        return intval($v);
     }
 
     public function setPlayerOnTurn(int $player_id): void
@@ -206,7 +209,7 @@ class PersistentStore
         }
     }
 
-    /** @return array<int,StatOp> */
+    /** @return list<StatOp> */
     public function deleteAllMoves(int $player_id): array
     {
         $rows = $this->db->getObjectList("SELECT op, stat_name, player_id, val FROM turn_progress_stats ORDER BY seq_id");
@@ -214,7 +217,9 @@ class PersistentStore
         foreach ($rows as $row) {
             $pid = intval($row["player_id"]);
             if ($pid == 0) { $pid = null; }
-            $statOps[] = new StatOp(OpType::from($row["op"]), $row["stat_name"], $pid, $row["val"]);
+            // FIXME: it may be an int or a bool. We need to know the stat type, and don't have it.
+            $val = floatval($row["val"]);
+            $statOps[] = new StatOp(OpType::from($row["op"]), $row["stat_name"], $pid, $val);
         }
         $sql = "DELETE FROM turn_progress
                 WHERE player_id=$player_id";
