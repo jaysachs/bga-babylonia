@@ -1012,10 +1012,11 @@ export class Game extends BaseGame<BGamedatas> {
     await this.animationManager.slideOutAndDestroy(
       hex.firstElementChild as HTMLElement, dest, {}).then(() => {
         this.unmarkHexSelected(args);
-        args.details.forEach(details => {
+        for (const playerId in args.details) {
+          const details = args.details[playerId]!;
           this.bga.playerPanels.getScoreCounter(details.player_id).incValue(details.capture_points);
           this.updateCapturedCityCount(details);
-        });
+        }
       }).then(() => this.unmarkHexSelected(args));
   }
 
