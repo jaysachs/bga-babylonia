@@ -302,6 +302,7 @@ namespace Bga\GameFramework {
     abstract class Bga {
         public Db\Globals $globals;
         public Notify $notify;
+        public Logs $logs;
         public Legacy $legacy;
         public Tournament $tournament;
         public TableOptions $tableOptions;
@@ -351,6 +352,25 @@ namespace Bga\GameFramework {
             //
         }
     }
+
+    abstract class Logs {
+        /**
+         * Returns the current move id, when doing an action, that should be stored along informations to undo.
+         * 
+         * @return int the current move id
+         */
+        function getCurrentMoveId(): int {
+            return 0;
+        }
+
+        /**
+         * Remove all logs from a move id that was stored during an action using `getCurrentMoveId()`.
+         * The game should be in the exact same point as it was before the stored action.
+         */
+        function remove(int $startMoveId): void {
+        }
+    }
+
 
     abstract class Legacy {
         /**
@@ -2176,7 +2196,7 @@ namespace Bga\GameFramework {
          *
          * @param array<int, array{ player_name: string, player_colors: array<string> }> $players
          * @param array $options
-         * @return void
+         * @return mixed the first state (id or class)
          */
         abstract protected function setupNewGame($players, $options = []);
 

@@ -5,16 +5,16 @@ import { BgaAnimations, AnimationManager } from './libs';
 
 type SpecialLogArgs = Record<string, (any) => HTMLElement>;
 
-export abstract class BaseGame<T extends Gamedatas> {
+export abstract class BaseGame<P extends Player, T extends Gamedatas<P>> {
   protected currentState: string | null;
   private pendingUpdate: boolean;
   private currentPlayerWasActive: boolean;
   protected readonly animationManager: AnimationManager;
   protected gamedatas: T;
-  public readonly bga: Bga<T>;
+  public readonly bga: Bga<P, T>;
   private readonly special_log_args: SpecialLogArgs;
 
-  constructor(bga: Bga<T>, special_log_args: SpecialLogArgs) {
+  constructor(bga: Bga<P, T>, special_log_args: SpecialLogArgs) {
     console.log('game constructor');
     this.bga = bga;
     this.special_log_args = special_log_args;

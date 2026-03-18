@@ -166,7 +166,7 @@ interface Zcard {
   owning_player_id: number;
 }
 
-interface BGamedatas extends Gamedatas {
+interface BGamedatas extends Gamedatas<Player> {
   player_data: PlayerData[];
   board: Hex[];
   hand: string[];
@@ -181,7 +181,7 @@ interface PlayState {
 }
 
 /** Game class */
-export class Game extends BaseGame<BGamedatas> {
+export class Game extends BaseGame<Player, BGamedatas> {
   private handCounters: Counter[] = [];
   private poolCounters: Counter[] = [];
   private cityCounters: Counter[] = [];
@@ -190,7 +190,7 @@ export class Game extends BaseGame<BGamedatas> {
   private static playerIdToColorIndex: Record<number, number> = {};
   private zcardTooltips: string[] = [];
 
-  constructor(bga: Bga<BGamedatas>) {
+  constructor(bga: Bga<Player, BGamedatas>) {
     super(bga, Game.special_log_args);
   }
 
