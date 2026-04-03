@@ -21,15 +21,15 @@
 ALTER TABLE `player` ADD `captured_city_count` INT UNSIGNED NOT NULL DEFAULT '0';
 
 CREATE TABLE IF NOT EXISTS `handpools` (
-  `player_id` int(10) unsigned NOT NULL,
-  `seq_id` int(3) unsigned NOT NULL,
+  `player_id` int unsigned NOT NULL,
+  `seq_id` int unsigned NOT NULL,
   `piece` varchar(8) NOT NULL,
   PRIMARY KEY (`player_id`, `seq_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ;
 
 CREATE TABLE IF NOT EXISTS `hands` (
-  `player_id` int(10) unsigned NOT NULL,
-  `pos` int(2) unsigned NOT NULL,
+  `player_id` int unsigned NOT NULL,
+  `pos` int unsigned NOT NULL,
   `piece` varchar(8) NOT NULL,
   PRIMARY KEY (`player_id`, `pos`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -37,39 +37,39 @@ CREATE TABLE IF NOT EXISTS `hands` (
 -- Needed to determine allowable plays (e.g. 3+ if all farmers, some ziggurat powers)
 -- Also useful for incremental undo.
 CREATE TABLE IF NOT EXISTS `turn_progress` (
-  `player_id` int(10) unsigned NOT NULL,
-  `seq_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `player_id` int unsigned NOT NULL,
+  `seq_id` int unsigned NOT NULL AUTO_INCREMENT,
   `original_piece` varchar(8) NOT NULL,
   `piece` varchar(8) NOT NULL,
   -- position in hand
-  `handpos` int(2) NOT NULL,
+  `handpos` int NOT NULL,
   -- where it was placed
-  `board_row` int(10) unsigned NOT NULL,
-  `board_col` int(10) unsigned NOT NULL,
+  `board_row` int unsigned NOT NULL,
+  `board_col` int unsigned NOT NULL,
   -- what field was "captured" if any
   `captured_piece` varchar(8) DEFAULT NULL,
   -- what was immediately scored (field and/or ziggurat adjacency)
-  `field_points` int(10) unsigned DEFAULT NULL,
-  `ziggurat_points` int(10) unsigned DEFAULT NULL,
+  `field_points` int unsigned DEFAULT NULL,
+  `ziggurat_points` int unsigned DEFAULT NULL,
   -- no need to record "inversion", as the hextype will tell us
   PRIMARY KEY (`seq_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 CREATE TABLE IF NOT EXISTS `turn_progress_stats` (
-  `turn_progress_seq_id` int(10) unsigned NOT NULL,
-  `seq_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `turn_progress_seq_id` int unsigned NOT NULL,
+  `seq_id` int unsigned NOT NULL AUTO_INCREMENT,
   `op` varchar(3) NOT NULL,
   `stat_name` varchar(40) NOT NULL,
-  `player_id` int(10) unsigned,
+  `player_id` int unsigned,
   `val` varchar(20),
   PRIMARY KEY (`seq_id`),
   FOREIGN KEY (`turn_progress_seq_id`) REFERENCES `turn_progress` (`seq_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 CREATE TABLE IF NOT EXISTS `ziggurat_cards` (
-  `seq_id` int(10) unsigned NOT NULL,
+  `seq_id` int unsigned NOT NULL,
   -- which player holds it; if 0 still available
-  `player_id` int(10) unsigned,
+  `player_id` int unsigned,
   -- whether the one-shot power was activated
   `used` boolean NOT NULL DEFAULT false,
   -- the card itself
@@ -78,8 +78,8 @@ CREATE TABLE IF NOT EXISTS `ziggurat_cards` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `board` (
-  `board_row` smallint(5) unsigned NOT NULL,
-  `board_col` smallint(5) unsigned NOT NULL,
+  `board_row` int unsigned NOT NULL,
+  `board_col` int unsigned NOT NULL,
    -- LAND or WATER
   `hextype` varchar(8) NOT NULL,
    -- one of: CITY_{P,S,M,MS,MP,SP,MSP}, FIELD_{5,6,7,X}, ZIGGURAT,
@@ -88,7 +88,7 @@ CREATE TABLE IF NOT EXISTS `board` (
    --   to HIDDEN before returning to client
   `piece` varchar(8) DEFAULT NULL,
   `scored` boolean DEFAULT FALSE,
-  `player_id` int(10) unsigned DEFAULT NULL,
+  `player_id` int unsigned DEFAULT NULL,
   `landmass` varchar(8) NOT NULL,
   PRIMARY KEY (`board_row`,`board_col`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
