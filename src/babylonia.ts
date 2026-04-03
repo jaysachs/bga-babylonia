@@ -185,22 +185,22 @@ export class Game extends BaseGame<Player, BGamedatas> {
   private handCounters: Counter[] = [];
   private poolCounters: Counter[] = [];
   private cityCounters: Counter[] = [];
-  private selectedHandDiv: Element | null = null;
-  private playStateArgs: PlayState | null = null;
   private static playerIdToColorIndex: Record<number, number> = {};
-  private zcardTooltips: string[] = [];
+  public zcardTooltips: string[] = [];
+
+  public get currentPlayerState(): BabyloniaState | null {
+    return this.bga.states.getCurrentPlayerStateClass() as any;
+  }
+
+  public get playStateArgs(): PlayState | null {
+    return this.currentPlayerState?.playStateArgs || null;
+  }
 
   constructor(bga: Bga<Player, BGamedatas>) {
     super(bga, Game.special_log_args);
   }
 
-  private setupHandlers(): void {
-    $(IDS.HAND).addEventListener('click', this.onHandClicked.bind(this));
-    $(IDS.BOARD).addEventListener('click', this.onBoardClicked.bind(this));
-    $(IDS.AVAILABLE_ZCARDS).addEventListener('click', this.onZcardClicked.bind(this));
-  }
-
-  private addTooltipsToLog() {
+  public addTooltipsToLog() {
     const elements = document.querySelectorAll(`[${Attrs.ZTYPE}]:not([${Attrs.TT_PROCESSED}])`);
     elements.forEach(ele => {
       ele.setAttribute(Attrs.TT_PROCESSED, '');  // prevents tooltips being re-added to previous log entries
@@ -237,10 +237,20 @@ export class Game extends BaseGame<Player, BGamedatas> {
     console.log('Setting up ziggurat cards', gamedatas.ziggurat_cards);
     this.setupZcards(gamedatas.ziggurat_cards);
 
-    console.log('setting up handlers');
-    this.setupHandlers();
-
     this.bga.notifications.setupPromiseNotifications({ logger: console.log, onEnd: this.addTooltipsToLog.bind(this) });
+
+    // Register states
+    this.bga.states.register('SelectExtraTurn', new SelectExtraTurnState(this));
+    this.bga.states.register('EndOfTurnScoring', new EndOfTurnScoringState(this));
+    this.bga.states.register('SelectZigguratCard', new SelectZigguratCardState(this));
+    this.bga.states.register('PlayPieces', new PlayPiecesState(this));
+    this.bga.states.register('SelectScoringHex', new SelectScoringHexState(this));
+    this.bga.states.register('client_pickHexToPlay', new ClientPickHexToPlayState(this));
+    this.bga.states.register('client_selectPieceOrEndTurn', new ClientSelectPieceOrEndTurnState(this));
+    this.bga.states.register('client_mustSelectPiece', new ClientMustSelectPieceState(this));
+    this.bga.states.register('client_noPlaysLeft', new ClientNoPlaysLeftState(this));
+    this.bga.states.register('client_undo', new ClientUndoState(this));
+    this.bga.states.register('client_hexpicked', new ClientHexPickedState(this));
 
     // if a ziggurat card is being chosen
     // TODO: should this be done in the state watcher?
@@ -338,7 +348,7 @@ export class Game extends BaseGame<Player, BGamedatas> {
       animate);
   }
 
-  private hexDiv(rc: RowCol): HTMLElement {
+  public hexDiv(rc: RowCol): HTMLElement {
     return $(IDS.hexDiv(rc));
   }
 
@@ -357,7 +367,7 @@ export class Game extends BaseGame<Player, BGamedatas> {
   }
 
   // Returns the hex (row,col) clicked on, or null if not a playable hex
-  private selectedHex(target: EventTarget): RowCol | null {
+  public selectedHex(target: EventTarget): RowCol | null {
     let hexDiv = target as Element;
     while (hexDiv.parentElement != null && hexDiv.parentElement.id != IDS.BOARD) {
       hexDiv = hexDiv.parentElement;
@@ -377,287 +387,30 @@ export class Game extends BaseGame<Player, BGamedatas> {
     };
   }
 
-  private selectHexToScore(event: Event) {
-    const hex = this.selectedHex(event.target!);
-    if (hex == null) {
-      return;
-    }
-    let div = this.hexDiv(hex);
-    let piece = div.firstElementChild!.getAttribute(Attrs.PIECE);
-    div.classList.add(CSS.SELECTED);
-    this.bga.states.setClientState('client_hexpicked', {});
-    this.bga.statusBar.setTitle(_('Score ${city} at (${row},${col})?'), {
-      row: hex.row, col: hex.col, city: piece,
-    });
-    this.bga.statusBar.addActionButton(_('Confirm'),
-      () => this.bgaPerformAction('actSelectHexToScore', hex).then(() => this.unmarkHexPlayable(hex)),
-      { autoclick: true });
-    this.bga.statusBar.addActionButton(_('Cancel'),
-      () => {
-        div.classList.remove(CSS.SELECTED);
-        this.bga.states.restoreServerGameState();
-      },
-      { color: "secondary" });
-  }
-
-  private playSelectedPiece(event: Event): void {
-    if (!this.selectedHandDiv) {
-      console.error('no piece selected!');
-      return;
-    }
-
-    const hex = this.selectedHex(event.target!);
-    if (hex == null) {
-      console.error('no hex selected!');
-      return;
-    }
-    this.bga.states.setClientState('client_hexpicked', {});
-    this.bgaPerformAction('actPlayPiece', {
-      handpos: this.indexInParent(this.selectedHandDiv),
-      row: hex.row,
-      col: hex.col
-    }).then(() => {
-      this.unmarkHexPlayable(hex);
-    });
-    this.unselectAllHandPieces();
-  }
-
-  private onBoardClicked(event: Event): boolean {
-    event.preventDefault();
-    event.stopPropagation();
-    if (!this.bga.players.isCurrentPlayerActive()) {
-      return false;
-    }
-    switch (this.currentState) {
-      case 'client_pickHexToPlay':
-        this.playSelectedPiece(event);
-        break;
-      case 'SelectScoringHex':
-        this.selectHexToScore(event);
-        break;
-    }
-    return false;
-  }
-
-  private onZcardClicked(event: Event): boolean {
-    event.preventDefault();
-    event.stopPropagation();
-    if (!this.bga.players.isCurrentPlayerActive()) {
-      return false;
-    }
-    if (this.currentState != 'SelectZigguratCard') {
-      return false;
-    }
-
-    let e = event.target as HTMLElement;
-    let z = e.getAttribute(Attrs.ZTYPE);
-    if (!z) { return false; }
-    // let c = e.parentElement!.classList;
-    // if (c.contains(CSS.UNPLAYABLE)) { return false; }
-    if (e.getAttribute(Attrs.ZTYPE)) {
-      this.toggleZcardSelected(e);
-    }
-    return false;
-  }
-
-  private toggleZcardSelected(e: Element) {
-    const zt = e.getAttribute(Attrs.ZTYPE)!;
-    let promptForConfirmation = () => {
-      this.bga.statusBar.setTitle(_('Select ziggurat card ${zcard}?'), { zcard: zt });
-      // this is a little bit of encapsulation breakage ...
-      //   would be nice if this happened automatically.
-      this.addTooltipsToLog();
-
-      this.bga.statusBar.addActionButton(_('Confirm'),
-        () => this.bgaPerformAction('actSelectZigguratCard', { zctype: zt }),
-        { autoclick: true }
-      );
-
-      this.bga.statusBar.addActionButton(
-        _('Cancel'),
-        () => this.toggleZcardSelected(e),
-        { color: "secondary"});
-    };
-    let cancel = () => this.bga.states.restoreServerGameState();
-
-    let alreadySelected = document.querySelector(`#${IDS.AVAILABLE_ZCARDS} > .${CSS.SELECTED}`);
-    e.classList.toggle(CSS.SELECTED);
-    if (alreadySelected == null) {
-      promptForConfirmation();
-    } else if (alreadySelected == e) {
-      // remove confirm and cancel buttons from action bar
-      cancel();
-    } else {
-      alreadySelected.classList.toggle(CSS.SELECTED);
-      // buttons should already be in right state but we need to change the title bar text.
-      // (We also can't reset the timer.) So we remove & add.
-      cancel();
-      promptForConfirmation();
-    }
-  }
-
-  private allowedMovesFor(div: Element | null): RowCol[] {
-    if (!div) { return []; }
-    // Peel off player number
-    const piece = div.getAttribute(Attrs.PIECE)!.split('_')[0]!;
-    return (this.playStateArgs!.allowedMoves as any)[piece] || [];
-  }
-
-  private markHexPlayable(rc: RowCol): void {
+  public markHexPlayable(rc: RowCol): void {
     this.hexDiv(rc).classList.add(CSS.PLAYABLE);
   }
 
-  private unmarkHexPlayable(rc: RowCol): void {
+  public unmarkHexPlayable(rc: RowCol): void {
     this.hexDiv(rc).classList.remove(CSS.PLAYABLE);
   }
 
-  private markHexSelected(rc: RowCol): void {
+  public markHexSelected(rc: RowCol): void {
     this.hexDiv(rc).classList.add(CSS.SELECTED);
   }
 
-  private unmarkHexSelected(rc: RowCol): void {
+  public unmarkHexSelected(rc: RowCol): void {
     this.hexDiv(rc).classList.remove(CSS.SELECTED);
   }
 
-  private markHexesPlayable(hexes: RowCol[]): void {
+  public markHexesPlayable(hexes: RowCol[]): void {
     hexes.forEach(this.markHexPlayable.bind(this));
   }
 
-  private unmarkHexesPlayable(hexes: RowCol[]): void {
+  public unmarkHexesPlayable(hexes: RowCol[]): void {
     hexes.forEach(this.unmarkHexPlayable.bind(this));
   }
 
-  private markHexesPlayableForPiece(div: Element): void {
-    this.markHexesPlayable(this.allowedMovesFor(div));
-  }
-
-  private unmarkHexesPlayableForPiece(div: Element): void {
-    this.unmarkHexesPlayable(this.allowedMovesFor(div));
-  }
-
-  private unselectAllHandPieces(): void {
-    const hand = $(IDS.HAND);
-    hand.childNodes.forEach((posDiv : HTMLElement) => {
-      const cl = posDiv.classList;
-      if (cl.contains(CSS.SELECTED)) {
-        this.unmarkHexesPlayableForPiece(posDiv.firstElementChild!);
-      }
-      cl.remove(CSS.SELECTED);
-      cl.remove(CSS.PLAYABLE);
-      cl.remove(CSS.UNPLAYABLE);
-    });
-    this.selectedHandDiv = null;
-  }
-
-  private setPlayablePieces(): void {
-    const hand = $(IDS.HAND);
-    hand.childNodes.forEach((child : HTMLElement) => {
-      const cl = child.classList;
-      if (this.allowedMovesFor(child.firstElementChild).length > 0) {
-        cl.add(CSS.PLAYABLE);
-        cl.remove(CSS.UNPLAYABLE);
-      } else {
-        cl.remove(CSS.PLAYABLE);
-        cl.add(CSS.UNPLAYABLE);
-      }
-    });
-  }
-
-  private setStatusBarForPlayState(): void {
-    if (!this.bga.players.isCurrentPlayerActive()) {
-      return;
-    }
-    if (this.playStateArgs == null) {
-      console.error('playStateArgs unexpectedly null');
-      return;
-    }
-    this.selectedHandDiv = null;
-    if (this.playStateArgs.canEndTurn) {
-      if (this.playStateArgs.allowedMoves.length == 0) {
-        this.bga.states.setClientState('client_noPlaysLeft', {
-          descriptionmyturn: _('${you} must end your turn'),
-        });
-        this.setPlayablePieces();
-      } else {
-        this.bga.states.setClientState('client_selectPieceOrEndTurn', {
-          descriptionmyturn: _('${you} may select a piece to play or end your turn'),
-        });
-        this.setPlayablePieces();
-      }
-      this.bga.statusBar.addActionButton(
-        _('End turn'),
-        () => {
-          this.unselectAllHandPieces();
-          this.bgaPerformAction('actDonePlayPieces');
-        });
-    } else {
-      this.bga.states.setClientState('client_mustSelectPiece', {
-        descriptionmyturn: _('${you} must select a piece to play'),
-      });
-      this.setPlayablePieces();
-    }
-    if (this.playStateArgs.canUndo) {
-      this.bga.statusBar.addActionButton(
-        _('Undo'),
-        () => { this.bga.states.setClientState('client_undo', { }); this.bgaPerformAction('actUndoPlay'); },
-        { color: "alert" }
-      );
-    }
-  }
-
-  private onHandClicked(ev: Event): boolean {
-    ev.preventDefault();
-    ev.stopPropagation();
-    if (!this.bga.players.isCurrentPlayerActive()) {
-      return false;
-    }
-    if (this.currentState != 'client_selectPieceOrEndTurn'
-      && this.currentState != 'client_pickHexToPlay'
-      && this.currentState != 'client_mustSelectPiece') {
-      return false;
-    }
-    const pieceDiv = ev.target as HTMLElement;
-    let p = pieceDiv.getAttribute(Attrs.PIECE);
-    if (!p || p == Piece.EMPTY) { return false; }
-
-    let parentDiv = pieceDiv.parentElement!;
-    let cl = parentDiv.classList;
-    if (cl.contains(CSS.UNPLAYABLE)) { return false; }
-    // if (parent.parentElement!.id != IDS.HAND) {
-    //   return false;
-    // }
-
-    if (this.allowedMovesFor(pieceDiv).length == 0) {
-      return false;
-    }
-    let playable = false;
-    if (!cl.contains(CSS.SELECTED)) {
-      this.unselectAllHandPieces();
-      this.markHexesPlayableForPiece(pieceDiv);
-      playable = true;
-    } else {
-      this.unmarkHexesPlayableForPiece(pieceDiv);
-    }
-    cl.toggle(CSS.SELECTED);
-    if (playable) {
-      this.selectedHandDiv = parentDiv;
-      if (this.currentState != 'client_pickHexToPlay') {
-        this.bga.states.setClientState('client_pickHexToPlay', {
-          descriptionmyturn: _('${you} must select a hex to play to'),
-        });
-        this.bga.statusBar.addActionButton(
-          _('Cancel'),
-          () => {
-            this.unselectAllHandPieces();
-            this.setStatusBarForPlayState();
-          },
-        { color: "secondary"});
-      }
-    } else {
-      this.setStatusBarForPlayState();
-    }
-    return false;
-  }
 
   private setupPlayerBoard(player: PlayerData): void {
     const playerId = player.player_id;
@@ -677,41 +430,8 @@ export class Game extends BaseGame<Player, BGamedatas> {
     this.bga.playerPanels.getScoreCounter(playerId).setValue(player.score);
   }
 
-  private onUpdateActionButtons_SelectExtraTurn(): void {
-    this.bga.statusBar.addActionButton(
-      _('Take your one-time extra turn'),
-      () => this.bgaPerformAction('actChooseExtraTurn', {
-        take_extra_turn: true
-      }));
-    this.bga.statusBar.addActionButton(
-      _('Just finish your turn'),
-      () => this.bgaPerformAction('actChooseExtraTurn', {
-        take_extra_turn: false
-      }));
-  }
 
-  private onUpdateActionButtons_EndOfTurnScoring(): void {
-    this.markAllHexesUnplayable();
-  }
-
-  private onUpdateActionButtons_SelectZigguratCard(): void {
-    // TODO: do better than this?
-    const div = $(IDS.AVAILABLE_ZCARDS);
-    div.scrollIntoView(false);
-    //  div.classList.add(CSS.SELECTING);
-  }
-
-  private onUpdateActionButtons_PlayPieces(args: PlayState): void {
-    this.playStateArgs = args;
-    this.setStatusBarForPlayState();
-    this.markAllHexesUnplayable();
-  }
-
-  private onUpdateActionButtons_SelectScoringHex(args: { hexes: RowCol[] }): void {
-    this.markHexesPlayable(args.hexes);
-  }
-
-  private markAllHexesUnplayable(): void {
+  public markAllHexesUnplayable(): void {
     $(IDS.BOARD).querySelectorAll('.' + CSS.PLAYABLE)
       .forEach(div => div.classList.remove(CSS.PLAYABLE));
   }
@@ -1029,3 +749,374 @@ export class Game extends BaseGame<Player, BGamedatas> {
     original_piece: (args: any) => BHtml.span({ attrs: Attrs.piece(Game.pieceVal(args.original_piece, args.player_id))}),
   };
 }
+
+export abstract class BabyloniaState {
+  public playStateArgs: PlayState | null = null;
+  
+  protected get selectedHandDiv(): Element | null {
+    return document.querySelector(`#${IDS.HAND} > .${CSS.SELECTED}`);
+  }
+
+  constructor(protected game: Game) {}
+
+  public onEnteringState(args: any, isCurrentPlayerActive: boolean) {
+    if (args && args.playStateArgs) {
+      this.playStateArgs = args.playStateArgs;
+    } else if (args && args.allowedMoves) {
+      this.playStateArgs = args as PlayState;
+    }
+    this.doEnterState(args, isCurrentPlayerActive);
+  }
+
+  public onLeavingState(args: any, isCurrentPlayerActive: boolean) {
+    this.doLeaveState(args, isCurrentPlayerActive);
+  }
+
+  protected doEnterState(args: any, isCurrentPlayerActive: boolean) {}
+  protected doLeaveState(args: any, isCurrentPlayerActive: boolean) {}
+
+  public playSelectedPiece(event: Event): void {
+    const handDiv = this.selectedHandDiv;
+    if (!handDiv) {
+      console.error('no piece selected!');
+      return;
+    }
+
+    const hex = this.game.selectedHex(event.target!);
+    if (hex == null) {
+      console.error('no hex selected!');
+      return;
+    }
+    this.game.bga.states.setClientState('client_hexpicked', {});
+    this.game.bgaPerformAction('actPlayPiece', {
+      handpos: this.game.indexInParent(handDiv),
+      row: hex.row,
+      col: hex.col
+    }).then(() => {
+      this.game.unmarkHexPlayable(hex);
+    });
+    this.unselectAllHandPieces();
+  }
+
+  protected allowedMovesFor(div: Element | null): RowCol[] {
+    if (!div) { return []; }
+    const piece = div.getAttribute(Attrs.PIECE)!.split('_')[0]!;
+    return (this.playStateArgs!.allowedMoves as any)[piece] || [];
+  }
+
+  protected markHexesPlayableForPiece(div: Element): void {
+    this.game.markHexesPlayable(this.allowedMovesFor(div));
+  }
+
+  protected unmarkHexesPlayableForPiece(div: Element): void {
+    this.game.unmarkHexesPlayable(this.allowedMovesFor(div));
+  }
+
+  public unselectAllHandPieces(): void {
+    const hand = $(IDS.HAND);
+    hand.childNodes.forEach((posDiv : HTMLElement) => {
+      const cl = posDiv.classList;
+      if (cl.contains(CSS.SELECTED)) {
+        this.unmarkHexesPlayableForPiece(posDiv.firstElementChild!);
+      }
+      cl.remove(CSS.SELECTED);
+      cl.remove(CSS.PLAYABLE);
+      cl.remove(CSS.UNPLAYABLE);
+    });
+  }
+
+  public setPlayablePieces(): void {
+    const hand = $(IDS.HAND);
+    hand.childNodes.forEach((child : HTMLElement) => {
+      const cl = child.classList;
+      if (this.allowedMovesFor(child.firstElementChild).length > 0) {
+        cl.add(CSS.PLAYABLE);
+        cl.remove(CSS.UNPLAYABLE);
+      } else {
+        cl.remove(CSS.PLAYABLE);
+        cl.add(CSS.UNPLAYABLE);
+      }
+    });
+  }
+
+  public onHandClickedLogic(ev: Event): boolean {
+    const pieceDiv = ev.target as HTMLElement;
+    let p = pieceDiv.getAttribute(Attrs.PIECE);
+    if (!p || p == Piece.EMPTY) { return false; }
+
+    let parentDiv = pieceDiv.parentElement!;
+    let cl = parentDiv.classList;
+    if (cl.contains(CSS.UNPLAYABLE)) { return false; }
+
+    if (this.allowedMovesFor(pieceDiv).length == 0) {
+      return false;
+    }
+    let playable = false;
+    if (!cl.contains(CSS.SELECTED)) {
+      this.unselectAllHandPieces();
+      this.markHexesPlayableForPiece(pieceDiv);
+      playable = true;
+    } else {
+      this.unmarkHexesPlayableForPiece(pieceDiv);
+    }
+    cl.toggle(CSS.SELECTED);
+    if (playable) {
+      if (this.game.currentState != 'client_pickHexToPlay') {
+        this.game.bga.states.setClientState('client_pickHexToPlay', {
+          descriptionmyturn: _('${you} must select a hex to play to'),
+          playStateArgs: this.playStateArgs,
+        });
+        this.game.bga.statusBar.addActionButton(
+          _('Cancel'),
+          () => {
+            this.unselectAllHandPieces();
+            this.setStatusBarForPlayState();
+          },
+        { color: "secondary"});
+      }
+    } else {
+      this.setStatusBarForPlayState();
+    }
+    return false;
+  }
+
+  public setStatusBarForPlayState(): void {
+    const bga = this.game.bga;
+    if (!bga.players.isCurrentPlayerActive()) {
+      return;
+    }
+    if (this.playStateArgs == null) {
+      console.error('playStateArgs unexpectedly null');
+      return;
+    }
+    if (this.playStateArgs.canEndTurn) {
+      if (this.playStateArgs.allowedMoves.length == 0) {
+        bga.states.setClientState('client_noPlaysLeft', {
+          descriptionmyturn: _('${you} must end your turn'),
+          playStateArgs: this.playStateArgs
+        });
+        this.setPlayablePieces();
+      } else {
+        bga.states.setClientState('client_selectPieceOrEndTurn', {
+          descriptionmyturn: _('${you} may select a piece to play or end your turn'),
+          playStateArgs: this.playStateArgs
+        });
+        this.setPlayablePieces();
+      }
+      bga.statusBar.addActionButton(
+        _('End turn'),
+        () => {
+          this.unselectAllHandPieces();
+          this.game.bgaPerformAction('actDonePlayPieces');
+        });
+    } else {
+      bga.states.setClientState('client_mustSelectPiece', {
+        descriptionmyturn: _('${you} must select a piece to play'),
+        playStateArgs: this.playStateArgs
+      });
+      this.setPlayablePieces();
+    }
+    if (this.playStateArgs.canUndo) {
+      bga.statusBar.addActionButton(
+        _('Undo'),
+        () => { bga.states.setClientState('client_undo', { playStateArgs: this.playStateArgs }); this.game.bgaPerformAction('actUndoPlay'); },
+        { color: "alert" }
+      );
+    }
+  }
+}
+
+export class SelectExtraTurnState extends BabyloniaState {
+  protected doEnterState(args: any, isCurrentPlayerActive: boolean) {
+    if (isCurrentPlayerActive) {
+      this.game.bga.statusBar.addActionButton(
+        _('Take your one-time extra turn'),
+        () => this.game.bgaPerformAction('actChooseExtraTurn', { take_extra_turn: true })
+      );
+      this.game.bga.statusBar.addActionButton(
+        _('Just finish your turn'),
+        () => this.game.bgaPerformAction('actChooseExtraTurn', { take_extra_turn: false })
+      );
+    }
+  }
+}
+
+export class EndOfTurnScoringState extends BabyloniaState {
+  protected doEnterState(args: any, isCurrentPlayerActive: boolean) {
+    if (isCurrentPlayerActive) {
+      this.game.markAllHexesUnplayable();
+    }
+  }
+}
+
+export class SelectZigguratCardState extends BabyloniaState {
+  private handler: (e: Event) => void;
+  constructor(game: Game) {
+    super(game);
+    this.handler = (e) => this.onZcardClicked(e);
+  }
+  protected doEnterState(args: any, isCurrentPlayerActive: boolean) {
+    if (isCurrentPlayerActive) {
+      const div = $(IDS.AVAILABLE_ZCARDS) as HTMLElement;
+      div.scrollIntoView(false);
+      $(IDS.AVAILABLE_ZCARDS).addEventListener('click', this.handler);
+    }
+  }
+  protected doLeaveState(args: any, isCurrentPlayerActive: boolean) {
+    if (isCurrentPlayerActive) {
+      $(IDS.AVAILABLE_ZCARDS).removeEventListener('click', this.handler);
+    }
+  }
+  public toggleZcardSelected(e: Element) {
+    const zt = e.getAttribute(Attrs.ZTYPE)!;
+    let promptForConfirmation = () => {
+      this.game.bga.statusBar.setTitle(_('Select ziggurat card ${zcard}?'), { zcard: zt });
+      this.game.addTooltipsToLog();
+
+      this.game.bga.statusBar.addActionButton(_('Confirm'),
+        () => this.game.bgaPerformAction('actSelectZigguratCard', { zctype: zt }),
+        { autoclick: true }
+      );
+
+      this.game.bga.statusBar.addActionButton(
+        _('Cancel'),
+        () => this.toggleZcardSelected(e),
+        { color: "secondary"});
+    };
+    let cancel = () => this.game.bga.states.restoreServerGameState();
+
+    let alreadySelected = document.querySelector(`#${IDS.AVAILABLE_ZCARDS} > .${CSS.SELECTED}`);
+    e.classList.toggle(CSS.SELECTED);
+    if (alreadySelected == null) {
+      promptForConfirmation();
+    } else if (alreadySelected == e) {
+      cancel();
+    } else {
+      alreadySelected.classList.toggle(CSS.SELECTED);
+      cancel();
+      promptForConfirmation();
+    }
+  }
+  onZcardClicked(event: Event) {
+    event.preventDefault();
+    event.stopPropagation();
+    let e = event.target as HTMLElement;
+    let z = e.getAttribute(Attrs.ZTYPE);
+    if (!z) { return false; }
+    if (e.getAttribute(Attrs.ZTYPE)) {
+      this.toggleZcardSelected(e);
+    }
+    return false;
+  }
+}
+
+export class PlayPiecesState extends BabyloniaState {
+  protected doEnterState(args: PlayState, isCurrentPlayerActive: boolean) {
+    if (isCurrentPlayerActive) {
+      this.playStateArgs = args;
+      this.setStatusBarForPlayState();
+      this.game.markAllHexesUnplayable();
+    }
+  }
+}
+
+export class SelectScoringHexState extends BabyloniaState {
+  private handler: (e: Event) => void;
+  constructor(game: Game) {
+    super(game);
+    this.handler = (e) => this.onBoardClicked(e);
+  }
+  protected doEnterState(args: { hexes: RowCol[] }, isCurrentPlayerActive: boolean) {
+    if (isCurrentPlayerActive) {
+      this.game.markHexesPlayable(args.hexes);
+      $(IDS.BOARD).addEventListener('click', this.handler);
+    }
+  }
+  protected doLeaveState(args: any, isCurrentPlayerActive: boolean) {
+    if (isCurrentPlayerActive) {
+      $(IDS.BOARD).removeEventListener('click', this.handler);
+    }
+  }
+  public selectHexToScore(event: Event) {
+    const hex = this.game.selectedHex(event.target!);
+    if (hex == null) {
+      return;
+    }
+    let div = this.game.hexDiv(hex);
+    let piece = div.firstElementChild!.getAttribute(Attrs.PIECE);
+    div.classList.add(CSS.SELECTED);
+    this.game.bga.states.setClientState('client_hexpicked', {});
+    this.game.bga.statusBar.setTitle(_('Score ${city} at (${row},${col})?'), {
+      row: hex.row, col: hex.col, city: piece,
+    });
+    this.game.bga.statusBar.addActionButton(_('Confirm'),
+      () => this.game.bgaPerformAction('actSelectHexToScore', hex).then(() => this.game.unmarkHexPlayable(hex)),
+      { autoclick: true });
+    this.game.bga.statusBar.addActionButton(_('Cancel'),
+      () => {
+        div.classList.remove(CSS.SELECTED);
+        this.game.bga.states.restoreServerGameState();
+      },
+      { color: "secondary" });
+  }
+  onBoardClicked(event: Event) {
+    event.preventDefault();
+    event.stopPropagation();
+    this.selectHexToScore(event);
+  }
+}
+
+class HandClickableState extends BabyloniaState {
+  protected handler: (e: Event) => void;
+  constructor(game: Game) {
+    super(game);
+    this.handler = (e) => this.onHandClicked(e);
+  }
+  protected doEnterState(args: any, isCurrentPlayerActive: boolean) {
+    if (isCurrentPlayerActive) {
+      $(IDS.HAND).addEventListener('click', this.handler);
+    }
+  }
+  protected doLeaveState(args: any, isCurrentPlayerActive: boolean) {
+    if (isCurrentPlayerActive) {
+      $(IDS.HAND).removeEventListener('click', this.handler);
+    }
+  }
+  onHandClicked(ev: Event) {
+    ev.preventDefault();
+    ev.stopPropagation();
+    this.onHandClickedLogic(ev);
+  }
+}
+
+export class ClientPickHexToPlayState extends HandClickableState {
+  private boardHandler: (e: Event) => void;
+  constructor(game: Game) {
+    super(game);
+    this.boardHandler = (e) => this.onBoardClicked(e);
+  }
+  protected doEnterState(args: any, isCurrentPlayerActive: boolean) {
+    super.doEnterState(args, isCurrentPlayerActive);
+    if (isCurrentPlayerActive) {
+      $(IDS.BOARD).addEventListener('click', this.boardHandler);
+    }
+  }
+  protected doLeaveState(args: any, isCurrentPlayerActive: boolean) {
+    super.doLeaveState(args, isCurrentPlayerActive);
+    if (isCurrentPlayerActive) {
+      $(IDS.BOARD).removeEventListener('click', this.boardHandler);
+    }
+  }
+  onBoardClicked(event: Event) {
+    event.preventDefault();
+    event.stopPropagation();
+    this.playSelectedPiece(event);
+  }
+}
+
+export class ClientSelectPieceOrEndTurnState extends HandClickableState {}
+export class ClientMustSelectPieceState extends HandClickableState {}
+
+export class ClientNoPlaysLeftState extends BabyloniaState {}
+export class ClientUndoState extends BabyloniaState {}
+export class ClientHexPickedState extends BabyloniaState {}
