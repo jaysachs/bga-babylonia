@@ -1,7 +1,7 @@
 import { colorIndexMap } from './colormap';
 import { BaseGame } from './basegame';
 import { Html } from './html';
-import { ClientHexPickedState, ClientMustSelectPieceState, ClientNoPlaysLeftState, ClientPickHexToPlayState, ClientSelectPieceOrEndTurnState, ClientUndoState, EndOfTurnScoringState, PlayPiecesState, SelectExtraTurnState, SelectScoringHexState, SelectZigguratCardState } from './gamestates';
+import { ClientMustSelectPieceState, ClientNoPlaysLeftState, ClientPickHexToPlayState, ClientSelectPieceOrEndTurnState, ClientUndoState, EndOfTurnScoringState, PlayPiecesState, SelectExtraTurnState, SelectScoringHexState, SelectZigguratCardState } from './gamestates';
 import { Hex, PlayerData, RowCol } from './bdata';
 import { Attrs, CSS, Html as BabHtml, IDS, Piece } from './bhtml';
 
@@ -84,7 +84,6 @@ export class Game extends BaseGame<Player, BGamedatas> {
     this.bga.states.register('client_mustSelectPiece', new ClientMustSelectPieceState(this));
     this.bga.states.register('client_noPlaysLeft', new ClientNoPlaysLeftState(this));
     this.bga.states.register('client_undo', new ClientUndoState(this));
-    this.bga.states.register('client_hexpicked', new ClientHexPickedState(this));
 
     // if a ziggurat card is being chosen
     // TODO: should this be done in the state watcher?

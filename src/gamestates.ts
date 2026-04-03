@@ -261,7 +261,11 @@ export class SelectScoringHexState extends BabyloniaState {
       $(IDS.BOARD).removeEventListener('click', this.handler);
     }
   }
-  public selectHexToScore(event: Event) {
+
+  onBoardClicked(event: Event) {
+    event.preventDefault();
+    event.stopPropagation();
+
     const hex = this.selectedHex(event.target!);
     if (hex == null) {
       return;
@@ -269,7 +273,6 @@ export class SelectScoringHexState extends BabyloniaState {
     let div = this.game.hexDiv(hex);
     let piece = div.firstElementChild!.getAttribute(Attrs.PIECE);
     div.classList.add(CSS.SELECTED);
-    this.game.bga.states.setClientState('client_hexpicked', {});
     this.game.bga.statusBar.setTitle(_('Score ${city} at (${row},${col})?'), {
       row: hex.row, col: hex.col, city: piece,
     });
@@ -282,11 +285,6 @@ export class SelectScoringHexState extends BabyloniaState {
         this.game.bga.states.restoreServerGameState();
       },
       { color: "secondary" });
-  }
-  onBoardClicked(event: Event) {
-    event.preventDefault();
-    event.stopPropagation();
-    this.selectHexToScore(event);
   }
 }
 
@@ -388,7 +386,6 @@ export class ClientPickHexToPlayState extends HandClickableState {
       console.error('no hex selected!');
       return;
     }
-    this.game.bga.states.setClientState('client_hexpicked', {});
     this.game.bgaPerformAction('actPlayPiece', {
       handpos: indexInParent(handDiv),
       row: hex.row,
@@ -404,4 +401,3 @@ export class ClientMustSelectPieceState extends HandClickableState {}
 
 export class ClientNoPlaysLeftState extends BabyloniaState {}
 export class ClientUndoState extends BabyloniaState {}
-export class ClientHexPickedState extends BabyloniaState {}
