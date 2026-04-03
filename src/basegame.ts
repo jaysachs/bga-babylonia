@@ -6,9 +6,6 @@ import { BgaAnimations, AnimationManager } from './libs';
 type SpecialLogArgs = Record<string, (any) => HTMLElement>;
 
 export abstract class BaseGame<P extends Player, T extends Gamedatas<P>> {
-  public currentState: string | null;
-  private pendingUpdate: boolean;
-  private currentPlayerWasActive: boolean;
   protected readonly animationManager: AnimationManager;
   protected gamedatas: T;
   public readonly bga: Bga<P, T>;
@@ -22,9 +19,6 @@ export abstract class BaseGame<P extends Player, T extends Gamedatas<P>> {
       animationsActive: () => this.bgaAnimationsActive(),
     });
 
-    this.currentState = null;
-    this.pendingUpdate = false;
-    this.currentPlayerWasActive = false;
 }
 
   protected bgaAnimationsActive(): boolean {
@@ -71,25 +65,5 @@ export abstract class BaseGame<P extends Player, T extends Gamedatas<P>> {
   bgaPerformAction(action: string, args?: any, params?: { lock?: boolean; checkAction?: boolean; checkPossibleActions?: boolean; }): Promise<any> {
     console.debug("action", action, args);
     return this.bga.actions.performAction(action, args, params ).then(() => console.debug("action completed", action, args));
-  }
-
-  onEnteringState(stateName: string, args: any) {
-    console.debug('onEnteringState: ' + stateName, args, this.debugStateInfo());
-    this.currentState = stateName;
-  }
-
-  onLeavingState(stateName: string) {
-    // console.debug('onLeavingState: ' + stateName, this.debugStateInfo());
-    this.currentPlayerWasActive = false;
-  }
-
-  // utils
-  debugStateInfo(): any {
-    return "";
-    // return {
-    //   isCurrentPlayerActive: gameui.isCurrentPlayerActive(),
-    //   instantaneousMode: gameui.instantaneousMode,
-    //   replayMode: typeof g_replayFrom != 'undefined',
-    // };
   }
 }

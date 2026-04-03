@@ -60,12 +60,7 @@ export abstract class BabyloniaState {
     this.doEnterState(args, isCurrentPlayerActive);
   }
 
-  public onLeavingState(args: any, isCurrentPlayerActive: boolean) {
-    this.doLeaveState(args, isCurrentPlayerActive);
-  }
-
   protected doEnterState(args: any, isCurrentPlayerActive: boolean) {}
-  protected doLeaveState(args: any, isCurrentPlayerActive: boolean) {}
 
   public playSelectedPiece(event: Event): void {
     const handDiv = this.selectedHandDiv;
@@ -135,47 +130,6 @@ export abstract class BabyloniaState {
     });
   }
 
-  public onHandClickedLogic(ev: Event): boolean {
-    const pieceDiv = ev.target as HTMLElement;
-    let p = pieceDiv.getAttribute(Attrs.PIECE);
-    if (!p || p == Piece.EMPTY) { return false; }
-
-    let parentDiv = pieceDiv.parentElement!;
-    let cl = parentDiv.classList;
-    if (cl.contains(CSS.UNPLAYABLE)) { return false; }
-
-    if (this.allowedMovesFor(pieceDiv).length == 0) {
-      return false;
-    }
-    let playable = false;
-    if (!cl.contains(CSS.SELECTED)) {
-      this.unselectAllHandPieces();
-      this.markHexesPlayableForPiece(pieceDiv);
-      playable = true;
-    } else {
-      this.unmarkHexesPlayableForPiece(pieceDiv);
-    }
-    cl.toggle(CSS.SELECTED);
-    if (playable) {
-      if (this.game.currentState != 'client_pickHexToPlay') {
-        this.game.bga.states.setClientState('client_pickHexToPlay', {
-          descriptionmyturn: _('${you} must select a hex to play to'),
-          playStateArgs: this.playStateArgs,
-        });
-        this.game.bga.statusBar.addActionButton(
-          _('Cancel'),
-          () => {
-            this.unselectAllHandPieces();
-            this.setStatusBarForPlayState();
-          },
-        { color: "secondary"});
-      }
-    } else {
-      this.setStatusBarForPlayState();
-    }
-    return false;
-  }
-
   public setStatusBarForPlayState(): void {
     const bga = this.game.bga;
     if (!bga.players.isCurrentPlayerActive()) {
@@ -223,7 +177,7 @@ export abstract class BabyloniaState {
 }
 
 export class SelectExtraTurnState extends BabyloniaState {
-  protected doEnterState(args: any, isCurrentPlayerActive: boolean) {
+  override doEnterState(args: any, isCurrentPlayerActive: boolean) {
     if (isCurrentPlayerActive) {
       this.game.bga.statusBar.addActionButton(
         _('Take your one-time extra turn'),
@@ -238,7 +192,7 @@ export class SelectExtraTurnState extends BabyloniaState {
 }
 
 export class EndOfTurnScoringState extends BabyloniaState {
-  protected doEnterState(args: any, isCurrentPlayerActive: boolean) {
+  override doEnterState(args: any, isCurrentPlayerActive: boolean) {
     if (isCurrentPlayerActive) {
       this.markAllHexesUnplayable();
     }
@@ -251,14 +205,14 @@ export class SelectZigguratCardState extends BabyloniaState {
     super(game);
     this.handler = (e) => this.onZcardClicked(e);
   }
-  protected doEnterState(args: any, isCurrentPlayerActive: boolean) {
+  override doEnterState(args: any, isCurrentPlayerActive: boolean) {
     if (isCurrentPlayerActive) {
       const div = $(IDS.AVAILABLE_ZCARDS) as HTMLElement;
       div.scrollIntoView(false);
       $(IDS.AVAILABLE_ZCARDS).addEventListener('click', this.handler);
     }
   }
-  protected doLeaveState(args: any, isCurrentPlayerActive: boolean) {
+  protected onLeavingState(args: any, isCurrentPlayerActive: boolean) {
     if (isCurrentPlayerActive) {
       $(IDS.AVAILABLE_ZCARDS).removeEventListener('click', this.handler);
     }
@@ -307,7 +261,7 @@ export class SelectZigguratCardState extends BabyloniaState {
 }
 
 export class PlayPiecesState extends BabyloniaState {
-  protected doEnterState(args: PlayState, isCurrentPlayerActive: boolean) {
+  override doEnterState(args: PlayState, isCurrentPlayerActive: boolean) {
     if (isCurrentPlayerActive) {
       this.playStateArgs = args;
       this.setStatusBarForPlayState();
@@ -322,13 +276,13 @@ export class SelectScoringHexState extends BabyloniaState {
     super(game);
     this.handler = (e) => this.onBoardClicked(e);
   }
-  protected doEnterState(args: { hexes: RowCol[] }, isCurrentPlayerActive: boolean) {
+  override doEnterState(args: { hexes: RowCol[] }, isCurrentPlayerActive: boolean) {
     if (isCurrentPlayerActive) {
       this.markHexesPlayable(args.hexes);
       $(IDS.BOARD).addEventListener('click', this.handler);
     }
   }
-  protected doLeaveState(args: any, isCurrentPlayerActive: boolean) {
+  protected onLeavingState(args: any, isCurrentPlayerActive: boolean) {
     if (isCurrentPlayerActive) {
       $(IDS.BOARD).removeEventListener('click', this.handler);
     }
@@ -362,27 +316,61 @@ export class SelectScoringHexState extends BabyloniaState {
   }
 }
 
-class HandClickableState extends BabyloniaState {
+abstract class HandClickableState extends BabyloniaState {
   protected handler: (e: Event) => void;
   constructor(game: Game) {
     super(game);
     this.handler = (e) => this.onHandClicked(e);
   }
-  protected doEnterState(args: any, isCurrentPlayerActive: boolean) {
+  override doEnterState(args: any, isCurrentPlayerActive: boolean) {
     if (isCurrentPlayerActive) {
       $(IDS.HAND).addEventListener('click', this.handler);
     }
   }
-  protected doLeaveState(args: any, isCurrentPlayerActive: boolean) {
+  protected onLeavingState(args: any, isCurrentPlayerActive: boolean) {
     if (isCurrentPlayerActive) {
       $(IDS.HAND).removeEventListener('click', this.handler);
     }
   }
-  onHandClicked(ev: Event) {
+  onHandClicked(ev: Event): boolean {
     ev.preventDefault();
     ev.stopPropagation();
-    this.onHandClickedLogic(ev);
+    const pieceDiv = ev.target as HTMLElement;
+    let p = pieceDiv.getAttribute(Attrs.PIECE);
+    if (!p || p == Piece.EMPTY) { return false; }
+
+    let parentDiv = pieceDiv.parentElement!;
+    let cl = parentDiv.classList;
+    if (cl.contains(CSS.UNPLAYABLE)) { return false; }
+
+    if (this.allowedMovesFor(pieceDiv).length == 0) {
+      return false;
+    }
+    if (!cl.contains(CSS.SELECTED)) {
+      this.unselectAllHandPieces();
+      this.markHexesPlayableForPiece(pieceDiv);
+      this.handleHandPieceClicked();
+    } else {
+      this.unmarkHexesPlayableForPiece(pieceDiv);
+      this.setStatusBarForPlayState();
+    }
+    cl.toggle(CSS.SELECTED);
+    return false;
   }
+
+  protected handleHandPieceClicked(): void {
+    this.game.bga.states.setClientState('client_pickHexToPlay', {
+        descriptionmyturn: _('${you} must select a hex to play to'),
+        playStateArgs: this.playStateArgs,
+    });
+    this.game.bga.statusBar.addActionButton(
+        _('Cancel'),
+        () => {
+            this.unselectAllHandPieces();
+            this.setStatusBarForPlayState();
+        },
+        { color: "secondary"});
+    }
 }
 
 export class ClientPickHexToPlayState extends HandClickableState {
@@ -391,14 +379,17 @@ export class ClientPickHexToPlayState extends HandClickableState {
     super(game);
     this.boardHandler = (e) => this.onBoardClicked(e);
   }
-  protected doEnterState(args: any, isCurrentPlayerActive: boolean) {
+
+  override handleHandPieceClicked(): void {}
+
+  override doEnterState(args: any, isCurrentPlayerActive: boolean) {
     super.doEnterState(args, isCurrentPlayerActive);
     if (isCurrentPlayerActive) {
       $(IDS.BOARD).addEventListener('click', this.boardHandler);
     }
   }
-  protected doLeaveState(args: any, isCurrentPlayerActive: boolean) {
-    super.doLeaveState(args, isCurrentPlayerActive);
+  protected onLeavingState(args: any, isCurrentPlayerActive: boolean) {
+    super.onLeavingState(args, isCurrentPlayerActive);
     if (isCurrentPlayerActive) {
       $(IDS.BOARD).removeEventListener('click', this.boardHandler);
     }
