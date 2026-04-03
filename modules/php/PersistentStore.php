@@ -82,8 +82,8 @@ class PersistentStore
 
     public function retrieveBoard(): Board
     {
-        $sql = "SELECT board_row row, board_col col, hextype, piece, scored,
-                       player_id board_player, landmass
+        $sql = "SELECT board_row, board_col, hextype, piece, scored,
+                       player_id AS board_player, landmass
                 FROM board";
         $data = $this->db->getObjectList($sql);
 
@@ -93,8 +93,8 @@ class PersistentStore
             $hexes[] = new Hex(
                 HexType::from($hex['hextype']),
                 new RowCol(
-                    intval($hex['row']),
-                    intval($hex['col'])
+                    intval($hex['board_row']),
+                    intval($hex['board_col'])
                 ),
                 Piece::from($hex['piece']),
                 intval($hex['board_player']),
