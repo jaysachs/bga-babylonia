@@ -246,7 +246,7 @@ export class Game extends BaseGame<Player, BGamedatas> {
       _private: {
         original_piece: string;
         handpos: number;
-      };
+      } | undefined;
       captured_piece: string;
       piece: string;
     }
@@ -267,7 +267,7 @@ export class Game extends BaseGame<Player, BGamedatas> {
     let pieceDiv = hexDiv.firstElementChild as HTMLElement;
     let destDiv = isActivePlayer ? this.handPosDiv(args._private.handpos) : $(IDS.handcount(args.player_id));
 
-    if (args._private.original_piece) {
+    if (args._private?.original_piece) {
         // restore piece value, e.g. if it was originally hidden
         pieceDiv.setAttribute(Attrs.PIECE, Game.pieceVal(args._private.original_piece, args.player_id));
     }
