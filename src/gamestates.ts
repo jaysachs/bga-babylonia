@@ -1,6 +1,7 @@
 import { Game } from "./babylonia";
 import { PlayState, RowCol } from "./bdata";
 import { Attrs, CSS, IDS, Piece } from "./bhtml";
+import { indexInParent } from "./html";
 
 
 
@@ -45,10 +46,6 @@ export abstract class BabyloniaState {
     hexes.forEach(this.markHexPlayable.bind(this));
   }
 
-  protected get selectedHandDiv(): Element | null {
-    return document.querySelector(`#${IDS.HAND} > .${CSS.SELECTED}`);
-  }
-
   constructor(protected game: Game) {}
 
   public onEnteringState(args: any, isCurrentPlayerActive: boolean) {
@@ -61,29 +58,6 @@ export abstract class BabyloniaState {
   }
 
   protected doEnterState(args: any, isCurrentPlayerActive: boolean) {}
-
-  public playSelectedPiece(event: Event): void {
-    const handDiv = this.selectedHandDiv;
-    if (!handDiv) {
-      console.error('no piece selected!');
-      return;
-    }
-
-    const hex = this.selectedHex(event.target!);
-    if (hex == null) {
-      console.error('no hex selected!');
-      return;
-    }
-    this.game.bga.states.setClientState('client_hexpicked', {});
-    this.game.bgaPerformAction('actPlayPiece', {
-      handpos: this.game.indexInParent(handDiv),
-      row: hex.row,
-      col: hex.col
-    }).then(() => {
-      this.unmarkHexPlayable(hex);
-    });
-    this.unselectAllHandPieces();
-  }
 
   protected allowedMovesFor(div: Element | null): RowCol[] {
     if (!div) { return []; }
@@ -394,12 +368,36 @@ export class ClientPickHexToPlayState extends HandClickableState {
       $(IDS.BOARD).removeEventListener('click', this.boardHandler);
     }
   }
+
+  private selectedHandDiv(): Element | null {
+    return document.querySelector(`#${IDS.HAND} > .${CSS.SELECTED}`);
+  }
+
+
   onBoardClicked(event: Event) {
     event.preventDefault();
     event.stopPropagation();
-    this.playSelectedPiece(event);
-  }
-}
+    const handDiv = this.selectedHandDiv();
+    if (!handDiv) {
+      console.error('no piece selected!');
+      return;
+    }
+
+    const hex = this.selectedHex(event.target!);
+    if (hex == null) {
+      console.error('no hex selected!');
+      return;
+    }
+    this.game.bga.states.setClientState('client_hexpicked', {});
+    this.game.bgaPerformAction('actPlayPiece', {
+      handpos: indexInParent(handDiv),
+      row: hex.row,
+      col: hex.col
+    }).then(() => {
+      this.unmarkHexPlayable(hex);
+    });
+    this.unselectAllHandPieces();
+  }}
 
 export class ClientSelectPieceOrEndTurnState extends HandClickableState {}
 export class ClientMustSelectPieceState extends HandClickableState {}

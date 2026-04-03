@@ -1,9 +1,9 @@
 import { colorIndexMap } from './colormap';
 import { BaseGame } from './basegame';
-import { Html as BHtml, AttrLike } from './html';
-import { BabyloniaState, ClientHexPickedState, ClientMustSelectPieceState, ClientNoPlaysLeftState, ClientPickHexToPlayState, ClientSelectPieceOrEndTurnState, ClientUndoState, EndOfTurnScoringState, PlayPiecesState, SelectExtraTurnState, SelectScoringHexState, SelectZigguratCardState } from './gamestates';
-import { Hex, PlayerData, PlayState, RowCol } from './bdata';
-import { Attrs, CSS, Html, IDS, Piece } from './bhtml';
+import { Html } from './html';
+import { ClientHexPickedState, ClientMustSelectPieceState, ClientNoPlaysLeftState, ClientPickHexToPlayState, ClientSelectPieceOrEndTurnState, ClientUndoState, EndOfTurnScoringState, PlayPiecesState, SelectExtraTurnState, SelectScoringHexState, SelectZigguratCardState } from './gamestates';
+import { Hex, PlayerData, RowCol } from './bdata';
+import { Attrs, CSS, Html as BabHtml, IDS, Piece } from './bhtml';
 
 type AnimationList = (() => Promise<any>)[];
 
@@ -29,14 +29,6 @@ export class Game extends BaseGame<Player, BGamedatas> {
   private cityCounters: Counter[] = [];
   private static playerIdToColorIndex: Record<number, number> = {};
   public zcardTooltips: string[] = [];
-
-  public get currentPlayerState(): BabyloniaState | null {
-    return this.bga.states.getCurrentPlayerStateClass() as any;
-  }
-
-  public get playStateArgs(): PlayState | null {
-    return this.currentPlayerState?.playStateArgs || null;
-  }
 
   constructor(bga: Bga<Player, BGamedatas>) {
     super(bga, Game.special_log_args);
@@ -117,7 +109,7 @@ export class Game extends BaseGame<Player, BGamedatas> {
     let anims: AnimationList = [];
 
     for (const hex of boardData) {
-      const hexDiv = Html.hexDiv(hex);
+      const hexDiv = BabHtml.hexDiv(hex);
       boardDiv.appendChild(hexDiv);
       if (hex.piece != null && hex.piece != Piece.EMPTY) {
         let pieceDiv = this.createPieceDiv(hex.piece, hex.board_player)
@@ -161,7 +153,7 @@ export class Game extends BaseGame<Player, BGamedatas> {
   }
 
   private setupGameHtml(): void {
-    this.bga.gameArea.getElement().insertAdjacentHTML('beforeend', Html.base_html());
+    this.bga.gameArea.getElement().insertAdjacentHTML('beforeend', BabHtml.base_html());
   }
 
   private updateCounter(counter: Counter, value: number, animate: boolean) {
@@ -220,7 +212,7 @@ export class Game extends BaseGame<Player, BGamedatas> {
     const playerId = player.player_id;
     console.log('Setting up board for player ' + playerId);
     this.bga.playerPanels.getElement(playerId)
-      .insertAdjacentHTML('beforeend', Html.player_board_ext(playerId, Game.playerIdToColorIndex[playerId]!));
+      .insertAdjacentHTML('beforeend', BabHtml.player_board_ext(playerId, Game.playerIdToColorIndex[playerId]!));
     //    create counters per player
     this.handCounters[playerId] = new ebg.counter();
     this.handCounters[playerId]!.create(IDS.handcount(playerId));
@@ -542,9 +534,9 @@ export class Game extends BaseGame<Player, BGamedatas> {
   ///////
   private static zcardSalt: number = 0;
   private static readonly special_log_args : Record<string, (args: any) => HTMLElement> = {
-    piece: (args: any) => BHtml.span({ attrs: Attrs.piece(Game.pieceVal(args.piece, args.player_id)) }),
-    city: (args: any) => BHtml.span({ attrs: Attrs.piece(Game.pieceVal(args.city, 0))}),
-    zcard: (args: any) => BHtml.span({ id: `logzcard_${Game.zcardSalt++}`, attrs: Attrs.ztype(args.zcard)}),
-    original_piece: (args: any) => BHtml.span({ attrs: Attrs.piece(Game.pieceVal(args.original_piece, args.player_id))}),
+    piece: (args: any) => Html.span({ attrs: Attrs.piece(Game.pieceVal(args.piece, args.player_id)) }),
+    city: (args: any) => Html.span({ attrs: Attrs.piece(Game.pieceVal(args.city, 0))}),
+    zcard: (args: any) => Html.span({ id: `logzcard_${Game.zcardSalt++}`, attrs: Attrs.ztype(args.zcard)}),
+    original_piece: (args: any) => Html.span({ attrs: Attrs.piece(Game.pieceVal(args.original_piece, args.player_id))}),
   };
 }

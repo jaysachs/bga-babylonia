@@ -43,3 +43,11 @@ export class Html {
       return this.makeElem('p', args, ...children);
   }
 }
+
+/**
+* Returns the index of the given element among its parent's child elements or -1 if no parent.
+*/
+export function indexInParent(el: Element): number {
+  return Array.from(el.parentElement?.children ?? []).findIndex(e => e == el);
+}
+

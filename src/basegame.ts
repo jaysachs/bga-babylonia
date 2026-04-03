@@ -51,13 +51,6 @@ export abstract class BaseGame<P extends Player, T extends Gamedatas<P>> {
     return { log, args };
   }
 
-  /**
-  * Returns the index of the given element among its parent's child elements or -1 if no parent.
-  */
-  public indexInParent(el: Element): number {
-    return Array.from(el.parentElement?.children ?? []).findIndex(e => e == el);
-  }
-
   protected async notif_debug(args: any) {
     console.log("debug", args);
   }
