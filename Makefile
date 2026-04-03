@@ -1,10 +1,9 @@
 #
-ROOT=$(HOME)/projects/bga
 GAME=babylonia
 SFTP=sftp://vagabond:@1.studio.boardgamearena.com:2022
 
 STATS=modules/php/Stats.php
-GENSTATS=$(ROOT)/bgautil/genstats/genstats.php
+GENSTATS=../bgautil/genstats/genstats.php
 WORK=work
 STUBS=$(WORK)/module/table/table.game.php
 TS_STUBS=src/bga-framework.d.ts
@@ -42,7 +41,7 @@ phpstan: build $(STUBS)
 	phpstan --autoload-file=$(STUBS) --level=$(PHPSTAN_LEVEL) --memory-limit=1G analyse modules/php modules/php/Utils modules/php/States misc/test/php
 
 deploy: test
-	lftp -e 'cd $(GAME); mirror -e -R --exclude .vscode/ --exclude .git/ --exclude work/ --exclude local/ --exclude bga-framework.d.ts --exclude .phpunit.cache/ --exclude node_modules/ --exclude _ide_helper.php; exit' $(SFTP)
+	lftp -e 'cd $(GAME); mirror -e -R --exclude .vscode/ --exclude .git/ --exclude work/ --exclude local/ --exclude bga-framework.d.ts --exclude .phpunit* --exclude node_modules*/ --exclude _ide_helper.php; exit' $(SFTP)
 
 clean:
 	rm -rf $(WORK) $(TS_STUBS) $(JS) $(COLORMAP) $(STATS)
