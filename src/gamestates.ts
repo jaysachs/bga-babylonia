@@ -44,7 +44,8 @@ export abstract class BabyloniaState {
     hexes.forEach((hex) => this.markHexPlayable(hex));
   }
 
-  constructor(protected game: Game) {}
+  protected bga: Bga;
+  constructor(protected game: Game) { this.bga = game.bga; }
 
   public onEnteringState(args: any, isCurrentPlayerActive: boolean) {}
 
@@ -54,13 +55,13 @@ export abstract class BabyloniaState {
 export class SelectExtraTurnState extends BabyloniaState {
   override onEnteringState(args: any, isCurrentPlayerActive: boolean) {
     if (isCurrentPlayerActive) {
-      this.game.bga.statusBar.addActionButton(
+      this.bga.statusBar.addActionButton(
         _('Take your one-time extra turn'),
-        () => this.game.bgaPerformAction('actChooseExtraTurn', { take_extra_turn: true })
+        () => this.bga.actions.performAction('actChooseExtraTurn', { take_extra_turn: true })
       );
-      this.game.bga.statusBar.addActionButton(
+      this.bga.statusBar.addActionButton(
         _('Just finish your turn'),
-        () => this.game.bgaPerformAction('actChooseExtraTurn', { take_extra_turn: false })
+        () => this.bga.actions.performAction('actChooseExtraTurn', { take_extra_turn: false })
       );
     }
   }
@@ -98,20 +99,20 @@ export class SelectZigguratCardState extends BabyloniaState {
   private toggleZcardSelected(e: Element) {
     const zt = e.getAttribute(Attrs.ZTYPE)!;
     let promptForConfirmation = () => {
-      this.game.bga.statusBar.setTitle(_('Select ziggurat card ${zcard}?'), { zcard: zt });
+      this.bga.statusBar.setTitle(_('Select ziggurat card ${zcard}?'), { zcard: zt });
       this.game.addTooltipsToLog();
 
-      this.game.bga.statusBar.addActionButton(_('Confirm'),
-        () => this.game.bgaPerformAction('actSelectZigguratCard', { zctype: zt }),
+      this.bga.statusBar.addActionButton(_('Confirm'),
+        () => this.bga.actions.performAction('actSelectZigguratCard', { zctype: zt }),
         { autoclick: true }
       );
 
-      this.game.bga.statusBar.addActionButton(
+      this.bga.statusBar.addActionButton(
         _('Cancel'),
         () => this.toggleZcardSelected(e),
         { color: "secondary"});
     };
-    let cancel = () => this.game.bga.states.restoreServerGameState();
+    let cancel = () => this.bga.states.restoreServerGameState();
 
     let alreadySelected = document.querySelector(`#${IDS.AVAILABLE_ZCARDS} > .${CSS.SELECTED}`);
     e.classList.toggle(CSS.SELECTED);
@@ -168,16 +169,16 @@ export class SelectScoringHexState extends BabyloniaState {
     let div = this.game.hexDiv(hex);
     let piece = div.firstElementChild!.getAttribute(Attrs.PIECE);
     div.classList.add(CSS.SELECTED);
-    this.game.bga.statusBar.setTitle(_('Score ${city} at (${row},${col})?'), {
+    this.bga.statusBar.setTitle(_('Score ${city} at (${row},${col})?'), {
       row: hex.row, col: hex.col, city: piece,
     });
-    this.game.bga.statusBar.addActionButton(_('Confirm'),
-      () => this.game.bgaPerformAction('actSelectHexToScore', hex).then(() => this.unmarkHexPlayable(hex)),
+    this.bga.statusBar.addActionButton(_('Confirm'),
+      () => this.bga.actions.performAction('actSelectHexToScore', hex).then(() => this.unmarkHexPlayable(hex)),
       { autoclick: true });
-    this.game.bga.statusBar.addActionButton(_('Cancel'),
+    this.bga.statusBar.addActionButton(_('Cancel'),
       () => {
         div.classList.remove(CSS.SELECTED);
-        this.game.bga.states.restoreServerGameState();
+        this.bga.states.restoreServerGameState();
       },
       { color: "secondary" });
   }
@@ -273,7 +274,7 @@ export class PlayPiecesState extends BabyloniaState {
     return document.querySelector(`#${IDS.HAND} > .${CSS.SELECTED}`);
   }
 
-  onBoardClicked(event: Event) {
+  async onBoardClicked(event: Event) {
     event.preventDefault();
     event.stopPropagation();
     const handDiv = this.selectedHandDiv();
@@ -287,13 +288,12 @@ export class PlayPiecesState extends BabyloniaState {
       console.error('no hex selected!');
       return;
     }
-    this.game.bgaPerformAction('actPlayPiece', {
+    await this.bga.actions.performAction('actPlayPiece', {
       handpos: indexInParent(handDiv),
       row: hex.row,
       col: hex.col
-    }).then(() => {
-      this.unmarkHexPlayable(hex);
     });
+    this.unmarkHexPlayable(hex);
     this.unselectAllHandPieces();
   }
 
@@ -314,7 +314,7 @@ export class PlayPiecesState extends BabyloniaState {
     if (!cl.contains(CSS.SELECTED)) {
       this.unselectAllHandPieces();
       this.markHexesPlayableForPiece(pieceDiv);
-      this.handleHandPieceClicked();
+      this.chooseDestination();
     } else {
       this.unmarkHexesPlayableForPiece(pieceDiv);
       this.setStatusBarForPlayState();
@@ -323,12 +323,12 @@ export class PlayPiecesState extends BabyloniaState {
     return false;
   }
 
-  protected handleHandPieceClicked(): void {
+  private chooseDestination(): void {
     // this.removeHandHandler();
     this.attachBoardHandler();
-    this.game.bga.statusBar.setTitle(_('${you} must select a hex to play to'));
-    this.game.bga.statusBar.removeActionButtons();
-    this.game.bga.statusBar.addActionButton(
+    this.bga.statusBar.setTitle(_('${you} must select a hex to play to'));
+    this.bga.statusBar.removeActionButtons();
+    this.bga.statusBar.addActionButton(
         _('Cancel'),
         () => {
             this.unselectAllHandPieces();
@@ -338,33 +338,32 @@ export class PlayPiecesState extends BabyloniaState {
     }
 
   private setStatusBarForPlayState(): void {
-    const bga = this.game.bga;
-    bga.statusBar.removeActionButtons();
+    this.bga.statusBar.removeActionButtons();
     if (this.playStateArgs.canEndTurn) {
       if (this.playStateArgs.allowedMoves.length == 0) {
-        bga.statusBar.setTitle(_('${you} must end your turn'));
+        this.bga.statusBar.setTitle(_('${you} must end your turn'));
         this.setPlayablePieces();
       } else {
-        bga.statusBar.setTitle(_('${you} may select a piece to play or end your turn'))
+        this.bga.statusBar.setTitle(_('${you} may select a piece to play or end your turn'))
         this.attachHandHandler();
         this.setPlayablePieces();
       }
-      bga.statusBar.addActionButton(
+      this.bga.statusBar.addActionButton(
         _('End turn'),
         () => {
           this.removeHandHandler();
           this.unselectAllHandPieces();
-          this.game.bgaPerformAction('actDonePlayPieces');
+          this.bga.actions.performAction('actDonePlayPieces');
         });
     } else {
-      bga.statusBar.setTitle(_('${you} must select a piece to play'));
+      this.bga.statusBar.setTitle(_('${you} must select a piece to play'));
       this.attachHandHandler();
       this.setPlayablePieces();
     }
     if (this.playStateArgs.canUndo) {
-      bga.statusBar.addActionButton(
+      this.bga.statusBar.addActionButton(
         _('Undo'),
-        () => this.game.bgaPerformAction('actUndoPlay'),
+        () => this.bga.actions.performAction('actUndoPlay'),
         { color: "alert" }
       );
     }
