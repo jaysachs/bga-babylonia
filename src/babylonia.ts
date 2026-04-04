@@ -103,7 +103,7 @@ export class Game extends BaseGame<Player, BGamedatas> {
     let anims: AnimationList = [];
 
     for (const hex of boardData) {
-      const hexDiv = BabHtml.hexDiv(hex);
+      const hexDiv = BabHtml.makeHexDiv(hex);
       boardDiv.appendChild(hexDiv);
       if (hex.piece != null && hex.piece != Piece.EMPTY) {
         let pieceDiv = this.createPieceDiv(hex.piece, hex.board_player)
@@ -194,11 +194,11 @@ export class Game extends BaseGame<Player, BGamedatas> {
       : piece;
   }
 
-  public markHexSelected(rc: RowCol): void {
+  private markHexSelected(rc: RowCol): void {
     this.hexDiv(rc).classList.add(CSS.SELECTED);
   }
 
-  public unmarkHexSelected(rc: RowCol): void {
+  private unmarkHexSelected(rc: RowCol): void {
     this.hexDiv(rc).classList.remove(CSS.SELECTED);
   }
 

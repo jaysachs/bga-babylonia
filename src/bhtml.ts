@@ -95,7 +95,7 @@ export class Html {
   static readonly hdelta = 0.75 * this.width + 2.0;
   static readonly vdelta = 1.0 * this.height + 2.0;
 
-  public static hexDiv(rc: RowCol): HTMLElement {
+  public static makeHexDiv(rc: RowCol): HTMLElement {
     let top = this.vstart + rc.row * this.vdelta / 2;
     let left = this.hstart + rc.col * this.hdelta;
     let div = document.createElement('div') as HTMLElement;
