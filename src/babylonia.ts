@@ -1,163 +1,11 @@
 import { colorIndexMap } from './colormap';
 import { BaseGame } from './basegame';
-import { Html as BHtml, AttrLike } from './html';
+import { Html } from './html';
+import { EndOfTurnScoringState, PlayPiecesState, SelectExtraTurnState, SelectScoringHexState, SelectZigguratCardState } from './gamestates';
+import { Hex, PlayerData, RowCol } from './bdata';
+import { Attrs, CSS, Html as BabHtml, IDS, Piece } from './bhtml';
 
 type AnimationList = (() => Promise<any>)[];
-
-interface RowCol { row: number, col: number };
-interface PlayerData {
-  player_id: number;
-  hand_size: number;
-  pool_size: number;
-  captured_city_count: number;
-  score: number;
-}
-interface Hex extends RowCol {
-  board_player: number;
-  piece: string;
-}
-
-export class Attrs implements AttrLike {
-  toRecord(): Record<string, string> {
-    return this.r;
-  }
-  private r: any = {};
-
-  static readonly ZTYPE : string = 'bbl_ztype';
-  static readonly ZUSED : string = 'bbl_zused';
-  static readonly PIECE : string = 'bbl_piece';
-  static readonly TT_PROCESSED : string = 'bbl_tt_processed';
-
-  static ztype(zt : string): Attrs {
-    return new Attrs().ztype(zt);
-  }
-  ztype(zt : string): Attrs {
-    this.r[Attrs.ZTYPE] = zt;
-    return this;
-  }
-
-  static zused(u: boolean): Attrs {
-    return new Attrs().zused(u);
-  }
-  zused(u: boolean): Attrs {
-    this.r[Attrs.ZUSED] = ""+u;
-    return this;
-  }
-
-  static piece(p: string) : Attrs {
-    return new Attrs().piece(p);
-  }
-  piece(p: string): Attrs {
-    this.r[Attrs.PIECE] = p;
-    return this;
-  }
-
-  static processed(p: string): Attrs {
-    return new Attrs().processed(p);
-  }
-  processed(p: string): Attrs {
-    this.r[Attrs.TT_PROCESSED] = p;
-    return this;
-  }
-}
-
-class Piece {
-  static readonly EMPTY = 'empty'
-}
-
-class IDS {
-  static readonly AVAILABLE_ZCARDS: string = 'bbl_available_zcards';
-  static readonly BOARD = 'bbl_board';
-  static readonly HAND = 'bbl_hand';
-
-  static handcount(playerId: number): string {
-    return `bbl_handcount_${playerId}`;
-  }
-
-  static poolcount(playerId: number): string {
-    return `bbl_poolcount_${playerId}`;
-  }
-
-  static citycount(playerId: number): string {
-    return `bbl_citycount_${playerId}`;
-  }
-
-  static hexDiv(rc: RowCol): string {
-    return `bbl_hex_${rc.row}_${rc.col}`;
-  }
-
-  static playerBoardZcards(playerId: number): string {
-    return `bbl_zcards_${playerId}`;
-  }
-
-  static zcard(type: string): string {
-    return `bbl_${type}`;
-  }
-}
-
-class CSS {
-  static readonly IN_NETWORK = 'bbl_in_network';
-  static readonly SELECTED = 'bbl_selected';
-  static readonly PLAYABLE = 'bbl_playable';
-  static readonly UNPLAYABLE = 'bbl_unplayable';
-  static readonly UNIMPORTANT = 'bbl_unimportant';
-}
-
-class Html {
-  static readonly hstart = 38.0; // this is related to board width but not sure how
-  static readonly vstart = 9.0; // depends on board size too
-  static readonly height = 768 / 12.59;
-  static readonly width = this.height * 1.155;
-  static readonly hdelta = 0.75 * this.width + 2.0;
-  static readonly vdelta = 1.0 * this.height + 2.0;
-
-  public static hexDiv(rc: RowCol): HTMLElement {
-    let top = this.vstart + rc.row * this.vdelta / 2;
-    let left = this.hstart + rc.col * this.hdelta;
-    let div = document.createElement('div') as HTMLElement;
-    div.id = IDS.hexDiv(rc);
-    div.style.top = `${top}px`;
-    div.style.left = `${left}px`;
-    return div;
-  }
-
-  public static player_board_ext(player_id: number, color_index: number): string {
-    return `
-      <div>
-        <span class='bbl_pb_hand_label_${color_index}'></span>
-        <span id='${IDS.handcount(player_id)}'>5</span>
-      </div>
-      <div>
-        <span class='bbl_pb_pool_label_${color_index}'></span>
-        <span id='${IDS.poolcount(player_id)}'>19</span>
-      </div>
-      <div>
-        <span class='bbl_pb_citycount_label'></span>
-        <span id='${IDS.citycount(player_id)}'>1</span>
-      </div>
-      <div id='${IDS.playerBoardZcards(player_id)}' class='bbl_pb_zcards'>
-        <span class='bbl_pb_zcard_label'></span>
-      </div>
-`;
-  }
-
-  public static base_html(): string {
-    return `
-    <div id='bbl_main'>
-      <div id='bbl_hand_container'>
-        <div id='${IDS.HAND}'></div>
-      </div>
-      <div id='bbl_board_container'>
-        <div id='${IDS.BOARD}'></div>
-      </div>
-      <div id='bbl_available_zcards_container' class="whiteblock">
-        <div>${_('Ziggurat Cards')}</div>
-        <div id='${IDS.AVAILABLE_ZCARDS}'></div>
-      </div>
-   </div>
-`;
-  }
-}
 
 interface Zcard {
   type: string;
@@ -174,33 +22,19 @@ interface BGamedatas extends Gamedatas<Player> {
   current_scoring_hex: RowCol | null;
 }
 
-interface PlayState {
-  canEndTurn: boolean;
-  canUndo: boolean;
-  allowedMoves: RowCol[];
-}
-
 /** Game class */
 export class Game extends BaseGame<Player, BGamedatas> {
   private handCounters: Counter[] = [];
   private poolCounters: Counter[] = [];
   private cityCounters: Counter[] = [];
-  private selectedHandDiv: Element | null = null;
-  private playStateArgs: PlayState | null = null;
   private static playerIdToColorIndex: Record<number, number> = {};
-  private zcardTooltips: string[] = [];
+  public zcardTooltips: string[] = [];
 
   constructor(bga: Bga<Player, BGamedatas>) {
     super(bga, Game.special_log_args);
   }
 
-  private setupHandlers(): void {
-    $(IDS.HAND).addEventListener('click', this.onHandClicked.bind(this));
-    $(IDS.BOARD).addEventListener('click', this.onBoardClicked.bind(this));
-    $(IDS.AVAILABLE_ZCARDS).addEventListener('click', this.onZcardClicked.bind(this));
-  }
-
-  private addTooltipsToLog() {
+  public addTooltipsToLog() {
     const elements = document.querySelectorAll(`[${Attrs.ZTYPE}]:not([${Attrs.TT_PROCESSED}])`);
     elements.forEach(ele => {
       ele.setAttribute(Attrs.TT_PROCESSED, '');  // prevents tooltips being re-added to previous log entries
@@ -237,10 +71,14 @@ export class Game extends BaseGame<Player, BGamedatas> {
     console.log('Setting up ziggurat cards', gamedatas.ziggurat_cards);
     this.setupZcards(gamedatas.ziggurat_cards);
 
-    console.log('setting up handlers');
-    this.setupHandlers();
-
     this.bga.notifications.setupPromiseNotifications({ logger: console.log, onEnd: this.addTooltipsToLog.bind(this) });
+
+    // Register states
+    this.bga.states.register('SelectExtraTurn', new SelectExtraTurnState(this));
+    this.bga.states.register('EndOfTurnScoring', new EndOfTurnScoringState(this));
+    this.bga.states.register('SelectZigguratCard', new SelectZigguratCardState(this));
+    this.bga.states.register('PlayPieces', new PlayPiecesState(this));
+    this.bga.states.register('SelectScoringHex', new SelectScoringHexState(this));
 
     // if a ziggurat card is being chosen
     // TODO: should this be done in the state watcher?
@@ -265,7 +103,7 @@ export class Game extends BaseGame<Player, BGamedatas> {
     let anims: AnimationList = [];
 
     for (const hex of boardData) {
-      const hexDiv = Html.hexDiv(hex);
+      const hexDiv = BabHtml.makeHexDiv(hex);
       boardDiv.appendChild(hexDiv);
       if (hex.piece != null && hex.piece != Piece.EMPTY) {
         let pieceDiv = this.createPieceDiv(hex.piece, hex.board_player)
@@ -309,7 +147,7 @@ export class Game extends BaseGame<Player, BGamedatas> {
   }
 
   private setupGameHtml(): void {
-    this.bga.gameArea.getElement().insertAdjacentHTML('beforeend', Html.base_html());
+    this.bga.gameArea.getElement().insertAdjacentHTML('beforeend', BabHtml.base_html());
   }
 
   private updateCounter(counter: Counter, value: number, animate: boolean) {
@@ -338,7 +176,7 @@ export class Game extends BaseGame<Player, BGamedatas> {
       animate);
   }
 
-  private hexDiv(rc: RowCol): HTMLElement {
+  public hexDiv(rc: RowCol): HTMLElement {
     return $(IDS.hexDiv(rc));
   }
 
@@ -356,161 +194,6 @@ export class Game extends BaseGame<Player, BGamedatas> {
       : piece;
   }
 
-  // Returns the hex (row,col) clicked on, or null if not a playable hex
-  private selectedHex(target: EventTarget): RowCol | null {
-    let hexDiv = target as Element;
-    while (hexDiv.parentElement != null && hexDiv.parentElement.id != IDS.BOARD) {
-      hexDiv = hexDiv.parentElement;
-    }
-    if (hexDiv.parentElement == null) {
-      console.warn('no hex');
-      return null;
-    }
-    // now check if it's allowed
-    if (!hexDiv.classList.contains(CSS.PLAYABLE)) {
-      return null;
-    }
-    const id = hexDiv.id.split('_');
-    return {
-      row: Number(id[2]),
-      col: Number(id[3]),
-    };
-  }
-
-  private selectHexToScore(event: Event) {
-    const hex = this.selectedHex(event.target!);
-    if (hex == null) {
-      return;
-    }
-    let div = this.hexDiv(hex);
-    let piece = div.firstElementChild!.getAttribute(Attrs.PIECE);
-    div.classList.add(CSS.SELECTED);
-    this.bga.states.setClientState('client_hexpicked', {});
-    this.bga.statusBar.setTitle(_('Score ${city} at (${row},${col})?'), {
-      row: hex.row, col: hex.col, city: piece,
-    });
-    this.bga.statusBar.addActionButton(_('Confirm'),
-      () => this.bgaPerformAction('actSelectHexToScore', hex).then(() => this.unmarkHexPlayable(hex)),
-      { autoclick: true });
-    this.bga.statusBar.addActionButton(_('Cancel'),
-      () => {
-        div.classList.remove(CSS.SELECTED);
-        this.bga.states.restoreServerGameState();
-      },
-      { color: "secondary" });
-  }
-
-  private playSelectedPiece(event: Event): void {
-    if (!this.selectedHandDiv) {
-      console.error('no piece selected!');
-      return;
-    }
-
-    const hex = this.selectedHex(event.target!);
-    if (hex == null) {
-      console.error('no hex selected!');
-      return;
-    }
-    this.bga.states.setClientState('client_hexpicked', {});
-    this.bgaPerformAction('actPlayPiece', {
-      handpos: this.indexInParent(this.selectedHandDiv),
-      row: hex.row,
-      col: hex.col
-    }).then(() => {
-      this.unmarkHexPlayable(hex);
-    });
-    this.unselectAllHandPieces();
-  }
-
-  private onBoardClicked(event: Event): boolean {
-    event.preventDefault();
-    event.stopPropagation();
-    if (!this.bga.players.isCurrentPlayerActive()) {
-      return false;
-    }
-    switch (this.currentState) {
-      case 'client_pickHexToPlay':
-        this.playSelectedPiece(event);
-        break;
-      case 'SelectScoringHex':
-        this.selectHexToScore(event);
-        break;
-    }
-    return false;
-  }
-
-  private onZcardClicked(event: Event): boolean {
-    event.preventDefault();
-    event.stopPropagation();
-    if (!this.bga.players.isCurrentPlayerActive()) {
-      return false;
-    }
-    if (this.currentState != 'SelectZigguratCard') {
-      return false;
-    }
-
-    let e = event.target as HTMLElement;
-    let z = e.getAttribute(Attrs.ZTYPE);
-    if (!z) { return false; }
-    // let c = e.parentElement!.classList;
-    // if (c.contains(CSS.UNPLAYABLE)) { return false; }
-    if (e.getAttribute(Attrs.ZTYPE)) {
-      this.toggleZcardSelected(e);
-    }
-    return false;
-  }
-
-  private toggleZcardSelected(e: Element) {
-    const zt = e.getAttribute(Attrs.ZTYPE)!;
-    let promptForConfirmation = () => {
-      this.bga.statusBar.setTitle(_('Select ziggurat card ${zcard}?'), { zcard: zt });
-      // this is a little bit of encapsulation breakage ...
-      //   would be nice if this happened automatically.
-      this.addTooltipsToLog();
-
-      this.bga.statusBar.addActionButton(_('Confirm'),
-        () => this.bgaPerformAction('actSelectZigguratCard', { zctype: zt }),
-        { autoclick: true }
-      );
-
-      this.bga.statusBar.addActionButton(
-        _('Cancel'),
-        () => this.toggleZcardSelected(e),
-        { color: "secondary"});
-    };
-    let cancel = () => this.bga.states.restoreServerGameState();
-
-    let alreadySelected = document.querySelector(`#${IDS.AVAILABLE_ZCARDS} > .${CSS.SELECTED}`);
-    e.classList.toggle(CSS.SELECTED);
-    if (alreadySelected == null) {
-      promptForConfirmation();
-    } else if (alreadySelected == e) {
-      // remove confirm and cancel buttons from action bar
-      cancel();
-    } else {
-      alreadySelected.classList.toggle(CSS.SELECTED);
-      // buttons should already be in right state but we need to change the title bar text.
-      // (We also can't reset the timer.) So we remove & add.
-      cancel();
-      promptForConfirmation();
-    }
-  }
-
-  private allowedMovesFor(div: Element | null): RowCol[] {
-    if (!div) { return []; }
-    // Peel off player number
-    const piece = div.getAttribute(Attrs.PIECE)!.split('_')[0]!;
-    return (this.playStateArgs!.allowedMoves as any)[piece] || [];
-  }
-
-  private markHexPlayable(rc: RowCol): void {
-    this.hexDiv(rc).classList.add(CSS.PLAYABLE);
-  }
-
-  private unmarkHexPlayable(rc: RowCol): void {
-    this.hexDiv(rc).classList.remove(CSS.PLAYABLE);
-  }
-
   private markHexSelected(rc: RowCol): void {
     this.hexDiv(rc).classList.add(CSS.SELECTED);
   }
@@ -519,151 +202,11 @@ export class Game extends BaseGame<Player, BGamedatas> {
     this.hexDiv(rc).classList.remove(CSS.SELECTED);
   }
 
-  private markHexesPlayable(hexes: RowCol[]): void {
-    hexes.forEach(this.markHexPlayable.bind(this));
-  }
-
-  private unmarkHexesPlayable(hexes: RowCol[]): void {
-    hexes.forEach(this.unmarkHexPlayable.bind(this));
-  }
-
-  private markHexesPlayableForPiece(div: Element): void {
-    this.markHexesPlayable(this.allowedMovesFor(div));
-  }
-
-  private unmarkHexesPlayableForPiece(div: Element): void {
-    this.unmarkHexesPlayable(this.allowedMovesFor(div));
-  }
-
-  private unselectAllHandPieces(): void {
-    const hand = $(IDS.HAND);
-    hand.childNodes.forEach((posDiv : HTMLElement) => {
-      const cl = posDiv.classList;
-      if (cl.contains(CSS.SELECTED)) {
-        this.unmarkHexesPlayableForPiece(posDiv.firstElementChild!);
-      }
-      cl.remove(CSS.SELECTED);
-      cl.remove(CSS.PLAYABLE);
-      cl.remove(CSS.UNPLAYABLE);
-    });
-    this.selectedHandDiv = null;
-  }
-
-  private setPlayablePieces(): void {
-    const hand = $(IDS.HAND);
-    hand.childNodes.forEach((child : HTMLElement) => {
-      const cl = child.classList;
-      if (this.allowedMovesFor(child.firstElementChild).length > 0) {
-        cl.add(CSS.PLAYABLE);
-        cl.remove(CSS.UNPLAYABLE);
-      } else {
-        cl.remove(CSS.PLAYABLE);
-        cl.add(CSS.UNPLAYABLE);
-      }
-    });
-  }
-
-  private setStatusBarForPlayState(): void {
-    if (!this.bga.players.isCurrentPlayerActive()) {
-      return;
-    }
-    if (this.playStateArgs == null) {
-      console.error('playStateArgs unexpectedly null');
-      return;
-    }
-    this.selectedHandDiv = null;
-    if (this.playStateArgs.canEndTurn) {
-      if (this.playStateArgs.allowedMoves.length == 0) {
-        this.bga.states.setClientState('client_noPlaysLeft', {
-          descriptionmyturn: _('${you} must end your turn'),
-        });
-        this.setPlayablePieces();
-      } else {
-        this.bga.states.setClientState('client_selectPieceOrEndTurn', {
-          descriptionmyturn: _('${you} may select a piece to play or end your turn'),
-        });
-        this.setPlayablePieces();
-      }
-      this.bga.statusBar.addActionButton(
-        _('End turn'),
-        () => {
-          this.unselectAllHandPieces();
-          this.bgaPerformAction('actDonePlayPieces');
-        });
-    } else {
-      this.bga.states.setClientState('client_mustSelectPiece', {
-        descriptionmyturn: _('${you} must select a piece to play'),
-      });
-      this.setPlayablePieces();
-    }
-    if (this.playStateArgs.canUndo) {
-      this.bga.statusBar.addActionButton(
-        _('Undo'),
-        () => { this.bga.states.setClientState('client_undo', { }); this.bgaPerformAction('actUndoPlay'); },
-        { color: "alert" }
-      );
-    }
-  }
-
-  private onHandClicked(ev: Event): boolean {
-    ev.preventDefault();
-    ev.stopPropagation();
-    if (!this.bga.players.isCurrentPlayerActive()) {
-      return false;
-    }
-    if (this.currentState != 'client_selectPieceOrEndTurn'
-      && this.currentState != 'client_pickHexToPlay'
-      && this.currentState != 'client_mustSelectPiece') {
-      return false;
-    }
-    const pieceDiv = ev.target as HTMLElement;
-    let p = pieceDiv.getAttribute(Attrs.PIECE);
-    if (!p || p == Piece.EMPTY) { return false; }
-
-    let parentDiv = pieceDiv.parentElement!;
-    let cl = parentDiv.classList;
-    if (cl.contains(CSS.UNPLAYABLE)) { return false; }
-    // if (parent.parentElement!.id != IDS.HAND) {
-    //   return false;
-    // }
-
-    if (this.allowedMovesFor(pieceDiv).length == 0) {
-      return false;
-    }
-    let playable = false;
-    if (!cl.contains(CSS.SELECTED)) {
-      this.unselectAllHandPieces();
-      this.markHexesPlayableForPiece(pieceDiv);
-      playable = true;
-    } else {
-      this.unmarkHexesPlayableForPiece(pieceDiv);
-    }
-    cl.toggle(CSS.SELECTED);
-    if (playable) {
-      this.selectedHandDiv = parentDiv;
-      if (this.currentState != 'client_pickHexToPlay') {
-        this.bga.states.setClientState('client_pickHexToPlay', {
-          descriptionmyturn: _('${you} must select a hex to play to'),
-        });
-        this.bga.statusBar.addActionButton(
-          _('Cancel'),
-          () => {
-            this.unselectAllHandPieces();
-            this.setStatusBarForPlayState();
-          },
-        { color: "secondary"});
-      }
-    } else {
-      this.setStatusBarForPlayState();
-    }
-    return false;
-  }
-
   private setupPlayerBoard(player: PlayerData): void {
     const playerId = player.player_id;
     console.log('Setting up board for player ' + playerId);
     this.bga.playerPanels.getElement(playerId)
-      .insertAdjacentHTML('beforeend', Html.player_board_ext(playerId, Game.playerIdToColorIndex[playerId]!));
+      .insertAdjacentHTML('beforeend', BabHtml.player_board_ext(playerId, Game.playerIdToColorIndex[playerId]!));
     //    create counters per player
     this.handCounters[playerId] = new ebg.counter();
     this.handCounters[playerId]!.create(IDS.handcount(playerId));
@@ -677,44 +220,6 @@ export class Game extends BaseGame<Player, BGamedatas> {
     this.bga.playerPanels.getScoreCounter(playerId).setValue(player.score);
   }
 
-  private onUpdateActionButtons_SelectExtraTurn(): void {
-    this.bga.statusBar.addActionButton(
-      _('Take your one-time extra turn'),
-      () => this.bgaPerformAction('actChooseExtraTurn', {
-        take_extra_turn: true
-      }));
-    this.bga.statusBar.addActionButton(
-      _('Just finish your turn'),
-      () => this.bgaPerformAction('actChooseExtraTurn', {
-        take_extra_turn: false
-      }));
-  }
-
-  private onUpdateActionButtons_EndOfTurnScoring(): void {
-    this.markAllHexesUnplayable();
-  }
-
-  private onUpdateActionButtons_SelectZigguratCard(): void {
-    // TODO: do better than this?
-    const div = $(IDS.AVAILABLE_ZCARDS);
-    div.scrollIntoView(false);
-    //  div.classList.add(CSS.SELECTING);
-  }
-
-  private onUpdateActionButtons_PlayPieces(args: PlayState): void {
-    this.playStateArgs = args;
-    this.setStatusBarForPlayState();
-    this.markAllHexesUnplayable();
-  }
-
-  private onUpdateActionButtons_SelectScoringHex(args: { hexes: RowCol[] }): void {
-    this.markHexesPlayable(args.hexes);
-  }
-
-  private markAllHexesUnplayable(): void {
-    $(IDS.BOARD).querySelectorAll('.' + CSS.PLAYABLE)
-      .forEach(div => div.classList.remove(CSS.PLAYABLE));
-  }
 
   private async notif_turnFinished(
     args: {
@@ -736,7 +241,7 @@ export class Game extends BaseGame<Player, BGamedatas> {
       _private: {
         original_piece: string;
         handpos: number;
-      };
+      } | undefined;
       captured_piece: string;
       piece: string;
     }
@@ -757,7 +262,7 @@ export class Game extends BaseGame<Player, BGamedatas> {
     let pieceDiv = hexDiv.firstElementChild as HTMLElement;
     let destDiv = isActivePlayer ? this.handPosDiv(args._private.handpos) : $(IDS.handcount(args.player_id));
 
-    if (args._private.original_piece) {
+    if (args._private?.original_piece) {
         // restore piece value, e.g. if it was originally hidden
         pieceDiv.setAttribute(Attrs.PIECE, Game.pieceVal(args._private.original_piece, args.player_id));
     }
@@ -1023,9 +528,9 @@ export class Game extends BaseGame<Player, BGamedatas> {
   ///////
   private static zcardSalt: number = 0;
   private static readonly special_log_args : Record<string, (args: any) => HTMLElement> = {
-    piece: (args: any) => BHtml.span({ attrs: Attrs.piece(Game.pieceVal(args.piece, args.player_id)) }),
-    city: (args: any) => BHtml.span({ attrs: Attrs.piece(Game.pieceVal(args.city, 0))}),
-    zcard: (args: any) => BHtml.span({ id: `logzcard_${Game.zcardSalt++}`, attrs: Attrs.ztype(args.zcard)}),
-    original_piece: (args: any) => BHtml.span({ attrs: Attrs.piece(Game.pieceVal(args.original_piece, args.player_id))}),
+    piece: (args: any) => Html.span({ attrs: Attrs.piece(Game.pieceVal(args.piece, args.player_id)) }),
+    city: (args: any) => Html.span({ attrs: Attrs.piece(Game.pieceVal(args.city, 0))}),
+    zcard: (args: any) => Html.span({ id: `logzcard_${Game.zcardSalt++}`, attrs: Attrs.ztype(args.zcard)}),
+    original_piece: (args: any) => Html.span({ attrs: Attrs.piece(Game.pieceVal(args.original_piece, args.player_id))}),
   };
 }
