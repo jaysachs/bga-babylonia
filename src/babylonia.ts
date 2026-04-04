@@ -1,7 +1,7 @@
 import { colorIndexMap } from './colormap';
 import { BaseGame } from './basegame';
 import { Html } from './html';
-import { ClientMustSelectPieceState, ClientNoPlaysLeftState, ClientPickHexToPlayState, ClientSelectPieceOrEndTurnState, ClientUndoState, EndOfTurnScoringState, PlayPiecesState, SelectExtraTurnState, SelectScoringHexState, SelectZigguratCardState } from './gamestates';
+import { EndOfTurnScoringState, PlayPiecesState, SelectExtraTurnState, SelectScoringHexState, SelectZigguratCardState } from './gamestates';
 import { Hex, PlayerData, RowCol } from './bdata';
 import { Attrs, CSS, Html as BabHtml, IDS, Piece } from './bhtml';
 
@@ -79,11 +79,6 @@ export class Game extends BaseGame<Player, BGamedatas> {
     this.bga.states.register('SelectZigguratCard', new SelectZigguratCardState(this));
     this.bga.states.register('PlayPieces', new PlayPiecesState(this));
     this.bga.states.register('SelectScoringHex', new SelectScoringHexState(this));
-    this.bga.states.register('client_pickHexToPlay', new ClientPickHexToPlayState(this));
-    this.bga.states.register('client_selectPieceOrEndTurn', new ClientSelectPieceOrEndTurnState(this));
-    this.bga.states.register('client_mustSelectPiece', new ClientMustSelectPieceState(this));
-    this.bga.states.register('client_noPlaysLeft', new ClientNoPlaysLeftState(this));
-    this.bga.states.register('client_undo', new ClientUndoState(this));
 
     // if a ziggurat card is being chosen
     // TODO: should this be done in the state watcher?
