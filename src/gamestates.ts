@@ -202,16 +202,23 @@ export class PlayPiecesState extends BabyloniaState {
     }
   }
 
-  private attachHandHandler() {
-      $(IDS.HAND).addEventListener('click', this.handHandler);
+  override onLeavingState(args: any, isCurrentPlayerActive: boolean): void {
+    if (isCurrentPlayerActive) {
+      this.removeBoardHandler();
+      this.removeHandHandler();
+    }
   }
 
-  protected removeHandHandler() {
-      $(IDS.HAND).removeEventListener('click', this.handHandler);
+  private attachHandHandler() {
+    $(IDS.HAND).addEventListener('click', this.handHandler);
+  }
+
+  private removeHandHandler() {
+    $(IDS.HAND).removeEventListener('click', this.handHandler);
   }
 
   private attachBoardHandler() {
-      $(IDS.BOARD).addEventListener('click', this.boardHandler);
+    $(IDS.BOARD).addEventListener('click', this.boardHandler);
   }
   private removeBoardHandler() {
     $(IDS.BOARD).removeEventListener('click', this.boardHandler);
@@ -220,7 +227,7 @@ export class PlayPiecesState extends BabyloniaState {
   protected allowedMovesFor(div: Element | null): RowCol[] {
     if (!div) { return []; }
     const piece = div.getAttribute(Attrs.PIECE)!.split('_')[0]!;
-    return (this.playStateArgs!.allowedMoves as any)[piece] || [];
+    return (this.playStateArgs.allowedMoves as any)[piece] || [];
   }
 
   protected unmarkHexesPlayable(hexes: RowCol[]): void {
@@ -317,9 +324,10 @@ export class PlayPiecesState extends BabyloniaState {
   }
 
   protected handleHandPieceClicked(): void {
-    this.removeHandHandler();
+    // this.removeHandHandler();
     this.attachBoardHandler();
     this.game.bga.statusBar.setTitle(_('${you} must select a hex to play to'));
+    this.game.bga.statusBar.removeActionButtons();
     this.game.bga.statusBar.addActionButton(
         _('Cancel'),
         () => {
@@ -331,6 +339,7 @@ export class PlayPiecesState extends BabyloniaState {
 
   private setStatusBarForPlayState(): void {
     const bga = this.game.bga;
+    bga.statusBar.removeActionButtons();
     if (this.playStateArgs.canEndTurn) {
       if (this.playStateArgs.allowedMoves.length == 0) {
         bga.statusBar.setTitle(_('${you} must end your turn'));
