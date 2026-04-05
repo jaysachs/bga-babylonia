@@ -3,7 +3,7 @@ import { BaseGame } from './basegame';
 import { Html } from './html';
 import { EndOfTurnScoringState, PlayPiecesState, SelectExtraTurnState, SelectScoringHexState, SelectZigguratCardState } from './gamestates';
 import { Hex, PlayerData, RowCol } from './bdata';
-import { Attrs, CSS, Html as BabHtml, IDS, Piece } from './bhtml';
+import { Attrs, CSS, BblHtml as BblHtml, IDS, Piece } from './bhtml';
 
 type AnimationList = (() => Promise<any>)[];
 
@@ -47,6 +47,7 @@ export class Game extends BaseGame<Player, BGamedatas> {
     for (const playerId in gamedatas.players) {
       Game.playerIdToColorIndex[playerId] = colorIndexMap[gamedatas.players[playerId]!.color]!;
     }
+    Attrs.initializeColorMap(Game.playerIdToColorIndex);
 
     this.setupGameHtml();
 
@@ -87,40 +88,17 @@ export class Game extends BaseGame<Player, BGamedatas> {
   }
 
   private createPieceDiv(piece: string, player_id?: number) : HTMLElement {
-    let e = document.createElement('div');
-    e.setAttribute(Attrs.PIECE, Game.pieceVal(piece, player_id || 0));
-    return e;
+    return Html.div({ attrs: Attrs.piece(piece, player_id) } );
   }
 
   private async setupGameBoard(boardData: Hex[]) {
     const boardDiv = $(IDS.BOARD);
-
-    const animateBoardInitialPlacement = false;
-    const inParallel = true;
-    const duration = inParallel ? 800 : 200;
-    let anims: AnimationList = [];
-
     for (const hex of boardData) {
-      const hexDiv = BabHtml.makeHexDiv(hex);
+      const hexDiv = BblHtml.makeHexDiv(hex);
       boardDiv.appendChild(hexDiv);
       if (hex.piece != null && hex.piece != Piece.EMPTY) {
         let pieceDiv = this.createPieceDiv(hex.piece, hex.board_player)
-        if (!animateBoardInitialPlacement || hex.board_player == 0) {
-          hexDiv.appendChild(pieceDiv);
-        } else {
-          anims.push(() => {
-            $(IDS.handcount(hex.board_player)).appendChild(pieceDiv);
-            return this.animationManager.slideAndAttach(pieceDiv, hexDiv, { duration: duration, fromPlaceholder: 'off' });
-          });
-        }
-      }
-    }
-
-    if (animateBoardInitialPlacement) {
-      if (inParallel) {
-        await this.animationManager.playParallel(anims);
-      } else {
-        await this.animationManager.playSequentially(anims);
+        hexDiv.appendChild(pieceDiv);
       }
     }
   }
@@ -145,7 +123,7 @@ export class Game extends BaseGame<Player, BGamedatas> {
   }
 
   private setupGameHtml(): void {
-    this.bga.gameArea.getElement().insertAdjacentHTML('beforeend', BabHtml.base_html());
+    this.bga.gameArea.getElement().appendChild(BblHtml.base_html());
   }
 
   private updateCounter(counter: Counter, value: number, animate: boolean) {
@@ -186,12 +164,6 @@ export class Game extends BaseGame<Player, BGamedatas> {
     return $(IDS.HAND).childNodes.item(i)! as HTMLElement;
   }
 
-  private static pieceVal(piece: string, playerId: number): string {
-    return (playerId > 0 && piece != Piece.EMPTY)
-      ? piece + '_' + this.playerIdToColorIndex[playerId]
-      : piece;
-  }
-
   private markHexSelected(rc: RowCol): void {
     this.hexDiv(rc).classList.add(CSS.SELECTED);
   }
@@ -204,7 +176,7 @@ export class Game extends BaseGame<Player, BGamedatas> {
     const playerId = player.player_id;
     console.log('Setting up board for player ' + playerId);
     this.bga.playerPanels.getElement(playerId)
-      .insertAdjacentHTML('beforeend', BabHtml.player_board_ext(playerId, Game.playerIdToColorIndex[playerId]!));
+      .append(...BblHtml.player_board_ext(playerId, Game.playerIdToColorIndex[playerId]!));
     //    create counters per player
     this.handCounters[playerId] = new ebg.counter();
     this.handCounters[playerId]!.create(IDS.handcount(playerId));
@@ -262,7 +234,7 @@ export class Game extends BaseGame<Player, BGamedatas> {
 
     if (args._private?.original_piece) {
         // restore piece value, e.g. if it was originally hidden
-        pieceDiv.setAttribute(Attrs.PIECE, Game.pieceVal(args._private.original_piece, args.player_id));
+        Attrs.setPiece(pieceDiv, args._private.original_piece, args.player_id);
     }
     // slide the played piece back to the hand
     anims.push(() => this.animationManager.slideAndAttach(pieceDiv, destDiv));
@@ -312,7 +284,7 @@ export class Game extends BaseGame<Player, BGamedatas> {
         // slide piece from hand to hex
         this.animationManager.slideAndAttach(pieceDiv, hexDiv)
           // play into river, piece is hidden, so use the value from the args not the hand
-          .then(() => pieceDiv.setAttribute(Attrs.PIECE, Game.pieceVal(args.piece, args.player_id)))
+          .then(() => Attrs.setPiece(pieceDiv, args.piece, args.player_id))
       );
     } else {
       anims.push(() => {
@@ -368,7 +340,7 @@ export class Game extends BaseGame<Player, BGamedatas> {
          let pt = pieceDiv.getAttribute(Attrs.PIECE);
          if (!pt) {
            console.error("hand had piece div but no attribute");
-         } else if (pt != Game.pieceVal(newPiece!, pid)) {
+         } else if (pt != Attrs.pieceVal(newPiece!, pid)) {
            console.error("piece from args", newPiece, "not matches hand", pieceDiv);
          }
       }
@@ -526,9 +498,9 @@ export class Game extends BaseGame<Player, BGamedatas> {
   ///////
   private static zcardSalt: number = 0;
   private registerLogArgs(): void {
-    this.registerLogArg('piece', (args) => Html.span({ attrs: Attrs.piece(Game.pieceVal(args.piece, args.player_id)) }));
-    this.registerLogArg('city', (args) => Html.span({ attrs: Attrs.piece(Game.pieceVal(args.city, 0))}));
+    this.registerLogArg('piece', (args) => Html.span({ attrs: Attrs.piece(args.piece, args.player_id) }));
+    this.registerLogArg('city', (args) => Html.span({ attrs: Attrs.piece(args.city, 0)}));
     this.registerLogArg('zcard', (args) => Html.span({ id: `logzcard_${Game.zcardSalt++}`, attrs: Attrs.ztype(args.zcard)}));
-    this.registerLogArg('original_piece', (args) => Html.span({ attrs: Attrs.piece(Game.pieceVal(args.original_piece, args.player_id))}));
+    this.registerLogArg('original_piece', (args) => Html.span({ attrs: Attrs.piece(args.original_piece, args.player_id)}));
   }
 }

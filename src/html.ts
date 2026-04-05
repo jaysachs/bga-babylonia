@@ -3,7 +3,7 @@ export interface AttrLike {
 }
 
 export class Html {
-  public static makeElem(ty: string, args: {id?: string, text?: string, title?: string, attrs?: Record<string, string> | AttrLike , classes?: (string | string[]), style?: (string | string[])}, ...children: (HTMLElement | undefined) []): HTMLElement  {
+  private static makeElem(ty: string, args: {id?: string, text?: string, title?: string, attrs?: Record<string, string> | AttrLike , classes?: (string | string[]), style?: (string|string[])}, ...children: (Node | undefined) []): HTMLElement  {
     const e = document.createElement(ty);
     if (args.id) { e.id = args.id; }
     if (args.classes) {
@@ -31,15 +31,15 @@ export class Html {
     return e;
   }
 
-  public static div(args: {id?: string, text?: string, title?: string, attrs?: Record<string, string> | AttrLike, classes?: (string | string[])}, ...children: (HTMLElement | undefined) []) {
+  public static div(args: {id?: string, text?: string, title?: string, attrs?: Record<string, string> | AttrLike, classes?: (string | string[]), style?: (string|string[])}, ...children: (Node | undefined) []) {
     return this.makeElem('div', args, ...children);
   }
 
-  public static span(args: {id?: string, text?: string, title?: string, attrs?: Record<string, string> | AttrLike, classes?: (string | string[]), style?: (string | string[])}, ...children: (HTMLElement | undefined) []) {
+  public static span(args: {id?: string, text?: string, title?: string, attrs?: Record<string, string> | AttrLike, classes?: (string | string[]), style?: (string|string[])}, ...children: (Node | undefined) []) {
     return this.makeElem('span', args, ...children);
   }
 
-  public static p(args: {id?: string, text?: string, title?: string, attrs?: Record<string, string> | AttrLike, classes?: (string | string[]), style?: (string | string[])}, ...children: (HTMLElement | undefined) []) {
+  public static p(args: {id?: string, text?: string, title?: string, attrs?: Record<string, string> | AttrLike, classes?: (string | string[]), style?: (string|string[])}, ...children: (Node | undefined) []) {
       return this.makeElem('p', args, ...children);
   }
 }
