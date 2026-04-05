@@ -54,9 +54,4 @@ export abstract class BaseGame<P extends Player, T extends Gamedatas<P>> {
   protected async notif_debug(args: any) {
     console.log("debug", args);
   }
-
-  bgaPerformAction(action: string, args?: any, params?: { lock?: boolean; checkAction?: boolean; checkPossibleActions?: boolean; }): Promise<any> {
-    console.debug("action", action, args);
-    return this.bga.actions.performAction(action, args, params ).then(() => console.debug("action completed", action, args));
-  }
 }

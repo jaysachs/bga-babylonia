@@ -94,7 +94,7 @@ export class Game extends BaseGame<Player, BGamedatas> {
     return e;
   }
 
-  private async setupGameBoard(boardData: Hex[]): Promise<void> {
+  private async setupGameBoard(boardData: Hex[]) {
     const boardDiv = $(IDS.BOARD);
 
     const animateBoardInitialPlacement = false;
@@ -227,7 +227,7 @@ export class Game extends BaseGame<Player, BGamedatas> {
       hand_size: number;
       pool_size: number;
     }
-  ): Promise<void> {
+  ) {
     this.updateHandCount(args);
     this.updatePoolCount(args);
   }
@@ -245,7 +245,7 @@ export class Game extends BaseGame<Player, BGamedatas> {
       captured_piece: string;
       piece: string;
     }
-  ): Promise<void> {
+  ) {
     let anims: AnimationList = [];
     let hexDiv = $(IDS.hexDiv(args));
     let isActivePlayer = this.bga.gameui.player_id == args.player_id;
@@ -292,7 +292,7 @@ export class Game extends BaseGame<Player, BGamedatas> {
       ziggurat_points: number;
       touched_ziggurats: RowCol[];
     }
-  ): Promise<void> {
+  ) {
     let anims: AnimationList = [];
 
     const hexDiv = this.hexDiv(args);
@@ -345,7 +345,7 @@ export class Game extends BaseGame<Player, BGamedatas> {
     this.bga.playerPanels.getScoreCounter(args.player_id).incValue(args.points);
   }
 
-  private async notif_handRefilled(args: { hand: string[] }): Promise<void> {
+  private async notif_handRefilled(args: { hand: string[] }) {
     const anims: AnimationList = [];
     const pid = this.bga.gameui.player_id;
     const hand = $(IDS.HAND);
@@ -379,7 +379,7 @@ export class Game extends BaseGame<Player, BGamedatas> {
     await this.animationManager.playParallel(anims);
   }
 
-  private async notif_extraTurnUsed(args: { card: string; used: boolean; }): Promise<void> {
+  private async notif_extraTurnUsed(args: { card: string; used: boolean; }) {
     const carddiv = $(IDS.zcard(args.card));
     if (carddiv == undefined) {
       console.error(`Could not find div for owned ${args.card} card`, args.card);
@@ -421,7 +421,7 @@ export class Game extends BaseGame<Player, BGamedatas> {
       player_id: number;
       winner_hexes: RowCol[];
       other_hexes: RowCol[];
-    }): Promise<void> {
+    }) {
       // slight subtlety here; if there is a winner, leave the hex selected until after the cards is selected
       await this.indicateNeighbors(args.winner_hexes, args.other_hexes).then(() => { if (!args.player_id) this.unmarkHexSelected(args) });
     // TODO: consider better visual treatments
@@ -434,7 +434,7 @@ export class Game extends BaseGame<Player, BGamedatas> {
       row: number;
       col: number;
       city: string;
-    }): Promise<void> {
+    }) {
     this.markHexSelected(args);
   }
 
@@ -446,7 +446,7 @@ export class Game extends BaseGame<Player, BGamedatas> {
       points: number;
       hex: RowCol;
     }
-  ): Promise<void> {
+  ) {
     this.unmarkHexSelected(args.hex);
     const dest = $(IDS.playerBoardZcards(args.player_id));
     const zelem = $(IDS.zcard(args.zcard));
@@ -477,7 +477,7 @@ export class Game extends BaseGame<Player, BGamedatas> {
         capture_points: number;
       }[];
     }
-  ): Promise<void> {
+  ) {
     const hex = $(IDS.hexDiv(args));
 
     let aa = this.bgaAnimationsActive();
