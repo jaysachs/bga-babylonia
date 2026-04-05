@@ -288,12 +288,16 @@ export class PlayPiecesState extends BabyloniaState {
       console.error('no hex selected!');
       return;
     }
-    await this.bga.actions.performAction('actPlayPiece', {
+    // FIXME: this is fragile; if we await, or put the unselctAllHandPieces in the then, we
+    //  end up with the animated moving piece not the eventual piece, and get a JS error
+    //  leaving the hand piece selected.
+    this.bga.actions.performAction('actPlayPiece', {
       handpos: indexInParent(handDiv),
       row: hex.row,
       col: hex.col
-    });
-    this.unmarkHexPlayable(hex);
+    }).then(() => {
+        this.unmarkHexPlayable(hex);
+    })
     this.unselectAllHandPieces();
   }
 
