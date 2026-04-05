@@ -31,7 +31,7 @@ export class Game extends BaseGame<Player, BGamedatas> {
   public zcardTooltips: string[] = [];
 
   constructor(bga: Bga<Player, BGamedatas>) {
-    super(bga, Game.special_log_args);
+    super(bga);
   }
 
   public addTooltipsToLog() {
@@ -42,10 +42,8 @@ export class Game extends BaseGame<Player, BGamedatas> {
     });
   }
 
-  override setup(gamedatas: BGamedatas) {
-    console.log(gamedatas);
-    super.setup(gamedatas);
-
+  setup(gamedatas: BGamedatas) {
+    this.registerLogArgs();
     for (const playerId in gamedatas.players) {
       Game.playerIdToColorIndex[playerId] = colorIndexMap[gamedatas.players[playerId]!.color]!;
     }
@@ -53,7 +51,7 @@ export class Game extends BaseGame<Player, BGamedatas> {
     this.setupGameHtml();
 
     console.log('setting up player boards', gamedatas.player_data);
-    for (let pid in gamedatas.player_data) {
+    for (const pid in gamedatas.player_data) {
       this.setupPlayerBoard(gamedatas.player_data[pid]!);
     }
 
@@ -333,7 +331,7 @@ export class Game extends BaseGame<Player, BGamedatas> {
           () => this.animationManager.displayScoring(
               this.hexDiv(rc),
               1,
-              this.gamedatas.players[args.player_id]!.color,
+              this.bga.gameui.gamedatas.players[args.player_id]!.color,
               { extraClass: 'bbl_city_scoring', duration: 700 })
             .then(() => args.touched_ziggurats.forEach(this.unmarkHexSelected.bind(this))))
       ));
@@ -495,7 +493,7 @@ export class Game extends BaseGame<Player, BGamedatas> {
         await this.animationManager.displayScoring(
           hex,
           details.network_points,
-          this.gamedatas.players[playerId]!.color,
+          this.bga.gameui.gamedatas.players[playerId]!.color,
           { extraClass: 'bbl_city_scoring' });
         details.network_locations.forEach(
           (rc: RowCol) => {
@@ -527,10 +525,10 @@ export class Game extends BaseGame<Player, BGamedatas> {
 
   ///////
   private static zcardSalt: number = 0;
-  private static readonly special_log_args : Record<string, (args: any) => HTMLElement> = {
-    piece: (args: any) => Html.span({ attrs: Attrs.piece(Game.pieceVal(args.piece, args.player_id)) }),
-    city: (args: any) => Html.span({ attrs: Attrs.piece(Game.pieceVal(args.city, 0))}),
-    zcard: (args: any) => Html.span({ id: `logzcard_${Game.zcardSalt++}`, attrs: Attrs.ztype(args.zcard)}),
-    original_piece: (args: any) => Html.span({ attrs: Attrs.piece(Game.pieceVal(args.original_piece, args.player_id))}),
-  };
+  private registerLogArgs(): void {
+    this.registerLogArg('piece', (args) => Html.span({ attrs: Attrs.piece(Game.pieceVal(args.piece, args.player_id)) }));
+    this.registerLogArg('city', (args) => Html.span({ attrs: Attrs.piece(Game.pieceVal(args.city, 0))}));
+    this.registerLogArg('zcard', (args) => Html.span({ id: `logzcard_${Game.zcardSalt++}`, attrs: Attrs.ztype(args.zcard)}));
+    this.registerLogArg('original_piece', (args) => Html.span({ attrs: Attrs.piece(Game.pieceVal(args.original_piece, args.player_id))}));
+  }
 }

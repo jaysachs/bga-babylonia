@@ -1,4 +1,5 @@
 import { BgaAnimations, AnimationManager } from './libs';
+import { MoreAnimations } from './more-animations';
 
 /** Class that extends default bga core game class with more functionality
  */
@@ -6,29 +7,25 @@ import { BgaAnimations, AnimationManager } from './libs';
 type SpecialLogArgs = Record<string, (any) => HTMLElement>;
 
 export abstract class BaseGame<P extends Player, T extends Gamedatas<P>> {
-  protected readonly animationManager: AnimationManager;
-  protected gamedatas: T;
+  public readonly animationManager: AnimationManager;
+  public readonly moreAnimations: MoreAnimations;
   public readonly bga: Bga<P, T>;
-  private readonly special_log_args: SpecialLogArgs;
+  private readonly special_log_args = new Map<string, (any) => HTMLElement>();
 
-  constructor(bga: Bga<P, T>, special_log_args: SpecialLogArgs) {
-    console.log('game constructor');
+  constructor(bga: Bga<P, T>) {
     this.bga = bga;
-    this.special_log_args = special_log_args;
     this.animationManager = new BgaAnimations.Manager({
       animationsActive: () => this.bgaAnimationsActive(),
     });
-
-}
+    this.moreAnimations = new MoreAnimations(this.animationManager);
+  }
 
   protected bgaAnimationsActive(): boolean {
     return this.bga.gameui.bgaAnimationsActive();
   }
 
-  setup(gamedatas: T) {
-    console.log('Starting game setup', gameui);
-    this.gamedatas = gamedatas;
-    // create the animation manager, and bind it to the `game.bgaAnimationsActive()` function
+  protected registerLogArg(arg: string, xform: (any) => HTMLElement): void {
+    this.special_log_args.set(arg, xform);
   }
 
   bgaFormatText(log: string, args: any): { log: string, args: any } {
@@ -36,14 +33,14 @@ export abstract class BaseGame<P extends Player, T extends Gamedatas<P>> {
       const shadowParent = document.createElement('span');
       if (log && args && !args.processed) {
         args.processed = true;
-        for (const key in this.special_log_args) {
+        this.special_log_args.forEach((xform, key) => {
           if (key in args) {
-            const e = this.special_log_args[key](args);
+            const e = xform(args);
             shadowParent.appendChild(e);
             args[key] = shadowParent.getHTML();
             e.remove();
           }
-        }
+        });
       }
     } catch (e: any) {
       console.error(log, args, 'Exception thrown', e.stack);
@@ -51,7 +48,10 @@ export abstract class BaseGame<P extends Player, T extends Gamedatas<P>> {
     return { log, args };
   }
 
-  protected async notif_debug(args: any) {
-    console.log("debug", args);
+  /**
+  * Returns the index of the given element among its parent's child elements or -1 if no parent.
+  */
+  protected indexInParent(el: Element): number {
+    return Array.from(el.parentElement?.children ?? []).findIndex(e => e == el);
   }
 }
