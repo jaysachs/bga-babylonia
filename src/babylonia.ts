@@ -106,7 +106,7 @@ export class Game extends BaseGame<Player, BGamedatas> {
   private setupZcards(zcards: Zcard[]): void {
     const available = $(IDS.AVAILABLE_ZCARDS);
     for (let zcard of zcards) {
-      const zelem = document.createElement('div');
+      const zelem = Html.div({});
       zelem.id = IDS.zcard(zcard.type);
       zelem.setAttribute(Attrs.ZTYPE, zcard.type);
       if (zcard.used) {
@@ -159,7 +159,7 @@ export class Game extends BaseGame<Player, BGamedatas> {
   private handPosDiv(i: number): HTMLElement {
     const hand = $(IDS.HAND);
     while (i >= hand.childElementCount) {
-      hand.appendChild(document.createElement('div'));
+      hand.appendChild(Html.div({}));
     }
     return $(IDS.HAND).childNodes.item(i)! as HTMLElement;
   }
@@ -323,7 +323,7 @@ export class Game extends BaseGame<Player, BGamedatas> {
     for (let newPiece of args.hand) {
       if (!handPosDiv) {
         // dynamically expand hand if 7 size hand is chosen
-        handPosDiv = document.createElement('div');
+        handPosDiv = Html.div({});
         hand.appendChild(handPosDiv);
       }
       let pieceDiv = handPosDiv!.firstElementChild as HTMLElement;
