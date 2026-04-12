@@ -28,7 +28,7 @@ export class Game extends BaseGame<Player, BGamedatas> {
   private poolCounters: Counter[] = [];
   private cityCounters: Counter[] = [];
   private static playerIdToColorIndex: Record<number, number> = {};
-  public zcardTooltips: string[] = [];
+  public zcardTooltips = new Map<string, string>();
 
   constructor(bga: Bga<Player, BGamedatas>) {
     super(bga);
@@ -38,7 +38,7 @@ export class Game extends BaseGame<Player, BGamedatas> {
     const elements = document.querySelectorAll(`[${Attrs.ZTYPE}]:not([${Attrs.TT_PROCESSED}])`);
     elements.forEach(ele => {
       ele.setAttribute(Attrs.TT_PROCESSED, '');  // prevents tooltips being re-added to previous log entries
-      this.bga.gameui.addTooltip(ele.id, this.zcardTooltips[ele.getAttribute(Attrs.ZTYPE)!], '');
+      this.bga.gameui.addTooltip(ele.id, this.zcardTooltips.get(ele.getAttribute(Attrs.ZTYPE)!)!, '');
     });
   }
 
@@ -117,7 +117,7 @@ export class Game extends BaseGame<Player, BGamedatas> {
       } else {
         available.appendChild(zelem);
       }
-      this.zcardTooltips[zcard.type] = zcard.tooltip;
+      this.zcardTooltips.set(zcard.type, zcard.tooltip);
       this.bga.gameui.addTooltip(zelem.id, zcard.tooltip, '');
     }
   }
@@ -230,7 +230,7 @@ export class Game extends BaseGame<Player, BGamedatas> {
     }
 
     let pieceDiv = hexDiv.firstElementChild as HTMLElement;
-    let destDiv = isActivePlayer ? this.handPosDiv(args._private.handpos) : $(IDS.handcount(args.player_id));
+    let destDiv = isActivePlayer ? this.handPosDiv(args._private!.handpos) : $(IDS.handcount(args.player_id));
 
     if (args._private?.original_piece) {
         // restore piece value, e.g. if it was originally hidden
