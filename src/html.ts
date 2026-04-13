@@ -21,9 +21,11 @@ export class Html {
       e.innerText = args.text;
     }
     if (args.attrs) {
-      var r = args.attrs;
+      var r: Record<string,string>;
       if (typeof ((args.attrs) as any).toRecord == "function") {
         r = (args.attrs as AttrLike).toRecord();
+      } else {
+        r = args.attrs as Record<string,string>;
       }
       Object.keys(r).forEach(k => e.setAttribute(k, r![k]!));
     }

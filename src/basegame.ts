@@ -4,13 +4,13 @@ import { MoreAnimations } from './more-animations';
 /** Class that extends default bga core game class with more functionality
  */
 
-type SpecialLogArgs = Record<string, (any) => HTMLElement>;
+type SpecialLogArgs = Record<string, (x: any) => HTMLElement>;
 
 export abstract class BaseGame<P extends Player, T extends Gamedatas<P>> {
   public readonly animationManager: AnimationManager;
   public readonly moreAnimations: MoreAnimations;
   public readonly bga: Bga<P, T>;
-  private readonly special_log_args = new Map<string, (any) => HTMLElement>();
+  private readonly special_log_args = new Map<string, (x: any) => HTMLElement>();
 
   constructor(bga: Bga<P, T>) {
     this.bga = bga;
@@ -24,7 +24,7 @@ export abstract class BaseGame<P extends Player, T extends Gamedatas<P>> {
     return this.bga.gameui.bgaAnimationsActive();
   }
 
-  protected registerLogArg(arg: string, xform: (any) => HTMLElement): void {
+  protected registerLogArg(arg: string, xform: (x: any) => HTMLElement): void {
     this.special_log_args.set(arg, xform);
   }
 

@@ -228,7 +228,7 @@ export class PlayPiecesState extends BabyloniaState {
   protected allowedMovesFor(div: Element | null): RowCol[] {
     if (!div) { return []; }
     const piece = div.getAttribute(Attrs.PIECE)!.split('_')[0]!;
-    return (this.playStateArgs.allowedMoves as any)[piece] || [];
+    return (this.playStateArgs!.allowedMoves as any)[piece] || [];
   }
 
   protected unmarkHexesPlayable(hexes: RowCol[]): void {
@@ -245,7 +245,8 @@ export class PlayPiecesState extends BabyloniaState {
 
   public unselectAllHandPieces(): void {
     const hand = $(IDS.HAND);
-    hand.childNodes.forEach((posDiv : HTMLElement) => {
+    hand.childNodes.forEach(node => {
+      const posDiv = node as HTMLElement;
       const cl = posDiv.classList;
       if (cl.contains(CSS.SELECTED)) {
         this.unmarkHexesPlayableForPiece(posDiv.firstElementChild!);
@@ -258,7 +259,9 @@ export class PlayPiecesState extends BabyloniaState {
 
   public setPlayablePieces(): void {
     const hand = $(IDS.HAND);
-    hand.childNodes.forEach((child : HTMLElement) => {
+
+    hand.childNodes.forEach((node) => {
+      const child = node as HTMLElement;
       const cl = child.classList;
       if (this.allowedMovesFor(child.firstElementChild).length > 0) {
         cl.add(CSS.PLAYABLE);
@@ -343,8 +346,8 @@ export class PlayPiecesState extends BabyloniaState {
 
   private setStatusBarForPlayState(): void {
     this.bga.statusBar.removeActionButtons();
-    if (this.playStateArgs.canEndTurn) {
-      if (this.playStateArgs.allowedMoves.length == 0) {
+    if (this.playStateArgs!.canEndTurn) {
+      if (this.playStateArgs!.allowedMoves.length == 0) {
         this.bga.statusBar.setTitle(_('${you} must end your turn'));
         this.setPlayablePieces();
       } else {
@@ -364,7 +367,7 @@ export class PlayPiecesState extends BabyloniaState {
       this.attachHandHandler();
       this.setPlayablePieces();
     }
-    if (this.playStateArgs.canUndo) {
+    if (this.playStateArgs!.canUndo) {
       this.bga.statusBar.addActionButton(
         _('Undo'),
         () => this.bga.actions.performAction('actUndoPlay'),

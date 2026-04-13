@@ -79,7 +79,7 @@ export class MoreAnimations {
         );
     }
 
-    async flip(front, back: HTMLElement, lift: string = 'scale(1.3,1.3) translate(-2.3vw,2.3vw)'): Promise<any> {
+    async flip(front: HTMLElement, back: HTMLElement, lift: string = 'scale(1.3,1.3) translate(-2.3vw,2.3vw)'): Promise<any> {
         const noflip = ' rotate(0deg)';
         const revflip = ' rotateY(-180deg)';
         const fwdflip = ' rotateY(180deg)';
