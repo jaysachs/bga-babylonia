@@ -131,6 +131,9 @@ export class BblHtml {
         Html.div({},
             Html.span({classes:'bbl_pb_city_label'}),
             Html.span({id: IDS.citycount(player_id)}),
+        ),
+        Html.div({id:IDS.playerBoardZcards(player_id), classes: 'bbl_pb_zcards'},
+            Html.span({classes:'bbl_pb_zcard_label'})
         )
     ];
   }
