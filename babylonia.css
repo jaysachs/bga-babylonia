@@ -421,7 +421,7 @@
     justify-content: space-evenly;
 }
 
-.bbl_pb_citycount_label,
+.bbl_pb_city_label,
 .bbl_pb_hand_label_1,
 .bbl_pb_hand_label_2,
 .bbl_pb_hand_label_3,
@@ -469,7 +469,7 @@
     background-position: -400% -600%;
 }
 
-.bbl_pb_citycount_label {
+.bbl_pb_city_label {
     background-position: 0% -200%;
 }
 
