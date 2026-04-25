@@ -54,9 +54,9 @@ class SelectScoringHex extends AbstractScoringSelection
     }
 
     #[PossibleAction]
-    public function actSelectHexToScore(int $active_player_id, int $row, int $col): mixed
+    public function actSelectHexToScore(int $active_player_id, int $rc): mixed
     {
-        return $this->selectHex(new RowCol($row, $col), $active_player_id);
+        return $this->selectHex($rc, $active_player_id);
     }
 
     function zombie(int $playerId): mixed
@@ -66,7 +66,7 @@ class SelectScoringHex extends AbstractScoringSelection
         $rcs = $model->locationsRequiringScoring();
         if (count($rcs) > 0) {
             $rc = array_shift($rcs);
-            return $this->actSelectHexToScore($playerId, $rc->row, $rc->col);
+            return $this->actSelectHexToScore($playerId, $rc);
         }
         return EndOfTurnScoring::class;
     }

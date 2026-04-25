@@ -37,12 +37,12 @@ class Hex
 
     public function __toString(): string
     {
-        return sprintf("%s %s %s(%d) %s %s", $this->type->value, $this->rc, $this->piece->value, $this->player_id, $this->scored ? "true" : "false", $this->landmass->value);
+        return sprintf("%s %d %s(%d) %s %s", $this->type->value, $this->rc, $this->piece->value, $this->player_id, $this->scored ? "true" : "false", $this->landmass->value);
     }
 
     public function __construct(
         public readonly HexType $type,
-        public readonly RowCol $rc,
+        public readonly int $rc,
         public Piece $piece = Piece::EMPTY,
         public int $player_id = 0,
         public bool $scored = false,
@@ -122,20 +122,24 @@ class Hex
 
     public function isNeighbor(Hex $hex): bool
     {
-        return $this->rc->isNeighbor($hex->rc);
+        $diff = abs($this->rc - $hex->rc);
+        return $diff == 200 || $diff == 101 || $diff == 99;
+        // $cd = abs(RowCol::col($this->rc) - RowCol::col($hex->rc));
+        // $rd = abs(RowCol::row($this->rc) - RowCol::row($hex->rc));
+        // return $cd == 1 && $rd == 1 || $cd == 0 && $rd == 2;
     }
 
-    public static function land(RowCol $rc): Hex
+    public static function land(int $rc): Hex
     {
         return new Hex(HexType::LAND, $rc);
     }
 
-    public static function water(RowCol $rc): Hex
+    public static function water(int $rc): Hex
     {
         return new Hex(HexType::WATER, $rc);
     }
 
-    public static function ziggurat(RowCol $rc): Hex
+    public static function ziggurat(int $rc): Hex
     {
         return new Hex(HexType::LAND, $rc, Piece::ZIGGURAT);
     }

@@ -6,19 +6,15 @@ use PHPUnit\Framework\TestCase;
 use Bga\Games\babylonia\ {
         Board,
         Components,
-        Db,
         Hand,
         Hex,
-        HexType,
         Model,
         Move,
         PersistentStore,
         Piece,
         PlayerInfo,
         RowCol,
-        ScoredCity,
         Stats,
-        TestStatsImpl,
         TurnProgress,
         ZigguratCard,
         ZigguratCardType,
@@ -68,7 +64,7 @@ class TestStore extends PersistentStore {
     public function updateHand(int $player_id, int $handpos, Piece $piece): void { }
     public function incPlayerScore(int $player_id, int $points): void { }
 
-    public function updateHex(RowCol $rc, ?Piece $piece = null, ?int $player_id = null, ?bool $scored = null): void { }
+    public function updateHex(int $rc, ?Piece $piece = null, ?int $player_id = null, ?bool $scored = null): void { }
     public function updatePlayers(array /* PlayerInfo */ $pis): void {
     }
     public function retrieveComponents(): Components {
@@ -88,7 +84,7 @@ class TestStore extends PersistentStore {
 
     /* test utility methods */
     public function hex(int $r, int $c): Hex {
-        return $this->board->hexAt(new RowCol($r, $c));
+        return $this->board->hexAt(RowCol::fromRowCol($r, $c));
     }
     /** @param list<Piece> $pieces */
     public function setHand(array $pieces): void {
@@ -149,7 +145,7 @@ END;
 
     public function testCitiesRequiringScoringOneSurrounded(): void {
         $this->setMap(ModelTest::MAP2);
-        $this->assertEquals([new RowCol(6, 0)],
+        $this->assertEquals([RowCol::fromRowCol(6, 0)],
                             $this->model->locationsRequiringScoring());
     }
 
@@ -168,7 +164,7 @@ END;
     public function testCitiesRequiringScoringMultipleSurrounded(): void {
         $this->setMap(ModelTest::MAP3);
         $this->assertEqualsCanonicalizing(
-            [new RowCol(6, 0), new RowCol(3,3)],
+            [RowCol::fromRowCol(6, 0), RowCol::fromRowCol(3,3)],
             $this->model->locationsRequiringScoring());
     }
 
@@ -192,7 +188,7 @@ END;
         $this->assertEquals([], $this->model->locationsRequiringScoring());
 
         $this->ps->hex(2, 0)->playPiece(Piece::PRIEST, 1);
-        $this->assertEquals([new RowCol(3, 1)],
+        $this->assertEquals([RowCol::fromRowCol(3, 1)],
                             $this->model->locationsRequiringScoring());
 
         $this->ps->hex(3, 1)->scored = true;
@@ -248,10 +244,10 @@ END;
     public function testPlayPiecesMoreThanTwoFarmers(): void {
         $this->setMap(ModelTest::MAP5);
         $this->ps->setHand([Piece::FARMER, Piece::SERVANT, Piece::FARMER, Piece::FARMER, Piece::FARMER]);
-        $m1 = $this->model->playPiece(0, new RowCol(2, 0));
-        $m2 = $this->model->playPiece(3, new RowCol(4, 0));
-        $m3 = $this->model->playPiece(2, new RowCol(7, 1));
-        $m4 = $this->model->playPiece(4, new RowCol(6, 2));
+        $m1 = $this->model->playPiece(0, RowCol::fromRowCol(2, 0));
+        $m2 = $this->model->playPiece(3, RowCol::fromRowCol(4, 0));
+        $m3 = $this->model->playPiece(2, RowCol::fromRowCol(7, 1));
+        $m4 = $this->model->playPiece(4, RowCol::fromRowCol(6, 2));
         // if we had another farmer, it would be allowed
         $this->assertTrue($this->model->checkPlay(Piece::FARMER, $this->ps->hex(2, 4))->isAllowed());
         // but only a farmer
@@ -280,21 +276,21 @@ END;
     public function testPlayPiecesOnFields_onlyAdjacentFarmer(): void {
         $this->setMap(ModelTest::MAP6);
         $this->ps->setHand([Piece::FARMER]);
-        $m1 = $this->model->playPiece(0, new RowCol(2, 0));
+        $m1 = $this->model->playPiece(0, RowCol::fromRowCol(2, 0));
         $this->assertTrue($this->model->checkPlay(Piece::FARMER, $this->ps->hex(1,1))->isAllowed());
     }
 
     public function testPlayPiecesOnFields_adjacentHiddenNobleInWater(): void {
         $this->setMap(ModelTest::MAP6);
         $this->ps->setHand([Piece::SERVANT]);
-        $m2 = $this->model->playPiece(0, new RowCol(2, 2));
+        $m2 = $this->model->playPiece(0, RowCol::fromRowCol(2, 2));
         $this->assertFalse($this->model->checkPlay(Piece::FARMER, $this->ps->hex(1,1))->isAllowed());
     }
 
     public function testPlayPiecesOnFields_adjacentNobleOnLand(): void {
         $this->setMap(ModelTest::MAP6);
         $this->ps->setHand([Piece::SERVANT]);
-        $m3 = $this->model->playPiece(0, new RowCol(0, 2));
+        $m3 = $this->model->playPiece(0, RowCol::fromRowCol(0, 2));
         $this->assertTrue($this->model->checkPlay(Piece::FARMER, $this->ps->hex(1,1))->isAllowed());
     }
 
@@ -309,8 +305,8 @@ END;
         $this->setMap(ModelTest::MAP6);
         $this->model->selectZigguratCard(ZigguratCardType::NOBLES_3_KINDS);
         $this->ps->setHand([Piece::SERVANT, Piece::MERCHANT, Piece::PRIEST, Piece::FARMER, Piece::MERCHANT]);
-        $this->model->playPiece(0, new RowCol(0, 0));
-        $this->model->playPiece(1, new RowCol(2, 0));
+        $this->model->playPiece(0, RowCol::fromRowCol(0, 0));
+        $this->model->playPiece(1, RowCol::fromRowCol(2, 0));
 
         $result = $this->model->checkPlay(Piece::PRIEST, $this->ps->hex(0, 2));
 
@@ -318,7 +314,7 @@ END;
         $this->assertEquals([ZigguratCardType::NOBLES_3_KINDS], $result->activatedCards());
         $this->assertFalse($this->model->checkPlay(Piece::SERVANT, $this->ps->hex(0, 2))->isAllowed());
         $this->assertFalse($this->model->checkPlay(Piece::FARMER, $this->ps->hex(0, 2))->isAllowed());
-        $this->model->playPiece(2, new RowCol(0, 2));
+        $this->model->playPiece(2, RowCol::fromRowCol(0, 2));
         $this->assertFalse($this->model->checkPlay(PIECE::PRIEST, $this->ps->hex(1,3))->isAllowed());
     }
 
@@ -326,8 +322,8 @@ END;
         $this->setMap(ModelTest::MAP6);
         $this->model->selectZigguratCard(ZigguratCardType::NOBLES_3_KINDS);
         $this->ps->setHand([Piece::SERVANT, Piece::MERCHANT, Piece::PRIEST, Piece::FARMER, Piece::MERCHANT]);
-        $this->model->playPiece(0, new RowCol(0, 0));
-        $this->model->playPiece(1, new RowCol(2, 2));
+        $this->model->playPiece(0, RowCol::fromRowCol(0, 0));
+        $this->model->playPiece(1, RowCol::fromRowCol(2, 2));
         $this->assertFalse($this->model->checkPlay(Piece::PRIEST, $this->ps->hex(0, 2))->isAllowed());
         $this->assertFalse($this->model->checkPlay(Piece::SERVANT, $this->ps->hex(0, 2))->isAllowed());
         $this->assertFalse($this->model->checkPlay(Piece::FARMER, $this->ps->hex(0, 2))->isAllowed());
@@ -347,6 +343,6 @@ END;
 
     public function testRequiresScoring(): void {
         $this->setMap(ModelTest::MAP8);
-        $this->assertTrue($this->model->hexRequiresScoring($this->model->board()->hexAt(new RowCol(3, 1))));
+        $this->assertTrue($this->model->hexRequiresScoring($this->model->board()->hexAt(RowCol::fromRowCol(3, 1))));
     }
 }

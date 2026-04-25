@@ -1,5 +1,3 @@
-export interface RowCol { row: number, col: number };
-
 export interface PlayerData {
   player_id: number;
   hand_size: number;
@@ -8,7 +6,8 @@ export interface PlayerData {
   score: number;
 }
 
-export interface Hex extends RowCol {
+export interface Hex {
+  rc: number;
   board_player: number;
   piece: string;
 }
@@ -16,5 +15,5 @@ export interface Hex extends RowCol {
 export interface PlayState {
   canEndTurn: boolean;
   canUndo: boolean;
-  allowedMoves: RowCol[];
+  allowedMoves: Record<string, number[]>;
 }

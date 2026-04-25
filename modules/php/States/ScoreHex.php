@@ -46,7 +46,7 @@ class ScoreHex extends AbstractState
             description: clienttranslate('${city} at ${row},${col} scoring'));
     }
 
-    private function scoringHex(): RowCol {
+    private function scoringHex(): int {
         $rc = $this->ps->rowColBeingScored();
         if ($rc === null) {
             throw new SystemException("In ScoreHex state but no rowcol selected for scoring");
@@ -59,8 +59,9 @@ class ScoreHex extends AbstractState
         $rc = $this->scoringHex();
         $model = $this->createModel(0);
         return [
-            "row" => $rc->row,
-            "col" => $rc->col,
+            "rc" => $rc,
+            "row" => RowCol::row($rc),
+            "col" => RowCol::col($rc),
             "city" => $model->board()->hexAt($rc)->piece->value,
         ];
     }
@@ -71,8 +72,9 @@ class ScoreHex extends AbstractState
         $rc = $hexWinner->hex->rc;
         $piece = $hexWinner->hex->piece;
         $data = array_merge($data, [
-            "row" =>  $rc->row,
-            "col" => $rc->col,
+            "rc" =>  $rc,
+            "row" => RowCol::row($rc),
+            "col" => RowCol::col($rc),
             "winner_hexes" => $hexWinner->winnerRowCols(),
             "other_hexes" => $hexWinner->othersRowCols(),
             "player_id" => $player_id,

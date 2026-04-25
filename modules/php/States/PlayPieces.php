@@ -34,7 +34,6 @@ use Bga\GameFramework\UserException;
 use Bga\Games\babylonia\Game;
 use Bga\Games\babylonia\Hex;
 use Bga\Games\babylonia\RowCol;
-use Bga\Games\babylonia\Utils;
 use Bga\Games\babylonia\Utils\Arrays;
 
 class PlayPieces extends AbstractState
@@ -56,17 +55,21 @@ class PlayPieces extends AbstractState
         $model = $this->createModel($active_player_id);
 
         return [
-            "allowedMoves" => $model->getAllowedMoves(),
-            "canEndTurn" => $model->canEndTurn(),
-            "canUndo" => $model->canUndo(),
+            "_private" => [
+                $active_player_id => [
+                    "allowedMoves" => $model->getAllowedMoves(),
+                    "canEndTurn" => $model->canEndTurn(),
+                    "canUndo" => $model->canUndo(),
+                ]
+            ]
         ];
     }
 
     #[PossibleAction]
-    public function actPlayPiece(int $active_player_id, int $handpos, int $row, int $col): mixed
+    public function actPlayPiece(int $active_player_id, int $handpos, int $rc): mixed
     {
         $model = $this->createModel($active_player_id);
-        $move = $model->playPiece($handpos, new RowCol($row, $col));
+        $move = $model->playPiece($handpos, $rc);
         $points = $move->points();
         $piece = $move->piece->value;
         $msg = ($points > 0)
@@ -80,8 +83,9 @@ class PlayPieces extends AbstractState
                 "player_id" => $active_player_id,
                 "piece" => $piece,
                 "handpos" => $handpos,
-                "row" => $row,
-                "col" => $col,
+                "rc" => $rc,
+                "row" => RowCol::row($rc),
+                "col" => RowCol::col($rc),
                 "captured_piece" => $move->captured_piece->value,
                 "points" => $points,
                 "ziggurat_points" => $move->ziggurat_points,
@@ -121,8 +125,9 @@ class PlayPieces extends AbstractState
 
         $this->notify->all("undoMove", clienttranslate('${player_name} undid their move'), [
             "player_id" => $active_player_id,
-            "row" => $move->rc->row,
-            "col" => $move->rc->col,
+            "rc" => $move->rc,
+            "row" => RowCol::row($move->rc),
+            "col" => RowCol::col($move->rc),
             "piece" => $move->piece->value,
             "captured_piece" => $move->captured_piece->value,
             "points" => $move->points(),

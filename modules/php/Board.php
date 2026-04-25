@@ -38,10 +38,10 @@ class Board
 
     private function addHex(Hex $hex): void
     {
-        $this->hexes[$hex->rc->asKey()] = $hex;
+        $this->hexes[$hex->rc] = $hex;
     }
 
-    public function hexAt(RowCol $rc): Hex
+    public function hexAt(int $rc): Hex
     {
         $hex = $this->maybeHexAt($rc);
         if ($hex != null) {
@@ -50,9 +50,9 @@ class Board
         throw new \InvalidArgumentException("No hex at $rc");
     }
 
-    private function maybeHexAt(RowCol $rc): ?Hex
+    private function maybeHexAt(int $rc): ?Hex
     {
-        return @$this->hexes[$rc->asKey()];
+        return @$this->hexes[$rc];
     }
 
     public function asTestMap(): string
@@ -61,19 +61,19 @@ class Board
         $row = -1;
         $col = -2;
         $this->visitAll(function (Hex $hex) use (&$row, &$col, &$lines): void {
-            if ($hex->rc->row != $row) {
+            if (RowCol::row($hex->rc) != $row) {
                 $lines[] = [];
-                $row = $hex->rc->row;
+                $row = RowCol::row($hex->rc);
                 $col = -2;
                 if ($row & 1) {
                     $col = -1;
                 }
             }
             $z = count($lines) - 1;
-            for ($i = $col + 2; $i < $hex->rc->col; $i += 2) {
+            for ($i = $col + 2; $i < RowCol::col($hex->rc); $i += 2) {
                 $lines[$z][] = 'XXX';
             }
-            $col = $hex->rc->col;
+            $col = RowCol::col($hex->rc);
 
             $r = match ($hex->piece) {
                 Piece::EMPTY => match ($hex->type) {
@@ -138,7 +138,7 @@ class Board
                 continue;
             }
             foreach ($fields as $t) {
-                $rc = new RowCol($row, $col);
+                $rc = RowCol::fromRowCol($row, $col);
                 $m = [];
                 if ($t == "XXX") {
                     // nothing, unplayable hex
@@ -250,9 +250,9 @@ END;
         /** @var RowCol[] */
         $development_locations = [];
         $board = Board::fromMap(Board::ACTUAL_MAP, $development_locations);
-        $board->markLandmass(Landmass::WEST, new RowCol(18, 16));
-        $board->markLandmass(Landmass::EAST, new RowCol(2, 0));
-        $board->markLandmass(Landmass::CENTER, new RowCol(11, 7));
+        $board->markLandmass(Landmass::WEST, RowCol::fromRowCol(18, 16));
+        $board->markLandmass(Landmass::EAST, RowCol::fromRowCol(2, 0));
+        $board->markLandmass(Landmass::CENTER, RowCol::fromRowCol(11, 7));
 
         switch ($numPlayers) {
             case 2:
@@ -272,7 +272,7 @@ END;
 
     /**
      * @param Piece[] $available_developments
-     * @param RowCol[] $development_locations
+     * @param int[] $development_locations
      */
     private function placeDevelopments(
         array &$available_developments,
@@ -317,7 +317,7 @@ END;
     }
 
     /* visit should return true if continue exploring */
-    public function bfs(RowCol $start, \Closure $visit): void
+    public function bfs(int $start, \Closure $visit): void
     {
         $seen = [];
         $queue = [$this->hexAt($start)];
@@ -335,7 +335,7 @@ END;
         }
     }
 
-    private function markLandmass(Landmass $landmass, RowCol $start): void
+    private function markLandmass(Landmass $landmass, int $start): void
     {
         $this->bfs(
             $start,
@@ -354,7 +354,7 @@ END;
     {
         foreach ($this->hexes as $hex) {
             if ($hex->landmass == $landmass) {
-                unset($this->hexes[$hex->rc->asKey()]);
+                unset($this->hexes[$hex->rc]);
                 $v = array_search($hex->rc, $development_locations);
                 if ($v !== false) {
                     array_splice($development_locations, intval($v), 1);
@@ -388,12 +388,12 @@ END;
         $rc = $hex->rc;
         return array_filter(
             [
-                $this->maybeHexAt($rc->north()),
-                $this->maybeHexAt($rc->northeast()),
-                $this->maybeHexAt($rc->southeast()),
-                $this->maybeHexAt($rc->south()),
-                $this->maybeHexAt($rc->southwest()),
-                $this->maybeHexAt($rc->northwest()),
+                $this->maybeHexAt(RowCol::north($rc)),
+                $this->maybeHexAt(RowCol::northeast($rc)),
+                $this->maybeHexAt(RowCol::southeast($rc)),
+                $this->maybeHexAt(RowCol::south($rc)),
+                $this->maybeHexAt(RowCol::southwest($rc)),
+                $this->maybeHexAt(RowCol::northwest($rc)),
             ],
             function ($nh) use ($matching) {
                 return $nh != null && ($matching === null || $matching($nh));

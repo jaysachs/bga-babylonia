@@ -259,7 +259,7 @@ class Model
         return $result;
     }
 
-    public function playPiece(int $handpos, RowCol $rc): ElaboratedMove
+    public function playPiece(int $handpos, int $rc): ElaboratedMove
     {
         $this->stats->enterDeferredMode();
 
@@ -437,7 +437,7 @@ class Model
         $this->ps->updateAuxScores($aux_scores);
     }
 
-    public function selectScoringHex(RowCol $rc): Hex {
+    public function selectScoringHex(int $rc): Hex {
         $hex = $this->board()->hexAt($rc);
         $lrs = $this->locationsRequiringScoring();
         if (array_search($hex->rc, $lrs) === false) {
@@ -451,7 +451,7 @@ class Model
         return $hex;
     }
 
-    public function scoreZiggurat(RowCol $rc): HexWinner
+    public function scoreZiggurat(int $rc): HexWinner
     {
         $hex = $this->board()->hexAt($rc);
         if (!$hex->piece->isZiggurat()) {
@@ -470,7 +470,7 @@ class Model
         return $this->scorer()->computeHexWinner($hex);
     }
 
-    public function scoreCity(RowCol $rc): ScoredCity
+    public function scoreCity(int $rc): ScoredCity
     {
         $hex = $this->board()->hexAt($rc);
         if (!$hex->piece->isCity()) {
@@ -503,7 +503,7 @@ class Model
         return $scoredCity;
     }
 
-    /** @return list<RowCol> */
+    /** @return list<int> */
     public function locationsRequiringScoring(): array
     {
         $result = [];
@@ -540,7 +540,7 @@ class Model
         $this->board()->visitAll(
             function (Hex $hex) use (&$result, $val) {
                 if ($this->hexRequiresScoring($hex)) {
-                    $result[$hex->rc->asKey()] = [$hex->rc, $val($hex)];
+                    $result[$hex->rc] = [$hex->rc, $val($hex)];
                 }
             }
         );
@@ -554,8 +554,8 @@ class Model
                 return $a[1] - $b[1];
             }
         );
-        /** @param array{0:RowCol,1:int} $a */
-        return array_map(function (array $a): RowCol {
+        /** @param array{0:int,1:int} $a */
+        return array_map(function (array $a): int {
             return $a[0];
         }, $result);
     }

@@ -66,12 +66,12 @@ class HexWinner
 
     /**
      * @param array<int, Hex> $hexes
-     * @return array<int, RowCol>
+     * @return array<int, int>
      */
     private function rcs(array $hexes): array
     {
         $a = array_map(
-            function (Hex $hex): RowCol {
+            function (Hex $hex): int {
                 return $hex->rc;
             },
             $hexes

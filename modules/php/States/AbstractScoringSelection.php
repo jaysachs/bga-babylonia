@@ -50,7 +50,7 @@ abstract class AbstractScoringSelection extends AbstractState
         );
     }
 
-    protected function selectHex(RowCol $rc, int $active_player_id): mixed
+    protected function selectHex(int $rc, int $active_player_id): mixed
     {
         $model = $this->createModel($active_player_id);
         $hex = $model->selectScoringHex($rc);
@@ -60,8 +60,9 @@ abstract class AbstractScoringSelection extends AbstractState
             $msg,
             [
                 "player_id" => $active_player_id,
-                "row" => $hex->rc->row,
-                "col" => $hex->rc->col,
+                "rc" => $hex->rc,
+                "row" => RowCol::row($rc),
+                "col" => RowCol::col($rc),
                 "city" => $hex->piece->value,
             ]
         );

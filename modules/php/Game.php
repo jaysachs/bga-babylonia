@@ -162,8 +162,7 @@ class Game extends Table
         $model->board()->visitAll(
             function (Hex &$hex) use (&$board_data) {
                 $board_data[] = [
-                    "row" => $hex->rc->row,
-                    "col" => $hex->rc->col,
+                    "rc" => $hex->rc,
                     "hextype" => $hex->type->value,
                     "piece" => $hex->piece->value,
                     "board_player" => $hex->player_id,

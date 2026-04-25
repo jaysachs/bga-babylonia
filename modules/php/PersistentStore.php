@@ -53,19 +53,19 @@ class PersistentStore
         return $b ? 'TRUE' : 'FALSE';
     }
 
-    public function rowColBeingScored(): ?RowCol
+    public function rowColBeingScored(): ?int
     {
         /** @var int|null */
         $v = $this->globals->get(PersistentStore::GLOBAL_ROW_COL_BEING_SCORED);
         if ($v == 0) {
             return null;
         }
-        return RowCol::fromKey(intval($v));
+        return intval($v);
     }
 
-    public function setRowColBeingScored(?RowCol $rc): void
+    public function setRowColBeingScored(?int $rc): void
     {
-        $this->globals->set(PersistentStore::GLOBAL_ROW_COL_BEING_SCORED, $rc === null ? 0 : $rc->asKey());
+        $this->globals->set(PersistentStore::GLOBAL_ROW_COL_BEING_SCORED, $rc === null ? 0 : $rc);
     }
 
     public function playerOnTurn(): int
@@ -82,7 +82,7 @@ class PersistentStore
 
     public function retrieveBoard(): Board
     {
-        $sql = "SELECT board_row, board_col, hextype, piece, scored,
+        $sql = "SELECT board_loc AS rc, hextype, piece, scored,
                        player_id AS board_player, landmass
                 FROM board";
         $data = $this->db->getObjectList($sql);
@@ -92,10 +92,7 @@ class PersistentStore
         foreach ($data as &$hex) {
             $hexes[] = new Hex(
                 HexType::from($hex['hextype']),
-                new RowCol(
-                    intval($hex['board_row']),
-                    intval($hex['board_col'])
-                ),
+                intval($hex['rc']),
                 Piece::from($hex['piece']),
                 intval($hex['board_player']),
                 boolval($hex['scored']),
@@ -116,10 +113,10 @@ class PersistentStore
             $lm = $hex->landmass->value;
             $rc = $hex->rc;
             $sql_values[] =
-                "($rc->row, $rc->col, '$t', '$piece', $sc, $player_id, '$lm')";
+                "($rc, '$t', '$piece', $sc, $player_id, '$lm')";
         });
         $values = implode(',', $sql_values);
-        $sql = "INSERT INTO board (board_row, board_col, hextype, piece,
+        $sql = "INSERT INTO board (board_loc, hextype, piece,
                                    scored, player_id, landmass)
                 VALUES $values";
         $this->db->execute($sql);
@@ -234,7 +231,7 @@ class PersistentStore
     }
 
     public function updateHex(
-        RowCol $rc,
+        int $rc,
         ?Piece $piece = null,
         ?int $player_id = null,
         ?bool $scored = null
@@ -253,7 +250,7 @@ class PersistentStore
         $updates = implode(',', $updates);
         $sql = "UPDATE board
                 SET $updates
-                WHERE board_row=$rc->row AND board_col=$rc->col";
+                WHERE board_loc=$rc";
         $this->db->execute($sql);
     }
 
@@ -289,11 +286,11 @@ class PersistentStore
         $rc = $move->rc;
         $sql = "INSERT INTO turn_progress(player_id, seq_id,
                                           original_piece, piece, handpos,
-                                          board_row, board_col,
+                                          board_loc,
                                           captured_piece, field_points,
                                           ziggurat_points)
                 VALUES($move->player_id, NULL, '$opiece', '$piece',
-                       $move->handpos, $rc->row, $rc->col,
+                       $move->handpos, $rc,
                        '$captured_piece', $move->field_points,
                        $move->ziggurat_points)";
         $this->db->execute($sql);
@@ -317,7 +314,7 @@ class PersistentStore
     public function retrieveTurnProgress(int $player_id): TurnProgress
     {
         $sql = "SELECT seq_id, player_id, handpos, piece, original_piece,
-                       board_row, board_col, captured_piece, field_points,
+                       board_loc, captured_piece, field_points,
                        ziggurat_points
                 FROM turn_progress
                 WHERE player_id = $player_id
@@ -331,10 +328,7 @@ class PersistentStore
                 Piece::from($md['piece']),
                 Piece::from($md['original_piece']),
                 intval($md['handpos']),
-                new RowCol(
-                    intval($md['board_row']),
-                    intval($md['board_col'])
-                ),
+                intval($md['board_loc']),
                 Piece::from($md['captured_piece']),
                 intval($md['field_points']),
                 intval($md['ziggurat_points']),

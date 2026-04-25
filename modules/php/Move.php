@@ -36,7 +36,7 @@ class Move
         public Piece $piece,
         public Piece $original_piece,
         public int $handpos,
-        public RowCol $rc,
+        public int $rc,
         public Piece $captured_piece,
         public int $field_points,
         public int $ziggurat_points,
@@ -51,7 +51,7 @@ class Move
     public function __toString(): string
     {
         return sprintf(
-            "id:%d/%d piece:%s opiece:%s pos:%d %s cap:%s field points:%d zig points:%d",
+            "id:%d/%d piece:%s opiece:%s pos:%d %d cap:%s field points:%d zig points:%d",
             $this->player_id,
             $this->seq_id,
             $this->piece->value,

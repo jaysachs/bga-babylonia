@@ -63,7 +63,7 @@ END;
     }
 
     private function hex(int $r, int $c): Hex {
-        return $this->board->hexAt(new RowCol($r, $c));
+        return $this->board->hexAt(RowCol::fromRowCol($r, $c));
     }
 
     private function runTest(ScoredCity $expected): void {
@@ -153,12 +153,12 @@ END;
         $this->doSetup(ScorerTest::MAP2);
 
         $this->assertEquals(3, $this->scorer->computeHexWinner(
-            $this->board->hexAt(new RowCol(6, 0)))->captured_by);
+            $this->board->hexAt(RowCol::fromRowCol(6, 0)))->captured_by);
         $this->assertEquals(3, $this->scorer->computeHexWinner(
-            $this->board->hexAt(new RowCol(3, 3)))->captured_by);
+            $this->board->hexAt(RowCol::fromRowCol(3, 3)))->captured_by);
         // 3 has 2, 1 and 2 each have 1, so 3 wins
         $this->assertEquals(3, $this->scorer->computeHexWinner(
-            $this->board->hexAt(new RowCol(3, 1)))->captured_by);
+            $this->board->hexAt(RowCol::fromRowCol(3, 1)))->captured_by);
     }
 
 const MAP3 = <<<'END'
@@ -176,7 +176,7 @@ END;
         $this->doSetup(ScorerTest::MAP3);
 
         $this->assertEquals(0, $this->scorer->computeHexWinner(
-            $this->board->hexAt(new RowCol(3, 1)))->captured_by);
+            $this->board->hexAt(RowCol::fromRowCol(3, 1)))->captured_by);
     }
 
 

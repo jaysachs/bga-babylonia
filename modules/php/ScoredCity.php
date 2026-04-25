@@ -114,12 +114,12 @@ class ScoredCity
 
     /**
      * @param list<Hex> $hexes
-     * @return list<RowCol>
+     * @return list<int>
      */
     private function toRowCol(array &$hexes): array
     {
         return array_map(
-            function (Hex $hex): RowCol {
+            function (Hex $hex): int {
                 return $hex->rc;
             },
             $hexes

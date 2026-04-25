@@ -4,32 +4,31 @@ declare(strict_types=1);
 use PHPUnit\Framework\TestCase;
 
 use Bga\Games\babylonia\ {
-        RowCol,
+    RowCol,
 };
 
 final class RowColTest extends TestCase
 {
-    public function testAsKey_0_0(): void
+
+    public function testNeighbors(): void
     {
-        $rc = new RowCol(0, 0);
-        $k = $rc->asKey();
-        $rc2 = RowCol::fromKey($k);
-        $this->assertEquals($rc, $rc2);
+        $rc = RowCol::fromRowCol(10, 13);
+        $this->assertEquals(RowCol::fromRowCol(8,13), RowCol::north($rc));
+        $this->assertEquals(RowCol::fromRowCol(12,13), RowCol::south($rc));
+        $this->assertEquals(RowCol::fromRowCol(9,12), RowCol::northwest($rc));
+        $this->assertEquals(RowCol::fromRowCol(9,14), RowCol::northeast($rc));
+        $this->assertEquals(RowCol::fromRowCol(11,12), RowCol::southwest($rc));
+        $this->assertEquals(RowCol::fromRowCol(11,14), RowCol::southeast($rc));
     }
 
-    public function testAsKey_7_8(): void
+    public function testPickle(): void
     {
-        $rc = new RowCol(7, 8);
-        $k = $rc->asKey();
-        $rc2 = RowCol::fromKey($k);
-        $this->assertEquals($rc, $rc2);
-    }
-
-    public function testAsKey_negatives(): void
-    {
-        $rc = new RowCol(-53, -7);
-        $k = $rc->asKey();
-        $rc2 = RowCol::fromKey($k);
-        $this->assertEquals($rc, $rc2);
+        for ($row = 0; $row < 20; $row++) {
+            for ($col = 0; $col < 20; $col++) {
+                $rc = RowCol::fromRowCol($row, $col);
+                $this->assertEquals($row, RowCol::row($rc));
+                $this->assertEquals($col, RowCol::col($rc));
+            }
+        }
     }
 }

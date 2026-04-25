@@ -1,4 +1,4 @@
-import { RowCol } from "./bdata";
+import { Hex } from "./bdata";
 import { AttrLike, Html } from "./html";
 
 export class Attrs implements AttrLike {
@@ -81,8 +81,8 @@ export class IDS {
     return `bbl_citycount_${playerId}`;
   }
 
-  static hexDiv(rc: RowCol): string {
-    return `bbl_hex_${rc.row}_${rc.col}`;
+  static hexDiv(rc: number): string {
+    return `bbl_hex_${rc}`;
   }
 
   static playerBoardZcards(playerId: number): string {
@@ -110,10 +110,12 @@ export class BblHtml {
   static readonly hdelta = 0.75 * this.width + 2.0;
   static readonly vdelta = 1.0 * this.height + 2.0;
 
-  public static makeHexDiv(rc: RowCol): HTMLElement {
-    let top = this.vstart + rc.row * this.vdelta / 2;
-    let left = this.hstart + rc.col * this.hdelta;
-    return Html.div({ id:  IDS.hexDiv(rc), style: [`top:${top}px`, `left:${left}px`] });
+  public static makeHexDiv(hex: Hex): HTMLElement {
+    const row = Math.trunc(hex.rc / 100);
+    const col = Math.trunc(hex.rc % 100);
+    let top = this.vstart + row * this.vdelta / 2;
+    let left = this.hstart + col * this.hdelta;
+    return Html.div({ id:  IDS.hexDiv(hex.rc), style: [`top:${top}px`, `left:${left}px`] });
   }
 
   public static player_board_ext(player_id: number, color_index: number): HTMLElement[] {

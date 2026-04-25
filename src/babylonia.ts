@@ -2,7 +2,7 @@ import { colorIndexMap } from './colormap';
 import { BaseGame } from './basegame';
 import { Html } from './html';
 import { EndOfTurnScoringState, PlayPiecesState, SelectExtraTurnState, SelectScoringHexState, SelectZigguratCardState } from './gamestates';
-import { Hex, PlayerData, RowCol } from './bdata';
+import { Hex, PlayerData } from './bdata';
 import { Attrs, CSS, BblHtml as BblHtml, IDS, Piece } from './bhtml';
 
 type AnimationList = (() => Promise<any>)[];
@@ -19,7 +19,7 @@ interface BGamedatas extends Gamedatas<Player> {
   board: Hex[];
   hand: string[];
   ziggurat_cards: Zcard[];
-  current_scoring_hex: RowCol | null;
+  current_scoring_hex: number | null;
 }
 
 /** Game class */
@@ -152,7 +152,7 @@ export class Game extends BaseGame<Player, BGamedatas> {
       animate);
   }
 
-  public hexDiv(rc: RowCol): HTMLElement {
+  public hexDiv(rc: number): HTMLElement {
     return $(IDS.hexDiv(rc));
   }
 
@@ -164,11 +164,11 @@ export class Game extends BaseGame<Player, BGamedatas> {
     return $(IDS.HAND).childNodes.item(i)! as HTMLElement;
   }
 
-  private markHexSelected(rc: RowCol): void {
+  private markHexSelected(rc: number): void {
     this.hexDiv(rc).classList.add(CSS.SELECTED);
   }
 
-  private unmarkHexSelected(rc: RowCol): void {
+  private unmarkHexSelected(rc: number): void {
     this.hexDiv(rc).classList.remove(CSS.SELECTED);
   }
 
@@ -206,8 +206,7 @@ export class Game extends BaseGame<Player, BGamedatas> {
     args: {
       player_id: number;
       points: number;
-      row: number;
-      col: number;
+      rc: number;
       _private: {
         original_piece: string;
         handpos: number;
@@ -217,7 +216,7 @@ export class Game extends BaseGame<Player, BGamedatas> {
     }
   ) {
     let anims: AnimationList = [];
-    let hexDiv = $(IDS.hexDiv(args));
+    let hexDiv = $(IDS.hexDiv(args.rc));
     let isActivePlayer = this.bga.gameui.player_id == args.player_id;
 
     if (args.captured_piece != Piece.EMPTY) {
@@ -254,18 +253,17 @@ export class Game extends BaseGame<Player, BGamedatas> {
       points: number;
       piece: string;
       handpos: number;
-      row: number;
-      col: number;
+      rc: number;
       hand_size: number;
       captured_piece: string;
       field_points: number;
       ziggurat_points: number;
-      touched_ziggurats: RowCol[];
+      touched_ziggurats: number[];
     }
   ) {
     let anims: AnimationList = [];
 
-    const hexDiv = this.hexDiv(args);
+    const hexDiv = this.hexDiv(args.rc);
 
     // Check for field capture
     if (args.captured_piece != Piece.EMPTY /* .startsWith('field') */) {
@@ -299,7 +297,7 @@ export class Game extends BaseGame<Player, BGamedatas> {
       args.touched_ziggurats.forEach(this.markHexSelected.bind(this));
       // TODO: since it's parallel, just flatten into the anims list?
       anims.push(() => this.animationManager.playParallel(
-        args.touched_ziggurats.map((rc: RowCol) =>
+        args.touched_ziggurats.map((rc: number) =>
           () => this.animationManager.displayScoring(
               this.hexDiv(rc),
               1,
@@ -359,8 +357,8 @@ export class Game extends BaseGame<Player, BGamedatas> {
   }
 
   private async indicateNeighbors(
-    winnerHexes: RowCol[],
-    otherHexes: RowCol[]) {
+    winnerHexes: number[],
+    otherHexes: number[]) {
     if (this.bgaAnimationsActive()) {
       for (const rc of otherHexes) {
         this.hexDiv(rc).classList.add(CSS.IN_NETWORK);
@@ -385,15 +383,14 @@ export class Game extends BaseGame<Player, BGamedatas> {
 
   private async notif_zigguratScored(
     args: {
-      row: number;
-      col: number;
+      rc: number;
       player_name: string;
       player_id: number;
-      winner_hexes: RowCol[];
-      other_hexes: RowCol[];
+      winner_hexes: number[];
+      other_hexes: number[];
     }) {
       // slight subtlety here; if there is a winner, leave the hex selected until after the cards is selected
-      await this.indicateNeighbors(args.winner_hexes, args.other_hexes).then(() => { if (!args.player_id) this.unmarkHexSelected(args) });
+      await this.indicateNeighbors(args.winner_hexes, args.other_hexes).then(() => { if (!args.player_id) this.unmarkHexSelected(args.rc) });
     // TODO: consider better visual treatments
   }
 
@@ -401,11 +398,10 @@ export class Game extends BaseGame<Player, BGamedatas> {
     args: {
       player_id: number;
       player_name: string;
-      row: number;
-      col: number;
+      rc: number;
       city: string;
     }) {
-    this.markHexSelected(args);
+    this.markHexSelected(args.rc);
   }
 
   private async notif_zigguratCardSelection(
@@ -414,7 +410,7 @@ export class Game extends BaseGame<Player, BGamedatas> {
       player_id: number;
       cardused: boolean;
       points: number;
-      hex: RowCol;
+      hex: number;
     }
   ) {
     this.unmarkHexSelected(args.hex);
@@ -432,23 +428,22 @@ export class Game extends BaseGame<Player, BGamedatas> {
 
   private async notif_cityScored(
     args: {
-      row: number;
-      col: number;
+      rc: number;
       city: string;
       player_id: number;
-      winner_hexes: RowCol[];
-      other_hexes: RowCol[];
+      winner_hexes: number[];
+      other_hexes: number[];
       details: {
         player_id: number;
         captured_city_count: number;
-        network_locations: RowCol[];
-        scored_locations: RowCol[];
+        network_locations: number[];
+        scored_locations: number[];
         network_points: number;
         capture_points: number;
       }[];
     }
   ) {
-    const hex = $(IDS.hexDiv(args));
+    const hex = $(IDS.hexDiv(args.rc));
 
     let aa = this.bgaAnimationsActive();
     for (const playerId in args.details) {
@@ -457,8 +452,7 @@ export class Game extends BaseGame<Player, BGamedatas> {
         for (const nh of details.network_locations) {
           let cl = this.hexDiv(nh).classList;
           cl.add(CSS.IN_NETWORK);
-          if (!details.scored_locations.some(
-            sh => (nh.row == sh.row && nh.col == sh.col))) {
+          if (!details.scored_locations.some(sh => (nh == sh))) {
             cl.add(CSS.UNIMPORTANT);
           }
         }
@@ -468,7 +462,7 @@ export class Game extends BaseGame<Player, BGamedatas> {
           this.bga.gameui.gamedatas.players[playerId]!.color,
           { extraClass: 'bbl_city_scoring' });
         details.network_locations.forEach(
-          (rc: RowCol) => {
+          (rc: number) => {
             let cl = this.hexDiv(rc).classList;
             cl.remove(CSS.IN_NETWORK);
             cl.remove(CSS.UNIMPORTANT);
@@ -486,13 +480,13 @@ export class Game extends BaseGame<Player, BGamedatas> {
 
     await this.animationManager.slideOutAndDestroy(
       hex.firstElementChild as HTMLElement, dest, {}).then(() => {
-        this.unmarkHexSelected(args);
+        this.unmarkHexSelected(args.rc);
         for (const playerId in args.details) {
           const details = args.details[playerId]!;
           this.bga.playerPanels.getScoreCounter(details.player_id).incValue(details.capture_points);
           this.updateCapturedCityCount(details);
         }
-      }).then(() => this.unmarkHexSelected(args));
+      }).then(() => this.unmarkHexSelected(args.rc));
   }
 
   ///////

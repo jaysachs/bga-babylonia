@@ -1,5 +1,5 @@
 import { Game } from "./babylonia";
-import { PlayState, RowCol } from "./bdata";
+import { PlayState } from "./bdata";
 import { Attrs, CSS, IDS, Piece } from "./bhtml";
 import { indexInParent } from "./html";
 
@@ -7,7 +7,7 @@ import { indexInParent } from "./html";
 
 export abstract class BabyloniaState {
   // Returns the hex (row,col) clicked on, or null if not a playable hex
-  protected selectedHex(target: EventTarget): RowCol | null {
+  protected selectedHex(target: EventTarget): number | null {
     let hexDiv = target as Element;
     while (hexDiv.parentElement != null && hexDiv.parentElement.id != IDS.BOARD) {
       hexDiv = hexDiv.parentElement;
@@ -21,17 +21,14 @@ export abstract class BabyloniaState {
       return null;
     }
     const id = hexDiv.id.split('_');
-    return {
-      row: Number(id[2]),
-      col: Number(id[3]),
-    };
+    return Number(id[2]);
   }
 
-  private markHexPlayable(rc: RowCol): void {
+  private markHexPlayable(rc: number): void {
     this.game.hexDiv(rc).classList.add(CSS.PLAYABLE);
   }
 
-  protected unmarkHexPlayable(rc: RowCol): void {
+  protected unmarkHexPlayable(rc: number): void {
     this.game.hexDiv(rc).classList.remove(CSS.PLAYABLE);
   }
 
@@ -40,7 +37,7 @@ export abstract class BabyloniaState {
       .forEach(div => div.classList.remove(CSS.PLAYABLE));
   }
 
-  protected markHexesPlayable(hexes: RowCol[]): void {
+  protected markHexesPlayable(hexes: number[]): void {
     hexes.forEach((hex) => this.markHexPlayable(hex));
   }
 
@@ -146,7 +143,7 @@ export class SelectScoringHexState extends BabyloniaState {
     super(game);
     this.handler = (e) => this.onBoardClicked(e);
   }
-  override onEnteringState(args: { hexes: RowCol[] }, isCurrentPlayerActive: boolean) {
+  override onEnteringState(args: { hexes: number[] }, isCurrentPlayerActive: boolean) {
     if (isCurrentPlayerActive) {
       this.markHexesPlayable(args.hexes);
       $(IDS.BOARD).addEventListener('click', this.handler);
@@ -169,11 +166,14 @@ export class SelectScoringHexState extends BabyloniaState {
     let div = this.game.hexDiv(hex);
     let piece = div.firstElementChild!.getAttribute(Attrs.PIECE);
     div.classList.add(CSS.SELECTED);
-    this.bga.statusBar.setTitle(_('Score ${city} at (${row},${col})?'), {
-      row: hex.row, col: hex.col, city: piece,
+    // this.bga.statusBar.setTitle(_('Score ${city} at (${row},${col})?'), {
+    //   row: hex.row, col: hex.col, city: piece,
+    // });
+    this.bga.statusBar.setTitle(_('Score ${city}?'), {
+      city: piece,
     });
     this.bga.statusBar.addActionButton(_('Confirm'),
-      () => this.bga.actions.performAction('actSelectHexToScore', hex).then(() => this.unmarkHexPlayable(hex)),
+      () => this.bga.actions.performAction('actSelectHexToScore', { rc: hex }).then(() => this.unmarkHexPlayable(hex)),
       { autoclick: true });
     this.bga.statusBar.addActionButton(_('Cancel'),
       () => {
@@ -195,9 +195,9 @@ export class PlayPiecesState extends BabyloniaState {
     this.boardHandler = (e) => this.onBoardClicked(e);
   }
 
-  override onEnteringState(args: PlayState, isCurrentPlayerActive: boolean) {
+  override onEnteringState(args: { _private: PlayState }, isCurrentPlayerActive: boolean) {
     if (isCurrentPlayerActive) {
-      this.playStateArgs = args;
+      this.playStateArgs = args._private;
       this.markAllHexesUnplayable();
       this.setStatusBarForPlayState();
     }
@@ -225,13 +225,13 @@ export class PlayPiecesState extends BabyloniaState {
     $(IDS.BOARD).removeEventListener('click', this.boardHandler);
   }
 
-  protected allowedMovesFor(div: Element | null): RowCol[] {
+  protected allowedMovesFor(div: Element | null): number[] {
     if (!div) { return []; }
     const piece = div.getAttribute(Attrs.PIECE)!.split('_')[0]!;
     return (this.playStateArgs!.allowedMoves as any)[piece] || [];
   }
 
-  protected unmarkHexesPlayable(hexes: RowCol[]): void {
+  protected unmarkHexesPlayable(hexes: number[]): void {
     hexes.forEach(this.unmarkHexPlayable.bind(this));
   }
 
@@ -296,8 +296,7 @@ export class PlayPiecesState extends BabyloniaState {
     //  leaving the hand piece selected.
     this.bga.actions.performAction('actPlayPiece', {
       handpos: indexInParent(handDiv),
-      row: hex.row,
-      col: hex.col
+      rc: hex
     }).then(() => {
         this.unmarkHexPlayable(hex);
     })
@@ -347,7 +346,7 @@ export class PlayPiecesState extends BabyloniaState {
   private setStatusBarForPlayState(): void {
     this.bga.statusBar.removeActionButtons();
     if (this.playStateArgs!.canEndTurn) {
-      if (this.playStateArgs!.allowedMoves.length == 0) {
+      if (Object.keys(this.playStateArgs!.allowedMoves).length == 0) {
         this.bga.statusBar.setTitle(_('${you} must end your turn'));
         this.setPlayablePieces();
       } else {

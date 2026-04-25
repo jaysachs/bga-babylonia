@@ -37,7 +37,7 @@ class ElaboratedMove extends Move
         Piece $piece,
         Piece $original_piece,
         int $handpos,
-        RowCol $rc,
+        int $rc,
         Piece $captured_piece,
         int $field_points,
         int $ziggurat_points,

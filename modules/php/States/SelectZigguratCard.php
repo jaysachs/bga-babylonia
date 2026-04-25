@@ -49,7 +49,7 @@ class SelectZigguratCard extends AbstractState
         );
     }
 
-    private function scoringHex(): RowCol {
+    private function scoringHex(): int {
         $rc = $this->ps->rowColBeingScored();
         if ($rc === null) {
             throw new SystemException("In ScoreHex state but no rowcol selected for scoring");

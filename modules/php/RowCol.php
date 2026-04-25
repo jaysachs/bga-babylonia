@@ -29,70 +29,40 @@ namespace Bga\Games\babylonia;
 
 class RowCol
 {
-
-    public function __toString(): string
-    {
-        return sprintf("%d:%d", $this->row, $this->col);
+    public static function north(int $rc): int {
+        return $rc - 200;
     }
 
-    public function equals(RowCol $other): bool
-    {
-        return $this->row == $other->row && $this->col == $other->col;
+    public static function northwest(int $rc): int {
+        return $rc - 101;
     }
 
-    public function __construct(
-        public readonly int $row,
-        public readonly int $col
-    ) {}
-
-    public function north(): RowCol
-    {
-        return new RowCol($this->row - 2, $this->col);
+    public static function northeast(int $rc): int {
+        return $rc - 99;
     }
 
-    public function northwest(): RowCol
-    {
-        return new RowCol($this->row - 1, $this->col - 1);
+    public static function south(int $rc): int {
+        return $rc + 200;
     }
 
-    public function northeast(): RowCol
-    {
-        return new RowCol($this->row - 1, $this->col + 1);
+    public static function southwest(int $rc): int {
+        return $rc + 99;
     }
 
-    public function south(): RowCol
-    {
-        return new RowCol($this->row + 2, $this->col);
+    public static function southeast(int $rc): int {
+        return $rc + 101;
     }
 
-    public function southwest(): RowCol
-    {
-        return new RowCol($this->row + 1, $this->col - 1);
+    public static function row(int $rc): int {
+        return intval($rc / 100);
     }
 
-    public function southeast(): RowCol
-    {
-        return new RowCol($this->row + 1, $this->col + 1);
+    public static function col(int $rc): int {
+        return intval(($rc % 100));
     }
 
-    public function isNeighbor(RowCol $rc): bool
-    {
-        $cd = abs($this->col - $rc->col);
-        $rd = abs($this->row - $rc->row);
-        return $cd == 1 && $rd == 1 || $cd == 0 && $rd == 2;
+    public static function fromRowCol(int $row, int $col): int {
+        return $row * 100 + $col;
     }
 
-    public function asKey(): int
-    {
-        return $this->row * 100000 + $this->col * 10 + 1;
-    }
-
-    public static function fromKey(int $key): RowCol
-    {
-        if ($key == 0) {
-            throw new \InvalidArgumentException("0 is not a valid key for a RowCol");
-        }
-        $key--;
-        return new RowCol(intval($key / 100000), intval(($key % 100000) / 10));
-    }
 }
