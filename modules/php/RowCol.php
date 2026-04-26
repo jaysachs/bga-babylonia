@@ -27,6 +27,14 @@ declare(strict_types=1);
 
 namespace Bga\Games\babylonia;
 
+/**
+ * We use double coordinate representation for rows/columns in the hexgrid.
+ * See https://www.redblobgames.com/grids/hexagons/#coordinates
+ *
+ * However, for efficiency (particurly keeping payload size down, but it also keeps
+ * server side lean), we use a single int to pack the row col into.
+ * Hex "rowcol" = 100 * row + col
+ */
 class RowCol
 {
     public static function north(int $rc): int {
@@ -58,7 +66,7 @@ class RowCol
     }
 
     public static function col(int $rc): int {
-        return intval(($rc % 100));
+        return intval($rc % 100);
     }
 
     public static function fromRowCol(int $row, int $col): int {
