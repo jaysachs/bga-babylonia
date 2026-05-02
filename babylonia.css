@@ -115,6 +115,9 @@
     clip-path: none;
     background-image: url(img/sprites.png);
     background-size: 700% 700%;
+    filter:
+        drop-shadow(2px -2px #573404)
+    ;
 
     /* so picked up for floating (animated) pieces */
     display: inline-block;
