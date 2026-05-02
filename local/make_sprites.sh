@@ -58,7 +58,7 @@ do
     # the player pieces, including "hidden"
     for P in ' ' ${F} ${M} ${S} ${P}
     do
-	addCanvas "-font 'Esagil-Regular' -pointsize 42 -stroke black -fill \#${C} -draw 'circle 50,43 50,81' -stroke black -strokewidth 2 -fill black -draw 'text 0,4 "${P}"'"
+	addCanvas "-font 'Esagil-Regular' -pointsize 42 -stroke black -fill \#${C} -draw 'circle 50,43 50,81' -stroke black -strokewidth 1 -fill black -draw 'text 0,4 "${P}"'"
     done
     # the player board "hand" icon
     addCanvas "-stroke none -background \#000001 \
