@@ -46,9 +46,9 @@ addCanvas "-background none -stroke \#FFFFFF30 -strokewidth 2 -fill \#FFFFFF30 -
 for C in ${COLORS[*]}
 do
     # the player pieces, including "hidden"
-    for P in ' ' F M S P
+    for P in ' ' 𒀿 𒈫 𒃰 𒐃
     do
-	addCanvas "-pointsize 36 -stroke black -fill \#${C} -draw 'circle 50,43 50,81' -stroke black -strokewidth 2 -fill black -draw 'text 0,0 "${P}"'"
+	addCanvas "-font 'Esagil-Regular' -pointsize 30 -stroke black -fill \#${C} -draw 'circle 50,43 50,81' -stroke black -strokewidth 2 -fill black -draw 'text 0,0 "${P}"'"
     done
     # the player board "hand" icon
     addCanvas "-stroke none -background \#000001 \
@@ -65,16 +65,17 @@ do
        -transparent \#000001"
 done
 
+# M S P:  𒈫 𒃰 𒐃
 # cities
-for P in M S P MS MP SP MSP
+for P in  𒈫 𒃰 𒐃 '𒈫 𒃰' '𒈫 𒐃' '𒃰 𒐃' '𒈫 𒃰 𒐃'
 do
-    addCanvas "-pointsize 28 -stroke none -fill \#D6C6B5 -draw 'polygon ${HEX}' -fill \#212575 -draw 'roundrectangle 16,22 83,64 5,5' -stroke white -strokewidth 2 -fill white -draw 'text 0,0 \""${P}"\"'"
+    addCanvas "-pointsize 20 -stroke none -fill \#D6C6B5 -draw 'polygon ${HEX}' -fill \#212575 -draw 'roundrectangle 16,22 83,64 5,5' -stroke white -strokewidth 2 -fill white -draw 'text 0,0 \""${P}"\"'"
 done
 
 #fields
-for P in F5 F6 F7 FX
+for P in 5 6 7 X
 do
-   addCanvas "-pointsize 28 -stroke none -fill \#667313 -draw 'polygon ${HEX}' -stroke black -strokewidth 2 -fill blue -draw 'text 0,0 \""${P}"\"'"
+   addCanvas "-pointsize 28 -stroke none -fill \#768323 -draw 'polygon ${HEX}' -stroke black -strokewidth 2 -fill blue -font Esagil-Regular -draw 'text 0,-15 \""𒀿"\"' -font Arial -draw 'text 0,20 \""${P}"\"'"
 done
 
 # ziggurat
