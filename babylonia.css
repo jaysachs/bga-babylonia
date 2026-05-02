@@ -512,6 +512,7 @@ div.bbl_pb_zcards>div {
     height: 1.0em;
     width: 1.15em;
     display: inline-block;
+    filter: unset;
     margin: 0;
     padding: 0;
     background-color: transparent;
