@@ -18,10 +18,10 @@ build: $(JS) $(STUBS) $(STATS)
 $(JS): $(COLORMAP) src/*.ts tsconfig.json $(TS_STUBS)
 	npm run build:ts
 
-$(STATS): $(GENSTATS) stats.json Makefile
+$(STATS): $(GENSTATS) stats.jsonc Makefile
 	php $(GENSTATS) $(GAME)  > $(STATS)
 
-$(COLORMAP): misc/colormap.php gameinfos.inc.php
+$(COLORMAP): misc/colormap.php gameinfos.jsonc
 	php misc/colormap.php > $(COLORMAP)
 
 $(WORK):
