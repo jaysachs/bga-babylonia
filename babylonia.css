@@ -38,10 +38,6 @@ body.mobile_version {
     --bbl-board-width: calc(100vw - var(--bbl-board-margin));
 }
 
-#page-content.bga-game-zoom {
-    zoom: unset !important;
-}
-
 #bbl_main {
     display: flex;
     flex-direction: column;
