@@ -103,9 +103,9 @@ export class CSS {
 }
 
 export class BblHtml {
-  static readonly hstart = 38.0; // this is related to board width but not sure how
-  static readonly vstart = 9.0; // depends on board size too
-  static readonly height = 768 / 12.59;
+  static readonly hstart = 38.0; // this the (negative) offset on left of board
+  static readonly vstart = 9.0; // this is the offset on the top of the board
+  static readonly height = 768 / 12.59; // 61 -- why? hexes on image seem to be 204px
   static readonly width = this.height * 1.155;
   static readonly hdelta = 0.75 * this.width + 2.0;
   static readonly vdelta = 1.0 * this.height + 2.0;
@@ -113,9 +113,9 @@ export class BblHtml {
   public static makeHexDiv(hex: Hex): HTMLElement {
     const row = Math.trunc(hex.rc / 100);
     const col = Math.trunc(hex.rc % 100);
-    let top = this.vstart + row * this.vdelta / 2;
-    let left = this.hstart + col * this.hdelta;
-    return Html.div({ id:  IDS.hexDiv(hex.rc), style: [`top:${top}px`, `left:${left}px`] });
+    let top = 100 * (this.vstart + row * this.vdelta / 2) / this.height;
+    let left = 100 * (this.hstart + col * this.hdelta) / this.width;
+    return Html.div({ id:  IDS.hexDiv(hex.rc), style: [`top:${top}%`, `left:${left}%`] });
   }
 
   public static player_board_ext(player_id: number, color_index: number): HTMLElement[] {

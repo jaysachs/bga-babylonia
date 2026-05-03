@@ -15,12 +15,14 @@
 
 
 /* inspired from https://css-tricks.com/hexagons-and-beyond-flexible-responsive-grid-patterns-sans-media-queries/ */
-:root {
+body {
     /*
       define these all here so they're available even for "floating" elements.
      */
-    --bbl-board-width: 1024px;
-    --bbl-board-height: 768px;
+    /* --bbl-board-width: 1024px; */
+    --bbl-board-margin: calc(max(20px, 0.02vw));
+    --bbl-board-width: calc((100vw - var(--bbl-board-margin) - 240px));
+    --bbl-board-height: calc(0.75 * var(--bbl-board-width));
 
     /* 2/sqrt(3) */
     --bbl-hex-ratio: 1.155;
@@ -30,6 +32,14 @@
       maybe compute board height/width based on hex size instead?
     */
     --bbl-hex-height: calc(var(--bbl-board-height)/12.59);
+}
+
+body.mobile_version {
+    --bbl-board-width: calc(100vw - var(--bbl-board-margin));
+}
+
+#page-content.bga-game-zoom {
+    zoom: unset !important;
 }
 
 #bbl_main {
@@ -47,6 +57,8 @@
 
 #bbl_board {
     font-size: 0;
+    margin-left: calc(var(--bbl-board-margin));
+    margin-right: calc(var(--bbl-board-margin));
     background: url(img/mapb.jpg) no-repeat center;
     background-size: cover;
     width: calc(var(--bbl-board-width));
