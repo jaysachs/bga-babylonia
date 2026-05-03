@@ -14,10 +14,12 @@ ZIG="16,61 20,45 24,45 28,29 32,29 34,21 66,21 68,29 72,29 76,45 80,45 84,61"
 
 COLORS=(FFFFFF 76A89B F9C29A 9A9A9A)
 
-M=𒈫
-S=𒉼 # 𒄮 𒇽 𒃰 𒂵
-P=𒆳
-F=𒀖 # 𒀿
+FONT=Noto-Sans-Cuneiform-Regular
+
+P=𒀭 # 𒁈
+S=𒅄 # 𒉼 # 𒄮 𒇽 𒃰 𒂵
+F=𒆕 #𒆳
+M=𒆩 # 𒀖 # 𒀿
 
 CMD="\( "
 ROWS=0
@@ -62,7 +64,7 @@ do
     # the player pieces, including "hidden"
     for P in ' ' ${F} ${M} ${S} ${P}
     do
-	addCanvas "-font 'Esagil-Regular' -pointsize 42 -stroke black -fill \#${C} -draw 'circle 50,43 50,81' -stroke black -strokewidth 1 -fill black -draw 'text 0,4 "${P}"'"
+	addCanvas "-font '${FONT}' -pointsize 36 -stroke black -fill \#${C} -draw 'circle 50,43 50,81' -stroke black -strokewidth 1 -fill black -draw 'text 0,-4 "${P}"'"
     done
     # the player board "hand" icon
     addCanvas "-stroke none -background \#000001 \
@@ -80,20 +82,20 @@ do
 done
 
 # cities
-for P in  ${M} ${S} ${P} "${M}  ${S}" "${M}  ${P}" "${S}  ${P}" "${M} ${S} ${P}"
+for P in  ${M} ${S} ${P} "${M}  ${S}" "${M} ${P}" "${S} ${P}" "${M} ${S} ${P}"
 do
     #    addCanvas "-pointsize 24 -stroke none -fill \#D6C6B5 -draw 'polygon ${HEX}' -fill \#212575 -draw 'roundrectangle 16,22 83,64 5,5' -stroke white -strokewidth 1 -fill white -draw 'text 0,0 \""${P}"\"'"
-        addCanvas "-pointsize 32 -stroke none -fill \#D6C6B5 -draw 'polygon ${HEX}' -fill \#212575 -draw 'polygon ${INNERHEX}' -stroke white -strokewidth 1 -fill white -draw 'text 0,3 \""${P}"\"'"
+        addCanvas "-pointsize 20 -stroke none -fill \#D6C6B5 -draw 'polygon ${HEX}' -fill \#212575 -draw 'polygon ${INNERHEX}' -stroke white -strokewidth 1 -fill white -draw 'text 0,0 \""${P}"\"'"
 done
 
 #fields
 for N in 5 6 7
 do
-   addCanvas "-pointsize 36 -stroke none -fill \#768323 -draw 'polygon ${HEX}' -stroke black -strokewidth 1 -fill blue -font Esagil-Regular -draw 'text 0,-10 \""${F}"\"' -font Arial -strokewidth 2 -draw 'text 0,20 \""${N}"\"'"
+   addCanvas "-pointsize 30 -stroke none -fill \#768323 -draw 'polygon ${HEX}' -stroke black -strokewidth 1 -fill blue -font ${FONT} -draw 'text 0,-20 \""${F}"\"' -font Arial -strokewidth 2 -draw 'text 0,20 \""${N}"\"'"
 done
 
 # city count field
-addCanvas "-pointsize 36 -stroke none -fill \#768323 -draw 'polygon ${HEX}' -stroke black -strokewidth 1 -fill blue -font Esagil-Regular -draw 'text 0,-10 \""${F}"\"' -fill \#212575 -draw 'polygon ${SMALLHEX}'"
+addCanvas "-pointsize 30 -stroke none -fill \#768323 -draw 'polygon ${HEX}' -stroke black -strokewidth 1 -fill blue -font ${FONT} -draw 'text 0,-20 \""${F}"\"' -fill \#212575 -draw 'polygon ${SMALLHEX}'"
 
 # ziggurat
 addCanvas "-stroke none -fill \#924018 -draw 'polygon ${ZIG}'"

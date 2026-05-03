@@ -113,8 +113,8 @@ export class BblHtml {
   public static makeHexDiv(hex: Hex): HTMLElement {
     const row = Math.trunc(hex.rc / 100);
     const col = Math.trunc(hex.rc % 100);
-    let top = 100 * (this.vstart + row * this.vdelta / 2) / this.height;
-    let left = 100 * (this.hstart + col * this.hdelta) / this.width;
+    let top = 100 * (this.vstart + row * this.vdelta / 2) / 768.0;
+    let left = 100 * (this.hstart + col * this.hdelta) / 1024.0;
     return Html.div({ id:  IDS.hexDiv(hex.rc), style: [`top:${top}%`, `left:${left}%`] });
   }
 
