@@ -45,7 +45,7 @@ class SelectScoringHex extends AbstractScoringSelection
         );
     }
 
-    /** @return array{hexes:list<RowCol>} */
+    /** @return array{hexes:list<int>} */
     public function getArgs(int $active_player_id): array
     {
         $model = $this->createModel($active_player_id);

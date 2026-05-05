@@ -105,7 +105,7 @@ class ScoreHex extends AbstractState
             $winner = $scored_zig->captured_by;
             if ($winner != 0) {
                 if ($winner != $active_player_id) {
-                    $this->gamestate->changeActivePlayer($winner);
+                    $this->changeActivePlayer($winner);
                     $this->giveExtraTime($winner);
                 }
                 return SelectZigguratCard::class;
@@ -125,8 +125,8 @@ class ScoreHex extends AbstractState
      * array{
      *  player_id:int,
      *  captured_city_count:int,
-     *  scored_locations:list<RowCol>,
-     *  network_locations:list<RowCol>,
+     *  scored_locations:list<int>,
+     *  network_locations:list<int>,
      *  network_points:int,
      *  capture_points:int,
      *  score:int}

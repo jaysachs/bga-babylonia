@@ -32,7 +32,7 @@ class Board
 
     private function __construct() {}
 
-    // key is stringified RowCol
+    // key is int-ified RowCol
     /** @var array<int,Hex> */
     private array $hexes = [];
 
@@ -50,6 +50,7 @@ class Board
         throw new \InvalidArgumentException("No hex at $rc");
     }
 
+    /** @phpstan-ignore return.unusedType */
     private function maybeHexAt(int $rc): ?Hex
     {
         return @$this->hexes[$rc];
@@ -118,7 +119,7 @@ class Board
         return self::fromMap($map, $dev_locs);
     }
 
-    /** @param RowCol[] $dev_locs */
+    /** @param int[] $dev_locs */
     private static function fromMap(string $map, array &$dev_locs): Board
     {
         $board = new Board();
@@ -247,7 +248,7 @@ END;
             throw new \InvalidArgumentException(sprintf("invalid number of players: %s", $numPlayers));
         }
 
-        /** @var RowCol[] */
+        /** @var int[] */
         $development_locations = [];
         $board = Board::fromMap(Board::ACTUAL_MAP, $development_locations);
         $board->markLandmass(Landmass::WEST, RowCol::fromRowCol(18, 16));
@@ -349,7 +350,7 @@ END;
         );
     }
 
-    /** @param RowCol[] $development_locations */
+    /** @param int[] $development_locations */
     private function removeLandmass(Landmass $landmass, array &$development_locations): void
     {
         foreach ($this->hexes as $hex) {
@@ -363,7 +364,7 @@ END;
         }
     }
 
-    /** @return RowCol[] */
+    /** @return int[] */
     public function touchedZiggurats(int $player_id): array
     {
         $adjacent = [];

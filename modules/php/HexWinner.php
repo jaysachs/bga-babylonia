@@ -37,7 +37,7 @@ class HexWinner
         public array $neighbors
     ) {}
 
-    /** @return array<int, RowCol> */
+    /** @return array<int, int> */
     public function winnerRowCols(): array
     {
         return $this->rcs(
@@ -50,7 +50,7 @@ class HexWinner
         );
     }
 
-    /** @return array<int, RowCol> */
+    /** @return array<int, int> */
     public function othersRowCols(): array
     {
         return $this->rcs(

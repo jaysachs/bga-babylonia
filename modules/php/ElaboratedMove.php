@@ -31,7 +31,7 @@ namespace Bga\Games\babylonia;
 
 class ElaboratedMove extends Move
 {
-    /** @param RowCol[] $touched_ziggurats */
+    /** @param int[] $touched_ziggurats */
     function __construct(
         int $player_id,
         Piece $piece,

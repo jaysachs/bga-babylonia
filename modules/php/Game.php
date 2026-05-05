@@ -263,7 +263,7 @@ class Game extends Table
                 "zcard" => $zctype,
                 "cardused" => $used,
                 "points" => $points,
-                "hex" => new RowCol($row, $col),
+                "hex" => RowCol::fromRowCol($row, $col),
             ]
         );
     }

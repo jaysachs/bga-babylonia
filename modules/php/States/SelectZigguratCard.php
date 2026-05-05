@@ -57,7 +57,7 @@ class SelectZigguratCard extends AbstractState
         return $rc;
     }
 
-    /** @return array{hex:RowCol,available_cards:list<string>} */
+    /** @return array{hex:int,available_cards:list<string>} */
     function getArgs(int $active_player_id): array
     {
         $model = $this->createModel($active_player_id);

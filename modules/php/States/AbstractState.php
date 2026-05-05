@@ -29,13 +29,13 @@ namespace Bga\Games\babylonia\States;
 
 use Bga\GameFramework\StateType;
 use Bga\GameFramework\States\GameState;
-use Bga\Games\babylonia\DefaultDb;
 use Bga\Games\babylonia\Game;
 use Bga\Games\babylonia\Model;
 use Bga\Games\babylonia\PersistentStore;
 use Bga\Games\babylonia\Stats;
 use Bga\Games\babylonia\TableOption;
 use Bga\Games\babylonia\Utils\DefaultDb as UtilsDefaultDb;
+use Exception;
 
 abstract class AbstractState extends GameState
 {
@@ -77,5 +77,12 @@ abstract class AbstractState extends GameState
 
     protected function activeNextPlayer(): void {
         $this->game->activeNextPlayer();
+    }
+
+    protected function changeActivePlayer(int $player_id): void {
+        if (!$this->gamestate) {
+            throw new Exception("gamestate unexpected null");
+        }
+        $this->gamestate->changeActivePlayer($player_id);
     }
 }

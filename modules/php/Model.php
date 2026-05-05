@@ -238,7 +238,7 @@ class Model
      * Returns an array ["piece" => [rc1, rc2,...], ...]
      * for piece types that are in hand
      *
-     * @return array<string,list<RowCol>>
+     * @return array<string,list<int>>
      */
     public function getAllowedMoves(): array
     {

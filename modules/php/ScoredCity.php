@@ -100,13 +100,13 @@ class ScoredCity
         return $this->captured_city_points[$player_id];
     }
 
-    /** @return list<RowCol> */
+    /** @return list<int> */
     public function scoringLocationsForPlayer(int $player_id): array
     {
         return $this->toRowCol($this->scoringHexes[$player_id]);
     }
 
-    /** @return list<RowCol> */
+    /** @return list<int> */
     public function networkLocationsForPlayer(int $player_id): array
     {
         return $this->toRowCol($this->networkHexes[$player_id]);

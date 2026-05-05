@@ -43,7 +43,7 @@ class EndOfTurnScoring extends AbstractState
         // switch back to player on turn if necessary.
         $player_on_turn = $this->ps->playerOnTurn();
         if ($active_player_id != $player_on_turn) {
-            $this->gamestate->changeActivePlayer($player_on_turn);
+            $this->changeActivePlayer($player_on_turn);
             $this->giveExtraTime($player_on_turn);
             $active_player_id = $player_on_turn;
         }
