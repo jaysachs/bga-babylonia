@@ -161,6 +161,7 @@ class PlayPieces extends AbstractState
         $handpos = $pos[bga_rand(0, count($pos) - 1)];
 
         // Find empty land spaces. River play is so situational that we just don't do it.
+        /** @var list<int> */
         $rcs = [];
         $model->board()->visitAll(function (Hex $hex) use (&$rcs): void {
             if ($hex->piece->isEmpty() && !$hex->isWater()) {
@@ -168,7 +169,7 @@ class PlayPieces extends AbstractState
             }
         });
         Arrays::shuffle($rcs);
-        return $this->actPlayPiece($playerId, $handpos, $rcs[0]->row, $rcs[0]->col);
+        return $this->actPlayPiece($playerId, $handpos, $rcs[0]);
 
         // TODO better choices:
         //   1) win a city or ziggurat
