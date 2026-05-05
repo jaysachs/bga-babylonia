@@ -146,11 +146,14 @@ class Scorer
         if ($h->player_id > 0) {
             return $h->player_id;
         }
+        if (!$h->isFree()) {
+            return 0;
+        }
         if ($h->isWater()) {
             if ($ignored_zcard != ZigguratCardType::EMPTY_RIVER_CONNECTS) {
                 return $this->components->zigguratCardOwner(ZigguratCardType::EMPTY_RIVER_CONNECTS);
             }
-        } else if ($h->landmass == Landmass::CENTER && $h->piece->isEmpty()) {
+        } else if ($h->landmass == Landmass::CENTER) {
             if ($ignored_zcard != ZigguratCardType::EMPTY_CENTER_LAND_CONNECTS) {
                 return $this->components->zigguratCardOwner(ZigguratCardType::EMPTY_CENTER_LAND_CONNECTS);
             }

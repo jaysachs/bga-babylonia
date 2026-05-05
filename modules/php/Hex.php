@@ -63,6 +63,10 @@ class Hex
             && $this->landmass == $other->landmass;
     }
 
+    public function isFree(): bool {
+        return $this->piece->isEmpty();
+    }
+
     public function captureCity(): Piece
     {
         if (!$this->piece->isCity()) {
