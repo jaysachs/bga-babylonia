@@ -5,4 +5,4 @@
   * stats only updated when turn committed
 * Truly responsive layout like T&E -- keep "ideal" size so board "always" fits in window
   * probably need onChangeSize support
-* Thorough PHPStan support
+

@@ -87,3 +87,11 @@ CREATE TABLE IF NOT EXISTS `turns` (
 )
 
 ```
+
+Questions
+=========
+
+* There is an appeal to storing the entire map in the DB; it would allow for randomization and
+  other scenarios. To do that, we'd need a type for "empty" and also a way to identify
+  which hexes are in which landmass. So definitely at least one addition type (`EMPTY`),
+  and either another field (`LANDMASS`), or make that three empty types (`EMPTY_N`, `EMPTY_C`, `EMPTY_S`). Or just two empty types (`EMPTY`, `EMPTY_8` -- to tie it to zcard 8).
