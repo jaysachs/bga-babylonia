@@ -46,7 +46,7 @@ enum Piece: string
     case FIELD_5 = 'field_5';
     case FIELD_6 = 'field_6';
     case FIELD_7 = 'field_7';
-    case FIELD_CITIES = 'field_X';
+    case FIELD_CITIES = 'field_x';
     case EMPTY = 'empty';
 
     public function isField(): bool
