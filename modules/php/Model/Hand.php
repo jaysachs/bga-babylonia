@@ -25,7 +25,7 @@
 
 declare(strict_types=1);
 
-namespace Bga\Games\babylonia;
+namespace Bga\Games\babylonia\Model;
 
 class Hand
 {

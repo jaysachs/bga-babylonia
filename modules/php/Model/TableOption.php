@@ -25,13 +25,10 @@
 
 declare(strict_types=1);
 
-namespace Bga\Games\babylonia;
+namespace Bga\Games\babylonia\Model;
 
-class ZigguratCard
+enum TableOption: int
 {
-    public function __construct(
-        public readonly ZigguratCardType $type,
-        public int $owning_player_id = 0,
-        public bool $used = false
-    ) {}
-};
+    case ADVANCED_ZIGGURAT_CARDS = 100;
+    case AUTOMATED_SCORING_SELECTION = 101;
+}

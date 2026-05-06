@@ -29,7 +29,7 @@ namespace Bga\Games\babylonia\States;
 
 use Bga\GameFramework\StateType;
 use Bga\Games\babylonia\Game;
-use Bga\Games\babylonia\RowCol;
+use Bga\Games\babylonia\Model\RowCol;
 
 abstract class AbstractScoringSelection extends AbstractState
 {

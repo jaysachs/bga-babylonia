@@ -3,7 +3,7 @@
 declare(strict_types=1);
 use PHPUnit\Framework\TestCase;
 
-use Bga\Games\babylonia\ {
+use Bga\Games\babylonia\Model\ {
         Hex,
         HexType,
         Piece,

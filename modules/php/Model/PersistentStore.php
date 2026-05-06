@@ -25,9 +25,11 @@
 
 declare(strict_types=1);
 
-namespace Bga\Games\babylonia;
+namespace Bga\Games\babylonia\Model;
 
 use Bga\GameFramework\Db\Globals;
+use Bga\Games\babylonia\OpType;
+use Bga\Games\babylonia\StatOp;
 use Bga\Games\babylonia\Utils\Db;
 
 class PersistentStore

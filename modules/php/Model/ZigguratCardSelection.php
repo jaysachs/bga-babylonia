@@ -25,10 +25,9 @@
 
 declare(strict_types=1);
 
-namespace Bga\Games\babylonia;
+namespace Bga\Games\babylonia\Model;
 
-enum HexType: string
+class ZigguratCardSelection
 {
-    case LAND = 'LAND';
-    case WATER = 'WATER';
+    public function __construct(public ZigguratCard $card, public int $points) {}
 }

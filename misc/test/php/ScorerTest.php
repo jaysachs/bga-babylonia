@@ -3,7 +3,7 @@
 declare(strict_types=1);
 use PHPUnit\Framework\TestCase;
 
-use Bga\Games\babylonia\ {
+use Bga\Games\babylonia\Model\ {
         Board,
         Components,
         Hex,
@@ -12,8 +12,8 @@ use Bga\Games\babylonia\ {
         RowCol,
         Scorer,
         ScoredCity,
-        Stats,
 };
+use Bga\Games\babylonia\Stats;
 
 final class ScorerTest extends TestCase
 {

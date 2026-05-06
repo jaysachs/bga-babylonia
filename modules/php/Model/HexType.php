@@ -25,10 +25,10 @@
 
 declare(strict_types=1);
 
-namespace Bga\Games\babylonia;
+namespace Bga\Games\babylonia\Model;
 
-enum TableOption: int
+enum HexType: string
 {
-    case ADVANCED_ZIGGURAT_CARDS = 100;
-    case AUTOMATED_SCORING_SELECTION = 101;
+    case LAND = 'LAND';
+    case WATER = 'WATER';
 }

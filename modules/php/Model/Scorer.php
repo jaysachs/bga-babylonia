@@ -25,7 +25,9 @@
 
 declare(strict_types=1);
 
-namespace Bga\Games\babylonia;
+namespace Bga\Games\babylonia\Model;
+
+use Bga\Games\babylonia\Stats;
 
 class Scorer
 {

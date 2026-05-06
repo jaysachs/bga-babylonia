@@ -25,16 +25,14 @@
 
 declare(strict_types=1);
 
-namespace Bga\Games\babylonia;
+namespace Bga\Games\babylonia\Model;
 
-class PlayerInfo
+class TurnResult
 {
+    public function __construct(public bool $pieces_exhausted, public bool $less_than_two_remaining_cities) {}
 
-    public function __construct(
-        public int $player_id,
-        public int $score,
-        public int $captured_city_count,
-        public int $hand_size,
-        public int $pool_size
-    ) {}
+    public function gameOver(): bool
+    {
+        return $this->pieces_exhausted || $this->less_than_two_remaining_cities;
+    }
 }

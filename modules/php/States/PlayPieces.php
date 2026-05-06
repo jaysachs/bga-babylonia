@@ -32,8 +32,8 @@ use Bga\GameFramework\StateType;
 use Bga\GameFramework\States\PossibleAction;
 use Bga\GameFramework\UserException;
 use Bga\Games\babylonia\Game;
-use Bga\Games\babylonia\Hex;
-use Bga\Games\babylonia\RowCol;
+use Bga\Games\babylonia\Model\Hex;
+use Bga\Games\babylonia\Model\RowCol;
 use Bga\Games\babylonia\Utils\Arrays;
 
 class PlayPieces extends AbstractState

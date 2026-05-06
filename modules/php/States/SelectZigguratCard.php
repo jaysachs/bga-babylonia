@@ -31,9 +31,7 @@ use Bga\GameFramework\StateType;
 use Bga\GameFramework\States\PossibleAction;
 use Bga\GameFramework\SystemException;
 use Bga\Games\babylonia\Game;
-use Bga\Games\babylonia\RowCol;
-use Bga\Games\babylonia\ZigguratCardType;
-use Bga\Games\babylonia\Utils;
+use Bga\Games\babylonia\Model\ZigguratCardType;
 use Bga\Games\babylonia\Utils\Arrays;
 
 class SelectZigguratCard extends AbstractState

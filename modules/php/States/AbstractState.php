@@ -30,10 +30,10 @@ namespace Bga\Games\babylonia\States;
 use Bga\GameFramework\StateType;
 use Bga\GameFramework\States\GameState;
 use Bga\Games\babylonia\Game;
-use Bga\Games\babylonia\Model;
-use Bga\Games\babylonia\PersistentStore;
+use Bga\Games\babylonia\Model\Model;
+use Bga\Games\babylonia\Model\PersistentStore;
 use Bga\Games\babylonia\Stats;
-use Bga\Games\babylonia\TableOption;
+use Bga\Games\babylonia\Model\TableOption;
 use Bga\Games\babylonia\Utils\DefaultDb as UtilsDefaultDb;
 use Exception;
 

@@ -3,7 +3,7 @@
 declare(strict_types=1);
 use PHPUnit\Framework\TestCase;
 
-use Bga\Games\babylonia\ {
+use Bga\Games\babylonia\Model\ {
         Board,
         Components,
         Hand,
@@ -14,13 +14,13 @@ use Bga\Games\babylonia\ {
         Piece,
         PlayerInfo,
         RowCol,
-        Stats,
         TurnProgress,
         ZigguratCard,
         ZigguratCardType,
 };
 
 use Bga\GameFramework\Db\Globals;
+use Bga\Games\babylonia\Stats;
 use Bga\Games\babylonia\Utils\TestDb;
 
 class TestGlobals extends Globals {}

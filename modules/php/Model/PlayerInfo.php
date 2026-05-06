@@ -25,13 +25,16 @@
 
 declare(strict_types=1);
 
-namespace Bga\Games\babylonia;
+namespace Bga\Games\babylonia\Model;
 
-enum Landmass: string
+class PlayerInfo
 {
-    case EAST = 'EAST';
-    case WEST = 'WEST';
-    case CENTER = 'CENTER';
 
-    case UNKNOWN = 'UNKNOWN';
+    public function __construct(
+        public int $player_id,
+        public int $score,
+        public int $captured_city_count,
+        public int $hand_size,
+        public int $pool_size
+    ) {}
 }

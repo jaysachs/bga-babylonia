@@ -1,6 +1,6 @@
 <?php
 
-require_once('work/test/module/table/table.game.php');
+require_once('work/module/table/table.game.php');
 
 spl_autoload_register(function ($class) {
     $prefix = 'Bga\\Games\\babylonia\\';

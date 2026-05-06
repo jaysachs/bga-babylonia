@@ -30,7 +30,7 @@ namespace Bga\Games\babylonia\States;
 use Bga\GameFramework\StateType;
 use Bga\GameFramework\States\PossibleAction;
 use Bga\Games\babylonia\Game;
-use Bga\Games\babylonia\ZigguratCardType;
+use Bga\Games\babylonia\Model\ZigguratCardType;
 
 class SelectExtraTurn extends AbstractState
 {

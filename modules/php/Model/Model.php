@@ -25,9 +25,9 @@
 
 declare(strict_types=1);
 
-namespace Bga\Games\babylonia\ModelImpl {
+namespace Bga\Games\babylonia\Model\ModelImpl {
 
-use Bga\Games\babylonia\ZigguratCardType;
+use Bga\Games\babylonia\Model\ZigguratCardType;
 
 class PlayAllowedResult {
     /** @param array<ZigguratCardType> $ziggurat_cards_activated */
@@ -54,10 +54,11 @@ class PlayAllowedResult {
 
 }
 
-namespace Bga\Games\babylonia {
+namespace Bga\Games\babylonia\Model {
 
 use Bga\GameFramework\UserException;
-use Bga\Games\babylonia\ModelImpl\PlayAllowedResult;
+use Bga\Games\babylonia\Model\ModelImpl\PlayAllowedResult;
+    use Bga\Games\babylonia\Stats;
 
 class Model
 {

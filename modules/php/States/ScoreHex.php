@@ -30,10 +30,10 @@ namespace Bga\Games\babylonia\States;
 use Bga\GameFramework\StateType;
 use Bga\GameFramework\SystemException;
 use Bga\Games\babylonia\Game;
-use Bga\Games\babylonia\HexWinner;
-use Bga\Games\babylonia\Model;
-use Bga\Games\babylonia\RowCol;
-use Bga\Games\babylonia\ScoredCity;
+use Bga\Games\babylonia\Model\HexWinner;
+use Bga\Games\babylonia\Model\Model;
+use Bga\Games\babylonia\Model\RowCol;
+use Bga\Games\babylonia\Model\ScoredCity;
 
 class ScoreHex extends AbstractState
 {

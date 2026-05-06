@@ -25,10 +25,9 @@
 
 declare(strict_types=1);
 
-namespace Bga\Games\babylonia;
+namespace Bga\Games\babylonia\Model;
 
 use Bga\GameFramework\SystemException;
-use Bga\GameFramework\UserException;
 
 class Pool
 {
