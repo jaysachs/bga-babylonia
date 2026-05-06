@@ -29,7 +29,7 @@ namespace Bga\Games\babylonia\States;
 
 use Bga\GameFramework\StateType;
 use Bga\Games\babylonia\Game;
-use Bga\Games\babylonia\Model\TableOption;
+use Bga\Games\babylonia\TableOption;
 
 class EndOfTurnScoring extends AbstractState
 {

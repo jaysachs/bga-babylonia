@@ -33,8 +33,8 @@ use Bga\Games\babylonia\Game;
 use Bga\Games\babylonia\Model\Model;
 use Bga\Games\babylonia\Model\PersistentStore;
 use Bga\Games\babylonia\Stats;
-use Bga\Games\babylonia\Model\TableOption;
-use Bga\Games\babylonia\Utils\DefaultDb as UtilsDefaultDb;
+use Bga\Games\babylonia\TableOption;
+use Bga\Games\babylonia\Utils\DefaultDb;
 use Exception;
 
 abstract class AbstractState extends GameState
@@ -58,7 +58,7 @@ abstract class AbstractState extends GameState
             description: $description,
             descriptionMyTurn: $descriptionMyTurn,
             updateGameProgression: $updateGameProgression);
-        $this->ps = new PersistentStore(new UtilsDefaultDb(), $this->globals);
+        $this->ps = new PersistentStore(new DefaultDb(), $this->globals);
         $this->stats = Stats::createForGame($game);
     }
 

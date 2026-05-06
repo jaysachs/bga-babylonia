@@ -32,7 +32,6 @@ use Bga\Games\babylonia\Model\PersistentStore;
 use Bga\GameFramework\Table;
 use Bga\Games\babylonia\Model\Hex;
 use Bga\Games\babylonia\Model\RowCol;
-use Bga\Games\babylonia\Model\TableOption;
 use Bga\Games\babylonia\States\StartTurn;
 use Bga\Games\babylonia\Utils\Arrays;
 use Bga\Games\babylonia\Utils\DefaultDb;
