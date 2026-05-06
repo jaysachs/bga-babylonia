@@ -28,33 +28,39 @@ CREATE TABLE IF NOT EXISTS `pieces` (
   `id` INTEGER NOT NULL,
 
   -- type: (player_id null unless indicated)
-  --  PRIEST  (requires player_id)
-  --  MERCHANT  (requires player_id)
-  --  SERVANT   (requires player_id)
-  --  FARMER    (requires player_id)
-  --  SECRET (for pieces played upside down; implies WATER; requires player_id)
-  --  CITY_M (all CITY_: player_id if captured),
-  --  CITY_P,
-  --  CITY_S,
-  --  CITY_MP,
-  --  CITY_MS,
-  --  CITY_MSP,
-  --  FIELD_5,
-  --  FIELD_6,
-  --  FIELD_7,
-  --  FIELD_X
-  --  ZIGGURAT (player_id of scoring player, or 0 if scored but no winner, null if unscored)
-  --  ZCARD_1 (player_id of owning player; null if none)
-  --  ZCARD_2
-  --  ...
-  --  ZCARD_9
-  `type` VARCHAR(8),
+  --  empty
+  --  priest  (requires player_id)
+  --  merchant  (requires player_id)
+  --  servant   (requires player_id)
+  --  farmer    (requires player_id)
+  --  hidden (for pieces played upside down; implies water; requires player_id)
+  --  city_m (all city_: player_id if captured),
+  --  city_p,
+  --  city_s,
+  --  city_mp,
+  --  city_ms,
+  --  city_msp,
+  --  field_5,
+  --  field_6,
+  --  field_7,
+  --  field_x
+  --  ziggurat
+  --  zc_10pts
+  --  zc_xturn
+  --  zc_hand7
+  --  zc_3nobles
+  --  zc_3farmers
+  --  zc_fields
+  --  zc_citypts
+  --  zc_land
+  --  zc_river
+  `type` VARCHAR(10),
 
   -- location
   --   BOARD (player_id depends on type)
   --   HAND (requires player_id) (both pieces and zcards can be in "HAND")
   --   POOL (requires player_id)
-  --   DISCARD (null player_id)
+  --   DISCARD (null player_id) - cities scored but uncaptured, scored fields
   `location` VARCHAR(8),
 
   -- location_id
@@ -64,10 +70,14 @@ CREATE TABLE IF NOT EXISTS `pieces` (
   --   if DISCARD, null
   `loc_id` INT UNSIGNED,
 
-  `player_id` INT UNSIGNED
+  `player_id` INT UNSIGNED,
 
-  -- only for ziggurats. needed?
+  -- for ziggurats and cities
   `scored` BOOLEAN,
+
+  -- landmass for board locations
+  --    north, center, south
+  `landmass` VARCHAR(6)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8
 
 -- hmm, this identical-ness suggests just having one table
