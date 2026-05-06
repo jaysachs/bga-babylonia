@@ -402,10 +402,7 @@ class Model
         $this->ps->upsertHand($this->player_id, $hand);
         $this->ps->upsertPool($this->player_id, $this->pool());
 
-        $result = new TurnResult(
-            $hand->size() == 0,
-            $this->board()->cityCount() <= 1
-        );
+        $result = new TurnResult($hand, $this->board());
         if ($result->gameOver()) {
             $this->resolveAnyTies();
             if ($result->less_than_two_remaining_cities) {

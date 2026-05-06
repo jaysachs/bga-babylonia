@@ -29,7 +29,13 @@ namespace Bga\Games\babylonia\Model;
 
 class TurnResult
 {
-    public function __construct(public bool $pieces_exhausted, public bool $less_than_two_remaining_cities) {}
+    public readonly bool $pieces_exhausted;
+    public readonly bool $less_than_two_remaining_cities;
+
+    public function __construct(Hand $hand, Board $board) {
+        $this->pieces_exhausted = $hand->size() == 0;
+        $this->less_than_two_remaining_cities = $board->cityCount() < 2;
+    }
 
     public function gameOver(): bool
     {
