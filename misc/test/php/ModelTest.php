@@ -1,6 +1,8 @@
 <?php
 
 declare(strict_types=1);
+
+use Bga\GameFramework\Components\Counters\PlayerCounter;
 use PHPUnit\Framework\TestCase;
 
 use Bga\Games\babylonia\Model\ {
@@ -25,6 +27,8 @@ use Bga\Games\babylonia\Utils\TestDb;
 
 class TestGlobals extends Globals {}
 
+class TestCounter extends PlayerCounter {}
+
 class TestStore extends PersistentStore {
     private Board $board;
     /** @var array<int,PlayerInfo> */
@@ -42,7 +46,7 @@ class TestStore extends PersistentStore {
     }
 
     public function __construct() {
-        PersistentStore::__construct(new TestDb(), new TestGlobals());
+        PersistentStore::__construct(new TestDb(), new TestGlobals(), new TestCounter(), new TestCounter());
         $this->hand = Hand::new();
         for ($i = 1; $i <= 3; $i++) {
             $this->player_infos[$i] = new PlayerInfo($i, 0, 0, 5, 25);

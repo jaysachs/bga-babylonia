@@ -58,7 +58,7 @@ abstract class AbstractState extends GameState
             description: $description,
             descriptionMyTurn: $descriptionMyTurn,
             updateGameProgression: $updateGameProgression);
-        $this->ps = new PersistentStore(new DefaultDb(), $this->globals);
+        $this->ps = new PersistentStore(new DefaultDb(), $this->globals, $this->playerScore, $this->playerScoreAux);
         $this->stats = Stats::createForGame($game);
     }
 

@@ -76,7 +76,7 @@ class Game extends Table
 		$logDecorator = new LogDecorator(\Closure::fromCallable($this->getPlayerNameById(...)));
 		$this->notify->addDecorator($logDecorator->playerNames(...));
  		$this->stats = Stats::createForGame($this);
-        $this->ps = new PersistentStore(new DefaultDb(), $this->globals);
+        $this->ps = new PersistentStore(new DefaultDb(), $this->globals, $this->playerScore, $this->playerScoreAux);
 
 		$this->initGameStateLabels([]);
 	}

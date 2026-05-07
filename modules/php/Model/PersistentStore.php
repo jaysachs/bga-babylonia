@@ -27,6 +27,7 @@ declare(strict_types=1);
 
 namespace Bga\Games\babylonia\Model;
 
+use Bga\GameFramework\Components\Counters\PlayerCounter;
 use Bga\GameFramework\Db\Globals;
 use Bga\Games\babylonia\OpType;
 use Bga\Games\babylonia\StatOp;
@@ -43,7 +44,7 @@ class PersistentStore
     /** @var string */
     private const GLOBAL_ROW_COL_BEING_SCORED = 'row_col_being_scored';
 
-    public function __construct(private Db $db, private Globals $globals) {}
+    public function __construct(private Db $db, private Globals $globals, private PlayerCounter $playerScore, private PlayerCounter $playerScoreAux) {}
 
     public function initializeGlobals(\Closure $initFn): void {
         $initFn([PersistentStore::GLOBAL_PLAYER_ON_TURN => 10,
@@ -194,8 +195,7 @@ class PersistentStore
     public function updatePlayer(PlayerInfo $player_info): void
     {
         $sql = "UPDATE player p
-                SET p.player_score = $player_info->score,
-                    p.captured_city_count = $player_info->captured_city_count
+                SET p.captured_city_count = $player_info->captured_city_count
                 WHERE p.player_id = $player_info->player_id";
         $this->db->execute($sql);
     }
@@ -269,14 +269,7 @@ class PersistentStore
         if ($points == 0) {
             return;
         }
-        $sql = "UPDATE player q
-                SET q.player_score = (
-                    SELECT p.sc + $points
-                    FROM (SELECT player_score sc
-                          FROM player
-                          WHERE player_id = $player_id) p)
-                    WHERE q.player_id = $player_id";
-        $this->db->execute($sql);
+        $this->playerScore->inc($player_id, $points);
     }
 
     /** @param array<int, StatOp> $statOps */
@@ -346,25 +339,15 @@ class PersistentStore
         if (count($aux_scores) == 0) {
             return;
         }
-        $cases = [];
         foreach ($aux_scores as $pid => $city_count) {
-            $cases[] = " WHEN {$pid} THEN {$city_count} ";
+            $this->playerScoreAux->set($pid, $city_count);
         }
-        $whens = implode(',', $cases);
-        $keys = implode(',', array_keys($aux_scores));
-        $sql = "UPDATE player
-                SET player_score_aux = CASE player_id
-                    $whens
-                    ELSE 0
-                  END
-                WHERE player_id IN ($keys)";
-        $this->db->execute($sql);
     }
 
     /** @return array<int,PlayerInfo> */
     public function &retrieveAllPlayerInfo(): array
     {
-        $sql = "SELECT P.player_id player_id, P.player_score score,
+        $sql = "SELECT P.player_id player_id,
                        P.captured_city_count captured_city_count,
                        H.hand_size, Q.pool_size
                 FROM player P
@@ -397,7 +380,7 @@ class PersistentStore
     {
         return new PlayerInfo(
             $player_id,
-            intval($pd["score"]),
+            $this->playerScore->get($player_id),
             intval($pd["captured_city_count"]),
             intval($pd["hand_size"]),
             intval($pd["pool_size"])

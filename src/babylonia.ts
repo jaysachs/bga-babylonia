@@ -187,7 +187,7 @@ export class Game extends BaseGame<Player, BGamedatas> {
     this.updateHandCount(player, false);
     this.updatePoolCount(player, false);
     this.updateCapturedCityCount(player, false);
-    this.bga.playerPanels.getScoreCounter(playerId).setValue(player.score);
+    // this.bga.playerPanels.getScoreCounter(playerId).setValue(player.score);
   }
 
 
@@ -205,7 +205,7 @@ export class Game extends BaseGame<Player, BGamedatas> {
   private async notif_undoMove(
     args: {
       player_id: number;
-      points: number;
+      // points: number;
       rc: number;
       _private: {
         original_piece: string;
@@ -243,20 +243,20 @@ export class Game extends BaseGame<Player, BGamedatas> {
          destDiv.classList.add(CSS.PLAYABLE);
       }
       this.handCounters[args.player_id]!.incValue(1);
-      this.bga.playerPanels.getScoreCounter(args.player_id).incValue(-args.points);
+      // this.bga.playerPanels.getScoreCounter(args.player_id).incValue(-args.points);
     });
   }
 
   private async notif_piecePlayed(
     args: {
       player_id: number;
-      points: number;
+      // points: number;
       piece: string;
       handpos: number;
       rc: number;
       hand_size: number;
       captured_piece: string;
-      field_points: number;
+      // field_points: number;
       ziggurat_points: number;
       touched_ziggurats: number[];
     }
@@ -310,7 +310,7 @@ export class Game extends BaseGame<Player, BGamedatas> {
     await this.animationManager.playParallel(anims);
 
     this.updateHandCount(args);
-    this.bga.playerPanels.getScoreCounter(args.player_id).incValue(args.points);
+    // this.bga.playerPanels.getScoreCounter(args.player_id).incValue(args.points);
   }
 
   private async notif_handRefilled(args: { hand: string[] }) {
@@ -409,7 +409,7 @@ export class Game extends BaseGame<Player, BGamedatas> {
       zcard: string;
       player_id: number;
       cardused: boolean;
-      points: number;
+      // points: number;
       hex: number;
     }
   ) {
@@ -419,7 +419,7 @@ export class Game extends BaseGame<Player, BGamedatas> {
     zelem.classList.remove(CSS.SELECTED);
     await this.animationManager.slideAndAttach(zelem, dest, { toPlaceholder: 'off' })
         .then(() => {
-          this.bga.playerPanels.getScoreCounter(args.player_id).incValue(args.points);
+          // this.bga.playerPanels.getScoreCounter(args.player_id).incValue(args.points);
           if (args.cardused) {
             zelem.setAttribute(Attrs.ZUSED, "true");
           }
@@ -468,7 +468,7 @@ export class Game extends BaseGame<Player, BGamedatas> {
             cl.remove(CSS.UNIMPORTANT);
           });
       }
-      this.bga.playerPanels.getScoreCounter(details.player_id).incValue(details.network_points);
+      // this.bga.playerPanels.getScoreCounter(details.player_id).incValue(details.network_points);
     }
 
     await this.indicateNeighbors(args.winner_hexes, args.other_hexes);
@@ -483,7 +483,7 @@ export class Game extends BaseGame<Player, BGamedatas> {
         this.unmarkHexSelected(args.rc);
         for (const playerId in args.details) {
           const details = args.details[playerId]!;
-          this.bga.playerPanels.getScoreCounter(details.player_id).incValue(details.capture_points);
+          // this.bga.playerPanels.getScoreCounter(details.player_id).incValue(details.capture_points);
           this.updateCapturedCityCount(details);
         }
       }).then(() => this.unmarkHexSelected(args.rc));
