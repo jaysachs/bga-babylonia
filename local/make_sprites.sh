@@ -3,10 +3,8 @@ SIZE=100x87
 HEX="0,43 24,0 74,0 99,43 74,86 24,86"
 HEX2="2,43 24,2 74,2 97,43 74,84 24,84"
 HEX4="4,43 24,4 74,4 95,43 74,82 24,82"
-# INNERHEX="11,43 32,9 66,9 88,43 66,77 32,77"
-# SMALLHEX="33,62 42,48 58,48 67,62 58,76 42,76"
 INNERHEX="0,43 12,22 88,22 99,43 88,66 12,66"
-SMALLHEX="18,62 26,48 74,48 82,62 74,76 26,76"
+SMALLHEX="21,68 29,54 71,54 79,68 71,82 29,82"
 
 ZIG="20,43 32,43 32,33 44,33 44,23 56,23 56,33 68,33 68,43 80,43 80,53 92,53 92,63 8,63 8,53 20,53"
 #
@@ -18,8 +16,35 @@ FONT=Noto-Sans-Cuneiform-Regular
 
 P=𒀭 # 𒁈
 S=𒅄 # 𒉼 # 𒄮 𒇽 𒃰 𒂵
-F=𒆕 #𒆳
-M=𒆩 # 𒀖 # 𒀿
+M=𒆩 # 𒀖 # 𒀿 # 𒆕 🌾 𒆳
+
+FARMER_SVG='  m 0,10 a 20,20 0 0,0 20,-10
+              a 20,20 0 0,0 -20,10 Z
+              m 0,10 a 20,20 0 0,0 20,-10
+              a 20,20 0 0,0 -20,10 Z
+              m 0,10 a 20,20 0 0,0 20,-10
+              a 20,20 0 0,0 -20,10 Z
+              m 0,-30 l 0,0
+              m 0,10 a 20,20 0 0,0 -20,-10
+              a 20,20 0 0,0 20,10 Z
+              m 0,10 a 20,20 0 0,0 -20,-10
+              a 20,20 0 0,0 20,10 Z
+              m 0,10 a 20,20 0 0,0 -20,-10
+              a 20,20 0 0,0 20,10 Z
+              m 0,-20 a 15,15 0 0,0 0,-20
+              a 15,15 0 0,0 0,20 Z
+              m 0,0 l 0,30'
+
+FARMER_FARM="path \"
+              M 50,10 l 0,0
+              ${FARMER_SVG}
+              \""
+
+FARMER_PIECE="path \"
+              M 50,25 l 0,0
+              ${FARMER_SVG}
+              \""
+
 
 CMD="\( "
 ROWS=0
@@ -62,10 +87,11 @@ addCanvas "-background none -stroke \#FFFFFF30 -strokewidth 2 -fill \#FFFFFF30 -
 for C in ${COLORS[*]}
 do
     # the player pieces, including "hidden"
-    for P in ' ' ${F} ${M} ${S} ${P}
+    for P in ' ' ${M} ${S} ${P}
     do
 	addCanvas "-font '${FONT}' -pointsize 36 -stroke black -fill \#${C} -draw 'circle 50,43 50,81' -stroke black -strokewidth 1 -fill black -draw 'text 0,-4 "${P}"'"
     done
+    addCanvas "-fill \#${C} -draw 'circle 50,43 50,81' -stroke black -strokewidth 2  -draw '${FARMER_PIECE}'"
     # the player board "hand" icon
     addCanvas "-stroke none -background \#000001 \
        -fill \#924018 -draw 'roundrectangle 0,0,99,86 15,15' \
@@ -91,11 +117,11 @@ done
 #fields
 for N in 5 6 7
 do
-   addCanvas "-pointsize 30 -stroke none -fill \#768323 -draw 'polygon ${HEX}' -stroke black -strokewidth 1 -fill blue -font ${FONT} -draw 'text 0,-20 \""${F}"\"' -font Arial -strokewidth 2 -draw 'text 0,20 \""${N}"\"'"
+    addCanvas "-pointsize 30 -stroke none -fill \#768323 -draw 'polygon ${HEX}' -stroke black -strokewidth 2 -draw '${FARMER_FARM}' -font Arial -strokewidth 0 -fill black -draw 'text 0,25 \""${N}"\"'"
 done
 
 # city count field
-addCanvas "-pointsize 30 -stroke none -fill \#768323 -draw 'polygon ${HEX}' -stroke black -strokewidth 1 -fill blue -font ${FONT} -draw 'text 0,-20 \""${F}"\"' -fill \#212575 -draw 'polygon ${SMALLHEX}'"
+addCanvas "-pointsize 30 -stroke none -fill \#768323 -draw 'polygon ${HEX}' -stroke black -strokewidth 2 -draw '${FARMER_FARM}' -stroke \#212575 -fill \#212575 -draw 'polygon ${SMALLHEX}'"
 
 # ziggurat
 addCanvas "-stroke none -fill \#924018 -draw 'polygon ${ZIG}'"
