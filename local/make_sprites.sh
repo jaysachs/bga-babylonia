@@ -18,30 +18,34 @@ P=𒀭 # 𒁈
 S=𒅄 # 𒉼 # 𒄮 𒇽 𒃰 𒂵
 M=𒆩 # 𒀖 # 𒀿 # 𒆕 🌾 𒆳
 
-FARMER_SVG='  m 0,10 a 20,20 0 0,0 20,-10
-              a 20,20 0 0,0 -20,10 Z
-              m 0,10 a 20,20 0 0,0 20,-10
-              a 20,20 0 0,0 -20,10 Z
-              m 0,10 a 20,20 0 0,0 20,-10
-              a 20,20 0 0,0 -20,10 Z
-              m 0,-30 l 0,0
-              m 0,10 a 20,20 0 0,0 -20,-10
-              a 20,20 0 0,0 20,10 Z
-              m 0,10 a 20,20 0 0,0 -20,-10
-              a 20,20 0 0,0 20,10 Z
-              m 0,10 a 20,20 0 0,0 -20,-10
-              a 20,20 0 0,0 20,10 Z
-              m 0,-20 a 15,15 0 0,0 0,-20
-              a 15,15 0 0,0 0,20 Z
-              m 0,0 l 0,30'
+ARCANGLE=15,15
+LEAFSPACING=10
+LEAFSIZE=12
+STEM=30
+FARMER_SVG="  m 0,${LEAFSPACING} a ${ARCANGLE} 0 0,0 ${LEAFSIZE},-${LEAFSIZE}
+              a ${ARCANGLE} 0 0,0 -${LEAFSIZE},${LEAFSIZE} Z
+              m 0,${LEAFSPACING} a ${ARCANGLE} 0 0,0 ${LEAFSIZE},-${LEAFSIZE}
+              a ${ARCANGLE} 0 0,0 -${LEAFSIZE},${LEAFSIZE} Z
+              m 0,${LEAFSPACING} a ${ARCANGLE} 0 0,0 ${LEAFSIZE},-${LEAFSIZE}
+              a ${ARCANGLE} 0 0,0 -${LEAFSIZE},${LEAFSIZE} Z
+              m 0,-${STEM} l 0,0
+              m 0,${LEAFSPACING} a ${ARCANGLE} 0 0,0 -${LEAFSIZE},-${LEAFSIZE}
+              a ${ARCANGLE} 0 0,0 ${LEAFSIZE},${LEAFSIZE} Z
+              m 0,${LEAFSPACING} a ${ARCANGLE} 0 0,0 -${LEAFSIZE},-${LEAFSIZE}
+              a ${ARCANGLE} 0 0,0 ${LEAFSIZE},${LEAFSIZE} Z
+              m 0,${LEAFSPACING} a ${ARCANGLE} 0 0,0 -${LEAFSIZE},-${LEAFSIZE}
+              a ${ARCANGLE} 0 0,0 ${LEAFSIZE},${LEAFSIZE} Z
+              m 0,-26 a 12,12 0 0,0 0,-16
+              a 12,12 0 0,0 0,16 Z
+              m 0,0 l 0,${STEM}"
 
 FARMER_FARM="path \"
-              M 50,10 l 0,0
+              M 50,15 l 0,0
               ${FARMER_SVG}
               \""
 
 FARMER_PIECE="path \"
-              M 50,25 l 0,0
+              M 50,30 l 0,0
               ${FARMER_SVG}
               \""
 
@@ -91,7 +95,7 @@ do
     do
 	addCanvas "-font '${FONT}' -pointsize 36 -stroke black -fill \#${C} -draw 'circle 50,43 50,81' -stroke black -strokewidth 1 -fill black -draw 'text 0,-4 "${P}"'"
     done
-    addCanvas "-fill \#${C} -draw 'circle 50,43 50,81' -stroke black -strokewidth 2  -draw '${FARMER_PIECE}'"
+    addCanvas "-fill \#${C} -draw 'circle 50,43 50,81' -stroke black -strokewidth 2 -draw '${FARMER_PIECE}'"
     # the player board "hand" icon
     addCanvas "-stroke none -background \#000001 \
        -fill \#924018 -draw 'roundrectangle 0,0,99,86 15,15' \
@@ -111,17 +115,17 @@ done
 for P in  ${M} ${S} ${P} "${M}  ${S}" "${M} ${P}" "${S} ${P}" "${M} ${S} ${P}"
 do
     #    addCanvas "-pointsize 24 -stroke none -fill \#D6C6B5 -draw 'polygon ${HEX}' -fill \#212575 -draw 'roundrectangle 16,22 83,64 5,5' -stroke white -strokewidth 1 -fill white -draw 'text 0,0 \""${P}"\"'"
-        addCanvas "-pointsize 20 -stroke none -fill \#D6C6B5 -draw 'polygon ${HEX}' -fill \#212575 -draw 'polygon ${INNERHEX}' -stroke white -strokewidth 1 -fill white -draw 'text 0,0 \""${P}"\"'"
+        addCanvas "-pointsize 18 -stroke none -fill \#D6C6B5 -draw 'polygon ${HEX}' -fill \#212575 -draw 'polygon ${INNERHEX}' -stroke white -strokewidth 0 -fill white -draw 'text 0,0 \""${P}"\"'"
 done
 
 #fields
 for N in 5 6 7
 do
-    addCanvas "-pointsize 30 -stroke none -fill \#768323 -draw 'polygon ${HEX}' -stroke black -strokewidth 2 -draw '${FARMER_FARM}' -font Arial -strokewidth 0 -fill black -draw 'text 0,25 \""${N}"\"'"
+    addCanvas "-pointsize 30 -stroke none -fill \#768323 -draw 'polygon ${HEX}' -stroke black -strokewidth 1 -draw '${FARMER_FARM}' -font Arial -strokewidth 0 -fill black -draw 'text 0,25 \""${N}"\"'"
 done
 
 # city count field
-addCanvas "-pointsize 30 -stroke none -fill \#768323 -draw 'polygon ${HEX}' -stroke black -strokewidth 2 -draw '${FARMER_FARM}' -stroke \#212575 -fill \#212575 -draw 'polygon ${SMALLHEX}'"
+addCanvas "-pointsize 30 -stroke none -fill \#768323 -draw 'polygon ${HEX}' -stroke black -strokewidth 1 -draw '${FARMER_FARM}' -stroke \#212575 -fill \#212575 -draw 'polygon ${SMALLHEX}'"
 
 # ziggurat
 addCanvas "-stroke none -fill \#924018 -draw 'polygon ${ZIG}'"
