@@ -24,8 +24,21 @@ The `pieces` table:
 ```sql
 CREATE TABLE IF NOT EXISTS `pieces` (
 
-  -- id
-  `id` INTEGER NOT NULL,
+  -- no global piece id needed. location + location_id is sufficient identification.
+
+  -- location
+  --   BOARD (player_id depends on type)
+  --   HAND (requires player_id) (both pieces and zcards can be in "HAND")
+  --   POOL (requires player_id)
+  --   DISCARD (null player_id) - cities scored but uncaptured, scored fields
+  `location` VARCHAR(8),
+
+  -- location_id
+  --   if BOARD, encoded row/col
+  --   if HAND,  hand pos
+  --   if POOL,  "position" in pool
+  --   if DISCARD, unique seq_id
+  `loc_id` INT UNSIGNED,
 
   -- type: (player_id null unless indicated)
   --  empty
@@ -56,26 +69,12 @@ CREATE TABLE IF NOT EXISTS `pieces` (
   --  zc_river
   `type` VARCHAR(10),
 
-  -- location
-  --   BOARD (player_id depends on type)
-  --   HAND (requires player_id) (both pieces and zcards can be in "HAND")
-  --   POOL (requires player_id)
-  --   DISCARD (null player_id) - cities scored but uncaptured, scored fields
-  `location` VARCHAR(8),
-
-  -- location_id
-  --   if BOARD, encoded row/col
-  --   if HAND,  hand pos
-  --   if POOL,  "position" in pool
-  --   if DISCARD, null
-  `loc_id` INT UNSIGNED,
-
   `player_id` INT UNSIGNED,
 
   -- for ziggurats and cities
   `scored` BOOLEAN,
 
-  -- landmass for board locations
+  -- landmass for board locations only
   --    north, center, south
   `landmass` VARCHAR(6)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8
