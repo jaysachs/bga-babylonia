@@ -1,25 +1,17 @@
-Goals
-=====
+# Goals
 
 1. To make reading data a single query (possibly 2 for players).
 2. To facilitate having in-progress turn being private to the acting player
 
-Overview
-========
+# Overview
 
 * One large table, `pieces`
 * This stores player pieces on board,hand and pools; ziggurat cards; city and farms; and empty board spaces. Columns will identify what the piece is, which player "owns" it, board location, hand location, pool location.
 * Persistence engine will "inflate" the entire game state model from a single select on this table.
 
-Question: should in-progress moves go here or a different table?
+# Details
 
-* Propose a different table that is read in that same single select via a `JOIN`, and its values "overwrite/replace" what is in the main table.
-* This `inprogress` table will contain current players moves in progress. It should be suitable for supporting undo.
-
-Details
-=======
-
-The `pieces` table:
+## Tables
 
 ```sql
 CREATE TABLE IF NOT EXISTS `pieces` (
@@ -38,7 +30,7 @@ CREATE TABLE IF NOT EXISTS `pieces` (
   --   if HAND,  hand pos
   --   if POOL,  "position" in pool
   --   if DISCARD, unique seq_id
-  `loc_id` INT UNSIGNED,
+  `location_id` INT UNSIGNED,
 
   -- type: (player_id null unless indicated)
   --  empty
@@ -86,10 +78,9 @@ CREATE TABLE IF NOT EXISTS `pieces` (
 --   the points ...
 CREATE TABLE IF NOT EXISTS `turns` (
   `turn_id` INTEGER NOT NULL,
-  `piece_id` INTEGER NOT NULL,
   `type` VARCHAR(8) NOT NULL,
   `location` VARCHAR(8) NOT NULL,
-  `loc_id` INT UNSIGNED
+  `locaction_id` INT UNSIGNED
   `player_id` INT UNSIGNED,
   `scored` BOOLEAN,
   `points` INT UNSIGNED DEFAULT 0
@@ -97,10 +88,36 @@ CREATE TABLE IF NOT EXISTS `turns` (
 
 ```
 
-Questions
-=========
+## Examples
 
-* There is an appeal to storing the entire map in the DB; it would allow for randomization and
+Let's explore how reading and updates happen. Generally, we want to "inflate" the whole
+state of the game in one scan. For moves-before-turn-commit, changes are written to the `turns` table.
+
+### Piece played from hand into empty spot
+
+One row is written into `turns`:
+  * `type` is the type of the piece
+  * `location` is `BOARD`
+  * `location_id` is the encoded RowCol of the hex ("hex id")
+  * `player_id` is the player's ID
+  * `scored` is false/NULL
+  * `points` is the number of zig adjacency points scored for the play
+And we'd need a "deletion" update to remove the piece from the hand. That would require a "delete"
+flag on the rows in the `turns` table. Alternatively, we can assign IDs to pieces, and then we'd
+only need a single row in the turns table.
+
+...
+
+# Questions
+
+1. There is an appeal to storing the entire map in the DB; it would allow for randomization and
   other scenarios. To do that, we'd need a type for "empty" and also a way to identify
   which hexes are in which landmass. So definitely at least one addition type (`EMPTY`),
   and either another field (`LANDMASS`), or make that three empty types (`EMPTY_N`, `EMPTY_C`, `EMPTY_S`). Or just two empty types (`EMPTY`, `EMPTY_8` -- to tie it to zcard 8).
+
+2. Could/should we combine `turns` and `pieces` tables?
+  * If we don't, we need to union when we read and read in the right order
+  * If we do, we need a `turn_id` in the base table, and need to know what `turn_id`s are
+    "committed". Furthermore, "undoing" a whole turn would then be slightly more complex than
+    "remove all rows in `turns` table.
+
