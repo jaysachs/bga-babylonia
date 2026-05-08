@@ -16,7 +16,10 @@
 ```sql
 CREATE TABLE IF NOT EXISTS `pieces` (
 
-  -- no global piece id needed. location + location_id is sufficient identification.
+  -- piece_id
+  --    nullable, since empty board spaces do not have a unique piece_id
+  --    used to compactly represent an update in the `turns` table
+  `piece_id` INT,
 
   -- location
   --   BOARD (player_id depends on type)
@@ -77,7 +80,8 @@ CREATE TABLE IF NOT EXISTS `pieces` (
 --   then again, replaying the whole game from the beginning would recompute
 --   the points ...
 CREATE TABLE IF NOT EXISTS `turns` (
-  `turn_id` INTEGER NOT NULL,
+  `turn_id` INT NOT NULL,
+  `piece_id` INT,
   `type` VARCHAR(8) NOT NULL,
   `location` VARCHAR(8) NOT NULL,
   `locaction_id` INT UNSIGNED
@@ -88,7 +92,7 @@ CREATE TABLE IF NOT EXISTS `turns` (
 
 ```
 
-## Examples
+## Use cases / examples
 
 Let's explore how reading and updates happen. Generally, we want to "inflate" the whole
 state of the game in one scan. For moves-before-turn-commit, changes are written to the `turns` table.
@@ -96,17 +100,60 @@ state of the game in one scan. For moves-before-turn-commit, changes are written
 ### Piece played from hand into empty spot
 
 One row is written into `turns`:
+  * `piece_id` is the ID of the piece
   * `type` is the type of the piece
-  * `location` is `BOARD`
+  * `location` is "BOARD"
   * `location_id` is the encoded RowCol of the hex ("hex id")
   * `player_id` is the player's ID
   * `scored` is false/NULL
   * `points` is the number of zig adjacency points scored for the play
-And we'd need a "deletion" update to remove the piece from the hand. That would require a "delete"
-flag on the rows in the `turns` table. Alternatively, we can assign IDs to pieces, and then we'd
-only need a single row in the turns table.
 
-...
+When reading, we notice the piece_id overlap between the base table and the turns table and just drop the first info.
+
+### Farmer played onto field and captures it
+This adds two rows:
+1. The farmer piece row
+  * `piece_id` is the ID of the farmer piece
+  * `type` is "farmer"
+  * `location` is "BOARD"
+  * `location_id` is the encoded RowCol of the hex ("hex id")
+  * `player_id` is the player's ID
+  * `scored` is false/NULL
+  * `points` is the number of points scored for the play
+2. The field piece row
+  * `piece_id` is the ID of the field piece
+  * `type` is "field_5" (e.g.)
+  * `location` is "DISCARD"
+  * `location_id` is the next available ID
+  * `player_id` is NULL
+  * `scored` is true
+  * `points` is NULL
+
+### Merchant played that will score a city hex
+
+This is the same as "1. piece played from hand", since scoring happens after turns are committed.
+
+### Hand refilled
+
+This updates just the `pieces` table.
+
+For each tile "drawn":
+```sql
+  UPDATE pieces SET location = "HAND", location_id = <hand_pos> WHERE piece_id = <piece_id>
+```
+(ideally do this in a single update with a WHEN clause)
+
+### City hex scored
+
+This needs to either move the city piece to a player, or to the discard.
+
+### Ziggurat scored
+
+This needs to move a ziggurat card from the "available" to a player. It may also need to mark it "used". (Question: should we leverage the "scored" field for this? Change "scored" to "used"?)
+
+### Ziggurat used
+
+Needs to mark a ziggurat card used but not change location.
 
 # Questions
 
@@ -121,3 +168,8 @@ only need a single row in the turns table.
     "committed". Furthermore, "undoing" a whole turn would then be slightly more complex than
     "remove all rows in `turns` table.
 
+3. Do we need to record "points" for the "pieces" table? Or only for "turns"?
+
+4. We could record points scored per player for city scoring, but ... why, exactly?
+
+5. Why do we need to record the board and empty spaces? The board is fixed based on number of players. It would "allow" alternate boards, but ... why?
