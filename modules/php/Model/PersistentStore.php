@@ -198,6 +198,7 @@ class PersistentStore
                 SET p.captured_city_count = $player_info->captured_city_count
                 WHERE p.player_id = $player_info->player_id";
         $this->db->execute($sql);
+        $this->playerScore->set($player_info->player_id, $player_info->score);
     }
 
     /** @param array<int,PlayerInfo> $player_infos */
