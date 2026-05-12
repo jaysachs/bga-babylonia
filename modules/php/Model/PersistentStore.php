@@ -386,7 +386,7 @@ class PersistentStore
         return $result;
     }
 
-    /** @param string[] $pd */
+    /** @param array<string,string> $pd */
     private function playerInfoFromData(int $player_id, array $pd): PlayerInfo
     {
         return new PlayerInfo(
