@@ -173,3 +173,9 @@ Needs to mark a ziggurat card used but not change location.
 4. We could record points scored per player for city scoring, but ... why, exactly?
 
 5. Why do we need to record the board and empty spaces? The board is fixed based on number of players. It would "allow" alternate boards, but ... why?
+
+6. This model doesn't currently handle the "pool" of available ziggurat cards. Could add a
+new location type (but "pool" is already taken. "available"? "untaken"? "unselected"? "display"?)
+Maybe just use "cards", and then player_id indicates whether it's available or not. Though
+that is redundant, could just assert that types "zc_*" ignore the location type.
+That does bring up that maybe ... they don't belong here.
