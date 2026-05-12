@@ -56,6 +56,19 @@ class TestStore extends PersistentStore {
     }
 
     /* overrides of PersistentStore */
+
+    #[Override]
+    public function retrieveAllData(int $player_id): array
+    {
+        return [
+            'hand' => $this->hand,
+            'board' => $this->board,
+            'components' => $this->components,
+            'player_infos' => $this->player_infos,
+            'turnProgress' => $this->turnProgress,
+        ];
+    }
+
     public function insertBoard(Board $b): void { $this->board = $b; }
     /** @param array<int,PlayerInfo> $pis */
     public function insertPlayerInfos(array $pis): void { }

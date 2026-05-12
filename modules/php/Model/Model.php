@@ -62,15 +62,8 @@ use Bga\Games\babylonia\Model\ModelImpl\PlayAllowedResult;
 
 class Model
 {
-
-    private ?Board $_board = null;
-    private ?TurnProgress $_turn_progress = null;
-    /** @var array<int, PlayerInfo> */
-    private ?array $_allPlayerInfo = null;
-    private ?Hand $_hand = null;
-    private ?Pool $_pool = null;
-    private ?Components $_components = null;
-    private ?Scorer $_scorer = null;
+    /** @var array{player_infos:PlayerInfo[],board:Board,components:Components,hand:Hand,pool:Pool,turnProgress:TurnProgress} */
+    private ?array $_allData = null;
 
     public function __construct(private PersistentStore $ps, private Stats $stats, private int $player_id) {
     }
@@ -90,35 +83,50 @@ class Model
         $ps->insertComponents(Components::forNewGame($use_advanced_ziggurats));
     }
 
-    private function scorer(): Scorer
+    private function makeScorer(): Scorer
     {
-        if ($this->_scorer == null) {
-            $this->_scorer =
-                new Scorer(
-                    $this->board(),
-                    $this->allPlayerInfo(),
-                    $this->components(),
-                    $this->stats
-                );
+        return new Scorer(
+            $this->board(),
+            $this->allPlayerInfo(),
+            $this->components(),
+            $this->stats
+        );
+    }
+
+    /** @return array{player_infos:PlayerInfo[],board:Board,components:Components,hand:Hand,pool:Pool,turnProgress:TurnProgress} */
+    private function allData(): array {
+        if ($this->_allData == null) {
+            $this->_allData = $this->ps->retrieveAllData($this->player_id);
         }
-        return $this->_scorer;
+        return $this->_allData;
     }
 
     public function components(): Components
     {
-        if ($this->_components == null) {
-            $this->_components = $this->ps->retrieveComponents();
+        return $this->allData()['components'];
+    }
+
+    /**
+     * Compute and return the current game progression.
+     *    aspercent complete (0 .. 100 inclusive)
+     *
+     * This is based on total number of pieces played. Probably
+     * can improve based on taking the max of that and cities scored.
+     */
+    public function getProgressionPercent(): int {
+        $player_infos = $this->allPlayerInfo();
+        $total_pieces = 30 * count($player_infos);
+        $remaining_pieces = 0;
+        foreach ($player_infos as $pi) {
+            $remaining_pieces += $pi->hand_size + $pi->pool_size;
         }
-        return $this->_components;
+        return intval(100.0 - ($remaining_pieces * 100.0) / floatval($total_pieces));
     }
 
     /** @return array<int,PlayerInfo> */
     public function &allPlayerInfo(): array
     {
-        if ($this->_allPlayerInfo == null) {
-            $this->_allPlayerInfo = $this->ps->retrieveAllPlayerInfo();
-        }
-        return $this->_allPlayerInfo;
+        return $this->allData()['player_infos'];
     }
 
     /** @return int[] */
@@ -129,26 +137,17 @@ class Model
 
     public function hand(): Hand
     {
-        if ($this->_hand == null) {
-            $this->_hand = $this->ps->retrieveHand($this->player_id);
-        }
-        return $this->_hand;
+        return $this->allData()['hand'];
     }
 
     public function pool(): Pool
     {
-        if ($this->_pool == null) {
-            $this->_pool = $this->ps->retrievePool($this->player_id);
-        }
-        return $this->_pool;
+        return $this->allData()['pool'];
     }
 
     public function board(): Board
     {
-        if ($this->_board == null) {
-            $this->_board = $this->ps->retrieveBoard();
-        }
-        return $this->_board;
+        return $this->allData()['board'];
     }
 
     public function canUndo(): bool
@@ -158,10 +157,7 @@ class Model
 
     private function turnProgress(): TurnProgress
     {
-        if ($this->_turn_progress == null) {
-            $this->_turn_progress = $this->ps->retrieveTurnProgress($this->player_id);
-        }
-        return $this->_turn_progress;
+        return $this->allData()['turnProgress'];
     }
 
     public function checkPlay(Piece $piece, Hex $hex): PlayAllowedResult
@@ -465,7 +461,7 @@ class Model
         $hex->scored = true;
         $this->ps->updateHex($hex->rc, null, null, true);
 
-        return $this->scorer()->computeHexWinner($hex);
+        return $this->makeScorer()->computeHexWinner($hex);
     }
 
     public function scoreCity(int $rc): ScoredCity
@@ -478,7 +474,7 @@ class Model
         if (!$this->hexRequiresScoring($hex)) {
             throw new \InvalidArgumentException("{$hex} is not a city to be scored");
         }
-        $scoredCity = $this->scorer()->computeCityScores($hex);
+        $scoredCity = $this->makeScorer()->computeCityScores($hex);
         $playerInfos = $this->allPlayerInfo();
         $captured_by = $scoredCity->hex_winner->captured_by;
         // Increase captured_city_count for capturing player, if any
@@ -505,7 +501,8 @@ class Model
     public function locationsRequiringScoring(): array
     {
         $result = [];
-        $val = function (Hex $hex): int {
+        $scorer = $this->makeScorer();
+        $val = function (Hex $hex) use (&$scorer): int {
             // order is:
             // 0: ziggurats that player on turn is winning
             // 1: ziggurats no one is winning
@@ -514,7 +511,7 @@ class Model
             // 4: cities that other players are winning
             // 5: zigurats that other players are winning
 
-            $winner = $this->scorer()->computeHexWinner($hex);
+            $winner = $scorer->computeHexWinner($hex);
             if ($hex->piece->isZiggurat()) {
                 if ($winner->captured_by == $this->player_id) {
                     return 0;

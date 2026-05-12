@@ -83,7 +83,7 @@ class PersistentStore
         $this->globals->set(PersistentStore::GLOBAL_PLAYER_ON_TURN, $player_id);
     }
 
-    public function retrieveBoard(): Board
+    private function retrieveBoard(): Board
     {
         $sql = "SELECT board_loc AS rc, hextype, piece, scored,
                        player_id AS board_player, landmass
@@ -144,7 +144,7 @@ class PersistentStore
         $this->db->execute($sql);
     }
 
-    public function retrievePool(int $player_id): Pool
+    private function retrievePool(int $player_id): Pool
     {
         $sql = "SELECT piece
                 FROM handpools
@@ -178,7 +178,7 @@ class PersistentStore
         $this->db->execute($sql);
     }
 
-    public function retrieveHand(int $player_id): Hand
+    private function retrieveHand(int $player_id): Hand
     {
         $sql = "SELECT piece
                 FROM hands
@@ -306,7 +306,7 @@ class PersistentStore
         }
     }
 
-    public function retrieveTurnProgress(int $player_id): TurnProgress
+    private function retrieveTurnProgress(int $player_id): TurnProgress
     {
         $sql = "SELECT seq_id, player_id, handpos, piece, original_piece,
                        board_loc, captured_piece, field_points,
@@ -314,7 +314,6 @@ class PersistentStore
                 FROM turn_progress
                 WHERE player_id = $player_id
                 ORDER BY seq_id";
-        /** @var array<int,string[]> $data */
         $data = $this->db->getObjectList($sql);
         $moves = [];
         foreach ($data as &$md) {
@@ -344,8 +343,20 @@ class PersistentStore
         }
     }
 
+    /** @return array{player_infos:PlayerInfo[],board:Board,components:Components,hand:Hand,pool:Pool,turnProgress:TurnProgress} */
+    public function retrieveAllData(int $player_id): array {
+        return [
+            'player_infos' => $this->retrieveAllPlayerInfo(),
+            'board' => $this->retrieveBoard(),
+            'components' => $this->retrieveComponents(),
+            'hand' => $this->retrieveHand($player_id),
+            'pool' => $this->retrievePool($player_id),
+            'turnProgress' => $this->retrieveTurnProgress($player_id),
+        ];
+    }
+
     /** @return array<int,PlayerInfo> */
-    public function &retrieveAllPlayerInfo(): array
+    private function &retrieveAllPlayerInfo(): array
     {
         $sql = "SELECT P.player_id player_id,
                        P.captured_city_count captured_city_count,
@@ -365,7 +376,6 @@ class PersistentStore
         //         ...
         //  INNER JOIN ziggurat_cards Z ON P.player_id = Z.player_id"
 
-        /** @var array<int,string[]> $data */
         $data = $this->db->getObjectList($sql);
         $result = [];
         foreach ($data as $pd) {
@@ -401,7 +411,7 @@ class PersistentStore
         $this->db->execute($sql);
     }
 
-    public function retrieveComponents(): Components
+    private function retrieveComponents(): Components
     {
         $sql = "SELECT card_type, player_id, used
                 FROM ziggurat_cards

@@ -81,21 +81,9 @@ class Game extends Table
 		$this->initGameStateLabels([]);
 	}
 
-    /**
-     * Compute and return the current game progression.
-     *
-     * This is based on total number of pieces played. Probably
-     * can improve based on taking the max of that and cities scored.
-     */
     public function getGameProgression(): int {
         $model = new Model($this->ps, $this->stats, 0);
-        $player_infos = $model->allPlayerInfo();
-        $total_pieces = 30 * count($player_infos);
-        $remaining_pieces = 0;
-        foreach ($player_infos as $pid => $pi) {
-            $remaining_pieces += $pi->hand_size + $pi->pool_size;
-        }
-        return intval(100.0 - ($remaining_pieces * 100.0) / floatval($total_pieces));
+        return $model->getProgressionPercent();
     }
 
     /**
