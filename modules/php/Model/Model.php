@@ -129,12 +129,6 @@ class Model
         return $this->allData()['player_infos'];
     }
 
-    /** @return int[] */
-    public function allPlayerIds(): array
-    {
-        return array_keys($this->allPlayerInfo());
-    }
-
     public function hand(): Hand
     {
         return $this->allData()['hand'];
