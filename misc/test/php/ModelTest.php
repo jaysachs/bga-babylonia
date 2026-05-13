@@ -15,7 +15,8 @@ use Bga\Games\babylonia\Model\ {
         PersistentStore,
         Piece,
         PlayerInfo,
-        RowCol,
+    Pool,
+    RowCol,
         TurnProgress,
         ZigguratCard,
         ZigguratCardType,
@@ -66,6 +67,7 @@ class TestStore extends PersistentStore {
             'components' => $this->components,
             'player_infos' => $this->player_infos,
             'turnProgress' => $this->turnProgress,
+            'pool' => new Pool([]),
         ];
     }
 
@@ -74,25 +76,12 @@ class TestStore extends PersistentStore {
     public function insertPlayerInfos(array $pis): void { }
     /** @param list<ZigguratCard> $zs */
     public function insertZigguratCards(array $zs): void { }
-    public function retrieveBoard(): Board { return $this->board; }
-    public function &retrieveAllPlayerInfo(): array {
-        return $this->player_infos;
-    }
+
     public function updateHand(int $player_id, int $handpos, Piece $piece): void { }
     public function incPlayerScore(int $player_id, int $points): void { }
 
     public function updateHex(int $rc, ?Piece $piece = null, ?int $player_id = null, ?bool $scored = null): void { }
-    public function updatePlayers(array /* PlayerInfo */ $pis): void {
-    }
-    public function retrieveComponents(): Components {
-        return $this->components;
-    }
-    public function retrieveTurnProgress(int $player_id): TurnProgress {
-        return $this->turnProgress;
-    }
-    public function retrieveHand(int $player_id): Hand {
-        return $this->hand;
-    }
+    public function updatePlayers(array /* PlayerInfo */ $pis): void {}
     public function insertMove(Move $move, array $statOps): void {
         // $this->turnProgress->addMove($move);
     }

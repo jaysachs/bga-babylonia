@@ -3,7 +3,6 @@ export interface PlayerData {
   hand_size: number;
   pool_size: number;
   captured_city_count: number;
-  score: number;
 }
 
 export interface Hex {

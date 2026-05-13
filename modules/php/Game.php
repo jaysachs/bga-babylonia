@@ -143,7 +143,6 @@ class Game extends Table
         foreach ($model->allPlayerInfo() as $pid => $pi) {
             $player_data[$pid] = [
                 "player_id" => $pid,
-                "score" => $pi->score,
                 "captured_city_count" => $pi->captured_city_count,
                 "hand_size" => $pi->hand_size,
                 "pool_size" => $pi->pool_size
@@ -163,6 +162,8 @@ class Game extends Table
         );
 
         return [
+            "players" => $this->getCollectionFromDb(
+                "SELECT `player_id` `id`, `player_score` AS `score` FROM `player`"),
             'player_data' => $player_data,
             'hand' => array_map(
                 function ($p) {

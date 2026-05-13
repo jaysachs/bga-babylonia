@@ -336,15 +336,12 @@ class PersistentStore
     /** @param array<int,int> $aux_scores */
     public function updateAuxScores(array $aux_scores): void
     {
-        if (count($aux_scores) == 0) {
-            return;
-        }
-        foreach ($aux_scores as $pid => $city_count) {
-            $this->playerScoreAux->set($pid, $city_count);
+        foreach ($aux_scores as $pid => $aux_score) {
+            $this->playerScoreAux->set($pid, $aux_score);
         }
     }
 
-    /** @return array{player_infos:PlayerInfo[],board:Board,components:Components,hand:Hand,pool:Pool,turnProgress:TurnProgress} */
+    /** @return array{player_infos:array<int,PlayerInfo>,board:Board,components:Components,hand:Hand,pool:Pool,turnProgress:TurnProgress} */
     public function retrieveAllData(int $player_id): array {
         return [
             'player_infos' => $this->retrieveAllPlayerInfo(),

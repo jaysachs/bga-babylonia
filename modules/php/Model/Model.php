@@ -62,7 +62,7 @@ use Bga\Games\babylonia\Model\ModelImpl\PlayAllowedResult;
 
 class Model
 {
-    /** @var array{player_infos:PlayerInfo[],board:Board,components:Components,hand:Hand,pool:Pool,turnProgress:TurnProgress} */
+    /** @var array{player_infos:array<int,PlayerInfo>,board:Board,components:Components,hand:Hand,pool:Pool,turnProgress:TurnProgress} */
     private ?array $_allData = null;
 
     public function __construct(private PersistentStore $ps, private Stats $stats, private int $player_id) {
@@ -93,7 +93,7 @@ class Model
         );
     }
 
-    /** @return array{player_infos:PlayerInfo[],board:Board,components:Components,hand:Hand,pool:Pool,turnProgress:TurnProgress} */
+    /** @return array{player_infos:array<int,PlayerInfo>,board:Board,components:Components,hand:Hand,pool:Pool,turnProgress:TurnProgress} */
     private function allData(): array {
         if ($this->_allData == null) {
             $this->_allData = $this->ps->retrieveAllData($this->player_id);
@@ -409,19 +409,7 @@ class Model
 
     private function resolveAnyTies(): void
     {
-        $infos = array_values($this->allPlayerInfo());
-        usort($infos, function (PlayerInfo $i1, PlayerInfo $i2): int {
-            return $i1->score - $i2->score;
-        });
-        $aux_scores = [];
-        for ($i = 1; $i < count($infos); $i++) {
-            if ($infos[$i]->score == $infos[$i - 1]->score) {
-                $aux_scores[$infos[$i]->player_id] =
-                    $infos[$i]->captured_city_count;
-                $aux_scores[$infos[$i - 1]->player_id] =
-                    $infos[$i - 1]->captured_city_count;
-            }
-        }
+        $aux_scores = array_map(fn ($pi) => $pi->captured_city_count, $this->allPlayerInfo());
         $this->ps->updateAuxScores($aux_scores);
     }
 

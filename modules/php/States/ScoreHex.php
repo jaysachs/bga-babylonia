@@ -128,8 +128,7 @@ class ScoreHex extends AbstractState
      *  scored_locations:list<int>,
      *  network_locations:list<int>,
      *  network_points:int,
-     *  capture_points:int,
-     *  score:int}
+     *  capture_points:int}
      * >
      */
     private function computeCityScoringDetails(Model $model, ScoredCity $scored_city): array {
@@ -144,7 +143,6 @@ class ScoreHex extends AbstractState
                 "network_locations" => $scored_city->networkLocationsForPlayer($pid),
                 "network_points" => $scored_city->networkPointsForPlayer($pid),
                 "capture_points" => $scored_city->capturePointsForPlayer($pid),
-                "score" => $pi->score,
             ];
             if ($points > 0) {
                 // TODO: should we notify/log each player's point change?
