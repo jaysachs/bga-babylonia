@@ -6,7 +6,8 @@
 # Overview
 
 * One large table, `pieces`
-* This stores player pieces on board,hand and pools; ziggurat cards; city and farms; and empty board spaces. Columns will identify what the piece is, which player "owns" it, board location, hand location, pool location.
+* This stores player pieces on board,hand and pools; ziggurat cards; city and farms; and empty
+  board spaces. Columns will identify what the piece is, which player "owns" it, board location, hand location, pool location.
 * Persistence engine will "inflate" the entire game state model from a single select on this table.
 
 # Details
@@ -149,7 +150,7 @@ This needs to either move the city piece to a player, or to the discard.
 
 ### Ziggurat scored
 
-This needs to move a ziggurat card from the "available" to a player. It may also need to mark it "used". (Question: should we leverage the "scored" field for this? Change "scored" to "used"?)
+This needs to move a ziggurat card from the "available" to a player. It may also need to mark the card "used". (Question: should we leverage the "scored" field for this? Change "scored" to "used"?)
 
 ### Ziggurat used
 
@@ -158,9 +159,9 @@ Needs to mark a ziggurat card used but not change location.
 # Questions
 
 1. There is an appeal to storing the entire map in the DB; it would allow for randomization and
-  other scenarios. To do that, we'd need a type for "empty" and also a way to identify
-  which hexes are in which landmass. So definitely at least one addition type (`EMPTY`),
-  and either another field (`LANDMASS`), or make that three empty types (`EMPTY_N`, `EMPTY_C`, `EMPTY_S`). Or just two empty types (`EMPTY`, `EMPTY_8` -- to tie it to zcard 8).
+   other scenarios. To do that, we'd need a type for "empty" and also a way to identify
+   which hexes are in which landmass. So definitely at least one addition type (`EMPTY`),
+   and either another field (`LANDMASS`), or make that three empty types (`EMPTY_N`, `EMPTY_C`, `EMPTY_S`). Or just two empty types (`EMPTY`, `EMPTY_8` -- to tie it to zcard 8).
 
 2. Could/should we combine `turns` and `pieces` tables?
   * If we don't, we need to union when we read and read in the right order
@@ -172,10 +173,12 @@ Needs to mark a ziggurat card used but not change location.
 
 4. We could record points scored per player for city scoring, but ... why, exactly?
 
-5. Why do we need to record the board and empty spaces? The board is fixed based on number of players. It would "allow" alternate boards, but ... why?
+5. Why do we need to record the board and empty spaces? The board is fixed based on number of
+   players. It would "allow" alternate boards, but ... why?
 
 6. This model doesn't currently handle the "pool" of available ziggurat cards. Could add a
-new location type (but "pool" is already taken. "available"? "untaken"? "unselected"? "display"?)
-Maybe just use "cards", and then player_id indicates whether it's available or not. Though
-that is redundant, could just assert that types "zc_*" ignore the location type.
-That does bring up that maybe ... they don't belong here.
+   new location type (but "pool" is already taken. "available"? "untaken"? "unselected"? "display"?) Maybe just use "cards", and then player_id indicates whether it's available or not. Though that is redundant, could just assert that types "zc_*" ignore the location type. That does bring up that maybe ... they don't belong here.
+
+7. Maybe change `LANDMASS` to `TERRAIN`, which is one of `north`, `center`, `south`, and `river`.
+ * and maybe `ziggurat` as well should be a terrain type instead of a piece type?
+   that complicates the CSS and rendering. but also is maybe kinda true? they are immutable, not removable, not playable and thus technically don't count in any meaningful way as land or river.
