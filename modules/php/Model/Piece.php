@@ -49,6 +49,29 @@ enum Piece: string
     case FIELD_CITIES = 'field_x';
     case EMPTY = 'empty';
 
+    public function translated(): string {
+        return match ($this) {
+            self::FARMER => clienttranslate('farmer'),
+            self::PRIEST => clienttranslate('priest'),
+            self::MERCHANT => clienttranslate('merchant'),
+            self::SERVANT => clienttranslate('civil servant'),
+            self::ZIGGURAT => clienttranslate('ziggurat'),
+            self::FIELD_5 => clienttranslate('field 5'),
+            self::FIELD_6 => clienttranslate('field 6'),
+            self::FIELD_7 => clienttranslate('field 7'),
+            self::FIELD_CITIES => clienttranslate('field city count'),
+            self::CITY_M => clienttranslate('merchant city'),
+            self::CITY_P => clienttranslate('priest city'),
+            self::CITY_S => clienttranslate('civil servant city'),
+            self::CITY_MP => clienttranslate('merchant and priest city'),
+            self::CITY_MS => clienttranslate('merchant and civil servant city'),
+            self::CITY_SP => clienttranslate('civil servant and priest city'),
+            self::CITY_MSP => clienttranslate('merchant, civil servant and priest city'),
+            self::EMPTY => clienttranslate('empty'),
+            self::HIDDEN => clienttranslate('hidden'),
+        };
+    }
+
     public function isField(): bool
     {
         return match ($this) {

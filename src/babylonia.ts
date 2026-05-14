@@ -19,6 +19,7 @@ interface BGamedatas extends Gamedatas<Player> {
   board: Hex[];
   hand: string[];
   ziggurat_cards: Zcard[];
+  translated_pieces: Record<string,string>;
   current_scoring_hex: number | null;
 }
 
@@ -32,14 +33,6 @@ export class Game extends BaseGame<Player, BGamedatas> {
 
   constructor(bga: Bga<Player, BGamedatas>) {
     super(bga);
-  }
-
-  public addTooltipsToLog() {
-    const elements = document.querySelectorAll(`[${Attrs.ZTYPE}]:not([${Attrs.TT_PROCESSED}])`);
-    elements.forEach(ele => {
-      ele.setAttribute(Attrs.TT_PROCESSED, '');  // prevents tooltips being re-added to previous log entries
-      this.bga.gameui.addTooltip(ele.id, this.zcardTooltips.get(ele.getAttribute(Attrs.ZTYPE)!)!, '');
-    });
   }
 
   setup(gamedatas: BGamedatas) {
@@ -70,7 +63,7 @@ export class Game extends BaseGame<Player, BGamedatas> {
     console.log('Setting up ziggurat cards', gamedatas.ziggurat_cards);
     this.setupZcards(gamedatas.ziggurat_cards);
 
-    this.bga.notifications.setupPromiseNotifications({ logger: console.log, onEnd: this.addTooltipsToLog.bind(this) });
+    this.bga.notifications.setupPromiseNotifications({ logger: console.log });
 
     // Register states
     this.bga.states.register('SelectExtraTurn', new SelectExtraTurnState(this));
@@ -489,12 +482,19 @@ export class Game extends BaseGame<Player, BGamedatas> {
       }).then(() => this.unmarkHexSelected(args.rc));
   }
 
+  private translatedPiece(piece: string): string {
+    return this.bga.gameui.gamedatas.translated_pieces[piece] ?? '';
+  }
+
   ///////
   private static zcardSalt: number = 0;
   private registerLogArgs(): void {
-    this.registerLogArg('piece', (args) => Html.span({ attrs: Attrs.piece(args.piece, args.player_id) }));
-    this.registerLogArg('city', (args) => Html.span({ attrs: Attrs.piece(args.city, 0)}));
-    this.registerLogArg('zcard', (args) => Html.span({ id: `logzcard_${Game.zcardSalt++}`, attrs: Attrs.ztype(args.zcard)}));
-    this.registerLogArg('original_piece', (args) => Html.span({ attrs: Attrs.piece(args.original_piece, args.player_id)}));
+    this.registerLogArg('piece', (args) => Html.span({ title: this.translatedPiece(args.piece), attrs: Attrs.piece(args.piece, args.player_id) }));
+    this.registerLogArg('city', (args) => Html.span({ title: this.translatedPiece(args.city), attrs: Attrs.piece(args.city, 0)}));
+    this.registerLogArg('zcard', (args) => Html.span({
+      id: `logzcard_${Game.zcardSalt++}`,
+      title: this.zcardTooltips.get(args.zcard) ?? '',
+      attrs: Attrs.ztype(args.zcard)}));
+    this.registerLogArg('original_piece', (args) => Html.span({ title: this.translatedPiece(args.original_piece), attrs: Attrs.piece(args.original_piece, args.player_id)}));
   }
 }

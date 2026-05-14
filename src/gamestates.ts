@@ -97,7 +97,6 @@ export class SelectZigguratCardState extends BabyloniaState {
     const zt = e.getAttribute(Attrs.ZTYPE)!;
     let promptForConfirmation = () => {
       this.bga.statusBar.setTitle(_('Select ziggurat card ${zcard}?'), { zcard: zt });
-      this.game.addTooltipsToLog();
 
       this.bga.statusBar.addActionButton(_('Confirm'),
         () => this.bga.actions.performAction('actSelectZigguratCard', { zctype: zt }),

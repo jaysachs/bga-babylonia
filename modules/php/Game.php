@@ -31,6 +31,7 @@ use Bga\Games\babylonia\Model\Model;
 use Bga\Games\babylonia\Model\PersistentStore;
 use Bga\GameFramework\Table;
 use Bga\Games\babylonia\Model\Hex;
+use Bga\Games\babylonia\Model\Piece;
 use Bga\Games\babylonia\Model\RowCol;
 use Bga\Games\babylonia\States\StartTurn;
 use Bga\Games\babylonia\Utils\Arrays;
@@ -160,6 +161,10 @@ class Game extends Table
                 ];
             }
         );
+		$translated = [];
+		foreach (Piece::cases() as $tiletype) {
+			$translated[$tiletype->value] = $tiletype->translated();
+		}
 
         return [
             "players" => $this->getCollectionFromDb(
@@ -173,6 +178,7 @@ class Game extends Table
             ),
             'board' => $board_data,
             'current_scoring_hex' => $this->ps->rowColBeingScored(),
+            'translated_pieces' => $translated,
             'ziggurat_cards' =>
             array_map(
                 function ($z) {
@@ -180,7 +186,7 @@ class Game extends Table
                         "type" => $z->type->value,
                         "owning_player_id" => $z->owning_player_id,
                         "used" => $z->used,
-                        "tooltip" => $z->type->tooltip(),
+                        "tooltip" => $z->type->translated(),
                     ];
                 },
                 $model->components()->allZigguratCards()

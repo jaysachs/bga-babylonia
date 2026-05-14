@@ -61,7 +61,7 @@ enum ZigguratCardType: string
         return $ziggurats;
     }
 
-    public function tooltip(): string
+    public function translated(): string
     {
         return match ($this) {
             ZigguratCardType::PLUS_10 =>
