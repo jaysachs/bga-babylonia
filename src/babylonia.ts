@@ -63,14 +63,17 @@ export class Game extends BaseGame<Player, BGamedatas> {
     console.log('Setting up ziggurat cards', gamedatas.ziggurat_cards);
     this.setupZcards(gamedatas.ziggurat_cards);
 
-    this.bga.notifications.setupPromiseNotifications({ logger: console.log });
-
     // Register states
     this.bga.states.register('SelectExtraTurn', new SelectExtraTurnState(this));
     this.bga.states.register('EndOfTurnScoring', new EndOfTurnScoringState(this));
     this.bga.states.register('SelectZigguratCard', new SelectZigguratCardState(this));
     this.bga.states.register('PlayPieces', new PlayPiecesState(this));
     this.bga.states.register('SelectScoringHex', new SelectScoringHexState(this));
+
+    this.bga.notifications.setupPromiseNotifications({
+      logger: console.log,
+      handlers: [this, this.bga.states.getStateClass('PlayPieces')],
+    });
 
     // if a ziggurat card is being chosen
     // TODO: should this be done in the state watcher?

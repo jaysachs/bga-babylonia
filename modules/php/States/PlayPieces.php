@@ -33,6 +33,7 @@ use Bga\GameFramework\States\PossibleAction;
 use Bga\GameFramework\UserException;
 use Bga\Games\babylonia\Game;
 use Bga\Games\babylonia\Model\Hex;
+use Bga\Games\babylonia\Model\Model;
 use Bga\Games\babylonia\Model\RowCol;
 use Bga\Games\babylonia\Utils\Arrays;
 
@@ -49,11 +50,7 @@ class PlayPieces extends AbstractState
         );
     }
 
-    /** @return array{_private:array<int,array{allowedMoves:array<string,list<int>>,canEndTurn:bool,canUndo:bool}>} */
-    public function getArgs(int $active_player_id): array
-    {
-        $model = $this->createModel($active_player_id);
-
+    private function stateArgs(Model $model, int $active_player_id): array {
         return [
             "_private" => [
                 $active_player_id => [
@@ -63,6 +60,13 @@ class PlayPieces extends AbstractState
                 ]
             ]
         ];
+    }
+
+    /** @return array{_private:array<int,array{allowedMoves:array<string,list<int>>,canEndTurn:bool,canUndo:bool}>} */
+    public function getArgs(int $active_player_id): array
+    {
+        $model = $this->createModel($active_player_id);
+        return $this->stateArgs($model, $active_player_id);
     }
 
     #[PossibleAction]
@@ -94,7 +98,12 @@ class PlayPieces extends AbstractState
                 "touched_ziggurats" => $move->touched_ziggurats,
             ]
         );
-        return PlayPieces::class;
+        $this->notify->all(
+            'playPiecesUpdate',
+            '',
+            $this->stateArgs($model, $active_player_id)
+        );
+        return null;
     }
 
     #[PossibleAction]
@@ -139,7 +148,13 @@ class PlayPieces extends AbstractState
             ]
         ]);
 
-        return PlayPieces::class;
+        $this->notify->all(
+            'playPiecesUpdate',
+            '',
+            $this->stateArgs($model, $active_player_id)
+        );
+
+        return null;
     }
 
     function zombie(int $playerId): mixed

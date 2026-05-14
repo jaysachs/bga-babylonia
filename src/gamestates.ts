@@ -202,6 +202,10 @@ export class PlayPiecesState extends BabyloniaState {
     }
   }
 
+  async notif_playPiecesUpdate(args: { _private: PlayState }) {
+    this.onEnteringState(args, true);
+  }
+
   override onLeavingState(args: any, isCurrentPlayerActive: boolean): void {
     if (isCurrentPlayerActive) {
       this.removeBoardHandler();

@@ -92,6 +92,16 @@ class Hex
         return $this;
     }
 
+    public function remove(): Piece {
+        if ($this->player_id == 0 || !$this->piece->isPlayerPiece()) {
+            throw new \InvalidArgumentException("Cannot remove non-player piece");
+        }
+        $piece = $this->piece;
+        $this->piece = Piece::EMPTY;
+        $this->player_id = 0;
+        return $piece;
+    }
+
     public function playPiece(Piece $piece, int $player_id): Piece
     {
         if ($player_id == 0) {

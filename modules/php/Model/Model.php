@@ -94,7 +94,7 @@ class Model
     }
 
     /** @return array{player_infos:array<int,PlayerInfo>,board:Board,components:Components,hand:Hand,pool:Pool,turnProgress:TurnProgress} */
-    private function allData(): array {
+    private function &allData(): array {
         if ($this->_allData == null) {
             $this->_allData = $this->ps->retrieveAllData($this->player_id);
         }
@@ -617,6 +617,11 @@ class Model
                 "Move $move is not for player $this->player_id"
             );
         }
+        $this->board()->hexAt($move->rc)->remove();
+        if (!$move->captured_piece->isEmpty()) {
+            $this->board()->hexAt($move->rc)->playPiece($move->captured_piece, $move->player_id);
+        }
+        $this->hand()->replace($move->piece, $move->handpos);
         $this->ps->deleteSingleMove($move);
         $this->ps->updateHex($move->rc, $move->captured_piece, 0);
         $this->ps->updateHand($move->player_id, $move->handpos, $move->original_piece);

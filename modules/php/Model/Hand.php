@@ -96,6 +96,16 @@ class Hand
         return $this->size() == 0;
     }
 
+    public function replace(Piece $piece, int $pos): void {
+        if (!$piece->isPlayerPiece() || $piece == Piece::HIDDEN) {
+            throw new \InvalidArgumentException("Can't add $piece->value to hand");
+        }
+        if (!$this->pieces[$pos]->isEmpty()) {
+            throw new \InvalidArgumentException("Can't replace non-empty hand piece");
+        }
+        $this->pieces[$pos] = $piece;
+    }
+
     public function replenish(Piece $piece): void
     {
         if (!$piece->isPlayerPiece() || $piece == Piece::HIDDEN) {
