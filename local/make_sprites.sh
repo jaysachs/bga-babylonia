@@ -14,8 +14,14 @@ COLORS=(FFFFFF 76A89B F9C29A 9A9A9A)
 
 FONT=Noto-Sans-Cuneiform-Regular
 
-P=𒀭 # 𒁈
+# https://en.wikipedia.org/wiki/Dingir
+P=𒀭
+
+# https://en.wiktionary.org/wiki/%C4%93kallum
 S=𒅄 # 𒉼 # 𒄮 𒇽 𒃰 𒂵
+
+# https://en.wiktionary.org/wiki/mak%C4%81rum
+# https://en.wiktionary.org/wiki/tamk%C4%81rum
 M=𒆩 # 𒀖 # 𒀿 # 𒆕 🌾 𒆳
 
 ARCANGLE=15,15
