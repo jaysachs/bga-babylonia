@@ -1,9 +1,13 @@
 import { BaseGame } from './basegame';
 import { Html } from './html';
-import { EndOfTurnScoringState, PlayPiecesState, SelectExtraTurnState, SelectScoringHexState, SelectZigguratCardState } from './gamestates';
 import { BGamedatas } from './bdata';
 import { Attrs, CSS, View, IDS, Piece } from './view';
 import { AnimationList } from './more-animations';
+import { SelectExtraTurnState } from './states/select_extra_turn';
+import { EndOfTurnScoringState } from './states/end_of_turn_scoring';
+import { SelectZigguratCardState } from './states/select_ziggurate_card';
+import { PlayPiecesState } from './states/play_pieces';
+import { SelectScoringHexState } from './states/select_scoring_hex';
 
 /** Game class */
 export class Game extends BaseGame<Player, BGamedatas> {
@@ -20,8 +24,8 @@ export class Game extends BaseGame<Player, BGamedatas> {
     this.view.setup(gamedatas);
 
     // Register states
-    this.bga.states.register('SelectExtraTurn', new SelectExtraTurnState(this.bga, this.view, this.animationManager));
-    this.bga.states.register('EndOfTurnScoring', new EndOfTurnScoringState(this.bga, this.view, this.animationManager));
+    this.bga.states.register('SelectExtraTurn', new SelectExtraTurnState (this.bga, this.view, this.animationManager));
+    this.bga.states.register('EndOfTurnScoring', new EndOfTurnScoringState (this.bga, this.view, this.animationManager));
     this.bga.states.register('SelectZigguratCard', new SelectZigguratCardState(this.bga, this.view, this.animationManager));
     this.bga.states.register('PlayPieces', new PlayPiecesState(this.bga, this.view, this.animationManager));
     this.bga.states.register('SelectScoringHex', new SelectScoringHexState(this.bga, this.view, this.animationManager));
