@@ -11,7 +11,6 @@ export class Attrs implements AttrLike {
   static readonly ZTYPE : string = 'bbl_ztype';
   static readonly ZUSED : string = 'bbl_zused';
   static readonly PIECE : string = 'bbl_piece';
-  static readonly TT_PROCESSED : string = 'bbl_tt_processed';
 
   private static playerIdToColorIndex: Record<number, number> = {};
   static initializeColorMap(cm: Record<number, number>) {
@@ -49,14 +48,6 @@ export class Attrs implements AttrLike {
   }
   piece(p: string, playerId?: number): Attrs {
     this.r[Attrs.PIECE] = Attrs.pieceVal(p, playerId);
-    return this;
-  }
-
-  static processed(p: string): Attrs {
-    return new Attrs().processed(p);
-  }
-  processed(p: string): Attrs {
-    this.r[Attrs.TT_PROCESSED] = p;
     return this;
   }
 }
