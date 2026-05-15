@@ -6,5 +6,4 @@
   * stats only updated when turn committed
 * Truly responsive layout like T&E -- keep "ideal" size so board "always" fits in window
   * probably need onChangeSize support
-* Optimize the "available moves" by having an "anypiece" category, and then just extra for the
-  specific pieces, if any.
+* Animate piece moves before sending action (i.e. assume success action). This will give the UI a "peppier" feel.
