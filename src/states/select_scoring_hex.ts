@@ -21,7 +21,7 @@ export class SelectScoringHexState extends BabyloniaState {
     }
   }
 
-  onBoardClicked(event: Event) {
+  private onBoardClicked(event: Event) {
     event.preventDefault();
     event.stopPropagation();
 

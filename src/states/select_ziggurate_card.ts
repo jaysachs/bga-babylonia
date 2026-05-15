@@ -54,7 +54,7 @@ export class SelectZigguratCardState extends BabyloniaState {
     }
   }
 
-  onZcardClicked(event: Event) {
+  private onZcardClicked(event: Event) {
     event.preventDefault();
     event.stopPropagation();
     let e = event.target as HTMLElement;

@@ -104,7 +104,7 @@ export class PlayPiecesState extends BabyloniaState {
     }
   }
 
-  private async notif_undoMove(
+  async notif_undoMove(
     args: {
       player_id: number;
       // points: number;
@@ -197,7 +197,7 @@ export class PlayPiecesState extends BabyloniaState {
     this.unmarkHexesPlayable(this.allowedMovesFor(div));
   }
 
-  public unselectAllHandPieces(): void {
+  private unselectAllHandPieces(): void {
     const hand = $(IDS.HAND);
     hand.childNodes.forEach(node => {
       const posDiv = node as HTMLElement;
@@ -211,7 +211,7 @@ export class PlayPiecesState extends BabyloniaState {
     });
   }
 
-  public setPlayablePieces(): void {
+  private setPlayablePieces(): void {
     const hand = $(IDS.HAND);
 
     hand.childNodes.forEach((node) => {
@@ -231,7 +231,7 @@ export class PlayPiecesState extends BabyloniaState {
     return document.querySelector(`#${IDS.HAND} > .${CSS.SELECTED}`);
   }
 
-  async onBoardClicked(event: Event) {
+  private async onBoardClicked(event: Event) {
     event.preventDefault();
     event.stopPropagation();
     const handDiv = this.selectedHandDiv();
@@ -257,7 +257,7 @@ export class PlayPiecesState extends BabyloniaState {
     this.unselectAllHandPieces();
   }
 
-  onHandClicked(ev: Event): boolean {
+  private onHandClicked(ev: Event): boolean {
     ev.preventDefault();
     ev.stopPropagation();
     const pieceDiv = ev.target as HTMLElement;
