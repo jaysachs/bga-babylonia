@@ -11,12 +11,6 @@ export interface Hex {
   piece: string;
 }
 
-export interface PlayState {
-  canEndTurn: boolean;
-  canUndo: boolean;
-  allowedMoves: Record<string, number[]>;
-}
-
 export interface Zcard {
   type: string;
   used: boolean;

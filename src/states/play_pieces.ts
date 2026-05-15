@@ -1,9 +1,15 @@
-import { BGamedatas, PlayState } from "../bdata";
+import { BGamedatas } from "../bdata";
 import { AnimationManager } from "../bga-animations";
 import { Attrs, CSS, IDS, Piece, View } from "../view";
 import { indexInParent } from "../html";
 import { AnimationList } from "../more-animations";
 import { BabyloniaState } from "./base";
+
+interface PlayState {
+  canEndTurn: boolean;
+  canUndo: boolean;
+  allowedMoves: Record<string, number[]>;
+}
 
 export class PlayPiecesState extends BabyloniaState {
   private playStateArgs: PlayState| null = null;
@@ -171,21 +177,23 @@ export class PlayPiecesState extends BabyloniaState {
     $(IDS.BOARD).removeEventListener('click', this.boardHandler);
   }
 
-  protected allowedMovesFor(div: Element | null): number[] {
+  private allowedMovesFor(div: Element | null): number[] {
     if (!div) { return []; }
     const piece = div.getAttribute(Attrs.PIECE)!.split('_')[0]!;
-    return (this.playStateArgs!.allowedMoves as any)[piece] || [];
+    return (this.playStateArgs!.allowedMoves[""] ?? [])
+      .concat(this.playStateArgs!.allowedMoves[piece] ?? []);
+    ;
   }
 
-  protected unmarkHexesPlayable(hexes: number[]): void {
+  private unmarkHexesPlayable(hexes: number[]): void {
     hexes.forEach( hex => this.view.unmarkHexPlayable(hex));
   }
 
-  protected markHexesPlayableForPiece(div: Element): void {
-     this.view.markHexesPlayable(this.allowedMovesFor(div));
+  private markHexesPlayableForPiece(div: Element): void {
+    this.view.markHexesPlayable(this.allowedMovesFor(div));
   }
 
-  protected unmarkHexesPlayableForPiece(div: Element): void {
+  private unmarkHexesPlayableForPiece(div: Element): void {
     this.unmarkHexesPlayable(this.allowedMovesFor(div));
   }
 

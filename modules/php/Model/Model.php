@@ -233,21 +233,28 @@ class Model
      */
     public function getAllowedMoves(): array
     {
-        $result = [];
+        $result = [ "" => [] ];
         $hand = $this->hand();
-        $this->board()->visitAll(function (Hex $hex) use (&$result, &$hand): void {
-            foreach (Piece::playerPieces() as $piece) {
-                if ($hand->contains($piece)) {
+        $allPieces = Piece::playerPieces();
+        foreach ($allPieces as $piece) {
+            $result[$piece->value] = [];
+        }
+        $handPieces = array_filter($allPieces, fn ($p) => $hand->contains($p));
+        $this->board()->visitAll(function (Hex $hex) use (&$result, &$handPieces, &$allPieces): void {
+            $all = count(array_filter($allPieces, fn ($p) => $this->checkPlay($p, $hex)->isAllowed()))
+                    == count($allPieces);
+            if ($all) {
+                $result[""][] = $hex->rc;
+            }
+            else {
+                foreach ($handPieces as $piece) {
                     if ($this->checkPlay($piece, $hex)->isAllowed()) {
-                        if (!isset($result[$piece->value])) {
-                            $result[$piece->value] = [];
-                        }
                         $result[$piece->value][] = $hex->rc;
                     }
                 }
             }
         });
-        return $result;
+        return array_filter($result, fn ($am) => count($am) > 0);
     }
 
     public function playPiece(int $handpos, int $rc): ElaboratedMove
