@@ -180,13 +180,14 @@ export class PlayPiecesState extends BabyloniaState {
   override onEnteringState(args: { _private: PlayState }, isCurrentPlayerActive: boolean) {
     if (isCurrentPlayerActive) {
       this.playStateArgs = args._private;
-       this.view.markAllHexesUnplayable();
+      this.view.markAllHexesUnplayable();
       this.setStatusBarForPlayState();
     }
   }
 
-  async notif_playPiecesUpdate(args: { _private: PlayState }) {
-    this.onEnteringState(args, true);
+  async notif_playPiecesUpdate(args: { _private: Record<number,PlayState> }) {
+    // FIXME:must be cleaner way to handle this.
+    this.onEnteringState({ _private: args._private[this.bga.players.getCurrentPlayerId()]! }, true);
   }
 
   async notif_piecePlayed(

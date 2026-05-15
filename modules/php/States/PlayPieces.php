@@ -98,7 +98,7 @@ class PlayPieces extends AbstractState
                 "touched_ziggurats" => $move->touched_ziggurats,
             ]
         );
-        $this->notify->all(
+        $this->notify->player($active_player_id,
             'playPiecesUpdate',
             '',
             $this->stateArgs($model, $active_player_id)
@@ -148,7 +148,7 @@ class PlayPieces extends AbstractState
             ]
         ]);
 
-        $this->notify->all(
+        $this->notify->player($active_player_id,
             'playPiecesUpdate',
             '',
             $this->stateArgs($model, $active_player_id)
