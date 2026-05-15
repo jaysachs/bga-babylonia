@@ -1,7 +1,8 @@
 import { BgaAnimations, AnimationManager } from './libs';
 import { MoreAnimations } from './more-animations';
 
-/** Class that extends default bga core game class with more functionality
+/**
+ * Class that extends default bga core game class with more functionality
  */
 
 export abstract class BaseGame<P extends Player, T extends Gamedatas<P>> {
@@ -44,12 +45,5 @@ export abstract class BaseGame<P extends Player, T extends Gamedatas<P>> {
       console.error(log, args, 'Exception thrown', e.stack);
     }
     return { log, args };
-  }
-
-  /**
-  * Returns the index of the given element among its parent's child elements or -1 if no parent.
-  */
-  protected indexInParent(el: Element): number {
-    return Array.from(el.parentElement?.children ?? []).findIndex(e => e == el);
   }
 }
