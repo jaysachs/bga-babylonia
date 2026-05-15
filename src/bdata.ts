@@ -16,3 +16,19 @@ export interface PlayState {
   canUndo: boolean;
   allowedMoves: Record<string, number[]>;
 }
+
+export interface Zcard {
+  type: string;
+  used: boolean;
+  tooltip: string;
+  owning_player_id: number;
+}
+
+export interface BGamedatas extends Gamedatas<Player> {
+  player_data: PlayerData[];
+  board: Hex[];
+  hand: string[];
+  ziggurat_cards: Zcard[];
+  translated_pieces: Record<string,string>;
+  current_scoring_hex: number | null;
+}

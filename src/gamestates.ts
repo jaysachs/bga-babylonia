@@ -1,9 +1,9 @@
 import { Game } from "./babylonia";
 import { PlayState } from "./bdata";
-import { Attrs, CSS, IDS, Piece } from "./bhtml";
+import { AnimationManager } from "./bga-animations";
+import { Attrs, CSS, IDS, Piece, View } from "./view";
 import { indexInParent } from "./html";
-
-
+import { AnimationList } from "./more-animations";
 
 export abstract class BabyloniaState {
   // Returns the hex (row,col) clicked on, or null if not a playable hex
@@ -24,25 +24,8 @@ export abstract class BabyloniaState {
     return Number(id[2]);
   }
 
-  private markHexPlayable(rc: number): void {
-    this.game.hexDiv(rc).classList.add(CSS.PLAYABLE);
-  }
 
-  protected unmarkHexPlayable(rc: number): void {
-    this.game.hexDiv(rc).classList.remove(CSS.PLAYABLE);
-  }
-
-  protected markAllHexesUnplayable(): void {
-    $(IDS.BOARD).querySelectorAll('.' + CSS.PLAYABLE)
-      .forEach(div => div.classList.remove(CSS.PLAYABLE));
-  }
-
-  protected markHexesPlayable(hexes: number[]): void {
-    hexes.forEach((hex) => this.markHexPlayable(hex));
-  }
-
-  protected bga: Bga;
-  constructor(protected game: Game) { this.bga = game.bga; }
+  constructor(protected bga: Bga, protected view: View, protected animationManager: AnimationManager) {}
 
   public onEnteringState(args: any, isCurrentPlayerActive: boolean) {}
 
@@ -67,15 +50,15 @@ export class SelectExtraTurnState extends BabyloniaState {
 export class EndOfTurnScoringState extends BabyloniaState {
   override onEnteringState(args: any, isCurrentPlayerActive: boolean) {
     if (isCurrentPlayerActive) {
-      this.markAllHexesUnplayable();
+       this.view.markAllHexesUnplayable();
     }
   }
 }
 
 export class SelectZigguratCardState extends BabyloniaState {
   private handler: (e: Event) => void;
-  constructor(game: Game) {
-    super(game);
+  constructor(bga: Bga, view: View, animationManager: AnimationManager) {
+    super(bga, view, animationManager);
     this.handler = (e) => this.onZcardClicked(e);
   }
 
@@ -138,13 +121,13 @@ export class SelectZigguratCardState extends BabyloniaState {
 
 export class SelectScoringHexState extends BabyloniaState {
   private handler: (e: Event) => void;
-  constructor(game: Game) {
-    super(game);
+  constructor(bga: Bga, view: View, animationManager: AnimationManager) {
+    super(bga, view, animationManager);
     this.handler = (e) => this.onBoardClicked(e);
   }
   override onEnteringState(args: { hexes: number[] }, isCurrentPlayerActive: boolean) {
     if (isCurrentPlayerActive) {
-      this.markHexesPlayable(args.hexes);
+       this.view.markHexesPlayable(args.hexes);
       $(IDS.BOARD).addEventListener('click', this.handler);
     }
   }
@@ -162,7 +145,7 @@ export class SelectScoringHexState extends BabyloniaState {
     if (hex == null) {
       return;
     }
-    let div = this.game.hexDiv(hex);
+    let div =  this.view.hexDiv(hex);
     let piece = div.firstElementChild!.getAttribute(Attrs.PIECE);
     div.classList.add(CSS.SELECTED);
     // this.bga.statusBar.setTitle(_('Score ${city} at (${row},${col})?'), {
@@ -172,7 +155,7 @@ export class SelectScoringHexState extends BabyloniaState {
       city: piece,
     });
     this.bga.statusBar.addActionButton(_('Confirm'),
-      () => this.bga.actions.performAction('actSelectHexToScore', { rc: hex }).then(() => this.unmarkHexPlayable(hex)),
+      () => this.bga.actions.performAction('actSelectHexToScore', { rc: hex }).then(() =>  this.view.unmarkHexPlayable(hex)),
       { autoclick: true });
     this.bga.statusBar.addActionButton(_('Cancel'),
       () => {
@@ -188,8 +171,8 @@ export class PlayPiecesState extends BabyloniaState {
   private handHandler: (e: Event) => void;
   private boardHandler: (e: Event) => void;
 
-  constructor(game: Game) {
-    super(game);
+  constructor(bga: Bga, view: View, animationManager: AnimationManager) {
+    super(bga, view, animationManager);
     this.handHandler = (e) => this.onHandClicked(e);
     this.boardHandler = (e) => this.onBoardClicked(e);
   }
@@ -197,13 +180,124 @@ export class PlayPiecesState extends BabyloniaState {
   override onEnteringState(args: { _private: PlayState }, isCurrentPlayerActive: boolean) {
     if (isCurrentPlayerActive) {
       this.playStateArgs = args._private;
-      this.markAllHexesUnplayable();
+       this.view.markAllHexesUnplayable();
       this.setStatusBarForPlayState();
     }
   }
 
   async notif_playPiecesUpdate(args: { _private: PlayState }) {
     this.onEnteringState(args, true);
+  }
+
+  async notif_piecePlayed(
+    args: {
+      player_id: number;
+      // points: number;
+      piece: string;
+      handpos: number;
+      rc: number;
+      hand_size: number;
+      captured_piece: string;
+      // field_points: number;
+      ziggurat_points: number;
+      touched_ziggurats: number[];
+    }
+  ) {
+    let anims: AnimationList = [];
+
+    const hexDiv =  this.view.hexDiv(args.rc);
+
+    // Check for field capture
+    if (args.captured_piece != Piece.EMPTY /* .startsWith('field') */) {
+      let field = hexDiv.firstElementChild as HTMLElement;
+      if (!field) { // or field is not F567X
+        console.error("attempt to capture a field that is not there");
+      }
+      // slide the captured field to the player board
+      anims.push(() => this.animationManager.slideOutAndDestroy(field, $(IDS.handcount(args.player_id)), {}));
+    }
+
+    if (this.bga.players.isCurrentPlayerActive()) {
+      const handPosDiv =  this.view.handPosDiv(args.handpos);
+      const pieceDiv = handPosDiv.firstElementChild as HTMLElement;
+      anims.push(() =>
+        // slide piece from hand to hex
+        this.animationManager.slideAndAttach(pieceDiv, hexDiv)
+          // play into river, piece is hidden, so use the value from the args not the hand
+          .then(() => Attrs.setPiece(pieceDiv, args.piece, args.player_id))
+      );
+    } else {
+      anims.push(() => {
+        // slide piece from hand count to hex
+        let div =  this.view.createPieceDiv(args.piece, args.player_id);
+        $(IDS.handcount(args.player_id)).appendChild(div);
+        return this.animationManager.slideAndAttach(div, hexDiv, { fromPlaceholder: 'off' });
+      });
+    }
+    // animate the ziggurat scoring, if any
+    if (args.ziggurat_points > 0) {
+      args.touched_ziggurats.forEach(z => this.view.markHexSelected(z));
+      // TODO: since it's parallel, just flatten into the anims list?
+      anims.push(() => this.animationManager.playParallel(
+        args.touched_ziggurats.map((rc: number) =>
+          () => this.animationManager.displayScoring(
+               this.view.hexDiv(rc),
+              1,
+              this.bga.gameui.gamedatas.players[args.player_id]!.color,
+              { extraClass: 'bbl_city_scoring', duration: 700 })
+            .then(() => args.touched_ziggurats.forEach(z => this.view.unmarkHexSelected(z))))
+      ));
+    }
+
+    await this.animationManager.playParallel(anims);
+
+     this.view.updateHandCount(args);
+    // this.bga.playerPanels.getScoreCounter(args.player_id).incValue(args.points);
+  }
+
+  private async notif_undoMove(
+    args: {
+      player_id: number;
+      // points: number;
+      rc: number;
+      _private: {
+        original_piece: string;
+        handpos: number;
+      } | undefined;
+      captured_piece: string;
+      piece: string;
+    }
+  ) {
+    let anims: AnimationList = [];
+    let hexDiv = $(IDS.hexDiv(args.rc));
+    let isActivePlayer = this.bga.gameui.player_id == args.player_id;
+
+    if (args.captured_piece != Piece.EMPTY) {
+      // slide the previously captured field back
+      let field = this.view.createPieceDiv(args.captured_piece, 0);
+      anims.push(() => {
+        $(IDS.handcount(args.player_id)).appendChild(field);
+        return this.animationManager.slideAndAttach(field, hexDiv, { fromPlaceholder: 'off' });
+      })
+    }
+
+    let pieceDiv = hexDiv.firstElementChild as HTMLElement;
+    let destDiv = isActivePlayer ? this.view.handPosDiv(args._private!.handpos) : $(IDS.handcount(args.player_id));
+
+    if (args._private?.original_piece) {
+        // restore piece value, e.g. if it was originally hidden
+        Attrs.setPiece(pieceDiv, args._private.original_piece, args.player_id);
+    }
+    // slide the played piece back to the hand
+    anims.push(() => this.animationManager.slideAndAttach(pieceDiv, destDiv));
+
+    await this.animationManager.playParallel(anims).then(() => {
+      if (isActivePlayer) {
+         destDiv.classList.add(CSS.PLAYABLE);
+      }
+      this.view.handCounters[args.player_id]!.incValue(1);
+      // this.bga.playerPanels.getScoreCounter(args.player_id).incValue(-args.points);
+    });
   }
 
   override onLeavingState(args: any, isCurrentPlayerActive: boolean): void {
@@ -235,11 +329,11 @@ export class PlayPiecesState extends BabyloniaState {
   }
 
   protected unmarkHexesPlayable(hexes: number[]): void {
-    hexes.forEach(this.unmarkHexPlayable.bind(this));
+    hexes.forEach( hex => this.view.unmarkHexPlayable(hex));
   }
 
   protected markHexesPlayableForPiece(div: Element): void {
-    this.markHexesPlayable(this.allowedMovesFor(div));
+     this.view.markHexesPlayable(this.allowedMovesFor(div));
   }
 
   protected unmarkHexesPlayableForPiece(div: Element): void {
@@ -301,7 +395,7 @@ export class PlayPiecesState extends BabyloniaState {
       handpos: indexInParent(handDiv),
       rc: hex
     }).then(() => {
-        this.unmarkHexPlayable(hex);
+         this.view.unmarkHexPlayable(hex);
     })
     this.unselectAllHandPieces();
   }
