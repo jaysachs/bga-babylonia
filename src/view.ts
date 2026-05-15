@@ -100,9 +100,9 @@ export class View {
         this.translatedPieces = {};
     }
 
-    public setup(gamedatas: BGamedatas): void{
+    public setup(gamedatas: BGamedatas): void {
         this.translatedPieces = gamedatas.translated_pieces;
-        this.bga.gameArea.getElement().appendChild(View.base_html());
+        this.bga.gameArea.getElement().appendChild(this.base_html());
 
         console.log('setting up player boards', gamedatas.player_data);
         for (const pid in gamedatas.player_data) {
@@ -135,7 +135,7 @@ export class View {
     private setupGameBoard(boardData: Hex[]) {
         const boardDiv = $(IDS.BOARD);
         for (const hex of boardData) {
-            const hexDiv = View.makeHexDiv(hex);
+            const hexDiv = this.makeHexDiv(hex);
             boardDiv.appendChild(hexDiv);
             if (hex.piece != null && hex.piece != Piece.EMPTY) {
                 let pieceDiv = this.createPieceDiv(hex.piece, hex.board_player)
@@ -207,15 +207,15 @@ export class View {
         animate);
     }
 
-    public static makeHexDiv(hex: Hex): HTMLElement {
+    private makeHexDiv(hex: Hex): HTMLElement {
         const row = Math.trunc(hex.rc / 100);
         const col = Math.trunc(hex.rc % 100);
-        let top = 100 * (this.vstart + row * this.vdelta / 2) / 768.0;
-        let left = 100 * (this.hstart + col * this.hdelta) / 1024.0;
+        let top = 100 * (View.vstart + row * View.vdelta / 2) / 768.0;
+        let left = 100 * (View.hstart + col * View.hdelta) / 1024.0;
         return Html.div({ id:  IDS.hexDiv(hex.rc), style: [`top:${top}%`, `left:${left}%`] });
     }
 
-    public player_board_ext(player_id: number): HTMLElement[] {
+    private player_board_ext(player_id: number): HTMLElement[] {
         const color = this.bga.players.getPlayerById(player_id)?.color;
         return [
             Html.div({},
@@ -236,7 +236,7 @@ export class View {
         ];
     }
 
-    public static base_html(): HTMLElement {
+    private base_html(): HTMLElement {
         return Html.div({id:'bbl_main'},
             Html.div({id:'bbl_hand_container'},
                 Html.div({id: IDS.HAND })

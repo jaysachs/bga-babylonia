@@ -4,8 +4,6 @@ import { MoreAnimations } from './more-animations';
 /** Class that extends default bga core game class with more functionality
  */
 
-type SpecialLogArgs = Record<string, (x: any) => HTMLElement>;
-
 export abstract class BaseGame<P extends Player, T extends Gamedatas<P>> {
   public readonly animationManager: AnimationManager;
   public readonly moreAnimations: MoreAnimations;
