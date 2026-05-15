@@ -266,6 +266,7 @@ export class PlayPiecesState extends BabyloniaState {
         handpos: number;
       } | undefined;
       captured_piece: string;
+      hand_size: number;
       piece: string;
     }
   ) {
@@ -296,7 +297,7 @@ export class PlayPiecesState extends BabyloniaState {
       if (isActivePlayer) {
          destDiv.classList.add(CSS.PLAYABLE);
       }
-      this.view.handCounters[args.player_id]!.incValue(1);
+      this.view.updateHandCount(args);
       // this.bga.playerPanels.getScoreCounter(args.player_id).incValue(-args.points);
     });
   }

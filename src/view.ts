@@ -90,10 +90,10 @@ export class CSS {
 
 export class View {
 
-    public /* private */ handCounters: Counter[] = [];
+    private handCounters: Counter[] = [];
     private poolCounters: Counter[] = [];
     private cityCounters: Counter[] = [];
-    public /* private */ zcardTooltips = new Map<string, string>();
+    private zcardTooltips = new Map<string, string>();
     private translatedPieces: Record<string,string>;
 
     constructor(private bga: Bga<Player, BGamedatas>) {
@@ -300,12 +300,10 @@ export class View {
         return Html.span({ title: this.translatedPiece(piece), attrs: Attrs.piece(piece, this.bga.players.getPlayerById(player_id)) });
     }
 
-    public renderedZcard(id: string, zcard: string): HTMLElement {
+    public renderedZcard(zcard: string): HTMLElement {
         return Html.span({
-            // FIXME: why do we need the ID?
-            id: id,
-            //      id: `logzcard_${Game.zcardSalt++}`,
             title: this.zcardTooltips.get(zcard) ?? '',
-            attrs: Attrs.ztype(zcard)});
+            attrs: Attrs.ztype(zcard)
+        });
     }
 }
