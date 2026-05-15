@@ -177,17 +177,16 @@ export class PlayPiecesState extends BabyloniaState {
     this.boardHandler = (e) => this.onBoardClicked(e);
   }
 
-  override onEnteringState(args: { _private: PlayState }, isCurrentPlayerActive: boolean) {
-    if (isCurrentPlayerActive) {
-      this.playStateArgs = args._private;
+  private doEnterState(playState: PlayState) {
+      this.playStateArgs = playState;
       this.view.markAllHexesUnplayable();
       this.setStatusBarForPlayState();
-    }
   }
 
-  async notif_playPiecesUpdate(args: { _private: Record<number,PlayState> }) {
-    // FIXME:must be cleaner way to handle this.
-    this.onEnteringState({ _private: args._private[this.bga.players.getCurrentPlayerId()]! }, true);
+  override onEnteringState(args: { _private: { playState: PlayState } }, isCurrentPlayerActive: boolean) {
+    if (isCurrentPlayerActive) {
+      this.doEnterState(args._private.playState);
+    }
   }
 
   async notif_piecePlayed(
@@ -202,6 +201,7 @@ export class PlayPiecesState extends BabyloniaState {
       // field_points: number;
       ziggurat_points: number;
       touched_ziggurats: number[];
+      _private: { playState: PlayState } | undefined;
     }
   ) {
     let anims: AnimationList = [];
@@ -254,6 +254,9 @@ export class PlayPiecesState extends BabyloniaState {
 
      this.view.updateHandCount(args);
     // this.bga.playerPanels.getScoreCounter(args.player_id).incValue(args.points);
+    if (args._private) {
+      this.doEnterState(args._private.playState);
+    }
   }
 
   private async notif_undoMove(
@@ -262,6 +265,7 @@ export class PlayPiecesState extends BabyloniaState {
       // points: number;
       rc: number;
       _private: {
+        playState: PlayState;
         original_piece: string;
         handpos: number;
       } | undefined;
@@ -300,6 +304,10 @@ export class PlayPiecesState extends BabyloniaState {
       this.view.updateHandCount(args);
       // this.bga.playerPanels.getScoreCounter(args.player_id).incValue(-args.points);
     });
+
+    if (args._private) {
+      this.doEnterState(args._private.playState);
+    };
   }
 
   override onLeavingState(args: any, isCurrentPlayerActive: boolean): void {

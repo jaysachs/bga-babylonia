@@ -50,23 +50,20 @@ class PlayPieces extends AbstractState
         );
     }
 
-    private function stateArgs(Model $model, int $active_player_id): array {
-        return [
-            "_private" => [
-                $active_player_id => [
-                    "allowedMoves" => $model->getAllowedMoves(),
-                    "canEndTurn" => $model->canEndTurn(),
-                    "canUndo" => $model->canUndo(),
-                ]
-            ]
+    private function addStateArgs(array $args, Model $model, int $active_player_id): array {
+        $args["_private"][$active_player_id]["playState"] = [
+            "allowedMoves" => $model->getAllowedMoves(),
+            "canEndTurn" => $model->canEndTurn(),
+            "canUndo" => $model->canUndo(),
         ];
+        return $args;
     }
 
     /** @return array{_private:array<int,array{allowedMoves:array<string,list<int>>,canEndTurn:bool,canUndo:bool}>} */
     public function getArgs(int $active_player_id): array
     {
         $model = $this->createModel($active_player_id);
-        return $this->stateArgs($model, $active_player_id);
+        return $this->addStateArgs([], $model, $active_player_id);
     }
 
     #[PossibleAction]
@@ -83,25 +80,24 @@ class PlayPieces extends AbstractState
         $this->notify->all(
             "piecePlayed",
             $msg,
-            [
-                "player_id" => $active_player_id,
-                "piece" => $piece,
-                "handpos" => $handpos,
-                "rc" => $rc,
-                "row" => RowCol::row($rc),
-                "col" => RowCol::col($rc),
-                "captured_piece" => $move->captured_piece->value,
-                "points" => $points,
-                "ziggurat_points" => $move->ziggurat_points,
-                "field_points" => $move->field_points,
-                "hand_size" => $model->hand()->size(),
-                "touched_ziggurats" => $move->touched_ziggurats,
-            ]
-        );
-        $this->notify->player($active_player_id,
-            'playPiecesUpdate',
-            '',
-            $this->stateArgs($model, $active_player_id)
+            $this->addStateArgs(
+                [
+                    "player_id" => $active_player_id,
+                    "piece" => $piece,
+                    "handpos" => $handpos,
+                    "rc" => $rc,
+                    "row" => RowCol::row($rc),
+                    "col" => RowCol::col($rc),
+                    "captured_piece" => $move->captured_piece->value,
+                    "points" => $points,
+                    "ziggurat_points" => $move->ziggurat_points,
+                    "field_points" => $move->field_points,
+                    "hand_size" => $model->hand()->size(),
+                    "touched_ziggurats" => $move->touched_ziggurats,
+                ],
+                $model,
+                $active_player_id
+            )
         );
         return null;
     }
@@ -132,27 +128,29 @@ class PlayPieces extends AbstractState
         $model = $this->createModel($active_player_id);
         $move = $model->undo();
 
-        $this->notify->all("undoMove", clienttranslate('${player_name} undid their move'), [
-            "player_id" => $active_player_id,
-            "rc" => $move->rc,
-            "row" => RowCol::row($move->rc),
-            "col" => RowCol::col($move->rc),
-            "piece" => $move->piece->value,
-            "captured_piece" => $move->captured_piece->value,
-            "hand_size" => $model->hand()->size(),
-            "points" => $move->points(),
-            "_private" => [
-                $active_player_id => new NotificationMessage(clienttranslate('You undid your move from ${row},${col} returning ${_private.original_piece} to your hand'), [
-                    "handpos" => $move->handpos,
-                    "original_piece" => $move->original_piece->value,
-                ])
-            ]
-        ]);
-
-        $this->notify->player($active_player_id,
-            'playPiecesUpdate',
-            '',
-            $this->stateArgs($model, $active_player_id)
+        $this->notify->all(
+            "undoMove",
+            clienttranslate('${player_name} undid their move from ${row},${col}'),
+            $this->addStateArgs(
+                [
+                    "player_id" => $active_player_id,
+                    "rc" => $move->rc,
+                    "row" => RowCol::row($move->rc),
+                    "col" => RowCol::col($move->rc),
+                    "piece" => $move->piece->value,
+                    "captured_piece" => $move->captured_piece->value,
+                    "hand_size" => $model->hand()->size(),
+                    "points" => $move->points(),
+                    "_private" => [
+                        $active_player_id => [
+                            "handpos" => $move->handpos,
+                            "original_piece" => $move->original_piece->value,
+                        ]
+                    ]
+                ],
+                $model,
+                $active_player_id
+            )
         );
 
         return null;
