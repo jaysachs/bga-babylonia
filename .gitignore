@@ -4,7 +4,6 @@
 # exclude patterns (uncomment them if you want to use them):
 # *.[oa]
 # *~
-.last_sync
 modules/php/Stats.php
 work
 node_modules
@@ -17,4 +16,3 @@ local/backup/
 local/vassalimgs/
 package-lock.json
 src/bga-framework.d.ts
-src/colormap.ts

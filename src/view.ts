@@ -1,4 +1,3 @@
-import { colorIndexMap } from './colormap';
 import { BGamedatas, Hex, PlayerData, Zcard } from "./bdata";
 import { AttrLike, Html } from "./html";
 
@@ -11,11 +10,6 @@ export class Attrs implements AttrLike {
   static readonly ZTYPE : string = 'bbl_ztype';
   static readonly ZUSED : string = 'bbl_zused';
   static readonly PIECE : string = 'bbl_piece';
-
-  private static playerIdToColorIndex: Record<number, number> = {};
-  static initializeColorMap(cm: Record<number, number>) {
-    Attrs.playerIdToColorIndex = cm;
-  }
 
   static ztype(zt : string): Attrs {
     return new Attrs().ztype(zt);
@@ -33,21 +27,21 @@ export class Attrs implements AttrLike {
     return this;
   }
 
-  static piece(p: string, playerId? : number) : Attrs {
-    return new Attrs().piece(p, playerId);
+  static piece(p: string, pl? : Player) : Attrs {
+    return new Attrs().piece(p, pl);
   }
 
-  static setPiece(el: Element, p: string, playerId?: number) {
-    el.setAttribute(Attrs.PIECE, Attrs.pieceVal(p, playerId));
+  static setPiece(el: Element, p: string, pl?: Player) {
+    el.setAttribute(Attrs.PIECE, Attrs.pieceVal(p, pl));
   }
 
-  /* private */ static pieceVal(p: string, playerId?: number): string {
-    return (playerId && p != Piece.EMPTY)
-      ? p + '_' + Attrs.playerIdToColorIndex[playerId]
+  /* private */ static pieceVal(p: string, pl?: Player): string {
+    return (pl && p != Piece.EMPTY)
+      ? p + '_' + pl.color
       : p;
   }
-  piece(p: string, playerId?: number): Attrs {
-    this.r[Attrs.PIECE] = Attrs.pieceVal(p, playerId);
+  piece(p: string, pl?: Player): Attrs {
+    this.r[Attrs.PIECE] = Attrs.pieceVal(p, pl);
     return this;
   }
 }
@@ -101,18 +95,12 @@ export class View {
     private cityCounters: Counter[] = [];
     public /* private */ zcardTooltips = new Map<string, string>();
     private translatedPieces: Record<string,string>;
-    private playerIdToColorIndex: Record<number,number> = [];
 
-    constructor(private bga: Bga) {
+    constructor(private bga: Bga<Player, BGamedatas>) {
         this.translatedPieces = {};
     }
 
     public setup(gamedatas: BGamedatas): void{
-        for (const playerId in gamedatas.players) {
-            this.playerIdToColorIndex[playerId] = colorIndexMap[gamedatas.players[playerId]!.color]!;
-        }
-        Attrs.initializeColorMap(this.playerIdToColorIndex);
-
         this.translatedPieces = gamedatas.translated_pieces;
         this.bga.gameArea.getElement().appendChild(View.base_html());
 
@@ -159,8 +147,7 @@ export class View {
     private setupPlayerBoard(player: PlayerData): void {
         const playerId = player.player_id;
         console.log('Setting up board for player ' + playerId);
-        this.bga.playerPanels.getElement(playerId)
-            .append(...View.player_board_ext(playerId, this.playerIdToColorIndex[playerId]!));
+        this.bga.playerPanels.getElement(playerId).append(...this.player_board_ext(playerId));
         //    create counters per player
         this.handCounters[playerId] = new ebg.counter();
         this.handCounters[playerId]!.create(IDS.handcount(playerId));
@@ -228,14 +215,15 @@ export class View {
         return Html.div({ id:  IDS.hexDiv(hex.rc), style: [`top:${top}%`, `left:${left}%`] });
     }
 
-    public static player_board_ext(player_id: number, color_index: number): HTMLElement[] {
+    public player_board_ext(player_id: number): HTMLElement[] {
+        const color = this.bga.players.getPlayerById(player_id)?.color;
         return [
             Html.div({},
-                Html.span({classes:`bbl_pb_hand_label_${color_index}`}),
+                Html.span({classes:`bbl_pb_hand_label_${color}`}),
                 Html.span({id: IDS.handcount(player_id)}),
             ),
             Html.div({},
-                Html.span({classes:`bbl_pb_pool_label_${color_index}`}),
+                Html.span({classes:`bbl_pb_pool_label_${color}`}),
                 Html.span({id: IDS.poolcount(player_id)}),
             ),
             Html.div({},
@@ -263,8 +251,8 @@ export class View {
         );
     }
 
-    public createPieceDiv(piece: string, player_id?: number) : HTMLElement {
-        return Html.div({ attrs: Attrs.piece(piece, player_id) } );
+    public createPieceDiv(piece: string, player_id: number) : HTMLElement {
+        return Html.div({ attrs: Attrs.piece(piece, this.bga.players.getPlayerById(player_id)) } );
     }
 
     public hexDiv(rc: number): HTMLElement {
@@ -309,7 +297,7 @@ export class View {
     }
 
     public renderedPiece(piece: string, player_id: number = 0): HTMLElement {
-        return Html.span({ title: this.translatedPiece(piece), attrs: Attrs.piece(piece, player_id) });
+        return Html.span({ title: this.translatedPiece(piece), attrs: Attrs.piece(piece, this.bga.players.getPlayerById(player_id)) });
     }
 
     public renderedZcard(id: string, zcard: string): HTMLElement {

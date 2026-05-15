@@ -8,21 +8,17 @@ WORK=work
 STUBS=$(WORK)/module/table/table.game.php
 TS_STUBS=src/bga-framework.d.ts
 JS=modules/js/Game.js
-COLORMAP=src/colormap.ts
 PHPSTAN_LEVEL=10
 
 .PHONY: build test phpstan deploy clean
 
 build: $(JS) $(STUBS) $(STATS)
 
-$(JS): $(COLORMAP) src/*.ts tsconfig.json $(TS_STUBS)
+$(JS): src/*.ts tsconfig.json $(TS_STUBS)
 	npm run build:ts
 
 $(STATS): $(GENSTATS) stats.jsonc Makefile
 	php $(GENSTATS) $(GAME)  > $(STATS)
-
-$(COLORMAP): misc/colormap.php gameinfos.jsonc
-	php misc/colormap.php > $(COLORMAP)
 
 $(WORK):
 	mkdir $(WORK)
@@ -44,4 +40,4 @@ deploy: test
 	lftp -e 'cd $(GAME); mirror -e -R --exclude .vscode/ --exclude .git/ --exclude work/ --exclude local/ --exclude bga-framework.d.ts --exclude .phpunit* --exclude node_modules*/ --exclude _ide_helper.php; exit' $(SFTP)
 
 clean:
-	rm -rf $(WORK) $(TS_STUBS) $(JS) $(COLORMAP) $(STATS)
+	rm -rf $(WORK) $(TS_STUBS) $(JS) $(STATS)

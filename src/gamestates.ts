@@ -1,5 +1,5 @@
 import { Game } from "./babylonia";
-import { PlayState } from "./bdata";
+import { BGamedatas, PlayState } from "./bdata";
 import { AnimationManager } from "./bga-animations";
 import { Attrs, CSS, IDS, Piece, View } from "./view";
 import { indexInParent } from "./html";
@@ -25,7 +25,7 @@ export abstract class BabyloniaState {
   }
 
 
-  constructor(protected bga: Bga, protected view: View, protected animationManager: AnimationManager) {}
+  constructor(protected bga: Bga<Player, BGamedatas>, protected view: View, protected animationManager: AnimationManager) {}
 
   public onEnteringState(args: any, isCurrentPlayerActive: boolean) {}
 
@@ -57,7 +57,7 @@ export class EndOfTurnScoringState extends BabyloniaState {
 
 export class SelectZigguratCardState extends BabyloniaState {
   private handler: (e: Event) => void;
-  constructor(bga: Bga, view: View, animationManager: AnimationManager) {
+  constructor(bga: Bga<Player, BGamedatas>, view: View, animationManager: AnimationManager) {
     super(bga, view, animationManager);
     this.handler = (e) => this.onZcardClicked(e);
   }
@@ -121,7 +121,7 @@ export class SelectZigguratCardState extends BabyloniaState {
 
 export class SelectScoringHexState extends BabyloniaState {
   private handler: (e: Event) => void;
-  constructor(bga: Bga, view: View, animationManager: AnimationManager) {
+  constructor(bga: Bga<Player, BGamedatas>, view: View, animationManager: AnimationManager) {
     super(bga, view, animationManager);
     this.handler = (e) => this.onBoardClicked(e);
   }
@@ -171,7 +171,7 @@ export class PlayPiecesState extends BabyloniaState {
   private handHandler: (e: Event) => void;
   private boardHandler: (e: Event) => void;
 
-  constructor(bga: Bga, view: View, animationManager: AnimationManager) {
+  constructor(bga: Bga<Player, BGamedatas>, view: View, animationManager: AnimationManager) {
     super(bga, view, animationManager);
     this.handHandler = (e) => this.onHandClicked(e);
     this.boardHandler = (e) => this.onBoardClicked(e);
@@ -225,7 +225,7 @@ export class PlayPiecesState extends BabyloniaState {
         // slide piece from hand to hex
         this.animationManager.slideAndAttach(pieceDiv, hexDiv)
           // play into river, piece is hidden, so use the value from the args not the hand
-          .then(() => Attrs.setPiece(pieceDiv, args.piece, args.player_id))
+          .then(() => Attrs.setPiece(pieceDiv, args.piece, this.bga.players.getPlayerById(args.player_id)))
       );
     } else {
       anims.push(() => {
@@ -287,7 +287,7 @@ export class PlayPiecesState extends BabyloniaState {
 
     if (args._private?.original_piece) {
         // restore piece value, e.g. if it was originally hidden
-        Attrs.setPiece(pieceDiv, args._private.original_piece, args.player_id);
+        Attrs.setPiece(pieceDiv, args._private.original_piece, this.bga.players.getPlayerById(args.player_id));
     }
     // slide the played piece back to the hand
     anims.push(() => this.animationManager.slideAndAttach(pieceDiv, destDiv));
