@@ -65,4 +65,26 @@ export class SelectZigguratCardState extends BabyloniaState {
     }
     return false;
   }
+
+  async notif_zigguratCardSelection(
+    args: {
+      zcard: string;
+      player_id: number;
+      cardused: boolean;
+      // points: number;
+      hex: number;
+    }
+  ) {
+    this.view.unmarkHexSelected(args.hex);
+    const dest = $(IDS.playerBoardZcards(args.player_id));
+    const zelem = $(IDS.zcard(args.zcard));
+    zelem.classList.remove(CSS.SELECTED);
+    await this.animationManager.slideAndAttach(zelem, dest, { toPlaceholder: 'off' })
+        .then(() => {
+          // this.bga.playerPanels.getScoreCounter(args.player_id).incValue(args.points);
+          if (args.cardused) {
+            zelem.setAttribute(Attrs.ZUSED, "true");
+          }
+        });
+  }
 }

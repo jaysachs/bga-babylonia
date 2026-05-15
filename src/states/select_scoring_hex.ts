@@ -48,4 +48,15 @@ export class SelectScoringHexState extends BabyloniaState {
       },
       { color: "secondary" });
   }
+
+  async notif_scoringSelection(
+    args: {
+      player_id: number;
+      player_name: string;
+      rc: number;
+      city: string;
+    }) {
+     this.view.markHexSelected(args.rc);
+  }
+
 }
