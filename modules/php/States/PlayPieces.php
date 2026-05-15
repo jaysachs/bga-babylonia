@@ -139,6 +139,7 @@ class PlayPieces extends AbstractState
             "col" => RowCol::col($move->rc),
             "piece" => $move->piece->value,
             "captured_piece" => $move->captured_piece->value,
+            "hand_size" => $model->hand()->size(),
             "points" => $move->points(),
             "_private" => [
                 $active_player_id => new NotificationMessage(clienttranslate('You undid your move from ${row},${col} returning ${_private.original_piece} to your hand'), [
