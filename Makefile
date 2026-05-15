@@ -14,7 +14,7 @@ PHPSTAN_LEVEL=10
 
 build: $(JS) $(STUBS) $(STATS)
 
-$(JS): src/**/*.ts tsconfig.json $(TS_STUBS)
+$(JS): src/**/*.ts src/*.ts tsconfig.json $(TS_STUBS)
 	npm run build:ts
 
 $(STATS): $(GENSTATS) stats.jsonc Makefile
