@@ -84,16 +84,14 @@ export class PlayPiecesState extends BabyloniaState {
     // animate the ziggurat scoring, if any
     if (args.ziggurat_points > 0) {
       args.touched_ziggurats.forEach(z => this.view.markHexSelected(z));
-      // TODO: since it's parallel, just flatten into the anims list?
-      anims.push(() => this.animationManager.playParallel(
-        args.touched_ziggurats.map((rc: number) =>
-          () => this.animationManager.displayScoring(
-               this.view.hexDiv(rc),
-              1,
-              this.bga.gameui.gamedatas.players[args.player_id]!.color,
-              { extraClass: 'bbl_city_scoring', duration: 700 })
-            .then(() => args.touched_ziggurats.forEach(z => this.view.unmarkHexSelected(z))))
-      ));
+      anims.push(... args.touched_ziggurats.map((rc: number) =>
+        () => this.animationManager.displayScoring(
+                this.view.hexDiv(rc),
+                1,
+                this.bga.gameui.gamedatas.players[args.player_id]!.color,
+                { extraClass: 'bbl_city_scoring', duration: 700 })
+                .then(() => args.touched_ziggurats.forEach(z => this.view.unmarkHexSelected(z))))
+      );
     }
 
     await this.animationManager.playParallel(anims);
