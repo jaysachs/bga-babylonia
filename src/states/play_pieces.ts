@@ -58,34 +58,28 @@ export class PlayPiecesState extends BabyloniaState {
   ) {
     let anims: AnimationList = [];
 
-    const hexDiv =  this.view.hexDiv(args.rc);
+    if (!this.bga.players.isCurrentPlayerActive()) {
+      const hexDiv =  this.view.hexDiv(args.rc);
 
-    // Check for field capture
-    if (args.captured_piece != Piece.EMPTY /* .startsWith('field') */) {
-      let field = hexDiv.firstElementChild as HTMLElement;
-      if (!field) { // or field is not F567X
-        console.error("attempt to capture a field that is not there");
+      // Check for field capture
+      if (args.captured_piece != Piece.EMPTY /* .startsWith('field') */) {
+        let field = hexDiv.firstElementChild as HTMLElement;
+        if (!field) { // or field is not F567X
+          console.error("attempt to capture a field that is not there");
+        }
+        // slide the captured field to the player board
+        anims.push(() => this.animationManager.slideOutAndDestroy(field, $(IDS.handcount(args.player_id)), {}));
       }
-      // slide the captured field to the player board
-      anims.push(() => this.animationManager.slideOutAndDestroy(field, $(IDS.handcount(args.player_id)), {}));
-    }
-
-    if (this.bga.players.isCurrentPlayerActive()) {
-      const handPosDiv =  this.view.handPosDiv(args.handpos);
-      const pieceDiv = handPosDiv.firstElementChild as HTMLElement;
-      anims.push(() =>
-        // slide piece from hand to hex
-        this.animationManager.slideAndAttach(pieceDiv, hexDiv)
-          // play into river, piece is hidden, so use the value from the args not the hand
-          .then(() => Attrs.setPiece(pieceDiv, args.piece, this.bga.players.getPlayerById(args.player_id)))
-      );
-    } else {
       anims.push(() => {
         // slide piece from hand count to hex
         let div =  this.view.createPieceDiv(args.piece, args.player_id);
         $(IDS.handcount(args.player_id)).appendChild(div);
         return this.animationManager.slideAndAttach(div, hexDiv, { fromPlaceholder: 'off' });
       });
+    } else {
+      // FIXME: think about how to move this into the `onBoardClicked` function.
+      const pieceDiv = this.view.hexDiv(args.rc).firstElementChild as HTMLElement;
+      Attrs.setPiece(pieceDiv, args.piece, this.bga.players.getPlayerById(args.player_id))
     }
     // animate the ziggurat scoring, if any
     if (args.ziggurat_points > 0) {
@@ -104,7 +98,7 @@ export class PlayPiecesState extends BabyloniaState {
 
     await this.animationManager.playParallel(anims);
 
-     this.view.updateHandCount(args);
+    this.view.updateHandCount(args);
     // this.bga.playerPanels.getScoreCounter(args.player_id).incValue(args.points);
     if (args._private) {
       this.doEnterState(args._private.playState);
@@ -252,16 +246,35 @@ export class PlayPiecesState extends BabyloniaState {
       console.error('no hex selected!');
       return;
     }
-    // FIXME: this is fragile; if we await, or put the unselctAllHandPieces in the then, we
-    //  end up with the animated moving piece not the eventual piece, and get a JS error
-    //  leaving the hand piece selected.
-    this.bga.actions.performAction('actPlayPiece', {
-      handpos: indexInParent(handDiv),
-      rc: hex
-    }).then(() => {
-         this.view.unmarkHexPlayable(hex);
-    })
+
+
+    let anims: AnimationList = [];
+
+    const hexDiv =  this.view.hexDiv(hex);
+
+    // Check for field capture
+    if (hexDiv.firstElementChild) /* and is field */ {
+      let field = hexDiv.firstElementChild as HTMLElement;
+      // slide the captured field to the player board
+      anims.push(() => this.animationManager.slideOutAndDestroy(field, $(IDS.handcount(this.bga.players.getCurrentPlayerId())), {}));
+    }
+
+    const pieceDiv = handDiv.firstElementChild as HTMLElement;
+    anims.push(() =>
+      // slide piece from hand to hex
+      this.animationManager.slideAndAttach(pieceDiv, hexDiv)
+        // FIXME: need to know this is happening? or just let it flip in the notif??
+        // play into river, piece is hidden
+        // .then(() => Attrs.setPiece(pieceDiv, args.piece, this.bga.players.getCurrentPlayer()))
+    );
+
     this.unselectAllHandPieces();
+    // FIXME: is it fragile here to do the anim and action in parallel?
+    // FIXME: do we need to await?
+    await Promise.all([
+      this.animationManager.playParallel(anims),
+      this.bga.actions.performAction('actPlayPiece', { handpos: indexInParent(handDiv), rc: hex })
+    ]);
   }
 
   private onHandClicked(ev: Event): boolean {
