@@ -5,14 +5,21 @@ import { indexInParent } from "../html";
 import { AnimationList } from "../more-animations";
 import { BabyloniaState } from "./base";
 
-interface PlayState {
+interface PlayStateArgs {
   canEndTurn: boolean;
-  canUndo: boolean;
   allowedMoves: Record<string, number[]>;
+  previousMove: {
+    piece: string;
+    captured_piece: string;
+    hand_size: number;
+    points: number;
+    handpos: number;
+    original_piece: string;
+  } | undefined;
 }
 
 export class PlayPiecesState extends BabyloniaState {
-  private playStateArgs: PlayState| null = null;
+  private playStateArgs: PlayStateArgs| null = null;
   private handHandler: (e: Event) => void;
   private boardHandler: (e: Event) => void;
 
@@ -22,13 +29,13 @@ export class PlayPiecesState extends BabyloniaState {
     this.boardHandler = (e) => this.onBoardClicked(e);
   }
 
-  private doEnterState(playState: PlayState) {
-      this.playStateArgs = playState;
+  private doEnterState(playStateArgs: PlayStateArgs) {
+      this.playStateArgs = playStateArgs;
       this.view.markAllHexesUnplayable();
       this.setStatusBarForPlayState();
   }
 
-  override onEnteringState(args: { _private: { playState: PlayState } }, isCurrentPlayerActive: boolean) {
+  override onEnteringState(args: { _private: { playState: PlayStateArgs } }, isCurrentPlayerActive: boolean) {
     if (isCurrentPlayerActive) {
       this.doEnterState(args._private.playState);
     }
@@ -46,7 +53,7 @@ export class PlayPiecesState extends BabyloniaState {
       // field_points: number;
       ziggurat_points: number;
       touched_ziggurats: number[];
-      _private: { playState: PlayState } | undefined;
+      _private: { playState: PlayStateArgs } | undefined;
     }
   ) {
     let anims: AnimationList = [];
@@ -110,7 +117,7 @@ export class PlayPiecesState extends BabyloniaState {
       // points: number;
       rc: number;
       _private: {
-        playState: PlayState;
+        playState: PlayStateArgs;
         original_piece: string;
         handpos: number;
       } | undefined;
@@ -320,7 +327,7 @@ export class PlayPiecesState extends BabyloniaState {
       this.attachHandHandler();
       this.setPlayablePieces();
     }
-    if (this.playStateArgs!.canUndo) {
+    if (this.playStateArgs?.previousMove) {
       this.bga.statusBar.addActionButton(
         _('Undo'),
         () => this.bga.actions.performAction('actUndoPlay'),

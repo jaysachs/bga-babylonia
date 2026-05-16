@@ -144,12 +144,7 @@ class Model
         return $this->allData()['board'];
     }
 
-    public function canUndo(): bool
-    {
-        return $this->turnProgress()->canUndo();
-    }
-
-    private function turnProgress(): TurnProgress
+    public function turnProgress(): TurnProgress
     {
         return $this->allData()['turnProgress'];
     }

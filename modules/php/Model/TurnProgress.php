@@ -37,9 +37,12 @@ class TurnProgress
         $this->moves[] = $move;
     }
 
-    public function canUndo(): bool
-    {
-        return count($this->moves) > 0;
+    public function previousMove(): ?Move {
+        $x = count($this->moves);
+        if ($x == 0) {
+            return null;
+        }
+        return $this->moves[$x - 1];
     }
 
     public function undoLastMove(): Move
