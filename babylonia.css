@@ -194,7 +194,7 @@ body.mobile_version {
     background-position: -200% 0;
 }
 
-[bbl_piece="hidden_7f9c29a"] {
+[bbl_piece="hidden_f9c29a"] {
     background-position: -300% 0;
 }
 
@@ -210,7 +210,7 @@ body.mobile_version {
     background-position: -200% -400%;
 }
 
-[bbl_piece="farmer_7f9c29a"] {
+[bbl_piece="farmer_f9c29a"] {
     background-position: -300% -400%;
 }
 
@@ -226,7 +226,7 @@ body.mobile_version {
     background-position: -200% -100%;
 }
 
-[bbl_piece="merchant_7f9c29a"] {
+[bbl_piece="merchant_f9c29a"] {
     background-position: -300% -100%;
 }
 
@@ -242,7 +242,7 @@ body.mobile_version {
     background-position: -200% -200%;
 }
 
-[bbl_piece="servant_7f9c29a"] {
+[bbl_piece="servant_f9c29a"] {
     background-position: -300% -200%;
 }
 
@@ -258,7 +258,7 @@ body.mobile_version {
     background-position: -200% -300%;
 }
 
-[bbl_piece="priest_7f9c29a"] {
+[bbl_piece="priest_f9c29a"] {
     background-position: -300% -300%;
 }
 
@@ -435,11 +435,11 @@ body.mobile_version {
 .bbl_pb_city_label,
 .bbl_pb_hand_label_ffffff,
 .bbl_pb_hand_label_76a89b,
-.bbl_pb_hand_label_7f9c29a,
+.bbl_pb_hand_label_f9c29a,
 .bbl_pb_hand_label_9a9a9a,
 .bbl_pb_pool_label_ffffff,
 .bbl_pb_pool_label_76a89b,
-.bbl_pb_pool_label_7f9c29a,
+.bbl_pb_pool_label_f9c29a,
 .bbl_pb_pool_label_9a9a9a,
 .bbl_pb_zcard_label {
     width: calc(var(--bbl-label-width));
@@ -456,7 +456,7 @@ body.mobile_version {
     background-position: -200% -500%;
 }
 
-.bbl_pb_hand_label_7f9c29a {
+.bbl_pb_hand_label_f9c29a {
     background-position: -300% -500%;
 }
 
@@ -472,7 +472,7 @@ body.mobile_version {
     background-position: -200% -600%;
 }
 
-.bbl_pb_pool_label_7f9c29a {
+.bbl_pb_pool_label_f9c29a {
     background-position: -300% -600%;
 }
 
