@@ -623,7 +623,7 @@ class Model
         if (!$move->captured_piece->isEmpty()) {
             $this->board()->hexAt($move->rc)->playPiece($move->captured_piece, $move->player_id);
         }
-        $this->hand()->replace($move->piece, $move->handpos);
+        $this->hand()->replace($move->original_piece, $move->handpos);
         $this->ps->deleteSingleMove($move);
         $this->ps->updateHex($move->rc, $move->captured_piece, 0);
         $this->ps->updateHand($move->player_id, $move->handpos, $move->original_piece);
