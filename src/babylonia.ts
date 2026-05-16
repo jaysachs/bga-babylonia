@@ -7,6 +7,7 @@ import { SelectZigguratCardState } from './states/select_ziggurate_card';
 import { PlayPiecesState } from './states/play_pieces';
 import { SelectScoringHexState } from './states/select_scoring_hex';
 import { FinishTurnState } from './states/finish_turn';
+import { ScoreHexState } from './states/score_hex';
 
 /** Game class */
 export class Game extends BaseGame<Player, BGamedatas> {
@@ -29,12 +30,6 @@ export class Game extends BaseGame<Player, BGamedatas> {
       logger: console.log,
       handlers: [this, ...this.bga.states.getStateClasses()],
     });
-
-    // if a ziggurat card is being chosen
-    // FIXME: this should be done in a state class for ScoreHex state
-    if (gamedatas.current_scoring_hex) {
-       this.view.markHexSelected(gamedatas.current_scoring_hex);
-    }
     console.log('Game setup done');
   }
 
@@ -45,6 +40,7 @@ export class Game extends BaseGame<Player, BGamedatas> {
     this.bga.states.register('SelectZigguratCard', new SelectZigguratCardState(this.bga, this.view, this.animationManager));
     this.bga.states.register('PlayPieces', new PlayPiecesState(this.bga, this.view, this.animationManager));
     this.bga.states.register('SelectScoringHex', new SelectScoringHexState(this.bga, this.view, this.animationManager));
+    this.bga.states.register('ScoreHex', new ScoreHexState(this.bga, this.view, this.animationManager));
   }
 
   private registerLogArgs(): void {

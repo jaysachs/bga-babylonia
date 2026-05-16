@@ -24,5 +24,4 @@ export interface BGamedatas extends Gamedatas<Player> {
   hand: string[];
   ziggurat_cards: Zcard[];
   translated_pieces: Record<string,string>;
-  current_scoring_hex: number | null;
 }

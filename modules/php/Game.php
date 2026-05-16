@@ -177,7 +177,6 @@ class Game extends Table
                 $model->hand()->pieces()
             ),
             'board' => $board_data,
-            'current_scoring_hex' => $this->ps->rowColBeingScored(),
             'translated_pieces' => $translated,
             'ziggurat_cards' =>
             array_map(

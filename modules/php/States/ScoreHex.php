@@ -59,7 +59,7 @@ class ScoreHex extends AbstractState
         $rc = $this->scoringHex();
         $model = $this->createModel(0);
         return [
-            "rc" => $rc,
+            "current_scoring_hex" => $rc,
             "row" => RowCol::row($rc),
             "col" => RowCol::col($rc),
             "city" => $model->board()->hexAt($rc)->piece->value,
