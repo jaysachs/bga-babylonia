@@ -56,7 +56,7 @@ END;
     private function hexWinner(int $r, int $c, int $captured_by): HexWinner {
         $hex = $this->hex($r, $c);
         $neighbors = $this->board->neighbors($hex, function (Hex &$hex): bool {
-            return $hex->piece->isPlayerPiece();
+            return $hex->piece->isPlayerPieceType();
         });
 
         return new HexWinner($hex, $captured_by, $neighbors);

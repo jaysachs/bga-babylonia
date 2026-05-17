@@ -6,7 +6,7 @@ use PHPUnit\Framework\TestCase;
 
 use Bga\Games\babylonia\Model\{
     Hand,
-    Piece,
+    PieceType,
 };
 
 final class HandTest extends TestCase
@@ -17,11 +17,11 @@ final class HandTest extends TestCase
         $this->assertEquals(0, $hand->size());
         $this->assertEquals(5, $hand->limit());
         $x = [
-            Piece::PRIEST,
-            Piece::SERVANT,
-            Piece::PRIEST,
-            Piece::MERCHANT,
-            Piece::FARMER
+            PieceType::PRIEST,
+            PieceType::SERVANT,
+            PieceType::PRIEST,
+            PieceType::MERCHANT,
+            PieceType::FARMER
         ];
         foreach ($x as $p) {
             $hand->replenish($p);
@@ -48,17 +48,17 @@ final class HandTest extends TestCase
         $this->assertEquals(0, $hand->size());
         $this->assertEquals(5, $hand->limit());
         $x = [
-            Piece::PRIEST,
-            Piece::SERVANT,
-            Piece::PRIEST,
-            Piece::MERCHANT,
-            Piece::FARMER
+            PieceType::PRIEST,
+            PieceType::SERVANT,
+            PieceType::PRIEST,
+            PieceType::MERCHANT,
+            PieceType::FARMER
         ];
         foreach ($x as $p) {
             $hand->replenish($p);
         }
         $this->expectException(LogicException::class);
-        $hand->replenish(Piece::PRIEST);
+        $hand->replenish(PieceType::PRIEST);
     }
 
     public function testHandExtend(): void
@@ -67,11 +67,11 @@ final class HandTest extends TestCase
         $this->assertEquals(0, $hand->size());
         $this->assertEquals(5, $hand->limit());
         $x = [
-            Piece::PRIEST,
-            Piece::SERVANT,
-            Piece::PRIEST,
-            Piece::MERCHANT,
-            Piece::FARMER
+            PieceType::PRIEST,
+            PieceType::SERVANT,
+            PieceType::PRIEST,
+            PieceType::MERCHANT,
+            PieceType::FARMER
         ];
         foreach ($x as $p) {
             $hand->replenish($p);
@@ -81,10 +81,10 @@ final class HandTest extends TestCase
         $hand->extend(7);
         $this->assertEquals(7, $hand->limit());
         $this->assertEquals(3, $hand->size());
-        $hand->replenish(Piece::PRIEST);
-        $hand->replenish(Piece::FARMER);
-        $hand->replenish(Piece::MERCHANT);
-        $hand->replenish(Piece::FARMER);
+        $hand->replenish(PieceType::PRIEST);
+        $hand->replenish(PieceType::FARMER);
+        $hand->replenish(PieceType::MERCHANT);
+        $hand->replenish(PieceType::FARMER);
         $this->assertEquals(7, $hand->limit());
         $this->assertEquals(7, $hand->size());
     }

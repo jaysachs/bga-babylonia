@@ -149,7 +149,7 @@ class Model
         return $this->allData()['turnProgress'];
     }
 
-    public function checkPlay(Piece $piece, Hex $hex): PlayAllowedResult
+    public function checkPlay(PieceType $piece, Hex $hex): PlayAllowedResult
     {
         $zcardsUsed = [];
         if ($hex->piece->isField()) {
@@ -170,7 +170,7 @@ class Model
             } else {
                 $zcardsUsed[] = ZigguratCardType::NOBLES_IN_FIELDS;
             }
-        } else if ($hex->piece != Piece::EMPTY) {
+        } else if ($hex->piece != PieceType::EMPTY) {
             return PlayAllowedResult::failure("can't place in occupied non-field space");
         }
 
@@ -230,7 +230,7 @@ class Model
     {
         $result = [ "" => [] ];
         $hand = $this->hand();
-        $allPieces = Piece::playerPieces();
+        $allPieces = PieceType::playerPieceTypes();
         foreach ($allPieces as $piece) {
             $result[$piece->value] = [];
         }
@@ -265,7 +265,7 @@ class Model
 
         $originalPiece = $piece;
         if ($hex->isWater()) {
-            $piece = Piece::HIDDEN;
+            $piece = PieceType::HIDDEN;
         }
         $hexPiece = $hex->playPiece($piece, $this->player_id);
 
@@ -273,21 +273,21 @@ class Model
         $ziggurats = [];
         // score field
         switch ($hexPiece) {
-            case Piece::FIELD_5:
+            case PieceType::FIELD_5:
                 $field_points = 5;
                 break;
-            case Piece::FIELD_6:
+            case PieceType::FIELD_6:
                 $field_points = 6;
                 break;
-            case Piece::FIELD_7:
+            case PieceType::FIELD_7:
                 $field_points = 7;
                 break;
-            case Piece::FIELD_CITIES:
+            case PieceType::FIELD_CITIES:
                 $field_points = $this->totalCapturedCities();
                 break;
         }
         $zigs = $this->board()->neighbors($hex, function (Hex $h): bool {
-            return $h->piece == Piece::ZIGGURAT;
+            return $h->piece == PieceType::ZIGGURAT;
         });
         if (count($zigs) > 0) {
             $ziggurats = $this->board()->touchedZiggurats($this->player_id);
@@ -315,7 +315,7 @@ class Model
         //      update the right one
         //   }
         $this->ps->incPlayerScore($move->player_id, $move->points());
-        $this->ps->updateHand($move->player_id, $move->handpos, Piece::EMPTY);
+        $this->ps->updateHand($move->player_id, $move->handpos, PieceType::EMPTY);
 
         foreach ($result->activatedCards() as $zctype) {
             switch ($zctype) {
@@ -547,7 +547,7 @@ class Model
             $missing = $this->board()->neighbors(
                 $hex,
                 function (Hex $nh): bool {
-                    return $nh->piece === Piece::EMPTY
+                    return $nh->piece === PieceType::EMPTY
                         && $nh->type === HexType::LAND;
                 }
             );

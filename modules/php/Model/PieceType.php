@@ -27,7 +27,7 @@ declare(strict_types=1);
 
 namespace Bga\Games\babylonia\Model;
 
-enum Piece: string
+enum PieceType: string
 {
 
     case ZIGGURAT = 'ziggurat';
@@ -75,10 +75,10 @@ enum Piece: string
     public function isField(): bool
     {
         return match ($this) {
-            Piece::FIELD_5,
-            Piece::FIELD_6,
-            Piece::FIELD_7,
-            Piece::FIELD_CITIES => true,
+            PieceType::FIELD_5,
+            PieceType::FIELD_6,
+            PieceType::FIELD_7,
+            PieceType::FIELD_CITIES => true,
             default => false,
         };
     }
@@ -86,75 +86,75 @@ enum Piece: string
     public function isCity(): bool
     {
         return match ($this) {
-            Piece::CITY_P,
-            Piece::CITY_S,
-            Piece::CITY_M,
-            Piece::CITY_SP,
-            Piece::CITY_MP,
-            Piece::CITY_MS,
-            Piece::CITY_MSP => true,
+            PieceType::CITY_P,
+            PieceType::CITY_S,
+            PieceType::CITY_M,
+            PieceType::CITY_SP,
+            PieceType::CITY_MP,
+            PieceType::CITY_MS,
+            PieceType::CITY_MSP => true,
             default => false,
         };
     }
 
-    /** @return Piece[] */
-    public static function playerPieces(): array
+    /** @return PieceType[] */
+    public static function playerPieceTypes(): array
     {
-        return [Piece::FARMER, Piece::MERCHANT, Piece::SERVANT, Piece::PRIEST];
+        return [PieceType::FARMER, PieceType::MERCHANT, PieceType::SERVANT, PieceType::PRIEST];
     }
 
     public function isEmpty(): bool
     {
-        return $this == Piece::EMPTY;
+        return $this == PieceType::EMPTY;
     }
     public function isZiggurat(): bool
     {
-        return $this == Piece::ZIGGURAT;
+        return $this == PieceType::ZIGGURAT;
     }
-    public function isPlayerPiece(): bool
+    public function isPlayerPieceType(): bool
     {
         return $this->isFarmer() || $this->isNoble() || $this->isHidden();
     }
     public function isHidden(): bool
     {
-        return $this == Piece::HIDDEN;
+        return $this == PieceType::HIDDEN;
     }
     public function isFarmer(): bool
     {
-        return $this == Piece::FARMER;
+        return $this == PieceType::FARMER;
     }
     public function isNoble(): bool
     {
         return match ($this) {
-            Piece::MERCHANT,
-            Piece::SERVANT,
-            Piece::PRIEST => true,
+            PieceType::MERCHANT,
+            PieceType::SERVANT,
+            PieceType::PRIEST => true,
             default => false,
         };
     }
 
-    public function scores(Piece $p): bool
+    public function scores(PieceType $p): bool
     {
         return match ($p) {
-            Piece::PRIEST => match ($this) {
-                Piece::CITY_P,
-                Piece::CITY_SP,
-                Piece::CITY_MP,
-                Piece::CITY_MSP => true,
+            PieceType::PRIEST => match ($this) {
+                PieceType::CITY_P,
+                PieceType::CITY_SP,
+                PieceType::CITY_MP,
+                PieceType::CITY_MSP => true,
                 default => false,
             },
-            Piece::SERVANT => match ($this) {
-                Piece::CITY_S,
-                Piece::CITY_MS,
-                Piece::CITY_SP,
-                Piece::CITY_MSP => true,
+            PieceType::SERVANT => match ($this) {
+                PieceType::CITY_S,
+                PieceType::CITY_MS,
+                PieceType::CITY_SP,
+                PieceType::CITY_MSP => true,
                 default => false,
             },
-            Piece::MERCHANT => match ($this) {
-                Piece::CITY_M,
-                Piece::CITY_MS,
-                Piece::CITY_MP,
-                Piece::CITY_MSP => true,
+            PieceType::MERCHANT => match ($this) {
+                PieceType::CITY_M,
+                PieceType::CITY_MS,
+                PieceType::CITY_MP,
+                PieceType::CITY_MSP => true,
                 default => false,
             },
             default => false,

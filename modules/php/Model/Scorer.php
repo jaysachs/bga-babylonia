@@ -46,7 +46,7 @@ class Scorer
         $neighbors = $this->board->neighbors(
             $hex,
             function (Hex $h): bool {
-                return $h->piece->isPlayerPiece();
+                return $h->piece->isPlayerPieceType();
             }
         );
         $adjacent = [];

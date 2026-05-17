@@ -96,7 +96,7 @@ class PersistentStore
             $hexes[] = new Hex(
                 HexType::from($hex['hextype']),
                 intval($hex['rc']),
-                Piece::from($hex['piece']),
+                PieceType::from($hex['piece']),
                 intval($hex['board_player']),
                 boolval($hex['scored']),
                 Landmass::from($hex['landmass'])
@@ -153,7 +153,7 @@ class PersistentStore
 
         $pieces = [];
         foreach ($data as $pd) {
-            $pieces[] = Piece::from($pd);
+            $pieces[] = PieceType::from($pd);
         }
         return new Pool($pieces);
     }
@@ -187,7 +187,7 @@ class PersistentStore
         $data = $this->db->getSingleFieldList($sql);
         $pieces = [];
         foreach ($data as $pd) {
-            $pieces[] = Piece::from($pd);
+            $pieces[] = PieceType::from($pd);
         }
         return new Hand($pieces);
     }
@@ -235,7 +235,7 @@ class PersistentStore
 
     public function updateHex(
         int $rc,
-        ?Piece $piece = null,
+        ?PieceType $piece = null,
         ?int $player_id = null,
         ?bool $scored = null
     ): void {
@@ -257,7 +257,7 @@ class PersistentStore
         $this->db->execute($sql);
     }
 
-    public function updateHand(int $player_id, int $handpos, Piece $piece): void
+    public function updateHand(int $player_id, int $handpos, PieceType $piece): void
     {
         $sql = "UPDATE hands
                 SET piece = '$piece->value'
@@ -320,11 +320,11 @@ class PersistentStore
         foreach ($data as &$md) {
             $moves[] = new Move(
                 intval($md['player_id']),
-                Piece::from($md['piece']),
-                Piece::from($md['original_piece']),
+                PieceType::from($md['piece']),
+                PieceType::from($md['original_piece']),
                 intval($md['handpos']),
                 intval($md['board_loc']),
-                Piece::from($md['captured_piece']),
+                PieceType::from($md['captured_piece']),
                 intval($md['field_points']),
                 intval($md['ziggurat_points']),
                 intval($md['seq_id'])

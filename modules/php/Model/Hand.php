@@ -31,14 +31,14 @@ class Hand
 {
     public const DEFAULT_SIZE = 5;
 
-    /** @param Piece[] $pieces */
+    /** @param PieceType[] $pieces */
     public function __construct(private array $pieces) {}
 
     public static function new(int $size = Hand::DEFAULT_SIZE): Hand
     {
         $pieces = [];
         for ($i = 0; $i < $size; $i++) {
-            $pieces[] = Piece::EMPTY;
+            $pieces[] = PieceType::EMPTY;
         }
         return new Hand($pieces);
     }
@@ -50,11 +50,11 @@ class Hand
         }
         error_log("extending from " . count($this->pieces) . " to " . $newsize);
         for ($i = count($this->pieces); $i < $newsize; $i++) {
-            $this->pieces[] = Piece::EMPTY;
+            $this->pieces[] = PieceType::EMPTY;
         }
     }
 
-    /** @return Piece[] */
+    /** @return PieceType[] */
     public function pieces(): array
     {
         return $this->pieces;
@@ -76,18 +76,18 @@ class Hand
         return $x;
     }
 
-    public function contains(Piece $piece): bool
+    public function contains(PieceType $piece): bool
     {
         return in_array($piece, $this->pieces);
     }
 
-    public function play(int $pos): Piece
+    public function play(int $pos): PieceType
     {
         $p = $this->pieces[$pos];
         if ($p->isEmpty()) {
             throw new \InvalidArgumentException("Can't play hand piece at empty position $pos");
         }
-        $this->pieces[$pos] = Piece::EMPTY;
+        $this->pieces[$pos] = PieceType::EMPTY;
         return $p;
     }
 
@@ -96,8 +96,8 @@ class Hand
         return $this->size() == 0;
     }
 
-    public function replace(Piece $piece, int $pos): void {
-        if (!$piece->isPlayerPiece() || $piece == Piece::HIDDEN) {
+    public function replace(PieceType $piece, int $pos): void {
+        if (!$piece->isPlayerPieceType() || $piece == PieceType::HIDDEN) {
             throw new \InvalidArgumentException("Can't add $piece->value to hand");
         }
         if (!$this->pieces[$pos]->isEmpty()) {
@@ -106,9 +106,9 @@ class Hand
         $this->pieces[$pos] = $piece;
     }
 
-    public function replenish(Piece $piece): void
+    public function replenish(PieceType $piece): void
     {
-        if (!$piece->isPlayerPiece() || $piece == Piece::HIDDEN) {
+        if (!$piece->isPlayerPieceType() || $piece == PieceType::HIDDEN) {
             throw new \InvalidArgumentException("Can't add $piece->value to hand");
         }
         for ($i = 0; $i < count($this->pieces); $i++) {

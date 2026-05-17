@@ -43,7 +43,7 @@ class Hex
     public function __construct(
         public readonly HexType $type,
         public readonly int $rc,
-        public Piece $piece = Piece::EMPTY,
+        public PieceType $piece = PieceType::EMPTY,
         public int $player_id = 0,
         public bool $scored = false,
         public Landmass $landmass = Landmass::UNKNOWN
@@ -67,42 +67,42 @@ class Hex
         return $this->piece->isEmpty();
     }
 
-    public function captureCity(): Piece
+    public function captureCity(): PieceType
     {
         if (!$this->piece->isCity()) {
             throw new \LogicException("attempt to capture a non-city $this");
         }
         $p = $this->piece;
-        $this->piece = Piece::EMPTY;
+        $this->piece = PieceType::EMPTY;
         return $p;
     }
 
-    public function placeDevelopment(Piece $development): Hex
+    public function placeDevelopment(PieceType $development): Hex
     {
-        if ($this->piece != Piece::EMPTY) {
+        if ($this->piece != PieceType::EMPTY) {
             throw new \LogicException("attempt to place city or field on top of $this");
         }
         if ($this->isWater()) {
             throw new \LogicException("attempt to place city or field on water hex $this");
         }
-        if (!$development->isCity() && !$development->isField() && $development != Piece::ZIGGURAT) {
+        if (!$development->isCity() && !$development->isField() && $development != PieceType::ZIGGURAT) {
             throw new \LogicException("attempt to place a non-city or field on $this");
         }
         $this->piece = $development;
         return $this;
     }
 
-    public function remove(): Piece {
-        if ($this->player_id == 0 || !$this->piece->isPlayerPiece()) {
+    public function remove(): PieceType {
+        if ($this->player_id == 0 || !$this->piece->isPlayerPieceType()) {
             throw new \InvalidArgumentException("Cannot remove non-player piece");
         }
         $piece = $this->piece;
-        $this->piece = Piece::EMPTY;
+        $this->piece = PieceType::EMPTY;
         $this->player_id = 0;
         return $piece;
     }
 
-    public function playPiece(Piece $piece, int $player_id): Piece
+    public function playPiece(PieceType $piece, int $player_id): PieceType
     {
         if ($player_id == 0) {
             throw new \InvalidArgumentException("playing a piece requires a non-zero player_id");
@@ -110,7 +110,7 @@ class Hex
         if ($this->player_id != 0) {
             throw new \LogicException("attempt to play piece $piece->value to occupied hex $this");
         }
-        if ($this->piece != Piece::EMPTY) {
+        if ($this->piece != PieceType::EMPTY) {
             if (!$this->piece->isField()) {
                 throw new \LogicException("attempt to play piece $piece->value on non-empty non-crop field hex $this");
             }
@@ -155,6 +155,6 @@ class Hex
 
     public static function ziggurat(int $rc): Hex
     {
-        return new Hex(HexType::LAND, $rc, Piece::ZIGGURAT);
+        return new Hex(HexType::LAND, $rc, PieceType::ZIGGURAT);
     }
 }

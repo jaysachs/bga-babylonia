@@ -34,11 +34,11 @@ class ElaboratedMove extends Move
     /** @param int[] $touched_ziggurats */
     function __construct(
         int $player_id,
-        Piece $piece,
-        Piece $original_piece,
+        PieceType $piece,
+        PieceType $original_piece,
         int $handpos,
         int $rc,
-        Piece $captured_piece,
+        PieceType $captured_piece,
         int $field_points,
         int $ziggurat_points,
         public array $touched_ziggurats,

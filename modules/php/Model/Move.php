@@ -33,11 +33,11 @@ class Move
 {
     function __construct(
         public int $player_id,
-        public Piece $piece,
-        public Piece $original_piece,
+        public PieceType $piece,
+        public PieceType $original_piece,
         public int $handpos,
         public int $rc,
-        public Piece $captured_piece,
+        public PieceType $captured_piece,
         public int $field_points,
         public int $ziggurat_points,
         public int $seq_id = 0

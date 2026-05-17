@@ -54,7 +54,7 @@ class TurnProgress
         return $move;
     }
 
-    /** @return Piece[] */
+    /** @return PieceType[] */
     public function uniqueNoblesPlayed(): array
     {
         $seen = [];
@@ -65,7 +65,7 @@ class TurnProgress
         }
         return array_map(
             function ($p) {
-                return Piece::from($p);
+                return PieceType::from($p);
             },
             array_keys($seen)
         );
@@ -74,7 +74,7 @@ class TurnProgress
     public function allMovesFarmersOnLand(Board $board): bool
     {
         foreach ($this->moves as &$move) {
-            if ($move->piece != Piece::FARMER) {
+            if ($move->piece != PieceType::FARMER) {
                 return false;
             }
             $hex = $board->hexAt($move->rc);

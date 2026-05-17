@@ -32,23 +32,23 @@ use Bga\GameFramework\SystemException;
 class Pool
 {
 
-    /** @param Piece[] $pieces */
+    /** @param PieceType[] $pieces */
     public function __construct(private array $pieces) {}
 
     public static function new(): Pool
     {
         $pieces = [];
         for ($i = 0; $i < 6; $i++) {
-            $pieces[] = Piece::PRIEST;
-            $pieces[] = Piece::MERCHANT;
-            $pieces[] = Piece::SERVANT;
-            $pieces[] = Piece::FARMER;
-            $pieces[] = Piece::FARMER;
+            $pieces[] = PieceType::PRIEST;
+            $pieces[] = PieceType::MERCHANT;
+            $pieces[] = PieceType::SERVANT;
+            $pieces[] = PieceType::FARMER;
+            $pieces[] = PieceType::FARMER;
         }
         return new Pool($pieces);
     }
 
-    /** @return array<Piece> */
+    /** @return array<PieceType> */
     public function pieces(): array
     {
         return $this->pieces;
@@ -64,7 +64,7 @@ class Pool
         return count($this->pieces);
     }
 
-    public function take(): Piece
+    public function take(): PieceType
     {
         $c = count($this->pieces());
         if ($c == 0) {

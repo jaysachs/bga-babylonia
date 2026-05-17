@@ -77,27 +77,27 @@ class Board
             $col = RowCol::col($hex->rc);
 
             $r = match ($hex->piece) {
-                Piece::EMPTY => match ($hex->type) {
+                PieceType::EMPTY => match ($hex->type) {
                     HexType::LAND => '---',
                     HexType::WATER => '≈≈≈',
                 },
-                Piece::CITY_P => 'C.P',
-                Piece::CITY_S => 'C.S',
-                Piece::CITY_M => 'C.M',
-                Piece::CITY_SP => 'CSP',
-                Piece::CITY_MS => 'CMS',
-                Piece::CITY_MP => 'CMP',
-                Piece::CITY_MSP => 'C**',
-                Piece::FIELD_5 => 'F.5',
-                Piece::FIELD_6 => 'F.6',
-                Piece::FIELD_7 => 'F.7',
-                Piece::FIELD_CITIES => 'F.C',
-                Piece::ZIGGURAT => 'ZZZ',
-                Piece::MERCHANT => 'm-' . $hex->player_id,
-                Piece::PRIEST => 'p-' . $hex->player_id,
-                Piece::FARMER => 'f-' . $hex->player_id,
-                Piece::SERVANT => 's-' . $hex->player_id,
-                Piece::HIDDEN => 'h-' . $hex->player_id,
+                PieceType::CITY_P => 'C.P',
+                PieceType::CITY_S => 'C.S',
+                PieceType::CITY_M => 'C.M',
+                PieceType::CITY_SP => 'CSP',
+                PieceType::CITY_MS => 'CMS',
+                PieceType::CITY_MP => 'CMP',
+                PieceType::CITY_MSP => 'C**',
+                PieceType::FIELD_5 => 'F.5',
+                PieceType::FIELD_6 => 'F.6',
+                PieceType::FIELD_7 => 'F.7',
+                PieceType::FIELD_CITIES => 'F.C',
+                PieceType::ZIGGURAT => 'ZZZ',
+                PieceType::MERCHANT => 'm-' . $hex->player_id,
+                PieceType::PRIEST => 'p-' . $hex->player_id,
+                PieceType::FARMER => 'f-' . $hex->player_id,
+                PieceType::SERVANT => 's-' . $hex->player_id,
+                PieceType::HIDDEN => 'h-' . $hex->player_id,
             };
             $lines[$z][] = $r;
         });
@@ -127,7 +127,7 @@ class Board
         $row = 0;
 
         // convenience utility function
-        $play = function (Hex $hex, Piece $piece, string $playerMatch) use (&$board): void {
+        $play = function (Hex $hex, PieceType $piece, string $playerMatch) use (&$board): void {
             $board->addHex($hex);
             $hex->playPiece($piece, intval($playerMatch));
         };
@@ -144,15 +144,15 @@ class Board
                 if ($t == "XXX") {
                     // nothing, unplayable hex
                 } else if (preg_match('/^m-([0-9])$/', $t, $m)) {
-                    $play(Hex::land($rc), Piece::MERCHANT, $m[1]);
+                    $play(Hex::land($rc), PieceType::MERCHANT, $m[1]);
                 } else if (preg_match('/^s-([0-9])$/', $t, $m)) {
-                    $play(Hex::land($rc), Piece::SERVANT, $m[1]);
+                    $play(Hex::land($rc), PieceType::SERVANT, $m[1]);
                 } else if (preg_match('/^f-([0-9])$/', $t, $m)) {
-                    $play(Hex::land($rc), Piece::FARMER, $m[1]);
+                    $play(Hex::land($rc), PieceType::FARMER, $m[1]);
                 } else if (preg_match('/^h-([0-9])$/', $t, $m)) {
-                    $play(Hex::land($rc), Piece::HIDDEN, $m[1]);
+                    $play(Hex::land($rc), PieceType::HIDDEN, $m[1]);
                 } else if (preg_match('/^p-([0-9])$/', $t, $m)) {
-                    $play(Hex::land($rc), Piece::PRIEST, $m[1]);
+                    $play(Hex::land($rc), PieceType::PRIEST, $m[1]);
                 } else if ($t == "---") {
                     $board->addHex(Hex::land($rc));
                 } else if ($t == "≈≈≈" || $t == '===') {
@@ -164,47 +164,47 @@ class Board
                     $dev_locs[] = $rc;
                 } else if ($t == "C.P") {
                     $board->addHex(
-                        Hex::land($rc)->placeDevelopment(Piece::CITY_P)
+                        Hex::land($rc)->placeDevelopment(PieceType::CITY_P)
                     );
                 } else if ($t == "C.S") {
                     $board->addHex(
-                        Hex::land($rc)->placeDevelopment(Piece::CITY_S)
+                        Hex::land($rc)->placeDevelopment(PieceType::CITY_S)
                     );
                 } else if ($t == "C.M") {
                     $board->addHex(
-                        Hex::land($rc)->placeDevelopment(Piece::CITY_M)
+                        Hex::land($rc)->placeDevelopment(PieceType::CITY_M)
                     );
                 } else if ($t == "CSP") {
                     $board->addHex(
-                        Hex::land($rc)->placeDevelopment(Piece::CITY_SP)
+                        Hex::land($rc)->placeDevelopment(PieceType::CITY_SP)
                     );
                 } else if ($t == "CMS") {
                     $board->addHex(
-                        Hex::land($rc)->placeDevelopment(Piece::CITY_MS)
+                        Hex::land($rc)->placeDevelopment(PieceType::CITY_MS)
                     );
                 } else if ($t == "CMP") {
                     $board->addHex(
-                        Hex::land($rc)->placeDevelopment(Piece::CITY_MP)
+                        Hex::land($rc)->placeDevelopment(PieceType::CITY_MP)
                     );
                 } else if ($t == "C**") {
                     $board->addHex(
-                        Hex::land($rc)->placeDevelopment(Piece::CITY_MSP)
+                        Hex::land($rc)->placeDevelopment(PieceType::CITY_MSP)
                     );
                 } else if ($t == "F.5") {
                     $board->addHex(
-                        Hex::land($rc)->placeDevelopment(Piece::FIELD_5)
+                        Hex::land($rc)->placeDevelopment(PieceType::FIELD_5)
                     );
                 } else if ($t == "F.6") {
                     $board->addHex(
-                        Hex::land($rc)->placeDevelopment(Piece::FIELD_6)
+                        Hex::land($rc)->placeDevelopment(PieceType::FIELD_6)
                     );
                 } else if ($t == "F.7") {
                     $board->addHex(
-                        Hex::land($rc)->placeDevelopment(Piece::FIELD_7)
+                        Hex::land($rc)->placeDevelopment(PieceType::FIELD_7)
                     );
                 } else if ($t == "F.C") {
                     $board->addHex(
-                        Hex::land($rc)->placeDevelopment(Piece::FIELD_CITIES)
+                        Hex::land($rc)->placeDevelopment(PieceType::FIELD_CITIES)
                     );
                 } else {
                     throw new \InvalidArgumentException("Unexpected string in board map: '$t' in '$s'");
@@ -272,7 +272,7 @@ END;
     }
 
     /**
-     * @param Piece[] $available_developments
+     * @param PieceType[] $available_developments
      * @param int[] $development_locations
      */
     private function placeDevelopments(
@@ -369,7 +369,7 @@ END;
     {
         $adjacent = [];
         $this->visitAll(function (Hex $hex) use ($player_id, &$adjacent): void {
-            if ($hex->piece == Piece::ZIGGURAT) {
+            if ($hex->piece == PieceType::ZIGGURAT) {
                 $nb = $this->neighbors($hex, function (Hex $nh) use ($player_id): bool {
                     return $nh->player_id == $player_id;
                 });
@@ -402,40 +402,40 @@ END;
         );
     }
 
-    /** @return Piece[] */
+    /** @return PieceType[] */
     private static function initializePool(int $numPlayers): array
     {
         $available_developments = array();
         for ($i = 0; $i < 2; $i++) {
-            $available_developments[] = Piece::CITY_P;
-            $available_developments[] = Piece::CITY_S;
-            $available_developments[] = Piece::CITY_M;
-            $available_developments[] = Piece::CITY_SP;
-            $available_developments[] = Piece::CITY_MS;
-            $available_developments[] = Piece::CITY_MP;
+            $available_developments[] = PieceType::CITY_P;
+            $available_developments[] = PieceType::CITY_S;
+            $available_developments[] = PieceType::CITY_M;
+            $available_developments[] = PieceType::CITY_SP;
+            $available_developments[] = PieceType::CITY_MS;
+            $available_developments[] = PieceType::CITY_MP;
         }
         for ($i = 0; $i < 3; $i++) {
-            $available_developments[] = Piece::FIELD_CITIES;
+            $available_developments[] = PieceType::FIELD_CITIES;
         }
-        $available_developments[] = Piece::FIELD_5;
-        $available_developments[] = Piece::FIELD_6;
-        $available_developments[] = Piece::FIELD_7;
+        $available_developments[] = PieceType::FIELD_5;
+        $available_developments[] = PieceType::FIELD_6;
+        $available_developments[] = PieceType::FIELD_7;
         if ($numPlayers > 2) {
-            $available_developments[] = Piece::CITY_SP;
-            $available_developments[] = Piece::CITY_MS;
-            $available_developments[] = Piece::CITY_MP;
-            $available_developments[] = Piece::CITY_MSP;
-            $available_developments[] = Piece::FIELD_5;
-            $available_developments[] = Piece::FIELD_6;
-            $available_developments[] = Piece::FIELD_7;
-            $available_developments[] = Piece::FIELD_CITIES;
+            $available_developments[] = PieceType::CITY_SP;
+            $available_developments[] = PieceType::CITY_MS;
+            $available_developments[] = PieceType::CITY_MP;
+            $available_developments[] = PieceType::CITY_MSP;
+            $available_developments[] = PieceType::FIELD_5;
+            $available_developments[] = PieceType::FIELD_6;
+            $available_developments[] = PieceType::FIELD_7;
+            $available_developments[] = PieceType::FIELD_CITIES;
         }
         if ($numPlayers > 3) {
-            $available_developments[] = Piece::CITY_P;
-            $available_developments[] = Piece::CITY_S;
-            $available_developments[] = Piece::CITY_M;
+            $available_developments[] = PieceType::CITY_P;
+            $available_developments[] = PieceType::CITY_S;
+            $available_developments[] = PieceType::CITY_M;
             for ($i = 0; $i < 3; $i++) {
-                $available_developments[] = Piece::FIELD_CITIES;
+                $available_developments[] = PieceType::FIELD_CITIES;
             }
         }
         shuffle($available_developments);
