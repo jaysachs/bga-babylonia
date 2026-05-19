@@ -77,9 +77,13 @@ class Board
             $col = RowCol::col($hex->rc);
 
             $r = match ($hex->piece) {
-                PieceType::EMPTY => match ($hex->type) {
-                    HexType::LAND => '---',
-                    HexType::WATER => '≈≈≈',
+                PieceType::EMPTY => match ($hex->terrain) {
+                    Terrain::NORTH => '---',
+                    Terrain::CENTER => '---',
+                    Terrain::SOUTH => '---',
+                    Terrain::RIVER => '≈≈≈',
+                    // FIXME
+                    Terrain::UNKNOWN => '!!!',
                 },
                 PieceType::CITY_P => 'C.P',
                 PieceType::CITY_S => 'C.S',
@@ -116,11 +120,11 @@ class Board
     public static function fromTestMap(string $map): Board
     {
         $dev_locs = [];
-        return self::fromMap($map, $dev_locs);
+        return self::fromMap($map, $dev_locs, Terrain::CENTER);
     }
 
     /** @param int[] $dev_locs */
-    private static function fromMap(string $map, array &$dev_locs): Board
+    private static function fromMap(string $map, array &$dev_locs, Terrain $terrain): Board
     {
         $board = new Board();
         $lines = explode("\n", trim($map));
@@ -131,6 +135,8 @@ class Board
             $board->addHex($hex);
             $hex->playPiece($piece, intval($playerMatch));
         };
+
+        $land = function(int $rc) use (&$terrain): Hex { return new Hex($terrain, $rc); };
 
         foreach ($lines as &$s) {
             $col = ($row & 1) ? 1 : 0;
@@ -144,67 +150,67 @@ class Board
                 if ($t == "XXX") {
                     // nothing, unplayable hex
                 } else if (preg_match('/^m-([0-9])$/', $t, $m)) {
-                    $play(Hex::land($rc), PieceType::MERCHANT, $m[1]);
+                    $play($land($rc), PieceType::MERCHANT, $m[1]);
                 } else if (preg_match('/^s-([0-9])$/', $t, $m)) {
-                    $play(Hex::land($rc), PieceType::SERVANT, $m[1]);
+                    $play($land($rc), PieceType::SERVANT, $m[1]);
                 } else if (preg_match('/^f-([0-9])$/', $t, $m)) {
-                    $play(Hex::land($rc), PieceType::FARMER, $m[1]);
+                    $play($land($rc), PieceType::FARMER, $m[1]);
                 } else if (preg_match('/^h-([0-9])$/', $t, $m)) {
-                    $play(Hex::land($rc), PieceType::HIDDEN, $m[1]);
+                    $play($land($rc), PieceType::HIDDEN, $m[1]);
                 } else if (preg_match('/^p-([0-9])$/', $t, $m)) {
-                    $play(Hex::land($rc), PieceType::PRIEST, $m[1]);
+                    $play($land($rc), PieceType::PRIEST, $m[1]);
                 } else if ($t == "---") {
-                    $board->addHex(Hex::land($rc));
+                    $board->addHex($land($rc));
                 } else if ($t == "≈≈≈" || $t == '===') {
-                    $board->addHex(Hex::water($rc));
+                    $board->addHex(new Hex(Terrain::RIVER, $rc));
                 } else if ($t == "ZZZ") {
-                    $board->addHex(Hex::ziggurat($rc));
+                    $board->addHex(new Hex(Terrain::UNKNOWN, $rc, PieceType::ZIGGURAT));
                 } else if ($t == "CCC") {
-                    $board->addHex(Hex::land($rc));
+                    $board->addHex($land($rc));
                     $dev_locs[] = $rc;
                 } else if ($t == "C.P") {
                     $board->addHex(
-                        Hex::land($rc)->placeDevelopment(PieceType::CITY_P)
+                        $land($rc)->placeDevelopment(PieceType::CITY_P)
                     );
                 } else if ($t == "C.S") {
                     $board->addHex(
-                        Hex::land($rc)->placeDevelopment(PieceType::CITY_S)
+                        $land($rc)->placeDevelopment(PieceType::CITY_S)
                     );
                 } else if ($t == "C.M") {
                     $board->addHex(
-                        Hex::land($rc)->placeDevelopment(PieceType::CITY_M)
+                        $land($rc)->placeDevelopment(PieceType::CITY_M)
                     );
                 } else if ($t == "CSP") {
                     $board->addHex(
-                        Hex::land($rc)->placeDevelopment(PieceType::CITY_SP)
+                        $land($rc)->placeDevelopment(PieceType::CITY_SP)
                     );
                 } else if ($t == "CMS") {
                     $board->addHex(
-                        Hex::land($rc)->placeDevelopment(PieceType::CITY_MS)
+                        $land($rc)->placeDevelopment(PieceType::CITY_MS)
                     );
                 } else if ($t == "CMP") {
                     $board->addHex(
-                        Hex::land($rc)->placeDevelopment(PieceType::CITY_MP)
+                        $land($rc)->placeDevelopment(PieceType::CITY_MP)
                     );
                 } else if ($t == "C**") {
                     $board->addHex(
-                        Hex::land($rc)->placeDevelopment(PieceType::CITY_MSP)
+                        $land($rc)->placeDevelopment(PieceType::CITY_MSP)
                     );
                 } else if ($t == "F.5") {
                     $board->addHex(
-                        Hex::land($rc)->placeDevelopment(PieceType::FIELD_5)
+                        $land($rc)->placeDevelopment(PieceType::FIELD_5)
                     );
                 } else if ($t == "F.6") {
                     $board->addHex(
-                        Hex::land($rc)->placeDevelopment(PieceType::FIELD_6)
+                        $land($rc)->placeDevelopment(PieceType::FIELD_6)
                     );
                 } else if ($t == "F.7") {
                     $board->addHex(
-                        Hex::land($rc)->placeDevelopment(PieceType::FIELD_7)
+                        $land($rc)->placeDevelopment(PieceType::FIELD_7)
                     );
                 } else if ($t == "F.C") {
                     $board->addHex(
-                        Hex::land($rc)->placeDevelopment(PieceType::FIELD_CITIES)
+                        $land($rc)->placeDevelopment(PieceType::FIELD_CITIES)
                     );
                 } else {
                     throw new \InvalidArgumentException("Unexpected string in board map: '$t' in '$s'");
@@ -250,17 +256,17 @@ END;
 
         /** @var int[] */
         $development_locations = [];
-        $board = Board::fromMap(Board::ACTUAL_MAP, $development_locations);
-        $board->markLandmass(Landmass::WEST, RowCol::fromRowCol(18, 16));
-        $board->markLandmass(Landmass::EAST, RowCol::fromRowCol(2, 0));
-        $board->markLandmass(Landmass::CENTER, RowCol::fromRowCol(11, 7));
+        $board = Board::fromMap(Board::ACTUAL_MAP, $development_locations, Terrain::UNKNOWN);
+        $board->markLandmass(Terrain::CENTER, RowCol::fromRowCol(5, 7));
+        $board->markLandmass(Terrain::SOUTH, RowCol::fromRowCol(18, 16));
+        $board->markLandmass(Terrain::NORTH, RowCol::fromRowCol(2, 0));
 
         switch ($numPlayers) {
             case 2:
-                $board->removeLandmass(Landmass::WEST, $development_locations);
+                $board->removeLandmass(Terrain::SOUTH, $development_locations);
                 break;
             case 3:
-                $board->removeLandmass(Landmass::EAST, $development_locations);
+                $board->removeLandmass(Terrain::NORTH, $development_locations);
         }
 
         $available_developments = self::initializePool($numPlayers);
@@ -336,13 +342,16 @@ END;
         }
     }
 
-    private function markLandmass(Landmass $landmass, int $start): void
+    private function markLandmass(Terrain $terrain, int $start): void
     {
         $this->bfs(
             $start,
-            function (Hex $hex) use ($landmass) {
+            function (Hex $hex) use ($terrain) {
                 if ($hex->isLand()) {
-                    $hex->landmass = $landmass;
+                    if ($hex->terrain == Terrain::UNKNOWN) {
+                        // $this->hexes[$hex->rc] = new Hex($terrain, $hex->rc, $hex->piece, $hex->player_id, $hex->scored);
+                        $hex->terrain = $terrain;
+                    }
                     return true;
                 }
                 return false;
@@ -351,10 +360,10 @@ END;
     }
 
     /** @param int[] $development_locations */
-    private function removeLandmass(Landmass $landmass, array &$development_locations): void
+    private function removeLandmass(Terrain $terrain, array &$development_locations): void
     {
         foreach ($this->hexes as $hex) {
-            if ($hex->landmass == $landmass) {
+            if ($hex->terrain == $terrain) {
                 unset($this->hexes[$hex->rc]);
                 $v = array_search($hex->rc, $development_locations);
                 if ($v !== false) {

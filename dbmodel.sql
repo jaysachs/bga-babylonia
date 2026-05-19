@@ -78,8 +78,8 @@ CREATE TABLE IF NOT EXISTS `ziggurat_cards` (
 
 CREATE TABLE IF NOT EXISTS `board` (
   `board_loc` int(10) unsigned NOT NULL,
-   -- LAND or WATER
-  `hextype` varchar(8) NOT NULL,
+   -- NORTH, CENTER, SOUTH, RIVER
+  `terrain` varchar(8) NOT NULL,
    -- one of: CITY_{P,S,M,MS,MP,SP,MSP}, FIELD_{5,6,7,X}, ZIGGURAT,
    -- or a played piece: FARMER, MERCHANT, PRIEST, SERVANT
    -- note that "hidden" will be based on hextype and we'll sanitize played pieces
@@ -87,6 +87,5 @@ CREATE TABLE IF NOT EXISTS `board` (
   `piece` varchar(8) DEFAULT NULL,
   `scored` boolean DEFAULT FALSE,
   `player_id` int unsigned DEFAULT NULL,
-  `landmass` varchar(8) NOT NULL,
   PRIMARY KEY (`board_loc`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

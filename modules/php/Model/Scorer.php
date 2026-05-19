@@ -155,7 +155,7 @@ class Scorer
             if ($ignored_zcard != ZigguratCardType::EMPTY_RIVER_CONNECTS) {
                 return $this->components->zigguratCardOwner(ZigguratCardType::EMPTY_RIVER_CONNECTS);
             }
-        } else if ($h->landmass == Landmass::CENTER) {
+        } else if ($h->terrain == Terrain::CENTER) {
             if ($ignored_zcard != ZigguratCardType::EMPTY_CENTER_LAND_CONNECTS) {
                 return $this->components->zigguratCardOwner(ZigguratCardType::EMPTY_CENTER_LAND_CONNECTS);
             }

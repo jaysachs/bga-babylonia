@@ -85,8 +85,7 @@ class PersistentStore
 
     private function retrieveBoard(): Board
     {
-        $sql = "SELECT board_loc AS rc, hextype, piece, scored,
-                       player_id AS board_player, landmass
+        $sql = "SELECT board_loc AS rc, terrain, piece, scored, player_id AS board_player
                 FROM board";
         $data = $this->db->getObjectList($sql);
 
@@ -94,12 +93,11 @@ class PersistentStore
         $hexes = [];
         foreach ($data as &$hex) {
             $hexes[] = new Hex(
-                HexType::from($hex['hextype']),
+                Terrain::from($hex['terrain']),
                 intval($hex['rc']),
                 PieceType::from($hex['piece']),
                 intval($hex['board_player']),
-                boolval($hex['scored']),
-                Landmass::from($hex['landmass'])
+                boolval($hex['scored'])
             );
         };
         return Board::fromHexes($hexes);
@@ -112,15 +110,12 @@ class PersistentStore
             $piece = $hex->piece->value;
             $player_id = $hex->player_id;
             $sc = $this->boolValue($hex->scored);
-            $t = $hex->type->value;
-            $lm = $hex->landmass->value;
+            $t = $hex->terrain->value;
             $rc = $hex->rc;
-            $sql_values[] =
-                "($rc, '$t', '$piece', $sc, $player_id, '$lm')";
+            $sql_values[] = "($rc, '$t', '$piece', $sc, $player_id)";
         });
         $values = implode(',', $sql_values);
-        $sql = "INSERT INTO board (board_loc, hextype, piece,
-                                   scored, player_id, landmass)
+        $sql = "INSERT INTO board (board_loc, terrain, piece, scored, player_id)
                 VALUES $values";
         $this->db->execute($sql);
     }

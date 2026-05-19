@@ -37,30 +37,29 @@ class Hex
 
     public function __toString(): string
     {
-        return sprintf("%s %d %s(%d) %s %s", $this->type->value, $this->rc, $this->piece->value, $this->player_id, $this->scored ? "true" : "false", $this->landmass->value);
+        return sprintf("%s %d %s(%d) %s", $this->terrain->value, $this->rc, $this->piece->value, $this->player_id, $this->scored ? "true" : "false");
     }
 
     public function __construct(
-        public readonly HexType $type,
+        public /* readonly */ Terrain $terrain,
         public readonly int $rc,
         public PieceType $piece = PieceType::EMPTY,
         public int $player_id = 0,
-        public bool $scored = false,
-        public Landmass $landmass = Landmass::UNKNOWN
+        public bool $scored = false
     ) {}
 
     public function clone(): Hex {
-        return new Hex($this->type, $this->rc, $this->piece, $this->player_id, $this->scored, $this->landmass);
+        return new Hex($this->terrain, $this->rc, $this->piece, $this->player_id, $this->scored);
     }
 
     public function equals(Hex $other): bool
     {
-        return $this->type == $other->type
+        return $this->terrain == $other->terrain
             && $this->rc == $other->rc
             && $this->piece == $other->piece
             && $this->player_id == $other->player_id
             && $this->scored == $other->scored
-            && $this->landmass == $other->landmass;
+            ;
     }
 
     public function isFree(): bool {
@@ -126,35 +125,25 @@ class Hex
 
     public function isLand(): bool
     {
-        return $this->type == HexType::LAND;
+        return !$this->isWater();
+        // return match ($this->terrain) {
+        //     Terrain::NORTH, Terrain::CENTER, Terrain::SOUTH, Terrain::UNKNOWN => true,
+        //     default => false
+        // };
     }
 
     public function isWater(): bool
     {
-        return $this->type == HexType::WATER;
+        return $this->terrain == Terrain::RIVER;
     }
 
     public function isNeighbor(Hex $hex): bool
     {
         $diff = abs($this->rc - $hex->rc);
         return $diff == 200 || $diff == 101 || $diff == 99;
-        // $cd = abs(RowCol::col($this->rc) - RowCol::col($hex->rc));
-        // $rd = abs(RowCol::row($this->rc) - RowCol::row($hex->rc));
-        // return $cd == 1 && $rd == 1 || $cd == 0 && $rd == 2;
-    }
-
-    public static function land(int $rc): Hex
-    {
-        return new Hex(HexType::LAND, $rc);
-    }
-
-    public static function water(int $rc): Hex
-    {
-        return new Hex(HexType::WATER, $rc);
-    }
-
-    public static function ziggurat(int $rc): Hex
-    {
-        return new Hex(HexType::LAND, $rc, PieceType::ZIGGURAT);
+        // Optimized version of:
+        //   $cd = abs(RowCol::col($this->rc) - RowCol::col($hex->rc));
+        //   $rd = abs(RowCol::row($this->rc) - RowCol::row($hex->rc));
+        //   return $cd == 1 && $rd == 1 || $cd == 0 && $rd == 2;
     }
 }

@@ -27,8 +27,12 @@ declare(strict_types=1);
 
 namespace Bga\Games\babylonia\Model;
 
-enum HexType: string
+enum Terrain: string
 {
-    case LAND = 'LAND';
-    case WATER = 'WATER';
+    case NORTH = 'NORTH';
+    case SOUTH = 'SOUTH';
+    case CENTER = 'CENTER';
+    case RIVER = 'RIVER';
+
+    case UNKNOWN = 'UNKNOWN';
 }

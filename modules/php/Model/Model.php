@@ -547,8 +547,7 @@ class Model
             $missing = $this->board()->neighbors(
                 $hex,
                 function (Hex $nh): bool {
-                    return $nh->piece === PieceType::EMPTY
-                        && $nh->type === HexType::LAND;
+                    return $nh->piece === PieceType::EMPTY && $nh->isLand();
                 }
             );
             return (count($missing) == 0);

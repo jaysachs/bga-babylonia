@@ -155,7 +155,7 @@ class Game extends Table
             function (Hex &$hex) use (&$board_data) {
                 $board_data[] = [
                     "rc" => $hex->rc,
-                    "hextype" => $hex->type->value,
+                    "terrain" => $hex->terrain->value,
                     "piece" => $hex->piece->value,
                     "board_player" => $hex->player_id,
                 ];
