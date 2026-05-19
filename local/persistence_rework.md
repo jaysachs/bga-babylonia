@@ -198,7 +198,7 @@ This needs to move a ziggurat card from the "available" to a player. It may also
 
 ```sql
 UPDATE pieces
-SET location = $dest_location, location_id = $dest_location_id
+SET location = $dest_location, location_id = $dest_location_id, player_id = $player_id
    -- , used = TRUE
 WHERE location = "$src_location" AND location_id = $src_location_id
 ```
