@@ -16,12 +16,23 @@
 
 /* inspired from https://css-tricks.com/hexagons-and-beyond-flexible-responsive-grid-patterns-sans-media-queries/ */
 body {
+    /* current map dimensions: 3385 × 2496  */
+    --bbl-map-aspect-ratio: calc(3385 / 2496);
+    /* rough guess of "top bar" consumed by BGA stuff (non-mobile) */
+    --bbl-top-consumed: 150px;
+    --bbl-right-consumed: 240px;
+
+    --bbl-height-raw: calc(100vh - var(--bbl-top-consumed));
+
+    --bbl-width-raw: calc((90vw - var(--bbl-board-margin) - var(--bbl-right-consumed)));
+
+
     /*
       define these all here so they're available even for "floating" elements.
      */
     /* --bbl-board-width: 1024px; */
     --bbl-board-margin: calc(max(20px, 0.02vw));
-    --bbl-board-width: calc((100vw - var(--bbl-board-margin) - 240px));
+    --bbl-board-width: calc(min(var(--bbl-height-raw) * var(--bbl-map-aspect-ratio), var(--bbl-width-raw)));
     --bbl-board-height: calc(0.75 * var(--bbl-board-width));
 
     /* 2/sqrt(3) */
@@ -32,35 +43,98 @@ body {
       maybe compute board height/width based on hex size instead?
     */
     --bbl-hex-height: calc(var(--bbl-board-height)/12.59);
+    --bbl-hex-width: calc(var(--bbl-hex-ratio) * var(--bbl-hex-height));
 }
 
 body.mobile_version {
-    --bbl-board-width: calc(100vw - var(--bbl-board-margin));
+    --bbl-top-consumed: 300px;
+    --bbl-right-consumed: 0px;
 }
+
 
 #bbl_main {
     display: flex;
-    flex-direction: column;
+    flex-direction: row-reverse;
     align-items: center;
+    height: calc(var(--bbl-board-height) + 12px);
 }
 
+/*
+ Board container is needed since hex positions are described in terms
+ of %ages of height/width, and we need the container to stretch
+ sometimes without changing the size of the board. Hard to do if the
+ board itself is the flex element, we want it to grow "as much as
+ possible" but no more.
+*/
 #bbl_board_container {
     flex: 1;
     position: relative;
-    margin-top: 10px;
-    margin-bottom: 10px;
+    margin: 6px;
 }
+
 
 #bbl_board {
     font-size: 0;
-    margin-left: calc(var(--bbl-board-margin));
-    margin-right: calc(var(--bbl-board-margin));
     background: url(img/mapb.jpg) no-repeat center;
     background-size: cover;
     width: calc(var(--bbl-board-width));
     height: calc(var(--bbl-board-height));
     position: relative;
 }
+
+#bbl_pieces {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    height: 100%;
+    justify-content: space-evenly;
+    align-items: center;
+}
+
+#bbl_hand {
+    display: flex;
+    flex-direction:column;
+    row-gap: calc(var(--bbl-hex-height) * 0.10);
+    background-size: 100% 100%;
+}
+
+#bbl_available_zcards {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    flex-wrap: wrap;
+    padding: 8px;
+}
+
+#bbl_main.bbl_altflow {
+    flex-direction: column-reverse;
+    --bbl-board-width: calc(var(--bbl-width-raw)) !important;
+    --bbl-board-height: calc(0.75 * var(--bbl-board-width));
+    --bbl-width-raw: calc((100vw - var(--bbl-board-margin) - var(--bbl-right-consumed)));
+    --bbl-hex-height: calc(var(--bbl-board-height)/12.59);
+    --bbl-hex-width: calc(var(--bbl-hex-ratio) * var(--bbl-hex-height));
+    height: auto;
+}
+
+#bbl_main.bbl_altflow #bbl_pieces {
+    flex-direction: row;
+    justify-content: space-evenly;
+    width: 100%;
+}
+
+#bbl_main.bbl_altflow #bbl_hand {
+    flex-direction: row;
+    padding: 8px;
+    column-gap: calc(var(--bbl-hex-width) * 0.10);
+}
+
+#bbl_main.bbl_altflow #bbl_available_zcards {
+    flex-direction: row;
+}
+
+
+
+/* Board contents */
 
 #bbl_board>div {
     height: calc(var(--bbl-hex-height));
@@ -186,83 +260,83 @@ body.mobile_version {
 /*
  * Player piece sprites
  */
-[bbl_piece="hidden_ffffff"] {
+[bbl_piece="hidden_dddddd"] {
     background-position: -100% 0;
 }
 
-[bbl_piece="hidden_76a89b"] {
+[bbl_piece="hidden_dccd7d"] {
     background-position: -200% 0;
 }
 
-[bbl_piece="hidden_f9c29a"] {
+[bbl_piece="hidden_5da899"] {
     background-position: -300% 0;
 }
 
-[bbl_piece="hidden_9a9a9a"] {
+[bbl_piece="hidden_c26a77"] {
     background-position: -400% 0;
 }
 
-[bbl_piece="farmer_ffffff"] {
+[bbl_piece="farmer_dddddd"] {
     background-position: -100% -400%;
 }
 
-[bbl_piece="farmer_76a89b"] {
+[bbl_piece="farmer_dccd7d"] {
     background-position: -200% -400%;
 }
 
-[bbl_piece="farmer_f9c29a"] {
+[bbl_piece="farmer_5da899"] {
     background-position: -300% -400%;
 }
 
-[bbl_piece="farmer_9a9a9a"] {
+[bbl_piece="farmer_c26a77"] {
     background-position: -400% -400%;
 }
 
-[bbl_piece="merchant_ffffff"] {
+[bbl_piece="merchant_dddddd"] {
     background-position: -100% -100%;
 }
 
-[bbl_piece="merchant_76a89b"] {
+[bbl_piece="merchant_dccd7d"] {
     background-position: -200% -100%;
 }
 
-[bbl_piece="merchant_f9c29a"] {
+[bbl_piece="merchant_5da899"] {
     background-position: -300% -100%;
 }
 
-[bbl_piece="merchant_9a9a9a"] {
+[bbl_piece="merchant_c26a77"] {
     background-position: -400% -100%;
 }
 
-[bbl_piece="servant_ffffff"] {
+[bbl_piece="servant_dddddd"] {
     background-position: -100% -200%;
 }
 
-[bbl_piece="servant_76a89b"] {
+[bbl_piece="servant_dccd7d"] {
     background-position: -200% -200%;
 }
 
-[bbl_piece="servant_f9c29a"] {
+[bbl_piece="servant_5da899"] {
     background-position: -300% -200%;
 }
 
-[bbl_piece="servant_9a9a9a"] {
+[bbl_piece="servant_c26a77"] {
     background-position: -400% -200%;
 }
 
-[bbl_piece="priest_ffffff"] {
+[bbl_piece="priest_dddddd"] {
     background-position: -100% -300%;
 }
 
-[bbl_piece="priest_76a89b"] {
+[bbl_piece="priest_dccd7d"] {
     background-position: -200% -300%;
 }
 
-[bbl_piece="priest_f9c29a"] {
+[bbl_piece="priest_5da899"] {
     background-position: -300% -300%;
 }
 
-[bbl_piece="priest_9a9a9a"] {
+[bbl_piece="priest_c26a77"] {
     background-position: -400% -300%;
 }
 
@@ -274,8 +348,8 @@ body.mobile_version {
     background-size: 900% 100%;
     background-image: url(img/zcards.png);
 
-    height: calc(var(--bbl-board-width) * 0.13);
-    width: calc(var(--bbl-board-width) * 0.1);
+    height: calc(1*var(--bbl-hex-height));
+    width: calc(.8*var(--bbl-hex-height));
 
 }
 
@@ -326,27 +400,8 @@ body.mobile_version {
 
 
 /*
- Styles for the hand and "rack".
+ Styles for the hand.
 */
-
-#bbl_hand_container {
-    padding-top: 10px;
-    margin-top: 10px;
-    width: calc(var(--bbl-board-width));
-    display: flex;
-    justify-content: center;
-}
-
-#bbl_hand {
-    box-shadow: 0 3px 8px rgba(0, 0, 0, .3);
-    display: flex;
-    width: auto;
-    background-image: url(img/stand.png);
-    background-size: 100% 100%;
-    padding-top: 2px;
-    padding-left: 16px;
-    padding-right: 16px;
-}
 
 #bbl_hand>div {
     display: inline-block;
@@ -354,8 +409,6 @@ body.mobile_version {
     height: calc(var(--bbl-hex-height));
     background-size: 700% 700%;
     border-style: none;
-    margin-top: 5px;
-    margin-bottom: 5px;
 }
 
 .bbl_playable {
@@ -378,27 +431,11 @@ body.mobile_version {
 
 /* available ziggurat cards panel */
 
-#bbl_available_zcards_container {
-    width: calc(var(--bbl-board-width));
-    border-width: 1px;
-    border-style: solid;
-    border-radius: 10px;
-    clip-path: rect(auto auto auto auto round 10px);
-    font-style: italic;
-}
-
-#bbl_available_zcards {
-    display: flex;
-    justify-content: center;
-}
-
 #bbl_available_zcards>div {
-    border-style: solid;
-    border-width: 5px;
     border-color: transparent;
     clip-path: padding-box;
-    margin: 8px;
     display: inline-block;
+    margin: 1px;
 }
 
 #bbl_available_zcards>div.bbl_selected {
@@ -433,14 +470,14 @@ body.mobile_version {
 }
 
 .bbl_pb_city_label,
-.bbl_pb_hand_label_ffffff,
-.bbl_pb_hand_label_76a89b,
-.bbl_pb_hand_label_f9c29a,
-.bbl_pb_hand_label_9a9a9a,
-.bbl_pb_pool_label_ffffff,
-.bbl_pb_pool_label_76a89b,
-.bbl_pb_pool_label_f9c29a,
-.bbl_pb_pool_label_9a9a9a,
+.bbl_pb_hand_label_dddddd,
+.bbl_pb_hand_label_dccd7d,
+.bbl_pb_hand_label_5da899,
+.bbl_pb_hand_label_c26a77,
+.bbl_pb_pool_label_dddddd,
+.bbl_pb_pool_label_dccd7d,
+.bbl_pb_pool_label_5da899,
+.bbl_pb_pool_label_c26a77,
 .bbl_pb_zcard_label {
     width: calc(var(--bbl-label-width));
     height: calc(var(--bbl-label-height));
@@ -448,35 +485,35 @@ body.mobile_version {
     background-size: 700% 700%;
 }
 
-.bbl_pb_hand_label_ffffff {
+.bbl_pb_hand_label_dddddd {
     background-position: -100% -500%;
 }
 
-.bbl_pb_hand_label_76a89b {
+.bbl_pb_hand_label_dccd7d {
     background-position: -200% -500%;
 }
 
-.bbl_pb_hand_label_f9c29a {
+.bbl_pb_hand_label_5da899 {
     background-position: -300% -500%;
 }
 
-.bbl_pb_hand_label_9a9a9a {
+.bbl_pb_hand_label_c26a77 {
     background-position: -400% -500%;
 }
 
-.bbl_pb_pool_label_ffffff {
+.bbl_pb_pool_label_dddddd {
     background-position: -100% -600%;
 }
 
-.bbl_pb_pool_label_76a89b {
+.bbl_pb_pool_label_dccd7d {
     background-position: -200% -600%;
 }
 
-.bbl_pb_pool_label_f9c29a {
+.bbl_pb_pool_label_5da899 {
     background-position: -300% -600%;
 }
 
-.bbl_pb_pool_label_9a9a9a {
+.bbl_pb_pool_label_c26a77 {
     background-position: -400% -600%;
 }
 

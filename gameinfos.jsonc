@@ -70,7 +70,14 @@
     "language_dependency": false,
 
     // Colors attributed to players
-    "player_colors": ["ffffff", "76a89b", "f9c29a", "9a9a9a"],
+    "player_colors": [
+      "dddddd", // dingy white
+      "dccd7d", // sandy
+      // "94cbe6", // light blue
+      "5da899", //  teal
+      // "9f4a96", // purple
+      "c26a77" // # rose
+    ],
 
     // Favorite colors support : if set to "true", support attribution of favorite colors based on player"s preferences (see reattributeColorsBasedOnPreferences PHP method)
     // NB: this parameter is used only to flag games supporting this feature; you must use (or not use) reattributeColorsBasedOnPreferences PHP method to actually enable or disable the feature.

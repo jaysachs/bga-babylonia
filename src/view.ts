@@ -238,16 +238,13 @@ export class View {
 
     private base_html(): HTMLElement {
         return Html.div({id:'bbl_main'},
-            Html.div({id:'bbl_hand_container'},
-                Html.div({id: IDS.HAND })
+            Html.div({id: 'bbl_pieces'},
+                Html.div({id: IDS.HAND }),
+                Html.div({id:IDS.AVAILABLE_ZCARDS})
             ),
             Html.div({id:'bbl_board_container'},
                 Html.div({id:IDS.BOARD})
             ),
-            Html.div({id:'bbl_available_zcards_container', classes: "whiteblock"},
-                Html.div({}, document.createTextNode(_('Ziggurat Cards'))),
-                Html.div({id:IDS.AVAILABLE_ZCARDS})
-            )
         );
     }
 

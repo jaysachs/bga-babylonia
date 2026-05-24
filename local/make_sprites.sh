@@ -10,7 +10,17 @@ ZIG="20,43 32,43 32,33 44,33 44,23 56,23 56,33 68,33 68,43 80,43 80,53 92,53 92,
 #
 ZIG="16,61 20,45 24,45 28,29 32,29 34,21 66,21 68,29 72,29 76,45 80,45 84,61"
 
-COLORS=(FFFFFF 76A89B F9C29A 9A9A9A)
+COLORS=(
+    DDDDDD # dingy white
+    DCCD7D # sandy
+#    94CBE6 # light blue
+    5DA899 # teal
+#    9F4A96 # purple
+    C26A77 # rose
+)
+
+COLORS=("${(@f)$(strip-json-comments gameinfos.jsonc | jq '.["player_colors"].[]')}")
+
 
 FONT=Noto-Sans-Cuneiform-Regular
 
@@ -94,8 +104,9 @@ addCanvas "-stroke yellow -strokewidth 5 -fill none -draw 'circle 50,43 50,84'"
 # remember this technique -- can specify alpha channel directly w/ 4-byte hex colors
 addCanvas "-background none -stroke \#FFFFFF30 -strokewidth 2 -fill \#FFFFFF30 -draw 'circle 50,43,50,81'"
 
-for C in ${COLORS[*]}
+for COLOR in ${COLORS[*]}
 do
+    C=${COLOR//\"/}
     # the player pieces, including "hidden"
     for P in ' ' ${M} ${S} ${P}
     do
@@ -103,17 +114,24 @@ do
     done
     addCanvas "-fill \#${C} -draw 'circle 50,43 50,81' -stroke black -strokewidth 2 -draw '${FARMER_PIECE}'"
     # the player board "hand" icon
+#    addCanvas "-stroke none -background \#000001 \
+#       -fill \#924018 -draw 'roundrectangle 0,0,99,86 15,15' \
+#       -fill \#000001 -draw 'rectangle 10,20,89,30' \
+#       -fill \#000001 -draw 'rectangle 10,56,89,66' \
+#       -stroke black -fill \#${C} -draw 'circle 50,43 50,81' \
+#       -transparent \#000001 "
     addCanvas "-stroke none -background \#000001 \
-       -fill \#924018 -draw 'roundrectangle 0,0,99,86 15,15' \
-       -fill \#000001 -draw 'rectangle 10,20,89,30' \
-       -fill \#000001 -draw 'rectangle 10,56,89,66' \
        -stroke black -fill \#${C} -draw 'circle 50,43 50,81' \
        -transparent \#000001 "
     # the player board "pool" icon
-    addCanvas "-stroke none -background \#000001 \
-       -stroke black -fill \#${C} -draw 'circle 31,30 51,43' \
-       -stroke black -fill \#${C} -draw 'circle 50,60 70,73' \
-       -stroke black -fill \#${C} -draw 'circle 69,30 89,43' \
+#       -stroke black -fill \#${C} -draw 'circle 31,30 51,43' \
+#       -stroke black -fill \#${C} -draw 'circle 50,60 70,73' \
+#       -stroke black -fill \#${C} -draw 'circle 69,30 89,43' \
+    addCanvas " \
+       -stroke none -background \#000001 \
+       -stroke black -fill \#${C} -draw 'ellipse 31,30 20,10 0,360' \
+       -stroke black -fill \#${C} -draw 'ellipse 50,50 20,10 0,360' \
+       -stroke black -fill \#${C} -draw 'ellipse 73,22 20,10 0,360' \
        -transparent \#000001"
 done
 
