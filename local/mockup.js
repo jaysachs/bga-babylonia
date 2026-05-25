@@ -238,3 +238,5 @@ function handleResize(evt) {
             document.body.style.setProperty('--bbl-board-width', w2 + 'px');
         }
    }
+
+window.onload = () => handleResize();
