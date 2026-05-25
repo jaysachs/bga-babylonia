@@ -54,6 +54,7 @@ export class IDS {
   static readonly AVAILABLE_ZCARDS: string = 'bbl_available_zcards';
   static readonly BOARD = 'bbl_board';
   static readonly HAND = 'bbl_hand';
+  static readonly MAIN = 'bbl_main';
 
   static handcount(playerId: number): string {
     return `bbl_handcount_${playerId}`;
@@ -86,6 +87,7 @@ export class CSS {
   static readonly PLAYABLE = 'bbl_playable';
   static readonly UNPLAYABLE = 'bbl_unplayable';
   static readonly UNIMPORTANT = 'bbl_unimportant';
+  static readonly LAYOUT_UNDER_BOARD = 'bbl_altflow';
 }
 
 export class View {
@@ -98,6 +100,26 @@ export class View {
 
     constructor(private bga: Bga<Player, BGamedatas>) {
         this.translatedPieces = {};
+    }
+
+    private handleResize(evt?: Event) {
+        // can't use bbl_main  ...
+        const pageEl = document.getElementById('page-content')!;
+        const pageRect = pageEl.getBoundingClientRect();
+        const viewPort = window.visualViewport!;
+
+        const vertAvail = viewPort.height - pageRect.top;
+
+        const mapHeightForWidth = pageRect.width * View.map_aspect_ratio;
+
+        const vertSpacePieces = mapHeightForWidth / 8;
+
+        const mailElCl = document.getElementById(IDS.MAIN)!.classList;
+        if (vertAvail - mapHeightForWidth - vertSpacePieces > 0) {
+            mailElCl.add(CSS.LAYOUT_UNDER_BOARD);
+        } else {
+            mailElCl.remove(CSS.LAYOUT_UNDER_BOARD);
+        }
     }
 
     public setup(gamedatas: BGamedatas): void {
@@ -123,13 +145,18 @@ export class View {
 
         console.log('Setting up ziggurat cards', gamedatas.ziggurat_cards);
         this.setupZcards(gamedatas.ziggurat_cards);
+
+        // document.body.addEventListener('resize', (ev) => this.handleResize(ev), { capture: true });
+        document.body.onresize = (ev) => this.handleResize(ev);
+        this.handleResize();
     }
 
+    static readonly map_aspect_ratio = 0.75;
     static readonly hstart = 38.0; // this the (negative) offset on left of board
     static readonly vstart = 9.0; // this is the offset on the top of the board
     static readonly height = 768 / 12.59; // 61 -- why? hexes on image seem to be 204px
     static readonly width = this.height * 1.155;
-    static readonly hdelta = 0.75 * this.width + 2.0;
+    static readonly hdelta = this.map_aspect_ratio * this.width + 2.0;
     static readonly vdelta = 1.0 * this.height + 2.0;
 
     private setupGameBoard(boardData: Hex[]) {
@@ -162,7 +189,7 @@ export class View {
     }
 
 
-  private setupZcards(zcards: Zcard[]): void {
+    private setupZcards(zcards: Zcard[]): void {
         const available = $(IDS.AVAILABLE_ZCARDS);
         for (let zcard of zcards) {
             const zelem = Html.div({});
@@ -237,7 +264,7 @@ export class View {
     }
 
     private base_html(): HTMLElement {
-        return Html.div({id:'bbl_main'},
+        return Html.div({id:IDS.MAIN},
             Html.div({id: 'bbl_pieces'},
                 Html.div({id: IDS.HAND }),
                 Html.div({id:IDS.AVAILABLE_ZCARDS})
