@@ -199,7 +199,7 @@ const IDS = {
 }
 
 const View = {
-    map_aspect_ratio: 0.75 // 1.333333
+    map_aspect_ratio:  2496.0 / 3385.0
 }
 
 const CSS = {
@@ -207,36 +207,34 @@ const CSS = {
 }
 
 function handleResize(evt) {
-    const pageEl = document.getElementById('page-content');
-    const pageRect = pageEl.getBoundingClientRect();
-    const viewPort = window.visualViewport;
+        const pageEl = document.getElementById('page-content');
+        const pageRect = pageEl.getBoundingClientRect();
+        const viewPort = window.visualViewport;
 
-    const vertAvail = viewPort.height - pageRect.top;
+        const vertAvail = viewPort.height - pageRect.top;
 
-    const mapHeightForWidth = pageRect.width * View.map_aspect_ratio;
+        // "horizontal" "default" layout
+        var w1 = pageRect.width * 0.875;
+        var h1 = w1 * View.map_aspect_ratio;
+        if (h1 > vertAvail) {
+            w1 = vertAvail / View.map_aspect_ratio;
+            h1 = vertAvail;
+        }
 
-    // "horizontal" "default" layout
-    var w1 = pageRect.width * 0.9;
-    var h1 = w1 * View.map_aspect_ratio;
-    if (h1 > vertAvail) {
-        w1 = vertAvail / View.map_aspect_ratio;
-        h1 = vertAvail;
-    }
+        // "vertical" "alt" layout
+        var h2 = vertAvail * 0.875;
+        var w2 = h2 / View.map_aspect_ratio;
+        if (w2 > pageRect.width) {
+            w2 = pageRect.width - 12;
+            h2 = w2 * View.map_aspect_ratio;
+        }
 
-    // "vertical" "alt" layout
-    var h2 = vertAvail * 0.9;
-    var w2 = h2 / View.map_aspect_ratio;
-    if (w2 > pageRect.width) {
-        w2 = pageRect.width;
-        h2 = w2 * View.map_aspect_ratio;
-    }
-
-    const mainElCl = document.getElementById(IDS.MAIN).classList;
-    if (w1 >= w2) {
-        mainElCl.remove(CSS.LAYOUT_UNDER_BOARD);
-        document.body.style.setProperty('--bbl-board-width', (w1 - 12) + 'px');
-    } else {
-        mainElCl.add(CSS.LAYOUT_UNDER_BOARD);
-        document.body.style.setProperty('--bbl-board-width', w2 + 'px');
-    }
-}
+        const mainElCl = document.getElementById(IDS.MAIN).classList;
+        if (w1 >= w2) {
+            mainElCl.remove(CSS.LAYOUT_UNDER_BOARD);
+            document.body.style.setProperty('--bbl-board-width', (w1 - 12) + 'px');
+        } else {
+            mainElCl.add(CSS.LAYOUT_UNDER_BOARD);
+            document.body.style.setProperty('--bbl-board-width', w2 + 'px');
+        }
+   }
