@@ -5,6 +5,7 @@ const width = height * 1.155;
 const hdelta = 0.75 * width + 2.0;
 const vdelta = 1.0 * height + 2.0;
 
+
 const putHex = function(rc) {
     let top = vstart + rc.row * vdelta / 2;
     let left = hstart + rc.col * hdelta;
@@ -191,4 +192,31 @@ function populateBoard2() {
           hexDiv(11, 1).classList.add('bbl_selected');
 
           hexDiv(7, 11).classList.add('bbl_selected');
+}
+
+function handleResize(evt) {
+    // maybe use bbl_main ?
+    pce = document.getElementById("page-content");
+    r = pce.getBoundingClientRect();
+
+    const mt = r.top;
+    const mw = r.width;
+    const vp = window.visualViewport;
+
+    // vertical space available
+    const h1 = vp.height - mt;
+
+    const map_aspect_ratio = 0.75;
+    const ch2 = mw * map_aspect_ratio;
+
+    // vertical space for pieces
+    const vsp = ch2 / 8; // 8 is heuristically guessed
+    let s = document.getElementById('bbl_main').classList;
+    if (h1 - ch2 - vsp > 0) {
+        // use alt flow layout, i.e. pieces underneath
+        s.add('bbl_altflow');
+    } else {
+        // use pieces-on-right layout
+        s.remove('bbl_altflow');
+    }
 }
