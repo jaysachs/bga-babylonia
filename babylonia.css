@@ -31,7 +31,7 @@ body {
       define these all here so they're available even for "floating" elements.
      */
     /* --bbl-board-width: 1024px; */
-    --bbl-board-margin: calc(max(20px, 0.02vw));
+    --bbl-board-margin: calc(max(6px, 0.02vw));
     --bbl-board-width: calc(min(var(--bbl-height-raw) * var(--bbl-map-aspect-ratio), var(--bbl-width-raw)));
     --bbl-board-height: calc(0.75 * var(--bbl-board-width));
 
@@ -56,7 +56,7 @@ body.mobile_version {
     display: flex;
     flex-direction: row-reverse;
     align-items: center;
-    height: calc(var(--bbl-board-height) + 12px);
+    height: calc(var(--bbl-board-height) + 2 * var(--bbl-board-margin));
 }
 
 /*
@@ -69,7 +69,7 @@ body.mobile_version {
 #bbl_board_container {
     flex: 1;
     position: relative;
-    margin: 6px;
+    margin: calc(var(--bbl-board-margin));
 }
 
 
@@ -255,6 +255,7 @@ body.mobile_version {
 
 [bbl_piece="ziggurat"] {
     background-position: -600% -400%;
+/*    filter: inherit; */
 }
 
 /*
