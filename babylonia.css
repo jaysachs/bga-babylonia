@@ -18,25 +18,16 @@
 body {
     /* current map dimensions: 3385 × 2496  */
     --bbl-map-aspect-ratio: calc(3385 / 2496);
-    /* rough guess of "top bar" consumed by BGA stuff (non-mobile) */
-    --bbl-top-consumed: 140px;
-    --bbl-right-consumed: 240px;
-
-    --bbl-height-raw: calc(100vh - var(--bbl-top-consumed));
-
-    --bbl-width-raw: calc((90vw - var(--bbl-board-margin) - var(--bbl-right-consumed)));
-
-
     /*
       define these all here so they're available even for "floating" elements.
      */
-    /* --bbl-board-width: 1024px; */
     --bbl-board-margin: calc(max(6px, 0.005vw));
-    --bbl-board-width: calc(min(var(--bbl-height-raw) * var(--bbl-map-aspect-ratio), var(--bbl-width-raw)));
-    --bbl-board-height: calc(var(--bbl-board-width) / var(--bbl-map-aspect-ratio));
 
     /* 2/sqrt(3) */
     --bbl-hex-ratio: 1.155;
+
+    --bbl-board-height: calc(var(--bbl-board-width) / var(--bbl-map-aspect-ratio));
+
     /*
       the denominator here works for height. but somehow width gets
       slightly off.
@@ -45,12 +36,6 @@ body {
     --bbl-hex-height: calc(var(--bbl-board-height)/12.59);
     --bbl-hex-width: calc(var(--bbl-hex-ratio) * var(--bbl-hex-height));
 }
-
-body.mobile_version {
-    --bbl-top-consumed: 300px;
-    --bbl-right-consumed: 0px;
-}
-
 
 #bbl_main {
     display: flex;
@@ -68,6 +53,7 @@ body.mobile_version {
 */
 #bbl_board_container {
     flex: 1;
+    flex-grow: 0;
     position: relative;
     margin: calc(var(--bbl-board-margin));
 }
@@ -108,11 +94,6 @@ body.mobile_version {
 
 #bbl_main.bbl_altflow {
     flex-direction: column-reverse;
-    --bbl-board-width: calc(var(--bbl-width-raw)) !important;
-    --bbl-board-height: calc(0.75 * var(--bbl-board-width));
-    --bbl-width-raw: calc((100vw - var(--bbl-board-margin) - var(--bbl-right-consumed)));
-    --bbl-hex-height: calc(var(--bbl-board-height)/12.59);
-    --bbl-hex-width: calc(var(--bbl-hex-ratio) * var(--bbl-hex-height));
     height: auto;
 }
 
@@ -120,6 +101,7 @@ body.mobile_version {
     flex-direction: row;
     justify-content: space-evenly;
     width: 100%;
+/*    margin: calc(var(--bbl-board-margin)); */
 }
 
 #bbl_main.bbl_altflow #bbl_hand {

@@ -103,22 +103,35 @@ export class View {
     }
 
     private handleResize(evt?: Event) {
-        // can't use bbl_main  ...
-        const pageEl = document.getElementById('page-content')!;
-        const pageRect = pageEl.getBoundingClientRect();
+        const pageEl = document.getElementById('page-content');
+        const pageRect = pageEl!.getBoundingClientRect();
         const viewPort = window.visualViewport!;
 
         const vertAvail = viewPort.height - pageRect.top;
 
-        const mapHeightForWidth = pageRect.width * View.map_aspect_ratio;
+        // "horizontal" "default" layout
+        var w1 = pageRect.width * 0.875;
+        var h1 = w1 * View.map_aspect_ratio;
+        if (h1 > vertAvail) {
+            w1 = vertAvail / View.map_aspect_ratio;
+            h1 = vertAvail;
+        }
 
-        const vertSpacePieces = mapHeightForWidth / 8;
+        // "vertical" "alt" layout
+        var h2 = vertAvail * 0.875;
+        var w2 = h2 / View.map_aspect_ratio;
+        if (w2 > pageRect.width) {
+            w2 = pageRect.width - 12;
+            h2 = w2 * View.map_aspect_ratio;
+        }
 
-        const mailElCl = document.getElementById(IDS.MAIN)!.classList;
-        if (vertAvail - mapHeightForWidth - vertSpacePieces > 0) {
-            mailElCl.add(CSS.LAYOUT_UNDER_BOARD);
+        const mainElCl = document.getElementById(IDS.MAIN)!.classList;
+        if (w1 >= w2) {
+            mainElCl.remove(CSS.LAYOUT_UNDER_BOARD);
+            document.body.style.setProperty('--bbl-board-width', (w1 - 12) + 'px');
         } else {
-            mailElCl.remove(CSS.LAYOUT_UNDER_BOARD);
+            mainElCl.add(CSS.LAYOUT_UNDER_BOARD);
+            document.body.style.setProperty('--bbl-board-width', w2 + 'px');
         }
     }
 
@@ -151,12 +164,12 @@ export class View {
         this.handleResize();
     }
 
-    static readonly map_aspect_ratio = 0.75;
-    static readonly hstart = 38.0; // this the (negative) offset on left of board
-    static readonly vstart = 9.0; // this is the offset on the top of the board
-    static readonly height = 768 / 12.59; // 61 -- why? hexes on image seem to be 204px
+    static readonly map_aspect_ratio = 2496 / 3385;
+    static readonly hstart = 151.0; // this the (negative) offset on left of board
+    static readonly vstart = 22.0; // this is the offset on the top of the board
+    static readonly height = 2496 / 12.25;
     static readonly width = this.height * 1.155;
-    static readonly hdelta = this.map_aspect_ratio * this.width + 2.0;
+    static readonly hdelta = this.height * 1.732 / 2.0 + 2.0;
     static readonly vdelta = 1.0 * this.height + 2.0;
 
     private setupGameBoard(boardData: Hex[]) {
@@ -237,8 +250,8 @@ export class View {
     private makeHexDiv(hex: Hex): HTMLElement {
         const row = Math.trunc(hex.rc / 100);
         const col = Math.trunc(hex.rc % 100);
-        let top = 100 * (View.vstart + row * View.vdelta / 2) / 768.0;
-        let left = 100 * (View.hstart + col * View.hdelta) / 1024.0;
+        let top = 100 * (View.vstart + row * View.vdelta / 2) / 2496.0;
+        let left = 100 * (View.hstart + col * View.hdelta) / 3385.0;
         return Html.div({ id:  IDS.hexDiv(hex.rc), style: [`top:${top}%`, `left:${left}%`] });
     }
 

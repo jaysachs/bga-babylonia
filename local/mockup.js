@@ -194,29 +194,49 @@ function populateBoard2() {
           hexDiv(7, 11).classList.add('bbl_selected');
 }
 
+const IDS = {
+    MAIN: 'bbl_main'
+}
+
+const View = {
+    map_aspect_ratio: 0.75 // 1.333333
+}
+
+const CSS = {
+    LAYOUT_UNDER_BOARD: 'bbl_altflow'
+}
+
 function handleResize(evt) {
-    // maybe use bbl_main ?
-    pce = document.getElementById("page-content");
-    r = pce.getBoundingClientRect();
+    const pageEl = document.getElementById('page-content');
+    const pageRect = pageEl.getBoundingClientRect();
+    const viewPort = window.visualViewport;
 
-    const mt = r.top;
-    const mw = r.width;
-    const vp = window.visualViewport;
+    const vertAvail = viewPort.height - pageRect.top;
 
-    // vertical space available
-    const h1 = vp.height - mt;
+    const mapHeightForWidth = pageRect.width * View.map_aspect_ratio;
 
-    const map_aspect_ratio = 0.75;
-    const ch2 = mw * map_aspect_ratio;
+    // "horizontal" "default" layout
+    var w1 = pageRect.width * 0.9;
+    var h1 = w1 * View.map_aspect_ratio;
+    if (h1 > vertAvail) {
+        w1 = vertAvail / View.map_aspect_ratio;
+        h1 = vertAvail;
+    }
 
-    // vertical space for pieces
-    const vsp = ch2 / 8; // 8 is heuristically guessed
-    let s = document.getElementById('bbl_main').classList;
-    if (h1 - ch2 - vsp > 0) {
-        // use alt flow layout, i.e. pieces underneath
-        s.add('bbl_altflow');
+    // "vertical" "alt" layout
+    var h2 = vertAvail * 0.9;
+    var w2 = h2 / View.map_aspect_ratio;
+    if (w2 > pageRect.width) {
+        w2 = pageRect.width;
+        h2 = w2 * View.map_aspect_ratio;
+    }
+
+    const mainElCl = document.getElementById(IDS.MAIN).classList;
+    if (w1 >= w2) {
+        mainElCl.remove(CSS.LAYOUT_UNDER_BOARD);
+        document.body.style.setProperty('--bbl-board-width', (w1 - 12) + 'px');
     } else {
-        // use pieces-on-right layout
-        s.remove('bbl_altflow');
+        mainElCl.add(CSS.LAYOUT_UNDER_BOARD);
+        document.body.style.setProperty('--bbl-board-width', w2 + 'px');
     }
 }
