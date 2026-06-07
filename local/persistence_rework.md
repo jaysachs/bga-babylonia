@@ -237,3 +237,4 @@ WHERE location = "$src_location" AND location_id = $src_location_id
 
 7. Maybe `ziggurat` as well should be a terrain type instead of a piece type?
    that complicates the CSS and rendering. but also is maybe kinda true? they are immutable, not removable, not playable and thus technically don't count in any meaningful way as land or river.
+   No, it shouldn't, because it gets marked "scored", like cities do. It just doesn't get removed.
