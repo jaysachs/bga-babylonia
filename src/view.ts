@@ -1,4 +1,4 @@
-import { BGamedatas, Hex, PlayerData, Zcard } from "./bdata";
+import { BGamedatas, Hex, BblPlayer, Zcard } from "./bdata";
 import { AttrLike, Html } from "./html";
 
 export class Attrs implements AttrLike {
@@ -139,9 +139,9 @@ export class View {
         this.translatedPieces = gamedatas.translated_pieces;
         this.bga.gameArea.getElement().appendChild(this.base_html());
 
-        console.log('setting up player boards', gamedatas.player_data);
-        for (const pid in gamedatas.player_data) {
-            this.setupPlayerBoard(gamedatas.player_data[pid]!);
+        console.log('setting up player boards');
+        for (const pid in gamedatas.players) {
+            this.setupPlayerBoard(gamedatas.players[pid]!);
         }
 
         console.log('setting the the game board');
@@ -184,7 +184,7 @@ export class View {
         }
     }
 
-    private setupPlayerBoard(player: PlayerData): void {
+    private setupPlayerBoard(player: BblPlayer): void {
         const playerId = player.player_id;
         console.log('Setting up board for player ' + playerId);
         this.bga.playerPanels.getElement(playerId).append(...this.player_board_ext(playerId));

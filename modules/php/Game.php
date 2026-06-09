@@ -140,15 +140,6 @@ class Game extends Table
 
         $model = new Model($this->ps, $this->stats, intval($this->getCurrentPlayerId()));
 
-        $player_data = [];
-        foreach ($model->allPlayerInfo() as $pid => $pi) {
-            $player_data[$pid] = [
-                "player_id" => $pid,
-                "captured_city_count" => $pi->captured_city_count,
-                "hand_size" => $pi->hand_size,
-                "pool_size" => $pi->pool_size
-            ];
-        }
         /** @var list<array{row:int,col:int,hextype:string,piece:string,board_player:int}> */
         $board_data = [];
         $model->board()->visitAll(
@@ -166,10 +157,19 @@ class Game extends Table
 			$translated[$tiletype->value] = $tiletype->translated();
 		}
 
+        $players = $this->getCollectionFromDb(
+                "SELECT `player_id` `id`, `player_score` AS `score` FROM `player`");
+        foreach ($model->allPlayerInfo() as $pid => $pi) {
+            $players[$pid] = [
+                "player_id" => $pid,
+                "captured_city_count" => $pi->captured_city_count,
+                "hand_size" => $pi->hand_size,
+                "pool_size" => $pi->pool_size
+            ];
+        }
+
         return [
-            "players" => $this->getCollectionFromDb(
-                "SELECT `player_id` `id`, `player_score` AS `score` FROM `player`"),
-            'player_data' => $player_data,
+            "players" => $players,
             'hand' => array_map(
                 function ($p) {
                     return $p->value;
