@@ -50,6 +50,10 @@ class PlayPieces extends AbstractState
         );
     }
 
+    /**
+     * @param mixed[] $args
+     * @return mixed[]
+     */
     private function addStateArgs(array $args, Model $model, int $active_player_id): array {
         $prevMoveArgs = null;
         $move = $model->turnProgress()->previousMove();
@@ -67,11 +71,17 @@ class PlayPieces extends AbstractState
                 "original_piece" => $move->original_piece->value,
             ];
         }
-        $args["_private"][$active_player_id]["playState"] = [
+        $playState = [
             "allowedMoves" => $model->getAllowedMoves(),
             "canEndTurn" => $model->canEndTurn(),
             "previousMove" => $prevMoveArgs,
         ];
+
+        $priv = &$args["_private"];
+        /** @phpstan-ignore offsetAccess.nonOffsetAccessible */
+        $apid = &$priv[$active_player_id];
+        /** @phpstan-ignore offsetAccess.nonOffsetAccessible */
+        $apid["playState"] = $playState;
         return $args;
     }
 
