@@ -12,3 +12,4 @@
   * Undo, though: we don't current know what was just played, or if a field was taken, points, etc.
     So, instead of "canUndo" we should send back a "undoData" submessage with all that stuff
     Then, can deal with the undo animation clientside while still sending the action call
+* Hand positions should be 1-based
