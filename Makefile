@@ -10,9 +10,7 @@ TS_STUBS=src/bga-framework.d.ts
 JS=modules/js/Game.js
 PHPSTAN_LEVEL=10
 
-.PHONY: build test phpstan deploy clean
-
-build: $(JS) $(STUBS) $(STATS)
+.PHONY: build test phpstan deploy clean pull-boilerplate
 
 $(JS): src/**/*.ts src/*.ts tsconfig.json $(TS_STUBS)
 	npm run build:ts
@@ -30,14 +28,19 @@ $(STUBS): $(WORK) _ide_helper.php Makefile
 	mkdir -p $(WORK)/module/table
 	perl -p -e 's/type_arg=null,/type_arg,/;' -e 's/  exit/\/\/ exit/;' -e 's/APP_GAMEMODULE_PATH = ""/APP_GAMEMODULE_PATH = "work\/"/;' -e 's/{}\(\)\;/{}\;/;' _ide_helper.php > $(STUBS)
 
+build: $(JS) $(STUBS) $(STATS)
+
 test: build
 	phpunit --bootstrap misc/autoload.php misc --testdox
 
-phpstan: build $(STUBS)
+phpstan: build
 	phpstan --autoload-file=$(STUBS) --level=$(PHPSTAN_LEVEL) --memory-limit=1G analyse modules/php modules/php/Utils modules/php/Model modules/php/States misc/test/php
 
 deploy: test
 	lftp -e 'cd $(GAME); mirror -e -R --exclude .vscode/ --exclude .git/ --exclude work/ --exclude local/ --exclude bga-framework.d.ts --exclude .phpunit* --exclude node_modules*/ --exclude _ide_helper.php; exit' $(SFTP)
+
+pull-boilerplate:
+	lftp -e 'cd $(GAME); set xfer:clobber true; get _ide_helper.php; get bga-framework.d.ts' $(SFTP)
 
 clean:
 	rm -rf $(WORK) $(TS_STUBS) $(JS) $(STATS)
