@@ -127,7 +127,7 @@ export class PlayPiecesState extends BabyloniaState {
     }
 
     let pieceDiv = hexDiv.firstElementChild as HTMLElement;
-    let destDiv = args.handpos ? this.view.handPosDiv(args.handpos) : $(IDS.handcount(args.player_id));
+    let destDiv = args.handpos !== undefined ? this.view.handPosDiv(args.handpos) : $(IDS.handcount(args.player_id));
 
     if (args.original_piece) {
         // restore piece value, e.g. if it was originally hidden
