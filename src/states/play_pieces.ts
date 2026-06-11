@@ -35,9 +35,9 @@ export class PlayPiecesState extends BabyloniaState {
       this.setStatusBarForPlayState();
   }
 
-  override onEnteringState(args: { _private: { playState: PlayStateArgs } }, isCurrentPlayerActive: boolean) {
+  override onEnteringState(args: { playState: PlayStateArgs }, isCurrentPlayerActive: boolean) {
     if (isCurrentPlayerActive) {
-      this.doEnterState(args._private.playState);
+      this.doEnterState(args.playState);
     }
   }
 
@@ -53,7 +53,7 @@ export class PlayPiecesState extends BabyloniaState {
       // field_points: number;
       ziggurat_points: number;
       touched_ziggurats: number[];
-      _private: { playState: PlayStateArgs } | undefined;
+      playState: PlayStateArgs | undefined;
     }
   ) {
     let anims: AnimationList = [];
@@ -98,29 +98,24 @@ export class PlayPiecesState extends BabyloniaState {
 
     this.view.updateHandCount(args);
     // this.bga.playerPanels.getScoreCounter(args.player_id).incValue(args.points);
-    if (args._private) {
-      this.doEnterState(args._private.playState);
+    if (args.playState) {
+      this.doEnterState(args.playState);
     }
   }
 
   async notif_undoMove(
     args: {
       player_id: number;
-      // points: number;
       rc: number;
-      _private: {
-        playState: PlayStateArgs;
-        original_piece: string;
-        handpos: number;
-      } | undefined;
+      playState: PlayStateArgs | undefined;
+      original_piece: string | undefined;
+      handpos: number | undefined;
       captured_piece: string;
       hand_size: number;
-      piece: string;
     }
   ) {
     let anims: AnimationList = [];
     let hexDiv = $(IDS.hexDiv(args.rc));
-    let isActivePlayer = this.bga.gameui.player_id == args.player_id;
 
     if (args.captured_piece != Piece.EMPTY) {
       // slide the previously captured field back
@@ -132,25 +127,25 @@ export class PlayPiecesState extends BabyloniaState {
     }
 
     let pieceDiv = hexDiv.firstElementChild as HTMLElement;
-    let destDiv = isActivePlayer ? this.view.handPosDiv(args._private!.handpos) : $(IDS.handcount(args.player_id));
+    let destDiv = args.handpos ? this.view.handPosDiv(args.handpos) : $(IDS.handcount(args.player_id));
 
-    if (args._private?.original_piece) {
+    if (args.original_piece) {
         // restore piece value, e.g. if it was originally hidden
-        Attrs.setPiece(pieceDiv, args._private.original_piece, this.bga.players.getPlayerById(args.player_id));
+        Attrs.setPiece(pieceDiv, args.original_piece, this.bga.players.getPlayerById(args.player_id));
     }
     // slide the played piece back to the hand
     anims.push(() => this.animationManager.slideAndAttach(pieceDiv, destDiv));
 
     await this.animationManager.playParallel(anims).then(() => {
-      if (isActivePlayer) {
+      if (args.handpos) {
          destDiv.classList.add(CSS.PLAYABLE);
       }
       this.view.updateHandCount(args);
       // this.bga.playerPanels.getScoreCounter(args.player_id).incValue(-args.points);
     });
 
-    if (args._private) {
-      this.doEnterState(args._private.playState);
+    if (args.playState) {
+      this.doEnterState(args.playState);
     };
   }
 

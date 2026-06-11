@@ -76,6 +76,7 @@ class Game extends Table
 		Log::setImpl(new GameLogger($this));
 		$logDecorator = new LogDecorator(\Closure::fromCallable($this->getPlayerNameById(...)));
 		$this->notify->addDecorator($logDecorator->playerNames(...));
+        $this->bga->notify->alwaysMergePrivate();
  		$this->stats = Stats::createForGame($this);
         $this->ps = new PersistentStore(new DefaultDb(), $this->globals, $this->playerScore, $this->playerScoreAux);
 
