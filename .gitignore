@@ -17,3 +17,5 @@ local/vassalimgs/
 package-lock.json
 src/bga-framework.d.ts
 local/research
+_ide_helper.php
+bga-framework.d.ts
