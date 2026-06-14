@@ -307,15 +307,12 @@ class Model
 
         // update the database
         $this->ps->updateHex($move->rc, $move->piece, $move->player_id);
-        // NOTE: we update the DB but not the player info
-        // This is OK at present because this is a top-level entry point
-        //  and we haven't retrieved player_infos.
-        // Could do:
-        //   if ($this->_player_infos != null) {
-        //      update the right one
-        //   }
-        $this->ps->incPlayerScore($move->player_id, $move->points());
-        $this->ps->updateHand($move->player_id, $move->handpos, PieceType::EMPTY);
+        if ($move->points() <> 0) {
+            $pinfo = $this->allPlayerInfo()[$move->player_id];
+            $pinfo->score += $move->points();
+            $this->ps->updatePlayer($pinfo);
+            $this->ps->updateHand($move->player_id, $move->handpos, PieceType::EMPTY);
+        }
 
         foreach ($result->activatedCards() as $zctype) {
             switch ($zctype) {
@@ -623,13 +620,14 @@ class Model
             $this->board()->hexAt($move->rc)->playPiece($move->captured_piece, $move->player_id);
         }
         $this->hand()->replace($move->original_piece, $move->handpos);
+        if ($move->points() <> 0) {
+            $pinfo = $this->allPlayerInfo()[$move->player_id];
+            $pinfo->score -= $move->points();
+            $this->ps->updatePlayer($pinfo);
+        }
         $this->ps->deleteSingleMove($move);
         $this->ps->updateHex($move->rc, $move->captured_piece, 0);
         $this->ps->updateHand($move->player_id, $move->handpos, $move->original_piece);
-        // NOTE: we update the DB but not the player info
-        // This seems OK since this is the main entry point and we
-        // haven't retrieve the player info yet.
-        $this->ps->incPlayerScore($move->player_id, -$move->points());
         return $move;
     }
 }

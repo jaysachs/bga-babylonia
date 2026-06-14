@@ -260,14 +260,6 @@ class PersistentStore
         $this->db->execute($sql);
     }
 
-    public function incPlayerScore(int $player_id, int $points): void
-    {
-        if ($points == 0) {
-            return;
-        }
-        $this->playerScore->inc($player_id, $points);
-    }
-
     /** @param array<int, StatOp> $statOps */
     public function insertMove(Move $move, array $statOps): void
     {
