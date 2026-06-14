@@ -311,8 +311,8 @@ class Model
             $pinfo = $this->allPlayerInfo()[$move->player_id];
             $pinfo->score += $move->points();
             $this->ps->updatePlayer($pinfo);
-            $this->ps->updateHand($move->player_id, $move->handpos, PieceType::EMPTY);
         }
+        $this->ps->updateHand($move->player_id, $move->handpos, PieceType::EMPTY);
 
         foreach ($result->activatedCards() as $zctype) {
             switch ($zctype) {
