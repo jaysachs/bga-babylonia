@@ -55,8 +55,6 @@ class Arrays
     {
         $e = sizeof($arr) - 1;
         for ($i = 0; $i < $e; $i++) {
-            // FIXME: not sure why this is needed.
-            /** @phpstan-ignore argument.type */
             $j = random_int($i, $e);
             if ($j <> $i) {
                 $tmp = $arr[$j];
