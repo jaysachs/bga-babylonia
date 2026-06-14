@@ -47,11 +47,11 @@ class PersistentStore
     public function __construct(private Db $db, private Globals $globals, private PlayerCounter $playerScore, private PlayerCounter $playerScoreAux) {}
 
     public function initializeGlobals(\Closure $initFn): void {
-        $initFn([PersistentStore::GLOBAL_PLAYER_ON_TURN => 10,
-                 PersistentStore::GLOBAL_ROW_COL_BEING_SCORED => 11]);
+        $initFn([self::GLOBAL_PLAYER_ON_TURN => 10,
+                 self::GLOBAL_ROW_COL_BEING_SCORED => 11]);
     }
 
-    private function boolValue(bool $b): string
+    private static function boolValue(bool $b): string
     {
         return $b ? 'TRUE' : 'FALSE';
     }
@@ -59,7 +59,7 @@ class PersistentStore
     public function rowColBeingScored(): ?int
     {
         /** @var int|null */
-        $v = $this->globals->get(PersistentStore::GLOBAL_ROW_COL_BEING_SCORED);
+        $v = $this->globals->get(PersistentStore::GLOBAL_ROW_COL_BEING_SCORED, 0);
         if ($v == 0) {
             return null;
         }
@@ -103,13 +103,52 @@ class PersistentStore
         return Board::fromHexes($hexes);
     }
 
+    /** @param array<int,PlayerInfo> $pinfos */
+    public function insertAll(Board $board, Components $components, array $pinfos): void {
+        $sql_values = [];
+        $board->visitAll(function (Hex $hex) use (&$sql_values) {
+            $piece = $hex->piece->value;
+            $player_id = $hex->player_id;
+            $sc = self::boolValue($hex->scored);
+            $t = $hex->terrain->value;
+            $rc = $hex->rc;
+            $sql_values[] = "('BOARD', $rc, '$piece', $player_id, $sc, '$t')";
+        });
+
+        foreach ($components->allZigguratCards() as $id => $zc) {
+            $t = $zc->type->value;
+            $pid = $zc->owning_player_id;
+            $used = self::boolValue($zc->used);
+            $sql_values[] = "('ZCARD', $id, '$t', $pid, $used, NULL)";
+        }
+
+        foreach ($pinfos as $pinfo) {
+            foreach ($pinfo->pool->pieces() as $i => $p) {
+                $x = $p->value;
+                $sql_values[] = "('POOL', $i, '$x', $pinfo->player_id, NULL, NULL)";
+            }
+            foreach ($pinfo->hand->pieces() as $i => $p) {
+                $x = $p->value;
+                $sql_values[] = "('HAND', $i, '$x', $pinfo->player_id, NULL, NULL)";
+            }
+        }
+        if (count($sql_values) == 0) {
+            return;
+        }
+        $values = implode(',', $sql_values);
+        $sql = "INSERT INTO pieces (location, location_id, type, player_id, used, terrain)
+                VALUES $values";
+        $this->db->execute($sql);
+    }
+
+
     public function insertBoard(Board $board): void
     {
         $sql_values = [];
         $board->visitAll(function (Hex $hex) use (&$sql_values) {
             $piece = $hex->piece->value;
             $player_id = $hex->player_id;
-            $sc = $this->boolValue($hex->scored);
+            $sc = self::boolValue($hex->scored);
             $t = $hex->terrain->value;
             $rc = $hex->rc;
             $sql_values[] = "($rc, '$t', '$piece', $sc, $player_id)";
@@ -242,7 +281,7 @@ class PersistentStore
             $updates[] = "player_id=$player_id";
         }
         if ($scored !== null) {
-            $bs = $this->boolValue($scored);
+            $bs = self::boolValue($scored);
             $updates[] = "scored=$bs";
         }
         $updates = implode(',', $updates);
@@ -389,7 +428,7 @@ class PersistentStore
     {
         $sql_values = [];
         foreach ($components->allZigguratCards() as $i => &$zc) {
-            $used = $this->boolValue($zc->used);
+            $used = self::boolValue($zc->used);
             $type = $zc->type->value;
             $sql_values[] = "($i, '$type', $used, $zc->owning_player_id)";
         }
@@ -421,7 +460,7 @@ class PersistentStore
     public function updateZigguratCard(ZigguratCard $card): void
     {
         $player_id = $card->owning_player_id;
-        $used = $this->boolValue($card->used);
+        $used = self::boolValue($card->used);
         $type = $card->type->value;
 
         $sql = "UPDATE ziggurat_cards

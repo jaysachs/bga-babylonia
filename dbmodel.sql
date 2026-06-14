@@ -61,7 +61,7 @@ CREATE TABLE IF NOT EXISTS `pieces` (
   --  zc_citypts
   --  zc_land
   --  zc_river
-  `type` VARCHAR(10),
+  `type` VARCHAR(20),
 
   `player_id` INT UNSIGNED,
 
@@ -73,7 +73,7 @@ CREATE TABLE IF NOT EXISTS `pieces` (
   --    north, center, south, river
   `terrain` VARCHAR(6),
 
-  PRIMARY KEY(`location`, `location_id`)
+  PRIMARY KEY(`location`, `location_id`, `player_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 

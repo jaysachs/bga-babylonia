@@ -86,6 +86,8 @@ class Model
         }
         $ps->insertBoard($board);
         $ps->insertComponents($components);
+
+        $ps->insertAll($board, $components, $pinfos);
     }
 
     private function makeScorer(): Scorer
@@ -132,6 +134,10 @@ class Model
     public function &allPlayerInfo(): array
     {
         return $this->allData()['player_infos'];
+    }
+
+    public function activePlayerInfo(): PlayerInfo {
+        return $this->allPlayerInfo()[$this->player_id];
     }
 
     public function hand(): Hand
