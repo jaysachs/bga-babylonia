@@ -71,16 +71,21 @@ class Model
     /** @param int[] $player_ids */
     public static function createNewGame(PersistentStore $ps, array $player_ids, bool $use_advanced_ziggurats): void
     {
-        $ps->insertBoard(Board::forPlayerCount(count($player_ids)));
-
+        $board = Board::forPlayerCount(count($player_ids));
+        $components = Components::forNewGame($use_advanced_ziggurats);
+        $pinfos = [];
         foreach ($player_ids as $player_id) {
             $hand = Hand::new();
             $pool = Pool::new();
             Model::refill($hand, $pool);
-            $ps->upsertHand($player_id, $hand);
-            $ps->upsertPool($player_id, $pool);
+            $pinfos[$player_id] = new PlayerInfo($player_id, 0, 0, $hand, $pool);
         }
-        $ps->insertComponents(Components::forNewGame($use_advanced_ziggurats));
+        foreach ($pinfos as $pinfo) {
+            $ps->upsertHand($pinfo->player_id, $pinfo->hand);
+            $ps->upsertPool($pinfo->player_id, $pinfo->pool);
+        }
+        $ps->insertBoard($board);
+        $ps->insertComponents($components);
     }
 
     private function makeScorer(): Scorer
@@ -118,7 +123,7 @@ class Model
         $total_pieces = 30 * count($player_infos);
         $remaining_pieces = 0;
         foreach ($player_infos as $pi) {
-            $remaining_pieces += $pi->hand_size + $pi->pool_size;
+            $remaining_pieces += $pi->hand->size() + $pi->pool->size();
         }
         return intval(100.0 - ($remaining_pieces * 100.0) / floatval($total_pieces));
     }

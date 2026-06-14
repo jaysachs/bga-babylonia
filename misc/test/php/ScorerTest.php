@@ -6,10 +6,12 @@ use PHPUnit\Framework\TestCase;
 use Bga\Games\babylonia\Model\ {
         Board,
         Components,
-        Hex,
+    Hand,
+    Hex,
         HexWinner,
         PlayerInfo,
-        RowCol,
+    Pool,
+    RowCol,
         Scorer,
         ScoredCity,
 };
@@ -20,9 +22,9 @@ final class ScorerTest extends TestCase
     /** @return array<int,PlayerInfo> */
     private function playerInfos(): array {
         return [
-            1 => new PlayerInfo(1, 0, 3, 0, 0),
-            2 => new PlayerInfo(2, 0, 0, 0, 0),
-            3 => new PlayerInfo(3, 0, 2, 0, 0)
+            1 => new PlayerInfo(1, 0, 3, new Hand([]), new Pool([])),
+            2 => new PlayerInfo(2, 0, 0, new Hand([]), new Pool([])),
+            3 => new PlayerInfo(3, 0, 2, new Hand([]), new Pool([]))
         ];
     }
 

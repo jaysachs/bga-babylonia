@@ -238,3 +238,6 @@ WHERE location = "$src_location" AND location_id = $src_location_id
 7. Maybe `ziggurat` as well should be a terrain type instead of a piece type?
    that complicates the CSS and rendering. but also is maybe kinda true? they are immutable, not removable, not playable and thus technically don't count in any meaningful way as land or river.
    No, it shouldn't, because it gets marked "scored", like cities do. It just doesn't get removed.
+
+8. If we go with "every thing in the table has a unique ID" that is fine, though we'll need
+   to synthesize IDs for empty hexes. What would we use? We could use the actual compressed RowCol integer -- except that we have 9 ziggurat cards, 5 ziggurats, 30 or so cities/farms, and 120 actual pieces, and assigning those starting at zero will collide with rowcol. We could make empty IDs the *negative* of the RowCol. Or, since it's 100*row+col, leaving room for 200 other things, we could start the IDs offset by 1000. (Or multiiplied by 1000.) But it's unclear why we need this id.

@@ -85,7 +85,7 @@ class PlayPieces extends AbstractState
         return $args;
     }
 
-    /** @return array{...} */
+    /** @return mixed[] */
     public function getArgs(int $active_player_id): array
     {
         $model = $this->createModel($active_player_id);

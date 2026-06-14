@@ -164,8 +164,8 @@ class Game extends Table
             $players[$pid] = [
                 "player_id" => $pid,
                 "captured_city_count" => $pi->captured_city_count,
-                "hand_size" => $pi->hand_size,
-                "pool_size" => $pi->pool_size
+                "hand_size" => $pi->hand->size(),
+                "pool_size" => $pi->pool->size()
             ];
         }
 

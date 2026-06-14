@@ -373,12 +373,15 @@ class PersistentStore
     /** @param array<string,string> $pd */
     private function playerInfoFromData(int $player_id, array $pd): PlayerInfo
     {
+        // FIXME: these are placeholders
+        $pool = new Pool(array_pad([], intval($pd["pool_size"]), PieceType::EMPTY));
+        $hand = new Hand(array_pad([], intval($pd["hand_size"]), PieceType::FARMER));
         return new PlayerInfo(
             $player_id,
             $this->playerScore->get($player_id),
             intval($pd["captured_city_count"]),
-            intval($pd["hand_size"]),
-            intval($pd["pool_size"])
+            $hand,
+            $pool
         );
     }
 

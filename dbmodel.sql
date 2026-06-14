@@ -18,6 +18,65 @@
 -- Note: The database schema is created from this file when the game starts. If you modify this file,
 --       you have to restart a game to see your changes in database.
 
+CREATE TABLE IF NOT EXISTS `pieces` (
+
+  -- location
+  --   BOARD (player_id depends on type)
+  --   HAND (requires player_id) (both pieces and zcards can be in "HAND")
+  --   POOL (requires player_id)
+  --   DISCARD (null player_id) - cities scored but uncaptured, scored fields
+  `location` VARCHAR(8),
+
+  -- location_id
+  --   if BOARD, encoded row/col
+  --   if HAND,  hand pos
+  --   if POOL,  "position" in pool
+  --   if DISCARD, unique seq_id
+  `location_id` INT UNSIGNED,
+
+  -- type: (player_id null unless indicated)
+  --  empty
+  --  priest  (requires player_id)
+  --  merchant  (requires player_id)
+  --  servant   (requires player_id)
+  --  farmer    (requires player_id)
+  --  hidden (for pieces played upside down; implies water; requires player_id)
+  --  city_m (all city_: player_id if captured),
+  --  city_p,
+  --  city_s,
+  --  city_mp,
+  --  city_ms,
+  --  city_msp,
+  --  field_5,
+  --  field_6,
+  --  field_7,
+  --  field_x
+  --  ziggurat
+  --  zc_10pts
+  --  zc_xturn
+  --  zc_hand7
+  --  zc_3nobles
+  --  zc_3farmers
+  --  zc_fields
+  --  zc_citypts
+  --  zc_land
+  --  zc_river
+  `type` VARCHAR(10),
+
+  `player_id` INT UNSIGNED,
+
+  -- indicates "scored" for ziggurats, cities and fields
+  -- indicates "used" for single use ziggurate cards
+  `used` BOOLEAN,
+
+  -- landmass for board locations only
+  --    north, center, south, river
+  `terrain` VARCHAR(6),
+
+  PRIMARY KEY(`location`, `location_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
 ALTER TABLE `player` ADD `captured_city_count` INT UNSIGNED NOT NULL DEFAULT '0';
 
 CREATE TABLE IF NOT EXISTS `handpools` (
