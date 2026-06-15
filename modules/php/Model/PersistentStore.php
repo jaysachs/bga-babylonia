@@ -83,26 +83,6 @@ class PersistentStore
         $this->globals->set(PersistentStore::GLOBAL_PLAYER_ON_TURN, $player_id);
     }
 
-    private function retrieveBoard(): Board
-    {
-        $sql = "SELECT board_loc AS rc, terrain, piece, scored, player_id AS board_player
-                FROM board";
-        $data = $this->db->getObjectList($sql);
-
-        /** @var Hex[] */
-        $hexes = [];
-        foreach ($data as &$hex) {
-            $hexes[] = new Hex(
-                Terrain::from($hex['terrain']),
-                intval($hex['rc']),
-                PieceType::from($hex['piece']),
-                intval($hex['board_player']),
-                boolval($hex['scored'])
-            );
-        };
-        return Board::fromHexes($hexes);
-    }
-
     /** @param array<int,PlayerInfo> $pinfos */
     public function insertAll(Board $board, Components $components, array $pinfos): void {
         $sql_values = [];
@@ -141,106 +121,112 @@ class PersistentStore
         $this->db->execute($sql);
     }
 
+    /** @return array{player_infos:array<int,PlayerInfo>,board:Board,components:Components,hand:Hand,pool:Pool,turnProgress:TurnProgress} */
+    public function retrieveAllData(int $player_id): array {
+        $rows = $this->db->getObjectList("SELECT location, location_id, type, player_id, used, terrain FROM pieces ORDER BY location, location_id, player_id");
 
-    public function insertBoard(Board $board): void
-    {
-        $sql_values = [];
-        $board->visitAll(function (Hex $hex) use (&$sql_values) {
-            $piece = $hex->piece->value;
-            $player_id = $hex->player_id;
-            $sc = self::boolValue($hex->scored);
-            $t = $hex->terrain->value;
-            $rc = $hex->rc;
-            $sql_values[] = "($rc, '$t', '$piece', $sc, $player_id)";
-        });
-        $values = implode(',', $sql_values);
-        $sql = "INSERT INTO board (board_loc, terrain, piece, scored, player_id)
-                VALUES $values";
-        $this->db->execute($sql);
+        /** @var Hex[] */
+        $hexes = [];
+        /** @var list<ZigguratCard> */
+        $cards = [];
+
+        /** @var array<int, array<int,PieceType>> */
+        $hands = [];
+        /** @var array<int, array<int,PieceType>> */
+        $pools = [];
+
+        $captured = [];
+
+        $player_ids = [];
+
+        foreach ($rows as $row) {
+            $pid = intval($row["player_id"]);
+            if ($pid > 0 && !isset($player_ids[$pid])) {
+                $player_ids[$pid] = 1;
+                $hands[$pid] = [];
+                $pools[$pid] = [];
+                $captured[$pid] = 0;
+            }
+            $locid = intval($row["location_id"]);
+            switch ($row["location"]) {
+                case "DISCARD":
+                    $pt = PieceType::from($row["type"]);
+                    if ($pt->isCity() && $pid > 0) {
+                        $captured[$pid]++;
+                    }
+                    // use this to compute captured city count
+                    break;
+                case "HAND":
+                    $hands[$pid][$locid] = PieceType::from($row['type']);
+                    break;
+                case "POOL":
+                    $pools[$pid][$locid] = PieceType::from($row['type']);
+                    break;
+                case "ZCARD":
+                    $cards[] = new ZigguratCard(
+                        ZigguratCardType::from($row["type"]),
+                        $pid,
+                        boolval($row["used"])
+                    );
+                    break;
+                case "BOARD":
+                    $hexes[] = new Hex(
+                        Terrain::from($row['terrain']),
+                        $locid,
+                        PieceType::from($row['type']),
+                        $pid,
+                        boolval($row['used'])
+                    );
+                    break;
+            }
+        }
+
+        $pinfos = [];
+        foreach ($player_ids as $pid => $_) {
+            $pinfos[$pid] = new PlayerInfo($pid, $captured[$pid], new Hand($hands[$pid]), new Pool($pools[$pid]));
+        }
+        return [
+            'player_infos' => $pinfos,
+            'board' => Board::fromHexes($hexes),
+            'components' => new Components($cards),
+            'hand' => $player_id > 0 ? $pinfos[$player_id]->hand : new Hand([]),
+            'pool' => $player_id > 0 ? $pinfos[$player_id]->pool : new Pool([]),
+            'turnProgress' => $this->retrieveTurnProgress($player_id),
+        ];
     }
 
-    public function upsertPool(int $player_id, Pool $pool): void
-    {
-        $sql = "DELETE FROM handpools WHERE player_id = $player_id";
-        $this->db->execute($sql);
+    public function updateUndoneMove(Move $move): void {
+        $cpt = $move->captured_piece->value;
+        if ($move->captured_piece <> PieceType::EMPTY) {
+            // assert is farm; need to put it into 'DISCARD' location
+            $this->db->execute("DELETE FROM pieces WHERE location = 'DISCARD' AND location_id = $move->rc");
+        }
 
-        $sql_values = [];
-        foreach ($pool->pieces() as $i => $p) {
-            $x = $p->value;
-            $sql_values[] = "($player_id, $i, '$x')";
-        }
-        if (count($sql_values) == 0) {
-            return;
-        }
-        $values = implode(',', $sql_values);
-        $sql = "INSERT INTO handpools (player_id, seq_id, piece)
-                VALUES $values";
-        $this->db->execute($sql);
+        $pt = $move->piece->value;
+        $this->db->execute("UPDATE pieces SET type='$cpt',player_id=0 WHERE location='BOARD' AND location_id=$move->rc");
+        $this->db->execute("UPDATE pieces SET type='$pt' WHERE location='HAND' AND location_id=$move->handpos AND player_id=$move->player_id");
+        $this->incPlayerScore($move->player_id, -$move->points());
     }
 
-    private function retrievePool(int $player_id): Pool
-    {
-        $sql = "SELECT piece
-                FROM handpools
-                WHERE player_id = $player_id";
-        $data = $this->db->getSingleFieldList($sql);
-
-        $pieces = [];
-        foreach ($data as $pd) {
-            $pieces[] = PieceType::from($pd);
+    public function updatePlayedPiece(ElaboratedMove $move): void {
+        if ($move->captured_piece <> PieceType::EMPTY) {
+            $pt = $move->captured_piece->value;
+            // assert is farm; need to put it into 'DISCARD' location
+            $this->db->execute("INSERT INTO pieces (location, location_id, type, player_id, used)
+                VALUES ('DISCARD', $move->rc, '$pt', $move->player_id, TRUE)");
         }
-        return new Pool($pieces);
+        $pt = $move->piece->value;
+        $this->db->execute("UPDATE pieces SET type='$pt',player_id=$move->player_id WHERE location='BOARD' AND location_id=$move->rc");
+        $this->db->execute("UPDATE pieces SET type='empty' WHERE location='HAND' AND location_id=$move->handpos AND player_id=$move->player_id");
+        $this->incPlayerScore($move->player_id, $move->points());
     }
 
-    // Not efficient, but there are at most seven rows involed here.
-    public function upsertHand(int $player_id, Hand $hand): void
-    {
-        $sql = "DELETE FROM hands
-                WHERE player_id = $player_id";
-        $this->db->execute($sql);
-
-        $sql_values = [];
-        foreach ($hand->pieces() as $i => $p) {
-            $sql_values[] = "($player_id, $i, '$p->value')";
-        }
-        if (count($sql_values) == 0) {
-            return;
-        }
-        $values = implode(',', $sql_values);
-        $sql = "INSERT INTO hands (player_id, pos, piece)
-                VALUES $values";
-        $this->db->execute($sql);
+    public function incPlayerScore(int $player_id, int $amt): void {
+        $this->playerScore->inc($player_id, $amt);
     }
 
-    private function retrieveHand(int $player_id): Hand
-    {
-        $sql = "SELECT piece
-                FROM hands
-                WHERE player_id = $player_id
-                ORDER BY pos";
-        $data = $this->db->getSingleFieldList($sql);
-        $pieces = [];
-        foreach ($data as $pd) {
-            $pieces[] = PieceType::from($pd);
-        }
-        return new Hand($pieces);
-    }
-
-    public function updatePlayer(PlayerInfo $player_info): void
-    {
-        $sql = "UPDATE player p
-                SET p.captured_city_count = $player_info->captured_city_count
-                WHERE p.player_id = $player_info->player_id";
-        $this->db->execute($sql);
-        $this->playerScore->set($player_info->player_id, $player_info->score);
-    }
-
-    /** @param array<int,PlayerInfo> $player_infos */
-    public function updatePlayers(array $player_infos): void
-    {
-        foreach ($player_infos as $_ => $pi) {
-            $this->updatePlayer($pi);
-        }
+    public function updateScoredZiggurat(int $rc): void {
+        $this->db->execute("UPDATE pieces SET used=TRUE WHERE location='BOARD' and location_id=$rc");
     }
 
     /** @return list<StatOp> */
@@ -264,38 +250,6 @@ class PersistentStore
         $sql = "DELETE FROM turn_progress
                 WHERE player_id = $move->player_id
                 AND seq_id = $move->seq_id";
-        $this->db->execute($sql);
-    }
-
-    public function updateHex(
-        int $rc,
-        ?PieceType $piece = null,
-        ?int $player_id = null,
-        ?bool $scored = null
-    ): void {
-        $updates = [];
-        if ($piece !== null) {
-            $updates[] = "piece='$piece->value'";
-        }
-        if ($player_id !== null) {
-            $updates[] = "player_id=$player_id";
-        }
-        if ($scored !== null) {
-            $bs = self::boolValue($scored);
-            $updates[] = "scored=$bs";
-        }
-        $updates = implode(',', $updates);
-        $sql = "UPDATE board
-                SET $updates
-                WHERE board_loc=$rc";
-        $this->db->execute($sql);
-    }
-
-    public function updateHand(int $player_id, int $handpos, PieceType $piece): void
-    {
-        $sql = "UPDATE hands
-                SET piece = '$piece->value'
-                WHERE player_id=$player_id AND pos=$handpos";
         $this->db->execute($sql);
     }
 
@@ -367,105 +321,38 @@ class PersistentStore
         }
     }
 
-    /** @return array{player_infos:array<int,PlayerInfo>,board:Board,components:Components,hand:Hand,pool:Pool,turnProgress:TurnProgress} */
-    public function retrieveAllData(int $player_id): array {
-        return [
-            'player_infos' => $this->retrieveAllPlayerInfo(),
-            'board' => $this->retrieveBoard(),
-            'components' => $this->retrieveComponents(),
-            'hand' => $this->retrieveHand($player_id),
-            'pool' => $this->retrievePool($player_id),
-            'turnProgress' => $this->retrieveTurnProgress($player_id),
-        ];
-    }
-
-    /** @return array<int,PlayerInfo> */
-    private function &retrieveAllPlayerInfo(): array
-    {
-        $sql = "SELECT P.player_id player_id,
-                       P.captured_city_count captured_city_count,
-                       H.hand_size, Q.pool_size
-                FROM player P
-                LEFT JOIN
-                    (SELECT player_id, COUNT(*) hand_size
-                     FROM hands WHERE piece <> 'empty'
-                     GROUP BY player_id) H
-                ON P.player_id = H.player_id
-                LEFT JOIN
-                    (SELECT player_id, COUNT(*) pool_size
-                     FROM handpools
-                     GROUP BY player_id) Q
-                ON P.player_id = Q.player_id";
-        //         GROUP_CONCAT(z.ziggurat_card SEPARATOR ',') cards
-        //         ...
-        //  INNER JOIN ziggurat_cards Z ON P.player_id = Z.player_id"
-
-        $data = $this->db->getObjectList($sql);
-        $result = [];
-        foreach ($data as $pd) {
-            $pid = intval($pd['player_id']);
-            $result[$pid] = $this->playerInfoFromData($pid, $pd);
-        }
-        return $result;
-    }
-
-    /** @param array<string,string> $pd */
-    private function playerInfoFromData(int $player_id, array $pd): PlayerInfo
-    {
-        // FIXME: these are placeholders
-        $pool = new Pool(array_pad([], intval($pd["pool_size"]), PieceType::EMPTY));
-        $hand = new Hand(array_pad([], intval($pd["hand_size"]), PieceType::FARMER));
-        return new PlayerInfo(
-            $player_id,
-            $this->playerScore->get($player_id),
-            intval($pd["captured_city_count"]),
-            $hand,
-            $pool
-        );
-    }
-
-    public function insertComponents(Components $components): void
-    {
-        $sql_values = [];
-        foreach ($components->allZigguratCards() as $i => &$zc) {
-            $used = self::boolValue($zc->used);
-            $type = $zc->type->value;
-            $sql_values[] = "($i, '$type', $used, $zc->owning_player_id)";
-        }
-        $values = implode(',', $sql_values);
-        $sql = "INSERT INTO ziggurat_cards (seq_id, card_type, used, player_id)
-                VALUES $values";
-        $this->db->execute($sql);
-    }
-
-    private function retrieveComponents(): Components
-    {
-        $sql = "SELECT card_type, player_id, used
-                FROM ziggurat_cards
-                ORDER BY seq_id";
-        $data = $this->db->getObjectList($sql);
-
-        $cards = [];
-        foreach ($data as $zd) {
-            $cards[] =
-                new ZigguratCard(
-                    ZigguratCardType::from($zd["card_type"]),
-                    intval($zd["player_id"]),
-                    boolval($zd["used"])
-                );
-        }
-        return new Components($cards);
+    public function updateScoredCity(ScoredCity $sc): void {
+        $hw = $sc->hex_winner;
+        $winner_pid = $hw->captured_by;
+        $rc = $hw->hex->rc;
+        $p = $hw->hex->piece->value;
+        $this->db->execute("INSERT INTO pieces (location, location_id, type, player_id, used) VALUES ('DISCARD', $rc, '$p', $winner_pid, TRUE)");
+        $this->db->execute("UPDATE pieces SET player_id=0,type='empty' WHERE location='BOARD' AND location_id=$rc");
     }
 
     public function updateZigguratCard(ZigguratCard $card): void
     {
-        $player_id = $card->owning_player_id;
+        $pid = $card->owning_player_id;
         $used = self::boolValue($card->used);
         $type = $card->type->value;
+        $this->db->execute("UPDATE pieces SET location='TAKEN',player_id=$pid, used=$used WHERE type='$type'");
+    }
 
-        $sql = "UPDATE ziggurat_cards
-                SET player_id = $player_id, used = $used
-                WHERE card_type = '$type'";
-        $this->db->execute($sql);
+    /** @param array<int,int> $refilled */
+    public function updateRefill(int $player_id, array $refilled): void {
+        foreach ($refilled as $loc_id => $hand_pos) {
+            $this->db->execute("DELETE FROM pieces WHERE player_id=$player_id AND location='HAND' and location_id = $hand_pos");
+            $this->db->execute("UPDATE pieces SET location='HAND',location_id=$hand_pos WHERE player_id=$player_id AND location='POOL' and location_id = $loc_id");
+        }
+    }
+
+    /** @param array<int> $added */
+    public function updateExtendedHand(int $player_id, array $added): void {
+        $values = [];
+        foreach ($added as $pos) {
+            $value[] = "('HAND', $pos, 'empty', $player_id)";
+        }
+        $this->db->execute("INSERT INTO pieces (location, location_id, type, player_id
+                            VALUES " . implode(',', $values));
     }
 }

@@ -78,15 +78,8 @@ class Model
             $hand = Hand::new();
             $pool = Pool::new();
             Model::refill($hand, $pool);
-            $pinfos[$player_id] = new PlayerInfo($player_id, 0, 0, $hand, $pool);
+            $pinfos[$player_id] = new PlayerInfo($player_id, 0, $hand, $pool);
         }
-        foreach ($pinfos as $pinfo) {
-            $ps->upsertHand($pinfo->player_id, $pinfo->hand);
-            $ps->upsertPool($pinfo->player_id, $pinfo->pool);
-        }
-        $ps->insertBoard($board);
-        $ps->insertComponents($components);
-
         $ps->insertAll($board, $components, $pinfos);
     }
 
@@ -316,15 +309,7 @@ class Model
         );
         $this->turnProgress()->addMove($move);
 
-        // update the database
-        $this->ps->updateHex($move->rc, $move->piece, $move->player_id);
-        if ($move->points() <> 0) {
-            $pinfo = $this->allPlayerInfo()[$move->player_id];
-            $pinfo->score += $move->points();
-            $this->ps->updatePlayer($pinfo);
-        }
-        $this->ps->updateHand($move->player_id, $move->handpos, PieceType::EMPTY);
-
+        $this->ps->updatePlayedPiece($move);
         foreach ($result->activatedCards() as $zctype) {
             switch ($zctype) {
                 case ZigguratCardType::NOBLE_WITH_3_FARMERS:
@@ -365,19 +350,31 @@ class Model
         return $result;
     }
 
-    private static function refill(Hand $hand, Pool $pool): void
+    /**
+     * Returns array map of pool location to hand location.
+     * @return array<int,int>
+     */
+    private static function refill(Hand $hand, Pool $pool): array
     {
-        while ($hand->size() < $hand->limit() && !$pool->isEmpty()) {
-            $hand->replenish($pool->take());
+        $taken = $pool->takeN($hand->limit() - $hand->size());
+        $result = [];
+        foreach ($taken as $pp => $p) {
+            $result[$pp] = $hand->replenish($p);
         }
+        return $result;
     }
 
-    private function refillHand(): void
+    /**
+     * Returns array map of pool location to hand location.
+     * @return array<int,int>
+     */
+    private function refillHand(): array
     {
-        Model::refill($this->hand(), $this->pool());
+        $result = self::refill($this->hand(), $this->pool());
         if ($this->hand()->size() > Hand::DEFAULT_SIZE) {
             $this->stats->PLAYER_ZC_USED_HAND_SIZE_7->inc($this->player_id);
         }
+        return $result;
     }
 
     public function donePlayPieces(): void {
@@ -398,9 +395,8 @@ class Model
     public function finishTurn(): TurnResult
     {
         $hand = $this->hand();
-        $this->refillHand();
-        $this->ps->upsertHand($this->player_id, $hand);
-        $this->ps->upsertPool($this->player_id, $this->pool());
+        $refilled = $this->refillHand();
+        $this->ps->updateRefill($this->player_id, $refilled);
 
         $result = new TurnResult($hand, $this->board());
         if ($result->gameOver()) {
@@ -451,7 +447,7 @@ class Model
             throw new \InvalidArgumentException("ziggurat at {$hex} is not ready to be scored");
         }
         $hex->scored = true;
-        $this->ps->updateHex($hex->rc, null, null, true);
+        $this->ps->updateScoredZiggurat($hex->rc);
 
         return $this->makeScorer()->computeHexWinner($hex);
     }
@@ -476,15 +472,13 @@ class Model
         }
         // Give players points for connected pieces
         foreach ($playerInfos as $pid => $pi) {
-            $pi->score += $scoredCity->pointsForPlayer($pid);
             $this->stats->PLAYER_POINTS_FROM_CITY_NETWORKS->inc($pid, $scoredCity->networkPointsForPlayer($pid));
             $this->stats->PLAYER_POINTS_FROM_CAPTURED_CITIES->inc($pid, $scoredCity->capturePointsForPlayer($pid));
         }
 
         $_unused = $hex->captureCity();
 
-        $this->ps->updateHex($hex->rc, $hex->piece, null, true);
-        $this->ps->updatePlayers($playerInfos);
+        $this->ps->updateScoredCity($scoredCity);
 
         return $scoredCity;
     }
@@ -580,11 +574,10 @@ class Model
             $points = 10;
             $this->stats->PLAYER_ZC_USED_PLUS_10->inc($this->player_id);
             $pi = $this->allPlayerInfo()[$this->player_id];
-            $pi->score += $points;
-            $this->ps->updatePlayer($pi);
+            $this->ps->incPlayerScore($this->player_id, $points);
         } else if ($card_type == ZigguratCardType::HAND_SIZE_7) {
-            $this->hand()->extend(7);
-            $this->ps->upsertHand($this->player_id, $this->hand());
+            $added = $this->hand()->extend(7);
+            $this->ps->updateExtendedHand($this->player_id, $added);
         }
         $this->ps->updateZigguratCard($card);
         $this->stats->PLAYER_ZIGGURAT_CARDS->inc($this->player_id);
@@ -633,12 +626,9 @@ class Model
         $this->hand()->replace($move->original_piece, $move->handpos);
         if ($move->points() <> 0) {
             $pinfo = $this->allPlayerInfo()[$move->player_id];
-            $pinfo->score -= $move->points();
-            $this->ps->updatePlayer($pinfo);
         }
         $this->ps->deleteSingleMove($move);
-        $this->ps->updateHex($move->rc, $move->captured_piece, 0);
-        $this->ps->updateHand($move->player_id, $move->handpos, $move->original_piece);
+        $this->ps->updateUndoneMove($move);
         return $move;
     }
 }

@@ -52,7 +52,7 @@ class TestStore extends PersistentStore {
         for ($i = 1; $i <= 3; $i++) {
             $pool = Pool::new();
             $hand = Hand::new(5);
-            $this->player_infos[$i] = new PlayerInfo($i, 0, 0, $hand, $pool);
+            $this->player_infos[$i] = new PlayerInfo($i, 0, $hand, $pool);
         }
         $this->components = Components::forNewGame(false);
         $this->turnProgress = new TurnProgress();
@@ -83,7 +83,6 @@ class TestStore extends PersistentStore {
     public function incPlayerScore(int $player_id, int $points): void { }
 
     public function updateHex(int $rc, ?PieceType $piece = null, ?int $player_id = null, ?bool $scored = null): void { }
-    public function updatePlayers(array /* PlayerInfo */ $pis): void {}
     public function insertMove(Move $move, array $statOps): void {
         // $this->turnProgress->addMove($move);
     }

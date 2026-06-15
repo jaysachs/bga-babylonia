@@ -28,6 +28,7 @@ declare(strict_types=1);
 namespace Bga\Games\babylonia\Model;
 
 use Bga\GameFramework\SystemException;
+use Bga\Games\babylonia\Utils\Arrays;
 
 class Pool
 {
@@ -45,6 +46,7 @@ class Pool
             $pieces[] = PieceType::FARMER;
             $pieces[] = PieceType::FARMER;
         }
+        Arrays::shuffle($pieces);
         return new Pool($pieces);
     }
 
@@ -64,15 +66,23 @@ class Pool
         return count($this->pieces);
     }
 
+    /** @return array<int,PieceType> */
+    public function takeN(int $n): array {
+        $result = array_slice($this->pieces, 0, $n, true);
+        foreach ($result as $i => $v) {
+            unset($this->pieces[$i]);
+        }
+        // @phpstan-ignore return.type
+        return $result;
+    }
+
     public function take(): PieceType
     {
-        $c = count($this->pieces());
-        if ($c == 0) {
+        if (count($this->pieces()) == 0) {
             throw new SystemException("attempt to take piece from empty pool");
         }
-        $ix = random_int(0, $c - 1);
-        $result = $this->pieces[$ix];
-        array_splice($this->pieces, $ix, 1);
-        return $result;
+
+        // @phpstan-ignore return.type
+        return array_pop($this->pieces);
     }
 }
