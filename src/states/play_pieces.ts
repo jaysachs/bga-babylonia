@@ -44,13 +44,13 @@ export class PlayPiecesState extends BabyloniaState {
   async notif_piecePlayed(
     args: {
       player_id: number;
-      // points: number;
+      points: number;
       piece: string;
       handpos: number;
       rc: number;
       hand_size: number;
       captured_piece: string;
-      // field_points: number;
+      field_points: number;
       ziggurat_points: number;
       touched_ziggurats: number[];
       playState: PlayStateArgs | undefined;
@@ -68,7 +68,9 @@ export class PlayPiecesState extends BabyloniaState {
           console.error("attempt to capture a field that is not there");
         }
         // slide the captured field to the player board
-        anims.push(() => this.animationManager.slideOutAndDestroy(field, $(IDS.handcount(args.player_id)), {}));
+        anims.push(
+          () => this.animationManager.slideOutAndDestroy(field, $(IDS.handcount(args.player_id)), {})
+                .then(() => this.bga.playerPanels.getScoreCounter(args.player_id).incValue(args.field_points)));
       }
       anims.push(() => {
         // slide piece from hand count to hex
@@ -91,7 +93,7 @@ export class PlayPiecesState extends BabyloniaState {
                 this.bga.gameui.gamedatas.players[args.player_id]!.color,
                 { extraClass: 'bbl_city_scoring', duration: 700 })
                 .then(() => args.touched_ziggurats.forEach(z => this.view.unmarkHexSelected(z)))
-               // .then(() => this.bga.playerPanels.getScoreCounter(args.player_id).incValue(args.ziggurat_points))
+                .then(() => this.bga.playerPanels.getScoreCounter(args.player_id).incValue(args.ziggurat_points))
               )
       );
     }
@@ -99,7 +101,6 @@ export class PlayPiecesState extends BabyloniaState {
     await this.animationManager.playParallel(anims);
 
     this.view.updateHandCount(args);
-    // this.bga.playerPanels.getScoreCounter(args.player_id).incValue(args.points);
     if (args.playState) {
       this.doEnterState(args.playState);
     }
@@ -107,6 +108,7 @@ export class PlayPiecesState extends BabyloniaState {
 
   async notif_undoMove(
     args: {
+      points: number;
       player_id: number;
       rc: number;
       playState: PlayStateArgs | undefined;
@@ -143,7 +145,7 @@ export class PlayPiecesState extends BabyloniaState {
          destDiv.classList.add(CSS.PLAYABLE);
       }
       this.view.updateHandCount(args);
-      // this.bga.playerPanels.getScoreCounter(args.player_id).incValue(-args.points);
+      this.bga.playerPanels.getScoreCounter(args.player_id).incValue(-args.points);
     });
 
     if (args.playState) {

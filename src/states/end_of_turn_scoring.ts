@@ -88,7 +88,7 @@ export class EndOfTurnScoringState extends BabyloniaState {
             cl.remove(CSS.UNIMPORTANT);
           });
       }
-      // this.bga.playerPanels.getScoreCounter(details.player_id).incValue(details.network_points);
+      this.bga.playerPanels.getScoreCounter(details.player_id).incValue(details.network_points);
     }
 
     await this.indicateNeighbors(args.winner_hexes, args.other_hexes);
@@ -96,14 +96,14 @@ export class EndOfTurnScoringState extends BabyloniaState {
     let dest = (args.player_id != 0)
       ? $(IDS.citycount(args.player_id))
       // TODO: find a better location for 'off the board' but not to any player?
-      : this.bga.gameui.getGameAreaElement();
+      : this.bga.gameArea.getElement();
 
     await this.animationManager.slideOutAndDestroy(
       hex.firstElementChild as HTMLElement, dest, {}).then(() => {
         this.view.unmarkHexSelected(args.rc);
         for (const playerId in args.details) {
           const details = args.details[playerId]!;
-          // this.bga.playerPanels.getScoreCounter(details.player_id).incValue(details.capture_points);
+          this.bga.playerPanels.getScoreCounter(details.player_id).incValue(details.capture_points);
           this.view.updateCapturedCityCount(details);
         }
       }).then(() => this.view.unmarkHexSelected(args.rc));

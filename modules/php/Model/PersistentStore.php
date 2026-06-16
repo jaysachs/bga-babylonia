@@ -222,7 +222,7 @@ class PersistentStore
     }
 
     public function incPlayerScore(int $player_id, int $amt): void {
-        $this->playerScore->inc($player_id, $amt);
+        $this->playerScore->inc($player_id, $amt, null);
     }
 
     public function updateScoredZiggurat(int $rc): void {
