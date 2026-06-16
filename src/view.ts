@@ -198,7 +198,7 @@ export class View {
         this.updateHandCount(player, false);
         this.updatePoolCount(player, false);
         this.updateCapturedCityCount(player, false);
-        // this.bga.playerPanels.getScoreCounter(playerId).setValue(player.score);
+        this.bga.playerPanels.getScoreCounter(playerId).setValue(Number(player.score));
     }
 
 

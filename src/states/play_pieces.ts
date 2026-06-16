@@ -90,7 +90,9 @@ export class PlayPiecesState extends BabyloniaState {
                 1,
                 this.bga.gameui.gamedatas.players[args.player_id]!.color,
                 { extraClass: 'bbl_city_scoring', duration: 700 })
-                .then(() => args.touched_ziggurats.forEach(z => this.view.unmarkHexSelected(z))))
+                .then(() => args.touched_ziggurats.forEach(z => this.view.unmarkHexSelected(z)))
+               // .then(() => this.bga.playerPanels.getScoreCounter(args.player_id).incValue(args.ziggurat_points))
+              )
       );
     }
 
