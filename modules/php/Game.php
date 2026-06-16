@@ -159,14 +159,11 @@ class Game extends Table
 		}
 
         $players = $this->getCollectionFromDb(
-                "SELECT `player_id` `id`, `player_score` AS `score` FROM `player`");
+                "SELECT `player_id`, `player_score` AS `score` FROM `player`");
         foreach ($model->allPlayerInfo() as $pid => $pi) {
-            $players[$pid] = [
-                "player_id" => $pid,
-                "captured_city_count" => $pi->captured_city_count,
-                "hand_size" => $pi->hand->size(),
-                "pool_size" => $pi->pool->size()
-            ];
+            $players[$pid]["captured_city_count"] = $pi->captured_city_count;
+            $players[$pid]["hand_size"] = $pi->hand->size();
+            $players[$pid]["pool_size"] = $pi->pool->size();
         }
 
         return [
@@ -175,7 +172,7 @@ class Game extends Table
                 function ($p) {
                     return $p->value;
                 },
-                $model->hand()->pieces()
+                $model->activePlayerInfo()->hand->pieces()
             ),
             'board' => $board_data,
             'translated_pieces' => $translated,
