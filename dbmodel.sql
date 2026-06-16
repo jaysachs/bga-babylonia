@@ -76,23 +76,6 @@ CREATE TABLE IF NOT EXISTS `pieces` (
   PRIMARY KEY(`location`, `location_id`, `player_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-
-ALTER TABLE `player` ADD `captured_city_count` INT UNSIGNED NOT NULL DEFAULT '0';
-
-CREATE TABLE IF NOT EXISTS `handpools` (
-  `player_id` int unsigned NOT NULL,
-  `seq_id` int unsigned NOT NULL,
-  `piece` varchar(8) NOT NULL,
-  PRIMARY KEY (`player_id`, `seq_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 ;
-
-CREATE TABLE IF NOT EXISTS `hands` (
-  `player_id` int unsigned NOT NULL,
-  `pos` int unsigned NOT NULL,
-  `piece` varchar(8) NOT NULL,
-  PRIMARY KEY (`player_id`, `pos`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
 -- Needed to determine allowable plays (e.g. 3+ if all farmers, some ziggurat powers)
 -- Also useful for incremental undo.
 CREATE TABLE IF NOT EXISTS `turn_progress` (
@@ -123,28 +106,3 @@ CREATE TABLE IF NOT EXISTS `turn_progress_stats` (
   PRIMARY KEY (`seq_id`),
   FOREIGN KEY (`turn_progress_seq_id`) REFERENCES `turn_progress` (`seq_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
-
-CREATE TABLE IF NOT EXISTS `ziggurat_cards` (
-  `seq_id` int unsigned NOT NULL,
-  -- which player holds it; if 0 still available
-  `player_id` int unsigned,
-  -- whether the one-shot power was activated
-  `used` boolean NOT NULL DEFAULT false,
-  -- the card itself
-  `card_type` varchar(12) NOT NULL,
-  PRIMARY KEY (`card_type`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-CREATE TABLE IF NOT EXISTS `board` (
-  `board_loc` int(10) unsigned NOT NULL,
-   -- NORTH, CENTER, SOUTH, RIVER
-  `terrain` varchar(8) NOT NULL,
-   -- one of: CITY_{P,S,M,MS,MP,SP,MSP}, FIELD_{5,6,7,X}, ZIGGURAT,
-   -- or a played piece: FARMER, MERCHANT, PRIEST, SERVANT
-   -- note that "hidden" will be based on hextype and we'll sanitize played pieces
-   --   to HIDDEN before returning to client
-  `piece` varchar(8) DEFAULT NULL,
-  `scored` boolean DEFAULT FALSE,
-  `player_id` int unsigned DEFAULT NULL,
-  PRIMARY KEY (`board_loc`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
