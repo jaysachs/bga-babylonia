@@ -65,7 +65,7 @@ class PlayPieces extends AbstractState
                 // "col" => RowCol::col($move->rc),
                 "piece" => $move->piece->value,
                 "captured_piece" => $move->captured_piece->value,
-                "hand_size" => $model->hand()->size(),
+                "hand_size" => $model->activePlayerInfo()->hand->size(),
                 "points" => $move->points(),
                 "handpos" => $move->handpos,
                 "original_piece" => $move->original_piece->value,
@@ -119,7 +119,7 @@ class PlayPieces extends AbstractState
                     "points" => $points,
                     "ziggurat_points" => $move->ziggurat_points,
                     "field_points" => $move->field_points,
-                    "hand_size" => $model->hand()->size(),
+                    "hand_size" => $model->activePlayerInfo()->hand->size(),
                     "touched_ziggurats" => $move->touched_ziggurats,
                 ],
                 $model,
@@ -166,7 +166,7 @@ class PlayPieces extends AbstractState
                     "col" => RowCol::col($move->rc),
                     "piece" => $move->piece->value,
                     "captured_piece" => $move->captured_piece->value,
-                    "hand_size" => $model->hand()->size(),
+                    "hand_size" => $model->activePlayerInfo()->hand->size(),
                     "points" => $move->points(),
                     "_private" => [
                         $active_player_id => [
@@ -191,7 +191,7 @@ class PlayPieces extends AbstractState
             return EndOfTurnScoring::class;
         }
 
-        $pieces = $model->hand()->pieces();
+        $pieces = $model->activePlayerInfo()->hand->pieces();
         // Need to not choose empty hand positions.
         $pos = [];
         foreach ($pieces as $i => $piece) {

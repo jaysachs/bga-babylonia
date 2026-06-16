@@ -55,6 +55,7 @@ class FinishTurn extends AbstractState
             return 99;
         }
 
+        $hand = $model->activePlayerInfo()->hand;
         $this->notify->player(
             $active_player_id,
             "handRefilled",
@@ -65,7 +66,7 @@ class FinishTurn extends AbstractState
                     function ($p) {
                         return $p->value;
                     },
-                    $model->hand()->pieces()
+                    $hand->pieces()
                 ),
             ]
         );
@@ -75,8 +76,8 @@ class FinishTurn extends AbstractState
             clienttranslate('${player_name} finished their turn'),
             [
                 "player_id" => $active_player_id,
-                "hand_size" => $model->hand()->size(),
-                "pool_size" => $model->pool()->size(),
+                "hand_size" => $hand->size(),
+                "pool_size" => $model->activePlayerInfo()-> pool->size(),
             ]
         );
 

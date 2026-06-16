@@ -133,16 +133,6 @@ class Model
         return $this->allPlayerInfo()[$this->player_id];
     }
 
-    public function hand(): Hand
-    {
-        return $this->allData()['hand'];
-    }
-
-    public function pool(): Pool
-    {
-        return $this->allData()['pool'];
-    }
-
     public function board(): Board
     {
         return $this->allData()['board'];
@@ -233,7 +223,7 @@ class Model
     public function getAllowedMoves(): array
     {
         $result = [ "" => [] ];
-        $hand = $this->hand();
+        $hand = $this->activePlayerInfo()->hand;
         $allPieces = PieceType::playerPieceTypes();
         foreach ($allPieces as $piece) {
             $result[$piece->value] = [];
@@ -260,7 +250,7 @@ class Model
     {
         $this->stats->enterDeferredMode();
 
-        $piece = $this->hand()->play($handpos);
+        $piece = $this->activePlayerInfo()->hand->play($handpos);
         $hex = $this->board()->hexAt($rc);
         $result = $this->checkPlay($piece, $hex);
         if (!$result->isAllowed()) {
@@ -370,8 +360,9 @@ class Model
      */
     private function refillHand(): array
     {
-        $result = self::refill($this->hand(), $this->pool());
-        if ($this->hand()->size() > Hand::DEFAULT_SIZE) {
+        $hand = $this->activePlayerInfo()->hand;
+        $result = self::refill($hand, $this->activePlayerInfo()->pool);
+        if ($hand->size() > Hand::DEFAULT_SIZE) {
             $this->stats->PLAYER_ZC_USED_HAND_SIZE_7->inc($this->player_id);
         }
         return $result;
@@ -394,7 +385,7 @@ class Model
     /* return true if game should end */
     public function finishTurn(): TurnResult
     {
-        $hand = $this->hand();
+        $hand = $this->activePlayerInfo()->hand;
         $refilled = $this->refillHand();
         $this->ps->updateRefill($this->player_id, $refilled);
 
@@ -474,6 +465,7 @@ class Model
         foreach ($playerInfos as $pid => $pi) {
             $this->stats->PLAYER_POINTS_FROM_CITY_NETWORKS->inc($pid, $scoredCity->networkPointsForPlayer($pid));
             $this->stats->PLAYER_POINTS_FROM_CAPTURED_CITIES->inc($pid, $scoredCity->capturePointsForPlayer($pid));
+            $this->ps->incPlayerScore($pid, $scoredCity->networkPointsForPlayer($pid) + $scoredCity->capturePointsForPlayer($pid));
         }
 
         $_unused = $hex->captureCity();
@@ -562,7 +554,7 @@ class Model
         // NOTE: could check that there allowed moves but given the
         // board size and piece count, there are always allowed moves.
         return count($this->turnProgress()->moves) >= 2
-            || $this->hand()->size() == 0;
+            || $this->activePlayerInfo()->hand->size() == 0;
     }
 
     public function selectZigguratCard(ZigguratCardType $card_type): ZigguratCardSelection
@@ -576,7 +568,7 @@ class Model
             $pi = $this->allPlayerInfo()[$this->player_id];
             $this->ps->incPlayerScore($this->player_id, $points);
         } else if ($card_type == ZigguratCardType::HAND_SIZE_7) {
-            $added = $this->hand()->extend(7);
+            $added = $this->activePlayerInfo()->hand->extend(7);
             $this->ps->updateExtendedHand($this->player_id, $added);
         }
         $this->ps->updateZigguratCard($card);
@@ -623,7 +615,7 @@ class Model
         if (!$move->captured_piece->isEmpty()) {
             $this->board()->hexAt($move->rc)->playPiece($move->captured_piece, $move->player_id);
         }
-        $this->hand()->replace($move->original_piece, $move->handpos);
+        $this->activePlayerInfo()->hand->replace($move->original_piece, $move->handpos);
         if ($move->points() <> 0) {
             $pinfo = $this->allPlayerInfo()[$move->player_id];
         }

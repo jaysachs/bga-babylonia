@@ -36,7 +36,7 @@ class TestStore extends PersistentStore {
     private array $player_infos = [];
     private Components $components;
     private TurnProgress $turnProgress;
-    private Hand $hand;
+    // private Hand $hand;
 
     public function setBoardFromMap(string $map): void {
         $this->board = Board::fromTestMap($map);
@@ -48,8 +48,7 @@ class TestStore extends PersistentStore {
 
     public function __construct() {
         PersistentStore::__construct(new TestDb(), new TestGlobals(), new TestCounter(), new TestCounter());
-        $this->hand = Hand::new();
-        for ($i = 1; $i <= 3; $i++) {
+        for ($i = 3; $i >= 1; $i--) {
             $pool = Pool::new();
             $hand = Hand::new(5);
             $this->player_infos[$i] = new PlayerInfo($i, 0, $hand, $pool);
@@ -64,7 +63,7 @@ class TestStore extends PersistentStore {
     public function retrieveAllData(int $player_id): array
     {
         return [
-            'hand' => $this->hand,
+            'hand' => $this->player_infos[$player_id]->hand,
             'board' => $this->board,
             'components' => $this->components,
             'player_infos' => $this->player_infos,
@@ -96,7 +95,7 @@ class TestStore extends PersistentStore {
     /** @param list<PieceType> $pieces */
     public function setHand(array $pieces): void {
         foreach ($pieces as $piece) {
-            $this->hand->replenish($piece);
+            $this->player_infos[1]->hand->replenish($piece);
         }
     }
 
