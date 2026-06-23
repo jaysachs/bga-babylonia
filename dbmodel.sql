@@ -22,9 +22,10 @@ CREATE TABLE IF NOT EXISTS `pieces` (
 
   -- location
   --   BOARD (player_id depends on type)
-  --   HAND (requires player_id) (both pieces and zcards can be in "HAND")
+  --   HAND (requires player_id)
   --   POOL (requires player_id)
   --   DISCARD (null player_id) - cities scored but uncaptured, scored fields
+  --   TAKEN (requires player_id) - captured cities and taken zcards
   `location` VARCHAR(8),
 
   -- location_id
@@ -94,15 +95,4 @@ CREATE TABLE IF NOT EXISTS `turn_progress` (
   `ziggurat_points` int unsigned DEFAULT NULL,
   -- no need to record "inversion", as the hextype will tell us
   PRIMARY KEY (`seq_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
-
-CREATE TABLE IF NOT EXISTS `turn_progress_stats` (
-  `turn_progress_seq_id` int unsigned NOT NULL,
-  `seq_id` int unsigned NOT NULL AUTO_INCREMENT,
-  `op` varchar(3) NOT NULL,
-  `stat_name` varchar(40) NOT NULL,
-  `player_id` int unsigned,
-  `val` varchar(20),
-  PRIMARY KEY (`seq_id`),
-  FOREIGN KEY (`turn_progress_seq_id`) REFERENCES `turn_progress` (`seq_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;

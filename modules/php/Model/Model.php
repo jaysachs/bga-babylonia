@@ -97,6 +97,13 @@ class Model
     private function &allData(): array {
         if ($this->_allData == null) {
             $this->_allData = $this->ps->retrieveAllData($this->player_id);
+            $turnProgress = $this->_allData["turnProgress"];
+            $moves = [];
+            $this->_allData["turnProgress"] = new TurnProgress($moves);
+            foreach ($turnProgress->moves as $move) {
+                $this->doPlayPiece($move->player_id, $move->handpos, $move->rc);
+            }
+            $this->_allData["turnProgress"] = $turnProgress;
         }
         return $this->_allData;
     }
@@ -143,21 +150,21 @@ class Model
         return $this->allData()['turnProgress'];
     }
 
-    public function checkPlay(PieceType $piece, Hex $hex): PlayAllowedResult
+    public function checkPlay(int $player_id, PieceType $piece, Hex $hex): PlayAllowedResult
     {
         $zcardsUsed = [];
         if ($hex->piece->isField()) {
             if ($piece->isFarmer()) {
                 // ensure player has at least one non-hidden piece adjacent.
-                $is_non_hidden = function (Hex $h): bool {
-                    return $h->player_id == $this->player_id
+                $is_non_hidden = function (Hex $h) use (&$player_id) : bool {
+                    return $h->player_id == $player_id
                         && !$h->piece->isHidden();
                 };
                 if (count($this->board()->neighbors($hex, $is_non_hidden)) == 0) {
                     return PlayAllowedResult::failure("can't place farmer in field with no adjacent unhidden piece");
                 }
             } else if (!$this->components()->hasUnusedZigguratCard(
-                $this->player_id,
+                $player_id,
                 ZigguratCardType::NOBLES_IN_FIELDS
             )) {
                 return PlayAllowedResult::failure("can't place nobles in field without ziggurat card");
@@ -190,7 +197,7 @@ class Model
             !$non_land_farmer_played
             && count($this->turnProgress()->moves) >= 3
             && $this->components()->hasUnusedZigguratCard(
-                $this->player_id,
+                $player_id,
                 ZigguratCardType::NOBLE_WITH_3_FARMERS
             )
         ) {
@@ -203,7 +210,7 @@ class Model
             count($nobles_played) == 2
             && !in_array($piece, $nobles_played)
             && $this->components()->hasUnusedZigguratCard(
-                $this->player_id,
+                $player_id,
                 ZigguratCardType::NOBLES_3_KINDS
             )
         ) {
@@ -230,14 +237,14 @@ class Model
         }
         $handPieces = array_filter($allPieces, fn ($p) => $hand->contains($p));
         $this->board()->visitAll(function (Hex $hex) use (&$result, &$handPieces, &$allPieces): void {
-            $all = count(array_filter($allPieces, fn ($p) => $this->checkPlay($p, $hex)->isAllowed()))
+            $all = count(array_filter($allPieces, fn ($p) => $this->checkPlay($this->player_id, $p, $hex)->isAllowed()))
                     == count($allPieces);
             if ($all) {
                 $result[""][] = $hex->rc;
             }
             else {
                 foreach ($handPieces as $piece) {
-                    if ($this->checkPlay($piece, $hex)->isAllowed()) {
+                    if ($this->checkPlay($this->player_id, $piece, $hex)->isAllowed()) {
                         $result[$piece->value][] = $hex->rc;
                     }
                 }
@@ -246,22 +253,19 @@ class Model
         return array_filter($result, fn ($am) => count($am) > 0);
     }
 
-    public function playPiece(int $handpos, int $rc): ElaboratedMove
-    {
-        $this->stats->enterDeferredMode();
-
-        $piece = $this->activePlayerInfo()->hand->play($handpos);
+    private function doPlayPiece(int $player_id, int $handpos, int $rc): ElaboratedMove {
+        $piece = $this->allPlayerInfo()[$player_id]->hand->play($handpos);
         $hex = $this->board()->hexAt($rc);
-        $result = $this->checkPlay($piece, $hex);
+        $result = $this->checkPlay($player_id, $piece, $hex);
         if (!$result->isAllowed()) {
-            throw new \InvalidArgumentException("Illegal to play $piece->value to $rc by player $this->player_id");
+            throw new \InvalidArgumentException("Illegal to play $piece->value to $rc by player $this->player_id: $result->reason");
         }
 
         $originalPiece = $piece;
         if ($hex->isWater()) {
             $piece = PieceType::HIDDEN;
         }
-        $hexPiece = $hex->playPiece($piece, $this->player_id);
+        $hexPiece = $hex->playPiece($piece, $player_id);
 
         $field_points = 0;
         $ziggurats = [];
@@ -286,7 +290,7 @@ class Model
         if (count($zigs) > 0) {
             $ziggurats = $this->board()->touchedZiggurats($this->player_id);
         }
-        $move = new ElaboratedMove(
+        return new ElaboratedMove(
             $this->player_id,
             $piece,
             $originalPiece,
@@ -295,39 +299,16 @@ class Model
             $hexPiece,
             $field_points,
             count($ziggurats),
-            $ziggurats
+            $ziggurats,
+            $result->activatedCards()
         );
+    }
+
+    public function playPiece(int $handpos, int $rc): ElaboratedMove
+    {
+        $move = $this->doPlayPiece($this->player_id, $handpos, $rc);
         $this->turnProgress()->addMove($move);
-
-        $this->ps->updatePlayedPiece($move);
-        foreach ($result->activatedCards() as $zctype) {
-            switch ($zctype) {
-                case ZigguratCardType::NOBLE_WITH_3_FARMERS:
-                    $this->stats->PLAYER_ZC_USED_NOBLE_WITH_3_FARMERS->inc($this->player_id);
-                    break;
-                case ZigguratCardType::NOBLES_3_KINDS:
-                    $this->stats->PLAYER_ZC_USED_NOBLES_3_KINDS->inc($this->player_id);
-                    break;
-                case ZigguratCardType::NOBLES_IN_FIELDS:
-                    $this->stats->PLAYER_ZC_USED_NOBLES_IN_FIELDS->inc($this->player_id);
-                    break;
-                default:
-                    error_log("Unexpected used ziggurat card during move: $zctype->value");
-            }
-        }
-
-        if ($move->captured_piece->isField()) {
-            $this->stats->PLAYER_FIELDS_CAPTURED->inc($this->player_id);
-        }
-        if ($move->piece->isHidden()) {
-            $this->stats->PLAYER_RIVER_SPACES_PLAYED->inc($this->player_id);
-        }
-        if ($move->points() > 0) {
-            $this->stats->PLAYER_POINTS_FROM_FIELDS->inc($this->player_id, $move->field_points);
-            $this->stats->PLAYER_POINTS_FROM_ZIGGURATS->inc($this->player_id, $move->ziggurat_points);
-        }
-
-        $this->ps->insertMove($move, $this->stats->exitDeferredMode());
+        $this->ps->insertMove($move);
         return $move;
     }
 
@@ -368,7 +349,46 @@ class Model
         return $result;
     }
 
+    private function fetchCommittedOnly(): TurnProgress {
+        $this->_allData = $this->ps->retrieveAllData($this->player_id);
+        $turnProgress = $this->turnProgress();
+        $moves = [];
+        $this->_allData["turnProgress"] = new TurnProgress($moves);
+        return $turnProgress;
+    }
+
     public function donePlayPieces(): void {
+        foreach ($this->fetchCommittedOnly()->moves as $move) {
+            $emove = $this->doPlayPiece($move->player_id, $move->handpos, $move->rc);
+            $this->ps->updatePlayedPiece($move);
+            foreach ($emove->activated_ziggurat_cards as $zctype) {
+                switch ($zctype) {
+                    case ZigguratCardType::NOBLE_WITH_3_FARMERS:
+                        $this->stats->PLAYER_ZC_USED_NOBLE_WITH_3_FARMERS->inc($this->player_id);
+                        break;
+                    case ZigguratCardType::NOBLES_3_KINDS:
+                        $this->stats->PLAYER_ZC_USED_NOBLES_3_KINDS->inc($this->player_id);
+                        break;
+                    case ZigguratCardType::NOBLES_IN_FIELDS:
+                        $this->stats->PLAYER_ZC_USED_NOBLES_IN_FIELDS->inc($this->player_id);
+                        break;
+                    default:
+                        error_log("Unexpected used ziggurat card during move: $zctype->value");
+                }
+            }
+
+            if ($move->captured_piece->isField()) {
+                $this->stats->PLAYER_FIELDS_CAPTURED->inc($this->player_id);
+            }
+            if ($move->piece->isHidden()) {
+                $this->stats->PLAYER_RIVER_SPACES_PLAYED->inc($this->player_id);
+            }
+            if ($move->points() > 0) {
+                $this->stats->PLAYER_POINTS_FROM_FIELDS->inc($this->player_id, $move->field_points);
+                $this->stats->PLAYER_POINTS_FROM_ZIGGURATS->inc($this->player_id, $move->ziggurat_points);
+            }
+        }
+
         // adjust avg pieces player per turn statistic
         $pid = $this->player_id;
 
@@ -377,9 +397,8 @@ class Model
         $sum = $this->stats->PLAYER_AVERAGE_PIECES_PLAYED_PER_TURN->get($pid) * ($numturns - 1.0);
         $this->stats->PLAYER_AVERAGE_PIECES_PLAYED_PER_TURN->set($pid, ($sum + $numplayed) / $numturns);
 
-        // delete turn progress, but apply any deferred stats
-        $statOps = $this->ps->deleteAllMoves($this->player_id);
-        $this->stats->applyAll($statOps);
+        // delete turn progress
+        $this->ps->deleteAllMoves($this->player_id);
     }
 
     /* return true if game should end */

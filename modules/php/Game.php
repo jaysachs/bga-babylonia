@@ -167,13 +167,20 @@ class Game extends Table
             $players[$pid]["pool_size"] = $pi->pool->size();
         }
 
+        $active_player_id = intval($this->getActivePlayerId());
+        if ($active_player_id > 0) {
+            foreach ($model->turnProgress()->moves as $move) {
+                $players[$active_player_id]["score"] = strval(intval($players[$active_player_id]["score"]) + $move->points());
+            }
+        }
+
         return [
             "players" => $players,
             'hand' => array_map(
                 function ($p) {
                     return $p->value;
                 },
-                $model->activePlayerInfo()->hand->pieces()
+                $model->allPlayerInfo()[intval($this->getCurrentPlayerId())]->hand->pieces()
             ),
             'board' => $board_data,
             'translated_pieces' => $translated,

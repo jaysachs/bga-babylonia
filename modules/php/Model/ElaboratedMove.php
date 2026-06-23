@@ -42,6 +42,7 @@ class ElaboratedMove extends Move
         int $field_points,
         int $ziggurat_points,
         public array $touched_ziggurats,
+        public array $activated_ziggurat_cards,
         int $seq_id = 0
     ) {
         parent::__construct(
