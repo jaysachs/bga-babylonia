@@ -62,7 +62,7 @@ use Bga\Games\babylonia\Model\ModelImpl\PlayAllowedResult;
 
 class Model
 {
-    /** @var array{player_infos:array<int,PlayerInfo>,board:Board,components:Components,hand:Hand,pool:Pool,turnProgress:TurnProgress} */
+    /** @var array{player_infos:array<int,PlayerInfo>,board:Board,components:Components,turnProgress:TurnProgress} */
     private ?array $_allData = null;
 
     public function __construct(private PersistentStore $ps, private Stats $stats, private int $player_id) {
@@ -93,7 +93,7 @@ class Model
         );
     }
 
-    /** @return array{player_infos:array<int,PlayerInfo>,board:Board,components:Components,hand:Hand,pool:Pool,turnProgress:TurnProgress} */
+    /** @return array{player_infos:array<int,PlayerInfo>,board:Board,components:Components,turnProgress:TurnProgress} */
     private function &allData(): array {
         if ($this->_allData == null) {
             $this->_allData = $this->ps->retrieveAllData($this->player_id);

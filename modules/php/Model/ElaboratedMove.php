@@ -31,7 +31,10 @@ namespace Bga\Games\babylonia\Model;
 
 class ElaboratedMove extends Move
 {
-    /** @param int[] $touched_ziggurats */
+    /**
+     * @param int[] $touched_ziggurats
+     * @param ZigguratCardType[] $activated_ziggurat_cards
+    */
     function __construct(
         int $player_id,
         PieceType $piece,

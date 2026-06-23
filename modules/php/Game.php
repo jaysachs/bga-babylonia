@@ -158,7 +158,7 @@ class Game extends Table
 			$translated[$tiletype->value] = $tiletype->translated();
 		}
 
-        /** @var array<int,array{captured_city_count:int,hand_size:int,pool_size:int,player_id:int,score:int}> */
+        /** @var array<int,array{captured_city_count:int,hand_size:int,pool_size:int,player_id:int,score:string}> */
         $players = $this->getCollectionFromDb(
                 "SELECT `player_id`, `player_score` AS `score` FROM `player`");
         foreach ($model->allPlayerInfo() as $pid => $pi) {
