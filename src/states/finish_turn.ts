@@ -1,3 +1,4 @@
+import { PieceType } from "../bdata";
 import { Html } from "../html";
 import { AnimationList } from "../more-animations";
 import { Attrs, IDS, Piece } from "../view";
@@ -15,7 +16,7 @@ export class FinishTurnState extends BabyloniaState {
     this.view.updatePoolCount(args);
   }
 
-  async notif_handRefilled(args: { hand: string[] }) {
+  async notif_handRefilled(args: { hand: PieceType[] }) {
     const anims: AnimationList = [];
     const pid = this.bga.gameui.player_id;
     const hand = $(IDS.HAND);

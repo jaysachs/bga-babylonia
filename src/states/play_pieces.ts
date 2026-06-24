@@ -1,4 +1,4 @@
-import { BGamedatas } from "../bdata";
+import { BGamedatas, Hex, PieceType } from "../bdata";
 import { AnimationManager } from "../bga-animations";
 import { Attrs, CSS, IDS, Piece, View } from "../view";
 import { indexInParent } from "../html";
@@ -22,6 +22,15 @@ export class PlayPiecesState extends BabyloniaState {
     this.boardHandler = (e) => this.onBoardClicked(e);
   }
 
+  private hexForRc(rc: number): Hex | undefined {
+    for (let hex of this.bga.gameui.gamedatas.board) {
+      if (hex.rc == rc) {
+        return hex;
+      }
+    };
+    return undefined;
+  }
+
   private doEnterState(playStateArgs: PlayStateArgs) {
       this.playStateArgs = playStateArgs;
       this.view.markAllHexesUnplayable();
@@ -38,7 +47,7 @@ export class PlayPiecesState extends BabyloniaState {
     args: {
       player_id: number;
       points: number;
-      piece: string;
+      piece: PieceType;
       handpos?: number;
       rc: number;
       hand_size: number;
@@ -73,8 +82,6 @@ export class PlayPiecesState extends BabyloniaState {
         return this.animationManager.slideAndAttach(pieceDiv, hexDiv, { fromPlaceholder: 'off' })
           .then(() => Attrs.setPiece(pieceDiv, args.piece, this.bga.players.getPlayerById(args.player_id)));
       });
-    } else {
-      Attrs.setPiece(hexDiv.firstElementChild as HTMLElement, args.piece, this.bga.players.getPlayerById(args.player_id))
     }
 
     // animate the ziggurat scoring, if any
@@ -106,9 +113,9 @@ export class PlayPiecesState extends BabyloniaState {
       player_id: number;
       rc: number;
       playState: PlayStateArgs | undefined;
-      original_piece: string | undefined;
+      original_piece: PieceType | undefined;
       handpos: number | undefined;
-      captured_piece: string;
+      captured_piece: PieceType;
       hand_size: number;
     }
   ) {
@@ -255,7 +262,11 @@ export class PlayPiecesState extends BabyloniaState {
       this.animationManager.slideAndAttach(pieceDiv, hexDiv)
         // FIXME: need to know this is happening? or just let it flip in the notif??
         // play into river, piece is hidden
-        // .then(() => Attrs.setPiece(pieceDiv, args.piece, this.bga.players.getCurrentPlayer()))
+        .then(() => {
+          if (this.hexForRc(hex)?.terrain == 'RIVER') {
+            Attrs.setPiece(pieceDiv, 'hidden', this.bga.players.getCurrentPlayer())
+          }
+        })
     );
 
     this.unselectAllHandPieces();

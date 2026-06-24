@@ -1,4 +1,4 @@
-import { BGamedatas, Hex, BblPlayer, Zcard } from "./bdata";
+import { BGamedatas, Hex, BblPlayer, Zcard, PieceType } from "./bdata";
 import { AttrLike, Html } from "./html";
 
 export class Attrs implements AttrLike {
@@ -31,7 +31,7 @@ export class Attrs implements AttrLike {
     return new Attrs().piece(p, pl);
   }
 
-  static setPiece(el: Element, p: string, pl?: Player) {
+  static setPiece(el: Element, p: PieceType, pl?: Player) {
     el.setAttribute(Attrs.PIECE, Attrs.pieceVal(p, pl));
   }
 
@@ -288,7 +288,7 @@ export class View {
         );
     }
 
-    public createPieceDiv(piece: string, player_id: number) : HTMLElement {
+    public createPieceDiv(piece: PieceType, player_id: number) : HTMLElement {
         return Html.div({ attrs: Attrs.piece(piece, this.bga.players.getPlayerById(player_id)) } );
     }
 
