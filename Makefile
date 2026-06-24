@@ -40,7 +40,7 @@ deploy: test
 	lftp -e 'cd $(GAME); mirror -e -R --exclude .vscode/ --exclude .git/ --exclude work/ --exclude local/ --exclude bga-framework.d.ts --exclude .phpunit* --exclude node_modules*/ --exclude _ide_helper.php; exit' $(SFTP)
 
 pull-boilerplate:
-	lftp -e 'cd $(GAME); set xfer:clobber true; get _ide_helper.php; get bga-framework.d.ts' $(SFTP)
+	lftp -e 'cd $(GAME); set xfer:clobber true; get _ide_helper.php; get bga-framework.d.ts; exit' $(SFTP)
 
 clean:
 	rm -rf $(WORK) $(TS_STUBS) $(JS) $(STATS)
