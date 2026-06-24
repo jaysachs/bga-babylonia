@@ -78,7 +78,7 @@ class Model
             $hand = Hand::new();
             $pool = Pool::new();
             Model::refill($hand, $pool);
-            $pinfos[$player_id] = new PlayerInfo($player_id, 0, $hand, $pool);
+            $pinfos[$player_id] = new PlayerInfo($player_id, 0, $hand, $pool, 0);
         }
         $ps->insertAll($board, $components, $pinfos);
     }
@@ -102,6 +102,7 @@ class Model
             $this->_allData["turnProgress"] = new TurnProgress($moves);
             foreach ($turnProgress->moves as $move) {
                 $this->doPlayPiece($move->player_id, $move->handpos, $move->rc);
+                $this->_allData["player_infos"][$move->player_id]->score += $move->points();
             }
             $this->_allData["turnProgress"] = $turnProgress;
         }

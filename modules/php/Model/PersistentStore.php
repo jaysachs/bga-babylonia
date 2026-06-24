@@ -181,7 +181,7 @@ class PersistentStore
 
         $pinfos = [];
         foreach ($player_ids as $pid => $_) {
-            $pinfos[$pid] = new PlayerInfo($pid, $captured[$pid], new Hand($hands[$pid]), new Pool($pools[$pid]));
+            $pinfos[$pid] = new PlayerInfo($pid, $captured[$pid], new Hand($hands[$pid]), new Pool($pools[$pid]), $this->playerScore->get($pid));
         }
         return [
             'player_infos' => $pinfos,

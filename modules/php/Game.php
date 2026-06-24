@@ -159,19 +159,13 @@ class Game extends Table
 		}
 
         /** @var array<int,array{captured_city_count:int,hand_size:int,pool_size:int,player_id:int,score:string}> */
-        $players = $this->getCollectionFromDb(
-                "SELECT `player_id`, `player_score` AS `score` FROM `player`");
+        $players = [];
         foreach ($model->allPlayerInfo() as $pid => $pi) {
             $players[$pid]["captured_city_count"] = $pi->captured_city_count;
             $players[$pid]["hand_size"] = $pi->hand->size();
             $players[$pid]["pool_size"] = $pi->pool->size();
-        }
-
-        $active_player_id = intval($this->getActivePlayerId());
-        if ($active_player_id > 0) {
-            foreach ($model->turnProgress()->moves as $move) {
-                $players[$active_player_id]["score"] = strval(intval($players[$active_player_id]["score"]) + $move->points());
-            }
+            $players[$pid]["score"] = $pi->score;
+            $players[$pid]["player_id"] = $pid;
         }
 
         return [

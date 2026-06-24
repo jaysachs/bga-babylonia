@@ -34,6 +34,7 @@ class PlayerInfo
         public readonly int $player_id,
         public int $captured_city_count,
         public readonly Hand $hand,
-        public readonly Pool $pool
+        public readonly Pool $pool,
+        public int $score
     ) {}
 }

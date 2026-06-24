@@ -68,9 +68,7 @@ export class PlayPiecesState extends BabyloniaState {
           console.error("attempt to capture a field that is not there");
         }
         // slide the captured field to the player board
-        anims.push(
-          () => this.animationManager.slideOutAndDestroy(field, $(IDS.handcount(args.player_id)), {})
-                .then(() => this.bga.playerPanels.getScoreCounter(args.player_id).incValue(args.field_points)));
+        anims.push(() => this.animationManager.slideOutAndDestroy(field, $(IDS.handcount(args.player_id)), {}))
       }
       anims.push(() => {
         // slide piece from hand count to hex
@@ -93,12 +91,12 @@ export class PlayPiecesState extends BabyloniaState {
                 this.bga.gameui.gamedatas.players[args.player_id]!.color,
                 { extraClass: 'bbl_city_scoring', duration: 700 })
                 .then(() => args.touched_ziggurats.forEach(z => this.view.unmarkHexSelected(z)))
-                .then(() => this.bga.playerPanels.getScoreCounter(args.player_id).incValue(args.ziggurat_points))
               )
       );
     }
 
-    await this.animationManager.playParallel(anims);
+    await this.animationManager.playParallel(anims)
+        .then(() => this.bga.playerPanels.getScoreCounter(args.player_id).incValue(args.points));
 
     this.view.updateHandCount(args);
     if (args.playState) {
