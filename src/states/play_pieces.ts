@@ -39,7 +39,7 @@ export class PlayPiecesState extends BabyloniaState {
       player_id: number;
       points: number;
       piece: string;
-      handpos: number;
+      handpos?: number;
       rc: number;
       hand_size: number;
       captured_piece: string;
@@ -50,10 +50,11 @@ export class PlayPiecesState extends BabyloniaState {
     }
   ) {
     let anims: AnimationList = [];
-
-    if (!this.bga.players.isCurrentPlayerActive()) {
-      const hexDiv =  this.view.hexDiv(args.rc);
-
+    const hexDiv =  this.view.hexDiv(args.rc);
+    const handDiv = (args.handpos === undefined) ? undefined : this.view.handPosDiv(args.handpos);
+    let pieceDiv = handDiv?.firstElementChild as HTMLElement;
+    // Either not active player, or another window of the active player (so piece still in hand)
+    if (args.handpos === undefined  || pieceDiv) {
       // Check for field capture
       if (args.captured_piece != Piece.EMPTY /* .startsWith('field') */) {
         let field = hexDiv.firstElementChild as HTMLElement;
@@ -64,16 +65,18 @@ export class PlayPiecesState extends BabyloniaState {
         anims.push(() => this.animationManager.slideOutAndDestroy(field, $(IDS.handcount(args.player_id)), {}))
       }
       anims.push(() => {
-        // slide piece from hand count to hex
-        let div =  this.view.createPieceDiv(args.piece, args.player_id);
-        $(IDS.handcount(args.player_id)).appendChild(div);
-        return this.animationManager.slideAndAttach(div, hexDiv, { fromPlaceholder: 'off' });
+        if (!pieceDiv) {
+          // slide piece from hand count to hex
+          pieceDiv =  this.view.createPieceDiv(args.piece, args.player_id);
+          $(IDS.handcount(args.player_id)).appendChild(pieceDiv);
+        }
+        return this.animationManager.slideAndAttach(pieceDiv, hexDiv, { fromPlaceholder: 'off' })
+          .then(() => Attrs.setPiece(pieceDiv, args.piece, this.bga.players.getPlayerById(args.player_id)));
       });
     } else {
-      // FIXME: think about how to move this into the `onBoardClicked` function.
-      const pieceDiv = this.view.hexDiv(args.rc).firstElementChild as HTMLElement;
-      Attrs.setPiece(pieceDiv, args.piece, this.bga.players.getPlayerById(args.player_id))
+      Attrs.setPiece(hexDiv.firstElementChild as HTMLElement, args.piece, this.bga.players.getPlayerById(args.player_id))
     }
+
     // animate the ziggurat scoring, if any
     if (args.ziggurat_points > 0) {
       args.touched_ziggurats.forEach(z => this.view.markHexSelected(z));
