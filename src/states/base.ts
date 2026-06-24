@@ -10,7 +10,6 @@ export abstract class BabyloniaState {
       hexDiv = hexDiv.parentElement;
     }
     if (hexDiv.parentElement == null) {
-      console.warn('no hex');
       return null;
     }
     // now check if it's allowed

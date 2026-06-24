@@ -231,7 +231,6 @@ export class PlayPiecesState extends BabyloniaState {
 
     const hex = this.selectedHex(event.target!);
     if (hex == null) {
-      console.error('no hex selected!');
       return;
     }
 
@@ -257,6 +256,8 @@ export class PlayPiecesState extends BabyloniaState {
     );
 
     this.unselectAllHandPieces();
+    this.removeHandHandler();
+    this.removeBoardHandler();
     // FIXME: is it fragile here to do the anim and action in parallel?
     // FIXME: do we need to await?
     await Promise.all([
@@ -303,7 +304,7 @@ export class PlayPiecesState extends BabyloniaState {
             this.setStatusBarForPlayState();
         },
         { color: "secondary"});
-    }
+  }
 
   private setStatusBarForPlayState(): void {
     this.bga.statusBar.removeActionButtons();
