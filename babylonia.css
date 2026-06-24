@@ -571,19 +571,3 @@ div.bbl_pb_zcards>div {
     width: 3.33em;
     vertical-align: middle;
 }
-
-
-.playername[style="color: #dddddd;"],
-.playername[style="color:#dddddd;"],
-.player-name a[style="color: #dddddd"]
- {
-/* text-shadow: 0px 0px 3px black; */
-  background-color: #000000;
-}
-.playername[style="color: #dccd7d;"],
-.playername[style="color:#dccd7d;"],
-.player-name a[style="color: #dccd7d"]
- {
-/* text-shadow: 0px 0px 3px black; */
-  background-color: #000000;
-}
