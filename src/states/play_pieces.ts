@@ -8,14 +8,7 @@ import { BabyloniaState } from "./base";
 interface PlayStateArgs {
   canEndTurn: boolean;
   allowedMoves: Record<string, number[]>;
-  previousMove: {
-    piece: string;
-    captured_piece: string;
-    hand_size: number;
-    points: number;
-    handpos: number;
-    original_piece: string;
-  } | undefined;
+  canUndo: boolean;
 }
 
 export class PlayPiecesState extends BabyloniaState {
@@ -335,7 +328,7 @@ export class PlayPiecesState extends BabyloniaState {
       this.attachHandHandler();
       this.setPlayablePieces();
     }
-    if (this.playStateArgs?.previousMove) {
+    if (this.playStateArgs?.canUndo) {
       this.bga.statusBar.addActionButton(
         _('Undo'),
         () => this.bga.actions.performAction('actUndoPlay'),

@@ -55,26 +55,10 @@ class PlayPieces extends AbstractState
      * @return mixed[]
      */
     private function addStateArgs(array $args, Model $model, int $active_player_id): array {
-        $prevMoveArgs = null;
-        $move = $model->turnProgress()->previousMove();
-        if ($move) {
-            $prevMoveArgs = [
-                // "player_id" => $active_player_id,
-                "rc" => $move->rc,
-                // "row" => RowCol::row($move->rc),
-                // "col" => RowCol::col($move->rc),
-                "piece" => $move->piece->value,
-                "captured_piece" => $move->captured_piece->value,
-                "hand_size" => $model->activePlayerInfo()->hand->size(),
-                "points" => $move->points(),
-                "handpos" => $move->handpos,
-                "original_piece" => $move->original_piece->value,
-            ];
-        }
         $playState = [
             "allowedMoves" => $model->getAllowedMoves(),
             "canEndTurn" => $model->canEndTurn(),
-            "previousMove" => $prevMoveArgs,
+            "canUndo" => $model->canUndo(),
         ];
 
         $priv = &$args["_private"];

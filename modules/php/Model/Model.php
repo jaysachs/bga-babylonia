@@ -146,7 +146,7 @@ class Model
         return $this->allData()['board'];
     }
 
-    public function turnProgress(): TurnProgress
+    private function turnProgress(): TurnProgress
     {
         return $this->allData()['turnProgress'];
     }
@@ -567,6 +567,10 @@ class Model
             return (count($missing) == 0);
         }
         return false;
+    }
+
+    public function canUndo(): bool {
+        return count($this->turnProgress()->moves) > 0;
     }
 
     public function canEndTurn(): bool
