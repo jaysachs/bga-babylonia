@@ -6,13 +6,16 @@ export interface BblPlayer extends Player {
   player_id: number;
 }
 
-export type PieceType = 'empty' | 'hidden' | 'merchant' | 'priest' | 'servant';
+export type PieceType = 'empty' | 'hidden' | 'merchant' | 'priest' | 'servant' | 'farmer'
+  | 'ziggurat'
+  | 'city_p' | 'city_s' | 'city_m' | 'city_sp' | 'city_mp' | 'city_ms' | 'city_msp'
+  | 'field_5' | 'field_6' | 'field_7' | 'field_x';
 
 export interface Hex {
   rc: number;
   board_player: number;
   piece: PieceType;
-  terrain: string;
+  terrain: 'NORTH' | 'SOUTH' | 'CENTRAL' | 'RIVER';
 }
 
 export interface Zcard {
@@ -26,5 +29,5 @@ export interface BGamedatas extends Gamedatas<BblPlayer> {
   board: Hex[];
   hand: PieceType[];
   ziggurat_cards: Zcard[];
-  translated_pieces: Record<string,string>;
+  translated_pieces: Record<PieceType,string>;
 }
