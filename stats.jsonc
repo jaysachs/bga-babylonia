@@ -39,7 +39,7 @@
         },
         "river_spaces_played": {
             "id": 25,
-            "name": "Rivers spaces played",
+            "name": "River spaces played",
             "type": "int"
         },
         "points_from_city_networks": {
