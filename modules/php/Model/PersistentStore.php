@@ -296,7 +296,7 @@ class PersistentStore
         $pid = $card->owning_player_id;
         $used = self::boolValue($card->used);
         $type = $card->type->value;
-        $this->db->execute("UPDATE pieces SET location='TAKEN',player_id=$pid, used=$used WHERE type='$type'");
+        $this->db->execute("UPDATE pieces SET player_id=$pid, used=$used WHERE type='$type'");
     }
 
     /** @param array<int,int> $refilled */
