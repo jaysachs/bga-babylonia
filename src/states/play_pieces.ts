@@ -323,8 +323,10 @@ export class PlayPiecesState extends BabyloniaState {
   private setStatusBarForPlayState(): void {
     this.bga.statusBar.removeActionButtons();
     if (this.playStateArgs!.canEndTurn) {
+      let mustEnd = false;
       if (Object.keys(this.playStateArgs!.allowedMoves).length == 0) {
         this.bga.statusBar.setTitle(_('${you} must end your turn'));
+        mustEnd = true;
         this.setPlayablePieces();
       } else {
         this.bga.statusBar.setTitle(_('${you} may select a piece to play or end your turn'))
@@ -337,6 +339,8 @@ export class PlayPiecesState extends BabyloniaState {
           this.removeHandHandler();
           this.unselectAllHandPieces();
           this.bga.actions.performAction('actDonePlayPieces');
+        }, {
+          autoclick: mustEnd,
         });
     } else {
       this.bga.statusBar.setTitle(_('${you} must select a piece to play'));
