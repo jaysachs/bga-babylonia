@@ -85,11 +85,23 @@ body {
 }
 
 #bbl_available_zcards {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+}
+
+#bbl_main:not(.bbl_altflow) #bbl_available_zcards > div:nth-child(7) {
+    position: relative;
+    left: 50%;
+}
+
+#bbl_main.bbl_altflow #bbl_available_zcards {
     display: flex;
     flex-direction: row;
-    justify-content: center;
-    flex-wrap: wrap;
-    padding: 8px;
+}
+
+#bbl_rightpadding {
+    display: flex;
+    flex-grow: 1;
 }
 
 #bbl_main.bbl_altflow {
