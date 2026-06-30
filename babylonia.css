@@ -448,10 +448,14 @@ body {
  */
 
 .player-board-game-specific-content {
-    --bbl-label-height: 40px;
+    --bbl-label-height: 2em;
     --bbl-label-width: calc(var(--bbl-hex-ratio) * var(--bbl-label-height));
-    display: grid;
     padding-top: 7px;
+    display: flex;
+}
+
+.bbl_pb {
+    display: grid;
     grid-template-columns: repeat(3, 1fr);
     grid-row-gap: 7px;
 }
@@ -513,6 +517,15 @@ body {
 
 .bbl_pb_city_label {
     background-position: 0% -200%;
+}
+
+.bbl_pb_hand,
+.bbl_pb_pool,
+.bbl_pb_city {
+    color: white;
+    font-weight: bold;
+    align-content: center;
+    text-align: center;
 }
 
 div.bbl_pb_zcards {
