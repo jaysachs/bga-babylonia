@@ -46,6 +46,8 @@
         if (canvas.getContext) {
           var ctx = canvas.getContext('2d'); //set context to 2d
 
+          // height 80 => width 92.38, offset 23.1
+
           var x_hex = 17; //set how many hexes on x axis
           var y_hex = 12; //set how many hexes on y axis
 
@@ -54,30 +56,31 @@
           ctx.clearRect(0, 0, canvas.width, canvas.height); //clear the draw area
 
           //resizing canvas width to x hexes
-          canvas.width = 20 + (70 * (x_hex + 2)) + 2; //the '+ 2' is to give a 1px 'border' to the canvas
+          canvas.width = 40 + 23.1 + (69.28 * (x_hex)) + 2; //the '+ 2' is to give a 1px 'border' to the canvas
 
           if (x_hex > 1){ //resizing canvas height to y hexes
-            canvas.height = 40 + ( 80 * (y_hex + 2) ) + 2; //the '+ 2' is to give a 1px 'border' to the canvas
+            canvas.height = 40 + ( 80 * (y_hex) ) + 2; //the '+ 2' is to give a 1px 'border' to the canvas
           } else { //this changes by half of a hex's height if there is more than 1 column
-            canvas.height = ( 80 * (y_hex + 2) )  + 2; //the '+ 2' is to give a 1px 'border' to the canvas
+            canvas.height = ( 80 * (y_hex) )  + 2; //the '+ 2' is to give a 1px 'border' to the canvas
           }
 
           W = canvas.width; //set canvas width
           H = canvas.height; //set canvas height
 
           var hexagon = new Path2D(); //drawing a hexagon as a 2d path
-          hexagon.moveTo(20,0);
-          hexagon.lineTo(20,0);
-          hexagon.lineTo(70,0);
-          hexagon.lineTo(90,40);
-          hexagon.lineTo(70,80);
-          hexagon.lineTo(20,80);
-          hexagon.lineTo(0,40);
+          hexagon.moveTo(23.1,0);
+          hexagon.lineTo(23.1,0);
+          hexagon.lineTo(69.28,0);
+          hexagon.lineTo(92.38, 39);
+          hexagon.lineTo(69.28,79);
+          hexagon.lineTo(23.1,79);
+          hexagon.lineTo(0,39);
           hexagon.closePath();
 
           //set up hex stroke variable
           var hstroke = document.forms["mapoptions"]["hex_stroke"];
-          var lineWidth = Number(document.forms["mapoptions"]["line_width"].value);
+            var lineWidth = Number(document.forms["mapoptions"]["line_width"].value);
+            console.log("lineWidth", lineWidth);
           //set up hex fill variable
           var hfill = document.forms["mapoptions"]["hex_fill"];
           //set up hex numbers variable
@@ -96,19 +99,21 @@
           ctx.textBaseline = 'top'; //text will draw with the y pos at the top
           ctx.direction = 'ltr'; //text will draw left to right
 
+//            ctx.fillStyle = HexFillStyle; //set hex fill style
+//            ctx.fillRect(0, 0, W, H);
           //function to draw base canvas
           function drawBase(cur_hex){
               for (var j = 0; j < ( y_hex ); j++){
-              ctx.strokeStyle = HexStrokeStyle; //set hex stroke style
+                  ctx.strokeStyle = HexStrokeStyle; // (j % 2 == 0) ? 'blue' : 'red'; // HexStrokeStyle; //set hex stroke style
 
-              ctx.fillStyle = HexFillStyle; //set hex fill style
+                  ctx.fillStyle = HexFillStyle; //set hex fill style
 
-              ctx.translate( 1 , 1 ); //translates from 0,0 to 1,1 in order to give a 1px border to canvas
+              ctx.translate( 20 , 30 ); //translates from 0,0 to 1,1 in order to give a 1px border to canvas
 
               if (cur_hex == x_hex){
-                ctx.translate( (i + 1) * 70 , lineWidth + (j+1) * 80 - lineWidth ); //translates to next hex location
+                ctx.translate( (i ) * 69.28 - lineWidth , (j) * 80 - j*lineWidth - 1 ); //translates to next hex location
               } else {
-                ctx.translate( (i + 1) * 70 , lineWidth + (j+1) * 80 + 40 - lineWidth ); //translates to next hex location
+                ctx.translate( (i ) * 69.28 - lineWidth , (j) * 80 + 40 - j*lineWidth - 1 ); //translates to next hex location
                                     }
 
                                   var sk = skipped[i];
@@ -117,12 +122,18 @@
                                   }
                                   var endy = sk.end;
                                   if (endy == undefined) { endy = 0; }
-                                  console.log(i, j, endy);
-                                  if (j < sk.start || j > y_hex - endy - 1) { ctx.strokeStyle = 'transparent'; }
+                  if (j < sk.start || j > y_hex - endy - 1) {
+                      ctx.resetTransform();
+                      continue; // ctx.strokeStyle = 'transparent';
+                  }
 
               ctx.lineWidth = lineWidth; //width (in pixels) of stroked hex path
               ctx.lineJoin = 'miter'; //when hex paths join have sharp corners
               if (hstroke.checked){ //if stoke variable is checked
+                  ctx.stroke(hexagon); //stroke the hex path
+                  ctx.translate(0, lineWidth / 2);
+                ctx.stroke(hexagon); //stroke the hex path
+                  ctx.translate(0, -lineWidth);
                 ctx.stroke(hexagon); //stroke the hex path
               }
               if (hfill.checked){ //if fill variable is checked
