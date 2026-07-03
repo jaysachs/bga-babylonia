@@ -239,4 +239,36 @@ function handleResize(evt) {
         }
    }
 
+
+function handleResize(evt) {
+        const pageEl = document.getElementById('page-content');
+        const pageRect = pageEl.getBoundingClientRect();
+        const viewPort = window.visualViewport;
+        const vertAvail = viewPort.height - pageRect.top;
+        // "horizontal" "default" layout
+        var w1 = pageRect.width * 0.875;
+        var h1 = w1 * _a.map_aspect_ratio;
+        if (h1 > vertAvail) {
+            w1 = vertAvail / _a.map_aspect_ratio;
+            h1 = vertAvail;
+        }
+        // "vertical" "alt" layout
+        var h2 = vertAvail * 0.875;
+        var w2 = h2 / _a.map_aspect_ratio;
+        if (w2 > pageRect.width) {
+            w2 = pageRect.width - 12;
+            h2 = w2 * _a.map_aspect_ratio;
+        }
+        const mainElCl = document.getElementById('bbl_main').classList;
+        if (w1 >= w2) {
+            mainElCl.remove('bbl_altflow');
+            document.body.style.setProperty('--bbl-board-width', (w1 - 12) + 'px');
+        }
+        else {
+            mainElCl.add('bbl_altflow');
+            document.body.style.setProperty('--bbl-board-width', w2 + 'px');
+        }
+    }
+
+
 window.onload = () => handleResize();
