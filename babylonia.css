@@ -16,6 +16,9 @@
 
 /* inspired from https://css-tricks.com/hexagons-and-beyond-flexible-responsive-grid-patterns-sans-media-queries/ */
 body {
+    --bbl-map-file: url(img/mapb.jpg);
+    --bbl-sprites-file: url(img/sprites.png);
+
     /* current map dimensions: 3385 × 2496  */
     --bbl-map-aspect-ratio: calc(3385 / 2496);
     /*
@@ -35,6 +38,13 @@ body {
     */
     --bbl-hex-height: calc(var(--bbl-board-height)/12.59);
     --bbl-hex-width: calc(var(--bbl-hex-ratio) * var(--bbl-hex-height));
+}
+
+body.mockup-pieces {
+    --bbl-sprites-file: url(img/sprites2.png);
+}
+body.mockup-board {
+    --bbl-map-file: url(img/mapv2.png);
 }
 
 #bbl_main {
@@ -61,7 +71,8 @@ body {
 
 #bbl_board {
     font-size: 0;
-    background: url(img/mapb.jpg) no-repeat center;
+/*    background: url(img/mapb.jpg) no-repeat center; */
+    background: var(--bbl-map-file) no-repeat center;
     background-size: cover;
     width: calc(var(--bbl-board-width));
     height: calc(var(--bbl-board-height));
@@ -147,7 +158,7 @@ body {
 }
 
 #bbl_board>div.bbl_playable::after {
-    background: url(img/sprites.png) 0% -400% / 700% 700%;
+    background: var(--bbl-sprites-file) 0% -400% / 700% 700%;
     cursor: pointer;
     content: '';
     display: inline;
@@ -172,12 +183,12 @@ body {
     top: 0;
     height: calc(var(--bbl-hex-height));
     aspect-ratio: calc(var(--bbl-hex-ratio));
-    background: url(img/sprites.png) -600% -500% / 700% 700%;
+    background: var(--bbl-sprites-file) -600% -500% / 700% 700%;
 }
 
 /* does this need the same ::after treatment as bbl_selected? */
 #bbl_board>div.bbl_in_network {
-    background: url(img/sprites.png) 0% -500% / 700% 700%;
+    background: var(--bbl-sprites-file) 0% -500% / 700% 700%;
 }
 
 #pagemaintitletext span[bbl_piece] {
@@ -189,7 +200,7 @@ body {
 [bbl_piece] {
     aspect-ratio: calc(var(--bbl-hex-ratio));
     clip-path: none;
-    background-image: url(img/sprites.png);
+    background-image: var(--bbl-sprites-file);
     background-size: 700% 700%;
     filter:
         drop-shadow(2px -2px #573404)
@@ -413,11 +424,11 @@ body {
 .bbl_unplayable {
     cursor: not-allowed;
     opacity: 0.5;
-    background: url(img/sprites.png) 0% -600% / 700% 700%;
+    background: var(--bbl-sprites-file) 0% -600% / 700% 700%;
 }
 
 #bbl_hand>div.bbl_selected {
-    background: url(img/sprites.png) 0% -500% / 700% 700%;
+    background: var(--bbl-sprites-file) 0% -500% / 700% 700%;
 }
 
 .bbl_unimportant {
@@ -479,7 +490,7 @@ body {
 .bbl_pb_zcard_label {
     width: calc(var(--bbl-label-width));
     height: calc(var(--bbl-label-height));
-    background-image: url(img/sprites.png);
+    background-image: var(--bbl-sprites-file);
     background-size: 700% 700%;
 }
 
