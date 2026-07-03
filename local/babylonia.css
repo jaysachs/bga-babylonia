@@ -1,0 +1,598 @@
+/**
+ *------
+ * BGA framework: Gregory Isabelli & Emmanuel Colin & BoardGameArena
+ * babylonia implementation : © Jay Sachs <vagabond@covariant.org>
+ *
+ * This code has been produced on the BGA studio platform for use on http://boardgamearena.com.
+ * See http://en.boardgamearena.com/#!doc/Studio for more information.
+ * -----
+ *
+ * babylonia.css
+ *
+ * babylonia stylesheet
+ *
+ */
+
+
+/* inspired from https://css-tricks.com/hexagons-and-beyond-flexible-responsive-grid-patterns-sans-media-queries/ */
+body {
+    /* current map dimensions: 3385 × 2496  */
+    --bbl-map-aspect-ratio: calc(3385 / 2496);
+    /*
+      define these all here so they're available even for "floating" elements.
+     */
+    --bbl-board-margin: calc(max(6px, 0.005vw));
+
+    /* 2/sqrt(3) */
+    --bbl-hex-ratio: 1.155;
+
+    --bbl-board-height: calc(var(--bbl-board-width) / var(--bbl-map-aspect-ratio));
+
+    /*
+      the denominator here works for height. but somehow width gets
+      slightly off.
+      maybe compute board height/width based on hex size instead?
+    */
+    --bbl-hex-height: calc(var(--bbl-board-height)/12.59);
+    --bbl-hex-width: calc(var(--bbl-hex-ratio) * var(--bbl-hex-height));
+}
+
+#bbl_main {
+    display: flex;
+    flex-direction: row-reverse;
+    align-items: center;
+    height: calc(var(--bbl-board-height) + 2 * var(--bbl-board-margin));
+}
+
+/*
+ Board container is needed since hex positions are described in terms
+ of %ages of height/width, and we need the container to stretch
+ sometimes without changing the size of the board. Hard to do if the
+ board itself is the flex element, we want it to grow "as much as
+ possible" but no more.
+*/
+#bbl_board_container {
+    flex: 1;
+    flex-grow: 0;
+    position: relative;
+    margin: calc(var(--bbl-board-margin));
+}
+
+
+#bbl_board {
+    font-size: 0;
+    background: url(mapb.jpg) no-repeat center;
+    background-size: cover;
+    width: calc(var(--bbl-board-width));
+    height: calc(var(--bbl-board-height));
+    position: relative;
+}
+
+#bbl_pieces {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    height: 100%;
+    justify-content: space-evenly;
+    align-items: center;
+}
+
+#bbl_hand {
+    display: flex;
+    flex-direction:column;
+    row-gap: calc(var(--bbl-hex-height) * 0.10);
+    background-size: 100% 100%;
+}
+
+#bbl_available_zcards {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+}
+
+#bbl_main:not(.bbl_altflow) #bbl_available_zcards > div:nth-child(7) {
+    position: relative;
+    left: 50%;
+}
+
+#bbl_main.bbl_altflow #bbl_available_zcards {
+    display: flex;
+    flex-direction: row;
+}
+
+#bbl_rightpadding {
+    display: flex;
+    flex-grow: 1;
+}
+
+#bbl_main.bbl_altflow {
+    flex-direction: column-reverse;
+    height: auto;
+}
+
+#bbl_main.bbl_altflow #bbl_pieces {
+    flex-direction: row;
+    justify-content: space-evenly;
+    width: 100%;
+/*    margin: calc(var(--bbl-board-margin)); */
+}
+
+#bbl_main.bbl_altflow #bbl_hand {
+    flex-direction: row;
+    padding: 8px;
+    column-gap: calc(var(--bbl-hex-width) * 0.10);
+}
+
+#bbl_main.bbl_altflow #bbl_available_zcards {
+    flex-direction: row;
+}
+
+
+
+/* Board contents */
+
+#bbl_board>div {
+    height: calc(var(--bbl-hex-height));
+    aspect-ratio: calc(var(--bbl-hex-ratio));
+    margin: 0;
+    padding: 0;
+    background-color: transparent;
+    display: inline-block;
+    font-size: 10pt;
+    text-align: center;
+    align-items: center;
+    color: #000000;
+    clip-path: polygon(0 50%, 25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%);
+    position: absolute;
+    /*    background-color: rgba(255, 22, 255, 0.2); */
+}
+
+#bbl_board>div.bbl_playable::after {
+    background: url(sprites.png) 0% -400% / 700% 700%;
+    cursor: pointer;
+    content: '';
+    display: inline;
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: calc(var(--bbl-hex-height));
+    aspect-ratio: calc(var(--bbl-hex-ratio));
+}
+
+#bbl_board>div>div {
+    position: absolute;
+    left: 0;
+    top: 0;
+}
+
+#bbl_board>div.bbl_selected::after {
+    content: '';
+    display: inline;
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: calc(var(--bbl-hex-height));
+    aspect-ratio: calc(var(--bbl-hex-ratio));
+    background: url(sprites.png) -600% -500% / 700% 700%;
+}
+
+/* does this need the same ::after treatment as bbl_selected? */
+#bbl_board>div.bbl_in_network {
+    background: url(sprites.png) 0% -500% / 700% 700%;
+}
+
+#pagemaintitletext span[bbl_piece] {
+    vertical-align: middle;
+    /* this is copied from #pagemaintitletext ... that seems suboptimal. */
+    height: 32px;
+}
+
+[bbl_piece] {
+    aspect-ratio: calc(var(--bbl-hex-ratio));
+    clip-path: none;
+    background-image: url(sprites.png);
+    background-size: 700% 700%;
+    filter:
+        drop-shadow(2px -2px #573404)
+    ;
+
+    /* so picked up for floating (animated) pieces */
+    display: inline-block;
+    height: calc(var(--bbl-hex-height));
+}
+
+/*
+ * Cities and fields sprites
+ */
+[bbl_piece="city_m"] {
+    background-position: -500% 0%;
+}
+
+[bbl_piece="city_p"] {
+    background-position: -500% -200%;
+}
+
+[bbl_piece="city_s"] {
+    background-position: -500% -100%;
+}
+
+[bbl_piece="city_mp"] {
+    background-position: -500% -400%;
+}
+
+[bbl_piece="city_ms"] {
+    background-position: -500% -300%;
+}
+
+[bbl_piece="city_sp"] {
+    background-position: -500% -500%;
+}
+
+[bbl_piece="city_msp"] {
+    background-position: -500% -600%;
+}
+
+[bbl_piece="field_5"] {
+    background-position: -600% 0%;
+}
+
+[bbl_piece="field_6"] {
+    background-position: -600% -100%;
+}
+
+[bbl_piece="field_7"] {
+    background-position: -600% -200%;
+}
+
+[bbl_piece="field_x"] {
+    background-position: -600% -300%;
+}
+
+[bbl_piece="ziggurat"] {
+    background-position: -600% -400%;
+/*    filter: inherit; */
+}
+
+/*
+ * Player piece sprites
+ */
+[bbl_piece="hidden_dddddd"] {
+    background-position: -100% 0;
+}
+
+[bbl_piece="hidden_dccd7d"] {
+    background-position: -200% 0;
+}
+
+[bbl_piece="hidden_5da899"] {
+    background-position: -300% 0;
+}
+
+[bbl_piece="hidden_c26a77"] {
+    background-position: -400% 0;
+}
+
+[bbl_piece="farmer_dddddd"] {
+    background-position: -100% -400%;
+}
+
+[bbl_piece="farmer_dccd7d"] {
+    background-position: -200% -400%;
+}
+
+[bbl_piece="farmer_5da899"] {
+    background-position: -300% -400%;
+}
+
+[bbl_piece="farmer_c26a77"] {
+    background-position: -400% -400%;
+}
+
+[bbl_piece="merchant_dddddd"] {
+    background-position: -100% -100%;
+}
+
+[bbl_piece="merchant_dccd7d"] {
+    background-position: -200% -100%;
+}
+
+[bbl_piece="merchant_5da899"] {
+    background-position: -300% -100%;
+}
+
+[bbl_piece="merchant_c26a77"] {
+    background-position: -400% -100%;
+}
+
+[bbl_piece="servant_dddddd"] {
+    background-position: -100% -200%;
+}
+
+[bbl_piece="servant_dccd7d"] {
+    background-position: -200% -200%;
+}
+
+[bbl_piece="servant_5da899"] {
+    background-position: -300% -200%;
+}
+
+[bbl_piece="servant_c26a77"] {
+    background-position: -400% -200%;
+}
+
+[bbl_piece="priest_dddddd"] {
+    background-position: -100% -300%;
+}
+
+[bbl_piece="priest_dccd7d"] {
+    background-position: -200% -300%;
+}
+
+[bbl_piece="priest_5da899"] {
+    background-position: -300% -300%;
+}
+
+[bbl_piece="priest_c26a77"] {
+    background-position: -400% -300%;
+}
+
+/*
+ * Ziggurat card sprites
+ */
+/* button.action-button[bbl_ztype], */
+[bbl_ztype] {
+    background-size: 900% 100%;
+    background-image: url(zcards.png);
+
+    height: calc(1*var(--bbl-hex-height));
+    width: calc(.8*var(--bbl-hex-height));
+
+}
+
+[bbl_ztype=""] {
+    background-image: none;
+}
+
+[bbl_zused] {
+    background-image: repeating-linear-gradient(45deg, rgb(127 127 127 / 90%), rgb(127 127 127 / 80%) 2px, transparent 2px, transparent 4px),
+        url(zcards.png);
+}
+
+[bbl_ztype="zc_10pts"] {
+    background-position: 0% 0%;
+}
+
+[bbl_ztype="zc_xturn"] {
+    background-position: -100% 0%;
+}
+
+[bbl_ztype="zc_hand7"] {
+    background-position: -200% 0%;
+}
+
+[bbl_ztype="zc_3nobles"] {
+    background-position: -300% 0%;
+}
+
+[bbl_ztype="zc_3farmers"] {
+    background-position: -400% 0%;
+}
+
+[bbl_ztype="zc_fields"] {
+    background-position: -500% 0%;
+}
+
+[bbl_ztype="zc_citypts"] {
+    background-position: -600% 0%;
+}
+
+[bbl_ztype="zc_land"] {
+    background-position: -700% 0%;
+}
+
+[bbl_ztype="zc_river"] {
+    background-position: -800% 0%;
+}
+
+
+/*
+ Styles for the hand.
+*/
+
+#bbl_hand>div {
+    display: inline-block;
+    aspect-ratio: calc(var(--bbl-hex-ratio));
+    height: calc(var(--bbl-hex-height));
+    background-size: 700% 700%;
+    border-style: none;
+}
+
+.bbl_playable {
+    cursor: pointer;
+}
+
+.bbl_unplayable {
+    cursor: not-allowed;
+    opacity: 0.5;
+    background: url(sprites.png) 0% -600% / 700% 700%;
+}
+
+#bbl_hand>div.bbl_selected {
+    background: url(sprites.png) 0% -500% / 700% 700%;
+}
+
+.bbl_unimportant {
+    opacity: 0.45;
+}
+
+/* available ziggurat cards panel */
+
+#bbl_available_zcards>div {
+    border-color: transparent;
+    clip-path: padding-box;
+    display: inline-block;
+    margin: 1px;
+}
+
+#bbl_available_zcards>div.bbl_selected {
+    border-color: green;
+    clip-path: margin-box;
+}
+
+
+#bbl_available_zcards.bbl_selecting>div[bbl_ztype] {
+    cursor: pointer;
+}
+
+/*
+ * Player boards
+ */
+
+.player-board-game-specific-content {
+    --bbl-label-height: 2em;
+    --bbl-label-width: calc(var(--bbl-hex-ratio) * var(--bbl-label-height));
+    padding-top: 7px;
+    display: flex;
+}
+
+.bbl_pb {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-row-gap: 7px;
+}
+
+.player-board-game-specific-content>div {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    justify-content: space-evenly;
+}
+
+.bbl_pb_city_label,
+.bbl_pb_hand_label_dddddd,
+.bbl_pb_hand_label_dccd7d,
+.bbl_pb_hand_label_5da899,
+.bbl_pb_hand_label_c26a77,
+.bbl_pb_pool_label_dddddd,
+.bbl_pb_pool_label_dccd7d,
+.bbl_pb_pool_label_5da899,
+.bbl_pb_pool_label_c26a77,
+.bbl_pb_zcard_label {
+    width: calc(var(--bbl-label-width));
+    height: calc(var(--bbl-label-height));
+    background-image: url(sprites.png);
+    background-size: 700% 700%;
+}
+
+.bbl_pb_hand_label_dddddd {
+    background-position: -100% -500%;
+}
+
+.bbl_pb_hand_label_dccd7d {
+    background-position: -200% -500%;
+}
+
+.bbl_pb_hand_label_5da899 {
+    background-position: -300% -500%;
+}
+
+.bbl_pb_hand_label_c26a77 {
+    background-position: -400% -500%;
+}
+
+.bbl_pb_pool_label_dddddd {
+    background-position: -100% -600%;
+}
+
+.bbl_pb_pool_label_dccd7d {
+    background-position: -200% -600%;
+}
+
+.bbl_pb_pool_label_5da899 {
+    background-position: -300% -600%;
+}
+
+.bbl_pb_pool_label_c26a77 {
+    background-position: -400% -600%;
+}
+
+.bbl_pb_city_label {
+    background-position: 0% -200%;
+}
+
+.bbl_pb_hand,
+.bbl_pb_pool,
+.bbl_pb_city {
+    color: white;
+    font-weight: bold;
+    align-content: center;
+    text-align: center;
+}
+
+div.bbl_pb_zcards {
+    grid-column-start: 1;
+    grid-column-end: 3;
+    grid-row-start: 2;
+    grid-row-end: 2;
+    display: inline-block;
+    /* TODO, these are hardcoded weirdness */
+    margin-left: 7px;
+    /* TODO: figure out how to lay this out to enable border */
+    /*
+    border: 1px solid black;
+    width: 100%;
+*/
+}
+
+.bbl_pb_zcard_label {
+    display: inline-block;
+    background-position: 0% -300%;
+}
+
+div.bbl_pb_zcards>div {
+    display: inline-block;
+    margin: 3px;
+    height: calc(var(--bbl-label-height));
+    width: calc(var(--bbl-label-height) * 0.67);
+}
+
+/*
+ * rendering log messages
+ *   particularly images for pieces
+ */
+
+.log [bbl_piece] {
+    height: 1.0em;
+    width: 1.15em;
+    display: inline-block;
+    filter: unset;
+    margin: 0;
+    padding: 0;
+    background-color: transparent;
+}
+
+.log [bbl_ztype] {
+    display: inline-block;
+    height: 1.0em;
+    width: 0.67em;
+}
+
+/*
+ *  cityscoring animation classes
+ */
+.bbl_city_scoring {
+    -webkit-text-stroke: thin black;
+    /* paint-order: stroke fill; */
+    color: black;
+    font-family: Helvetica;
+    font-style: bold;
+    font-size: 72;
+    /* text-shadow: '-2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000, 2px 2px 0 #000'; */
+}
+
+
+#pagemaintitletext span[bbl_ztype] {
+    display: inline-block;
+    height: 5.0em;
+    width: 3.33em;
+    vertical-align: middle;
+}
