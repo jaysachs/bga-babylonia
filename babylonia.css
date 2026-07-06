@@ -44,7 +44,7 @@ body.mockup-pieces {
     --bbl-sprites-file: url(img/sprites2.png);
 }
 body.mockup-board {
-    --bbl-map-file: url(img/other/mapv2.png);
+    --bbl-map-file: url(img/other/mapv2.jpg);
 }
 
 #bbl_main {
