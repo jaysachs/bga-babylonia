@@ -99,5 +99,9 @@
     },
 
     // Built-in undo support.
-    "db_undo_support": false
+    "db_undo_support": false,
+
+    // Trigger an exception when PHP detect warnings.
+    "exception_on_warning": true
+
 }

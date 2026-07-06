@@ -53,7 +53,10 @@ class Board
     /** @phpstan-ignore return.unusedType */
     private function maybeHexAt(int $rc): ?Hex
     {
-        return @$this->hexes[$rc];
+        if (!isset($this->hexes[$rc])) {
+            return null;
+        }
+        return $this->hexes[$rc];
     }
 
     public function asTestMap(): string
