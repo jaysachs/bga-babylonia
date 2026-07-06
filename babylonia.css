@@ -71,7 +71,6 @@ body.mockup-board {
 
 #bbl_board {
     font-size: 0;
-/*    background: url(img/mapb.jpg) no-repeat center; */
     background: var(--bbl-map-file) no-repeat center;
     background-size: cover;
     width: calc(var(--bbl-board-width));
@@ -154,7 +153,6 @@ body.mockup-board {
     color: #000000;
     clip-path: polygon(0 50%, 25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%);
     position: absolute;
-    /*    background-color: rgba(255, 22, 255, 0.2); */
 }
 
 #bbl_board>div.bbl_playable::after {
@@ -260,7 +258,6 @@ body.mockup-board {
 
 [bbl_piece="ziggurat"] {
     background-position: -600% -400%;
-/*    filter: inherit; */
 }
 
 /*
