@@ -102,7 +102,7 @@ export class View {
         this.translatedPieces = {};
     }
 
-    private handleResize(evt?: Event) {
+    private handleResize() {
         const pageEl = document.getElementById('page-content');
         const pageRect = pageEl!.getBoundingClientRect();
         const viewPort = window.visualViewport!;
@@ -126,16 +126,18 @@ export class View {
         }
 
         const mainElCl = document.getElementById(IDS.MAIN)!.classList;
+        let width = w2;
         if (w1 >= w2) {
+            width = w1 - 12;
             mainElCl.remove(CSS.LAYOUT_UNDER_BOARD);
-            document.body.style.setProperty('--bbl-board-width', (w1 - 12) + 'px');
         } else {
             mainElCl.add(CSS.LAYOUT_UNDER_BOARD);
-            document.body.style.setProperty('--bbl-board-width', w2 + 'px');
         }
+        document.body.style.setProperty('--bbl-board-width', `${width}px`);
     }
 
     public setup(gamedatas: BGamedatas): void {
+        this.bga.gameui.onScreenWidthChange = () => this.handleResize();
         this.translatedPieces = gamedatas.translated_pieces;
         this.bga.gameArea.getElement().appendChild(this.base_html());
 
@@ -158,9 +160,6 @@ export class View {
 
         console.log('Setting up ziggurat cards', gamedatas.ziggurat_cards);
         this.setupZcards(gamedatas.ziggurat_cards);
-
-        // document.body.addEventListener('resize', (ev) => this.handleResize(ev), { capture: true });
-        document.body.onresize = (ev) => this.handleResize(ev);
         this.handleResize();
     }
 

@@ -20,8 +20,6 @@ export class Game extends BaseGame<Player, BGamedatas> {
 
   setup(gamedatas: BGamedatas) {
     this.view = new View(this.bga);
-    this.view.setup(gamedatas);
-
     this.registerLogArgs();
 
     this.registerStateClasses();
@@ -30,6 +28,8 @@ export class Game extends BaseGame<Player, BGamedatas> {
       logger: console.log,
       handlers: [this, ...this.bga.states.getStateClasses()],
     });
+
+    this.view.setup(gamedatas);
     console.log('Game setup done');
   }
 
