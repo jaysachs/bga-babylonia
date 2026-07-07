@@ -29,6 +29,8 @@ body {
     /* 2/sqrt(3) */
     --bbl-hex-ratio: 1.155;
 
+    --bbl-board-width: 1000vw;
+
     --bbl-board-height: calc(var(--bbl-board-width) / var(--bbl-map-aspect-ratio));
 
     /*
