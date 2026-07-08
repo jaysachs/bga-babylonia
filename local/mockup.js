@@ -199,7 +199,7 @@ const IDS = {
 }
 
 const View = {
-    map_aspect_ratio:  2496.0 / 3385.0
+    map_aspect_ratio:  2709.0 / 3385.0
 }
 
 const CSS = {

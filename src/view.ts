@@ -163,13 +163,14 @@ export class View {
         this.handleResize();
     }
 
-    static readonly map_aspect_ratio = 2496 / 3385;
-    static readonly hstart = 151.0; // this the (negative) offset on left of board
-    static readonly vstart = 22.0; // this is the offset on the top of the board
-    static readonly height = 2496 / 12.25;
-    static readonly width = this.height * 1.155;
-    static readonly hdelta = this.height * 1.732 / 2.0 + 2.0;
-    static readonly vdelta = 1.0 * this.height + 2.0;
+    static readonly map_aspect_ratio = 2709 / 3385;
+    static readonly hstart = 56.0; // this the (negative) offset on left of board
+    static readonly vstart = 63.0; // this is the offset on the top of the board
+    static readonly height = 2709 / 12.42;
+
+//    static readonly width = this.height * 1.732;
+    static readonly hdelta = 190; // this.height / 2.0 * 2.0 * (2.0 / 1.732) + 2.0;
+    static readonly vdelta = 216; // 1.0 * this.height + 2.0;
 
     private setupGameBoard(boardData: Hex[]) {
         const boardDiv = $(IDS.BOARD);
@@ -249,7 +250,7 @@ export class View {
     private makeHexDiv(hex: Hex): HTMLElement {
         const row = Math.trunc(hex.rc / 100);
         const col = Math.trunc(hex.rc % 100);
-        let top = 100 * (View.vstart + row * View.vdelta / 2) / 2496.0;
+        let top = 100 * (View.vstart + row * View.vdelta / 2) / 2709.0;
         let left = 100 * (View.hstart + col * View.hdelta) / 3385.0;
         return Html.div({ id:  IDS.hexDiv(hex.rc), style: [`top:${top}%`, `left:${left}%`] });
     }
