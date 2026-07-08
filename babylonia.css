@@ -265,7 +265,8 @@ body.mockup-board {
 }
 
 [bbl_piece="ziggurat"] {
-    background-position: -600% -400%;
+/*    background-position: -600% -400%; */
+    background-position: 0% -300%;
 }
 
 /*
