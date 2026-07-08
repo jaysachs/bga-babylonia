@@ -102,6 +102,47 @@ export class View {
         this.translatedPieces = {};
     }
 
+     public setup(gamedatas: BGamedatas): void {
+        this.bga.gameui.onScreenWidthChange = () => this.handleResize();
+        this.translatedPieces = gamedatas.translated_pieces;
+        this.bga.gameArea.getElement().appendChild(this.base_html());
+
+        console.log('setting up player boards');
+        for (const pid in gamedatas.players) {
+            this.setupPlayerBoard(gamedatas.players[pid]!);
+        }
+
+        console.log('setting the the game board');
+        this.setupGameBoard(gamedatas.board);
+
+        // FIXME: this doesn't work for spectators!
+        console.log('setting up player hand', gamedatas.hand);
+        gamedatas.hand.forEach((piece, i) => {
+            const hpd = this.handPosDiv(i);
+            if (piece && piece != Piece.EMPTY) {
+                hpd.appendChild(this.createPieceDiv(piece, this.bga.gameui.player_id));
+            }
+        });
+
+        console.log('Setting up ziggurat cards', gamedatas.ziggurat_cards);
+        this.setupZcards(gamedatas.ziggurat_cards);
+        this.handleResize();
+    }
+
+    static readonly map_aspect_ratio = 2709 / 3385;
+    static readonly hstart = 56.0; // this the (negative) offset on left of board
+    static readonly vstart = 63.0; // this is the offset on the top of the board
+    static readonly hdelta = 190; // this.height / 2.0 * 2.0 * (2.0 / 1.732) + 2.0;
+    static readonly vdelta = 216; // 1.0 * this.height + 2.0;
+
+    private makeHexDiv(hex: Hex): HTMLElement {
+        const row = Math.trunc(hex.rc / 100);
+        const col = Math.trunc(hex.rc % 100);
+        let top = 100 * (View.vstart + row * View.vdelta / 2) / 2709.0;
+        let left = 100 * (View.hstart + col * View.hdelta) / 3385.0;
+        return Html.div({ id:  IDS.hexDiv(hex.rc), style: [`top:${top}%`, `left:${left}%`] });
+    }
+
     private handleResize() {
         const pageEl = document.getElementById('page-content');
         const pageRect = pageEl!.getBoundingClientRect();
@@ -136,43 +177,7 @@ export class View {
         document.body.style.setProperty('--bbl-board-width', `${width}px`);
     }
 
-    public setup(gamedatas: BGamedatas): void {
-        this.bga.gameui.onScreenWidthChange = () => this.handleResize();
-        this.translatedPieces = gamedatas.translated_pieces;
-        this.bga.gameArea.getElement().appendChild(this.base_html());
-
-        console.log('setting up player boards');
-        for (const pid in gamedatas.players) {
-            this.setupPlayerBoard(gamedatas.players[pid]!);
-        }
-
-        console.log('setting the the game board');
-        this.setupGameBoard(gamedatas.board);
-
-        // FIXME: this doesn't work for spectators!
-        console.log('setting up player hand', gamedatas.hand);
-        gamedatas.hand.forEach((piece, i) => {
-            const hpd = this.handPosDiv(i);
-            if (piece && piece != Piece.EMPTY) {
-                hpd.appendChild(this.createPieceDiv(piece, this.bga.gameui.player_id));
-            }
-        });
-
-        console.log('Setting up ziggurat cards', gamedatas.ziggurat_cards);
-        this.setupZcards(gamedatas.ziggurat_cards);
-        this.handleResize();
-    }
-
-    static readonly map_aspect_ratio = 2709 / 3385;
-    static readonly hstart = 56.0; // this the (negative) offset on left of board
-    static readonly vstart = 63.0; // this is the offset on the top of the board
-    static readonly height = 2709 / 12.42;
-
-//    static readonly width = this.height * 1.732;
-    static readonly hdelta = 190; // this.height / 2.0 * 2.0 * (2.0 / 1.732) + 2.0;
-    static readonly vdelta = 216; // 1.0 * this.height + 2.0;
-
-    private setupGameBoard(boardData: Hex[]) {
+   private setupGameBoard(boardData: Hex[]) {
         const boardDiv = $(IDS.BOARD);
         for (const hex of boardData) {
             const hexDiv = this.makeHexDiv(hex);
@@ -245,14 +250,6 @@ export class View {
         this.updateCounter(this.cityCounters[player.player_id]!,
         player.captured_city_count,
         animate);
-    }
-
-    private makeHexDiv(hex: Hex): HTMLElement {
-        const row = Math.trunc(hex.rc / 100);
-        const col = Math.trunc(hex.rc % 100);
-        let top = 100 * (View.vstart + row * View.vdelta / 2) / 2709.0;
-        let left = 100 * (View.hstart + col * View.hdelta) / 3385.0;
-        return Html.div({ id:  IDS.hexDiv(hex.rc), style: [`top:${top}%`, `left:${left}%`] });
     }
 
     private player_board_ext(player_id: number): HTMLElement[] {
