@@ -207,10 +207,11 @@ body.mockup-board {
     clip-path: none;
     background-image: var(--bbl-sprites-file);
     background-size: 700% 700%;
+    /*
     filter:
         drop-shadow(2px -2px #573404)
     ;
-
+*/
     /* so picked up for floating (animated) pieces */
     display: inline-block;
     height: calc(var(--bbl-hex-height));
