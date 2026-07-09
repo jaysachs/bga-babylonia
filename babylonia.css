@@ -221,7 +221,11 @@ body.mockup-board {
  * Cities and fields sprites
  */
 [bbl_piece="city_m"] {
-    background-position: -500% 0%;
+/*    background-position: -500% 0%; */
+
+    background-position: 0% 0%;
+    background-image: url(img/sprites-test.png);
+    background-size: 100% 300%;
 }
 
 [bbl_piece="city_p"] {
@@ -249,7 +253,11 @@ body.mockup-board {
 }
 
 [bbl_piece="field_5"] {
-    background-position: -600% 0%;
+    /*    background-position: -600% 0%; */
+
+    background-position: 0% -100%;
+    background-image: url(img/sprites-test.png);
+    background-size: 100% 300%;
 }
 
 [bbl_piece="field_6"] {
@@ -269,7 +277,11 @@ body.mockup-board {
 }
 
 [bbl_piece="ziggurat"] {
-    background-position: 0% -300%;
+
+    background-position: 0% -200%;
+    background-image: url(img/sprites-test.png);
+    background-size: 100% 300%;
+/*    background-position: 0% -300%; */
 }
 
 /*
