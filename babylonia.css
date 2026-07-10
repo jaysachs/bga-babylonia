@@ -151,7 +151,9 @@ body {
 }
 
 #bbl_board>div.bbl_playable::after {
-    background: var(--bbl-sprites-file) -600% -100% / 700% 700%;
+    background-image: var(--bbl-sprites-file);
+    background-size: 700% 700%;
+    background-position: -600% -100%;
     cursor: pointer;
     content: '';
     display: inline;
@@ -176,12 +178,16 @@ body {
     top: 0;
     height: calc(var(--bbl-hex-height));
     aspect-ratio: calc(var(--bbl-hex-ratio));
-    background: var(--bbl-sprites-file) 0% -200% / 700% 700%;
+    background-image: var(--bbl-sprites-file);
+    background-size: 700% 700%;
+    background-position: 0% -200%;
 }
 
 /* does this need the same ::after treatment as bbl_selected? */
 #bbl_board>div.bbl_in_network {
-    background: var(--bbl-sprites-file) -500% -100% / 700% 700%;
+    background-image: var(--bbl-sprites-file);
+    background-size: 700% 700%;
+    background-position: -500% -100%;
 }
 
 #pagemaintitletext span[bbl_piece] {
@@ -341,7 +347,7 @@ body {
 }
 
 [bbl_piece="priest_4"] {
-    background-position: -100% -500%;
+    background-position: 0% -500%;
 }
 
 /*
@@ -422,11 +428,15 @@ body {
 .bbl_unplayable {
     cursor: not-allowed;
     opacity: 0.5;
-    background: var(--bbl-sprites-file) -400% -100% / 700% 700%;
+    background-image: var(--bbl-sprites-file);
+    background-size: 700% 700%;
+    background-position: -400% -100%%;
 }
 
 #bbl_hand>div.bbl_selected {
-    background: var(--bbl-sprites-file) -500% -100% / 700% 700%;
+    background-image: var(--bbl-sprites-file);
+    background-size: 700% 700%;
+    background-position: -500% -100%;
 }
 
 .bbl_unimportant {
