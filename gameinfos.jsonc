@@ -71,12 +71,10 @@
 
     // Colors attributed to players
     "player_colors": [
-      "dddddd", // dingy white
-      "dccd7d", // sandy
-      // "94cbe6", // light blue
-      "5da899", //  teal
-      // "9f4a96", // purple
-      "c26a77" // # rose
+      "2c2b28", // black-ish
+      "219bba", // blue-ish
+      "91381b",  // rust-ish
+      "966905"  // ochre
     ],
 
     // Favorite colors support : if set to "true", support attribution of favorite colors based on player"s preferences (see reattributeColorsBasedOnPreferences PHP method)

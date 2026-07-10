@@ -17,7 +17,7 @@
 /* inspired from https://css-tricks.com/hexagons-and-beyond-flexible-responsive-grid-patterns-sans-media-queries/ */
 body {
     --bbl-map-file: url(img/mapv3.jpg);
-    --bbl-sprites-file: url(img/sprites2.png);
+    --bbl-sprites-file: url(img/spritesv3.png);
 
     /* current map dimensions: 3385 × 2709  */
     --bbl-map-aspect-ratio: calc(3385 / 2709);
@@ -151,7 +151,7 @@ body {
 }
 
 #bbl_board>div.bbl_playable::after {
-    background: var(--bbl-sprites-file) 0% -400% / 700% 700%;
+    background: var(--bbl-sprites-file) -600% -100% / 700% 700%;
     cursor: pointer;
     content: '';
     display: inline;
@@ -176,12 +176,12 @@ body {
     top: 0;
     height: calc(var(--bbl-hex-height));
     aspect-ratio: calc(var(--bbl-hex-ratio));
-    background: var(--bbl-sprites-file) -600% -500% / 700% 700%;
+    background: var(--bbl-sprites-file) 0% -200% / 700% 700%;
 }
 
 /* does this need the same ::after treatment as bbl_selected? */
 #bbl_board>div.bbl_in_network {
-    background: var(--bbl-sprites-file) 0% -500% / 700% 700%;
+    background: var(--bbl-sprites-file) -500% -100% / 700% 700%;
 }
 
 #pagemaintitletext span[bbl_piece] {
@@ -209,94 +209,83 @@ body {
  * Cities and fields sprites
  */
 [bbl_piece="city_m"] {
-/*    background-position: -500% 0%; */
-
-    background-position: 0% 0%;
-    background-image: url(img/sprites-test.png);
-    background-size: 100% 300%;
+    background-position: -100% 0%;
 }
 
 [bbl_piece="city_p"] {
-    background-position: -500% -200%;
+    background-position: 0% 0%;
 }
 
 [bbl_piece="city_s"] {
-    background-position: -500% -100%;
+    background-position: -200% 0%;
 }
 
 [bbl_piece="city_mp"] {
-    background-position: -500% -400%;
+    background-position: -300% 0%;
 }
 
 [bbl_piece="city_ms"] {
-    background-position: -500% -300%;
+    background-position: -500% 0%;
 }
 
 [bbl_piece="city_sp"] {
-    background-position: -500% -500%;
+    background-position: -400% 0%;
 }
 
 [bbl_piece="city_msp"] {
-    background-position: -500% -600%;
+    background-position: -600% 0%;
 }
 
 [bbl_piece="field_5"] {
-    /*    background-position: -600% 0%; */
-
     background-position: 0% -100%;
-    background-image: url(img/sprites-test.png);
-    background-size: 100% 300%;
 }
 
 [bbl_piece="field_6"] {
-    background-position: -600% -100%;
+    background-position: -100% -100%;
 }
 
 [bbl_piece="field_7"] {
-    background-position: -600% -200%;
+    background-position: -200% -100%;
 }
 
 [bbl_piece="field_x"] {
-    background-position: -600% -300%;
+    background-position: -300% -100%;
 }
 
 [bbl_piece="ziggurat2"] {
-    background-position: -600% -400%;
+    background-position: -600% -500%;
 }
 
 [bbl_piece="ziggurat"] {
 
-    background-position: 0% -200%;
-    background-image: url(img/sprites-test.png);
-    background-size: 100% 300%;
-/*    background-position: 0% -300%; */
+    background-position: -500% -500%;
 }
 
 /*
  * Player piece sprites
  */
 [bbl_piece="hidden_1"] {
-    background-position: -100% 0;
+    background-position: -100% -200%;
 }
 
 [bbl_piece="hidden_2"] {
-    background-position: -200% 0;
+    background-position: -200% -200%;
 }
 
 [bbl_piece="hidden_3"] {
-    background-position: -300% 0;
+    background-position: -300% -200%;
 }
 
 [bbl_piece="hidden_4"] {
-    background-position: -400% 0;
+    background-position: -400% -200%;
 }
 
 [bbl_piece="farmer_1"] {
-    background-position: -100% -400%;
+    background-position: -200% -300%;
 }
 
 [bbl_piece="farmer_2"] {
-    background-position: -200% -400%;
+    background-position: -600% -300%;
 }
 
 [bbl_piece="farmer_3"] {
@@ -308,51 +297,51 @@ body {
 }
 
 [bbl_piece="merchant_1"] {
-    background-position: -100% -100%;
-}
-
-[bbl_piece="merchant_2"] {
-    background-position: -200% -100%;
-}
-
-[bbl_piece="merchant_3"] {
-    background-position: -300% -100%;
-}
-
-[bbl_piece="merchant_4"] {
-    background-position: -400% -100%;
-}
-
-[bbl_piece="servant_1"] {
-    background-position: -100% -200%;
-}
-
-[bbl_piece="servant_2"] {
-    background-position: -200% -200%;
-}
-
-[bbl_piece="servant_3"] {
-    background-position: -300% -200%;
-}
-
-[bbl_piece="servant_4"] {
-    background-position: -400% -200%;
-}
-
-[bbl_piece="priest_1"] {
     background-position: -100% -300%;
 }
 
-[bbl_piece="priest_2"] {
-    background-position: -200% -300%;
+[bbl_piece="merchant_2"] {
+    background-position: -500% -300%;
 }
 
-[bbl_piece="priest_3"] {
+[bbl_piece="merchant_3"] {
+    background-position: -200% -400%;
+}
+
+[bbl_piece="merchant_4"] {
+    background-position: -600% -400%;
+}
+
+[bbl_piece="servant_1"] {
+    background-position: -600% -200%;
+}
+
+[bbl_piece="servant_2"] {
     background-position: -300% -300%;
 }
 
-[bbl_piece="priest_4"] {
+[bbl_piece="servant_3"] {
+    background-position: -0% -400%;
+}
+
+[bbl_piece="servant_4"] {
+    background-position: -300% -400%;
+}
+
+[bbl_piece="priest_1"] {
+    background-position: -0% -300%;
+}
+
+[bbl_piece="priest_2"] {
     background-position: -400% -300%;
+}
+
+[bbl_piece="priest_3"] {
+    background-position: -500% -400%;
+}
+
+[bbl_piece="priest_4"] {
+    background-position: -100% -500%;
 }
 
 /*
@@ -433,11 +422,11 @@ body {
 .bbl_unplayable {
     cursor: not-allowed;
     opacity: 0.5;
-    background: var(--bbl-sprites-file) 0% -600% / 700% 700%;
+    background: var(--bbl-sprites-file) -400% -100% / 700% 700%;
 }
 
 #bbl_hand>div.bbl_selected {
-    background: var(--bbl-sprites-file) 0% -500% / 700% 700%;
+    background: var(--bbl-sprites-file) -500% -100% / 700% 700%;
 }
 
 .bbl_unimportant {
@@ -504,39 +493,40 @@ body {
 }
 
 .bbl_pb_hand_label_1 {
-    background-position: -100% -500%;
+    background-position: -100% -200%;
 }
 
 .bbl_pb_hand_label_2 {
-    background-position: -200% -500%;
+    background-position: -100% -200%;
 }
 
 .bbl_pb_hand_label_3 {
-    background-position: -300% -500%;
+    background-position: -100% -300%;
 }
 
 .bbl_pb_hand_label_4 {
-    background-position: -400% -500%;
+    background-position: -100% -300%;
 }
 
 .bbl_pb_pool_label_1 {
-    background-position: -100% -600%;
+    background-position: -100% -500%;
 }
 
 .bbl_pb_pool_label_2 {
-    background-position: -200% -600%;
+    background-position: -200% -500%;
 }
 
 .bbl_pb_pool_label_3 {
-    background-position: -300% -600%;
+    background-position: -300% -500%;
 }
 
 .bbl_pb_pool_label_4 {
-    background-position: -400% -600%;
+    background-position: -400% -500%;
 }
 
 .bbl_pb_city_label {
-    background-position: 0% -200%;
+    /** FIXME */
+    background-position: 0% 0%;
 }
 
 .bbl_pb_hand,
@@ -565,7 +555,7 @@ div.bbl_pb_zcards {
 
 .bbl_pb_zcard_label {
     display: inline-block;
-    background-position: 0% -300%;
+    background-position: 0% -600%;
 }
 
 div.bbl_pb_zcards>div {
