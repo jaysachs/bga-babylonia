@@ -16,7 +16,7 @@
 
 /* inspired from https://css-tricks.com/hexagons-and-beyond-flexible-responsive-grid-patterns-sans-media-queries/ */
 body {
-    --bbl-map-file: url(img/mapv3.jpg);
+    --bbl-map-file: url(img/mapv2.jpg);
     --bbl-sprites-file: url(img/spritesv4.png);
 
     /* current map dimensions: 3385 × 2709  */
@@ -295,7 +295,7 @@ body {
 }
 
 [bbl_piece="farmer_3"] {
-    background-position: -300% -400%;
+    background-position: -300% -600%;
 }
 
 [bbl_piece="farmer_4"] {
@@ -311,7 +311,7 @@ body {
 }
 
 [bbl_piece="merchant_3"] {
-    background-position: -200% -400%;
+    background-position: -200% -600%;
 }
 
 [bbl_piece="merchant_4"] {
@@ -327,7 +327,7 @@ body {
 }
 
 [bbl_piece="servant_3"] {
-    background-position: -0% -400%;
+    background-position: -0% -600%;
 }
 
 [bbl_piece="servant_4"] {
@@ -343,7 +343,7 @@ body {
 }
 
 [bbl_piece="priest_3"] {
-    background-position: -100% -400%;
+    background-position: -100% -600%;
 }
 
 [bbl_piece="priest_4"] {
@@ -503,35 +503,35 @@ body {
 }
 
 .bbl_pb_hand_label_1 {
-    background-position: -100% -200%;
+    background-position: -400% -200%;
 }
 
 .bbl_pb_hand_label_2 {
-    background-position: -100% -200%;
+    background-position: -400% -300%;
 }
 
 .bbl_pb_hand_label_3 {
-    background-position: -100% -300%;
+    background-position: -400% -400%;
 }
 
 .bbl_pb_hand_label_4 {
-    background-position: -100% -300%;
+    background-position: -400% -400%;
 }
 
 .bbl_pb_pool_label_1 {
-    background-position: -100% -500%;
+    background-position: -500% -200%;
 }
 
 .bbl_pb_pool_label_2 {
-    background-position: -200% -500%;
+    background-position: -500% -300%;
 }
 
 .bbl_pb_pool_label_3 {
-    background-position: -300% -500%;
+    background-position: -500% -400%;
 }
 
 .bbl_pb_pool_label_4 {
-    background-position: -400% -500%;
+    background-position: -500% -500%;
 }
 
 .bbl_pb_city_label {
