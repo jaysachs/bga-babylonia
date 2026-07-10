@@ -16,11 +16,7 @@
 
 /* inspired from https://css-tricks.com/hexagons-and-beyond-flexible-responsive-grid-patterns-sans-media-queries/ */
 body {
-    /*
-    --bbl-map-file: url(img/mapb.jpg);
-*/
-/*    --bbl-sprites-file: url(img/sprites2.png); */
-    --bbl-map-file: url(img/mapv2.jpg);
+    --bbl-map-file: url(img/mapv3.jpg);
     --bbl-sprites-file: url(img/sprites2.png);
 
     /* current map dimensions: 3385 × 2709  */
@@ -44,14 +40,6 @@ body {
     */
     --bbl-hex-height: calc(var(--bbl-board-height)/13);
     --bbl-hex-width: calc(var(--bbl-hex-ratio) * var(--bbl-hex-height));
-}
-
-body.mockup-pieces {
-    --bbl-sprites-file: url(img/sprites2.png);
-}
-body.mockup-board {
-    --bbl-map-file: url(img/other/mapv2.jpg);
-    --bbl-map-aspect-ratio: calc(3385 / 2709);
 }
 
 #bbl_main {
