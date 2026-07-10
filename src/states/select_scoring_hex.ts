@@ -1,11 +1,11 @@
-import { BGamedatas } from "../bdata";
+import { BblPlayer, BGamedatas } from "../bdata";
 import { AnimationManager } from "../bga-animations";
 import { Attrs, CSS, IDS, View } from "../view";
 import { BabyloniaState } from "./base";
 
 export class SelectScoringHexState extends BabyloniaState {
   private handler: (e: Event) => void;
-  constructor(bga: Bga<Player, BGamedatas>, view: View, animationManager: AnimationManager) {
+  constructor(bga: Bga<BblPlayer, BGamedatas>, view: View, animationManager: AnimationManager) {
     super(bga, view, animationManager);
     this.handler = (e) => this.onBoardClicked(e);
   }

@@ -1,4 +1,4 @@
-import { BGamedatas } from "../bdata";
+import { BblPlayer, BGamedatas } from "../bdata";
 import { AnimationManager } from "../bga-animations";
 import { CSS, IDS, View } from "../view";
 
@@ -21,7 +21,7 @@ export abstract class BabyloniaState {
   }
 
 
-  constructor(protected bga: Bga<Player, BGamedatas>, protected view: View, protected animationManager: AnimationManager) {}
+  constructor(protected bga: Bga<BblPlayer, BGamedatas>, protected view: View, protected animationManager: AnimationManager) {}
 
   public onEnteringState(args: any, isCurrentPlayerActive: boolean) {}
 

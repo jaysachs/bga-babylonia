@@ -1,5 +1,5 @@
 import { BaseGame } from './basegame';
-import { BGamedatas } from './bdata';
+import { BblPlayer, BGamedatas } from './bdata';
 import { View } from './view';
 import { SelectExtraTurnState } from './states/select_extra_turn';
 import { EndOfTurnScoringState } from './states/end_of_turn_scoring';
@@ -10,10 +10,10 @@ import { FinishTurnState } from './states/finish_turn';
 import { ScoreHexState } from './states/score_hex';
 
 /** Game class */
-export class Game extends BaseGame<Player, BGamedatas> {
+export class Game extends BaseGame<BblPlayer, BGamedatas> {
   private view: View;
 
-  constructor(bga: Bga<Player, BGamedatas>) {
+  constructor(bga: Bga<BblPlayer, BGamedatas>) {
     super(bga);
     this.view = new View(bga);
   }

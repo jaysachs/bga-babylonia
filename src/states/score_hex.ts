@@ -1,10 +1,10 @@
-import { BGamedatas } from "../bdata";
+import { BblPlayer, BGamedatas } from "../bdata";
 import { AnimationManager } from "../bga-animations";
 import { View } from "../view";
 import { BabyloniaState } from "./base";
 
 export class ScoreHexState extends BabyloniaState {
-  constructor(bga: Bga<Player, BGamedatas>, view: View, animationManager: AnimationManager) {
+  constructor(bga: Bga<BblPlayer, BGamedatas>, view: View, animationManager: AnimationManager) {
     super(bga, view, animationManager);
   }
 

@@ -4,6 +4,7 @@ export interface BblPlayer extends Player {
   captured_city_count: number;
   // FIXME: remove this?
   player_id: number;
+  color_index: number;
 }
 
 export type PieceType = 'empty' | 'hidden' | 'merchant' | 'priest' | 'servant' | 'farmer'

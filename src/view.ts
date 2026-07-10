@@ -27,20 +27,20 @@ export class Attrs implements AttrLike {
     return this;
   }
 
-  static piece(p: string, pl? : Player) : Attrs {
+  static piece(p: string, pl? : BblPlayer) : Attrs {
     return new Attrs().piece(p, pl);
   }
 
-  static setPiece(el: Element, p: PieceType, pl?: Player) {
+  static setPiece(el: Element, p: PieceType, pl?: BblPlayer) {
     el.setAttribute(Attrs.PIECE, Attrs.pieceVal(p, pl));
   }
 
-  /* private */ static pieceVal(p: string, pl?: Player): string {
+  /* private */ static pieceVal(p: string, pl?: BblPlayer): string {
     return (pl && p != Piece.EMPTY)
-      ? p + '_' + pl.color
+      ? p + '_' + pl.color_index
       : p;
   }
-  piece(p: string, pl?: Player): Attrs {
+  piece(p: string, pl?: BblPlayer): Attrs {
     this.r[Attrs.PIECE] = Attrs.pieceVal(p, pl);
     return this;
   }
@@ -98,7 +98,7 @@ export class View {
     private zcardTooltips = new Map<string, string>();
     private translatedPieces: Record<string,string>;
 
-    constructor(private bga: Bga<Player, BGamedatas>) {
+    constructor(private bga: Bga<BblPlayer, BGamedatas>) {
         this.translatedPieces = {};
     }
 

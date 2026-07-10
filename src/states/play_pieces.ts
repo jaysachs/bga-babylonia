@@ -1,4 +1,4 @@
-import { BGamedatas, Hex, PieceType } from "../bdata";
+import { BblPlayer, BGamedatas, Hex, PieceType } from "../bdata";
 import { AnimationManager } from "../bga-animations";
 import { Attrs, CSS, IDS, Piece, View } from "../view";
 import { indexInParent } from "../html";
@@ -16,7 +16,7 @@ export class PlayPiecesState extends BabyloniaState {
   private handHandler: (e: Event) => void;
   private boardHandler: (e: Event) => void;
 
-  constructor(bga: Bga<Player, BGamedatas>, view: View, animationManager: AnimationManager) {
+  constructor(bga: Bga<BblPlayer, BGamedatas>, view: View, animationManager: AnimationManager) {
     super(bga, view, animationManager);
     this.handHandler = (e) => this.onHandClicked(e);
     this.boardHandler = (e) => this.onBoardClicked(e);

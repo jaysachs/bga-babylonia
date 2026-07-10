@@ -158,14 +158,19 @@ class Game extends Table
 			$translated[$tiletype->value] = $tiletype->translated();
 		}
 
-        /** @var array<int,array{captured_city_count:int,hand_size:int,pool_size:int,player_id:int,score:string}> */
+        $gameinfos = $this->getGameinfos();
+        $colors = array_values($gameinfos['player_colors']);
+
+        /** @var array<int,array{captured_city_count:int,hand_size:int,pool_size:int,player_id:int,score:string,color_index:int}> */
         $players = [];
         foreach ($model->allPlayerInfo() as $pid => $pi) {
+            $color = $this->getPlayerColorById($pid);
             $players[$pid]["captured_city_count"] = $pi->captured_city_count;
             $players[$pid]["hand_size"] = $pi->hand->size();
             $players[$pid]["pool_size"] = $pi->pool->size();
             $players[$pid]["score"] = $pi->score;
             $players[$pid]["player_id"] = $pid;
+            $players[$pid]["color_index"] = array_search($color, $colors) + 1;
         }
 
         return [
@@ -205,14 +210,14 @@ class Game extends Table
         // number of colors defined here must correspond to the
         // maximum number of players allowed for the gams.
         $gameinfos = $this->getGameinfos();
-        $default_colors = array_values($gameinfos['player_colors']);
-        Arrays::shuffle($default_colors);
+        $colors = array_values($gameinfos['player_colors']);
+        Arrays::shuffle($colors);
         $query_values = [];
         foreach ($players as $player_id => $player) {
             // Now you can access both $player_id and $player array
             $query_values[] = vsprintf("('%s', '%s', '%s')", [
                 $player_id,
-                array_shift($default_colors),
+                array_shift($colors),
                 addslashes($player["player_name"]),
             ]);
         }
