@@ -279,7 +279,8 @@ body {
 }
 
 [bbl_piece="hidden_3"] {
-    background-position: -400% -400%;
+/*    background-position: -400% -400%; */
+    background-position: -400% -600%;
 }
 
 [bbl_piece="hidden_4"] {
@@ -511,11 +512,12 @@ body {
 }
 
 .bbl_pb_hand_label_3 {
-    background-position: -400% -400%;
+/*    background-position: -400% -400%; */
+    background-position: -400% -600%;
 }
 
 .bbl_pb_hand_label_4 {
-    background-position: -400% -400%;
+    background-position: -400% -500%;
 }
 
 .bbl_pb_pool_label_1 {
@@ -527,7 +529,8 @@ body {
 }
 
 .bbl_pb_pool_label_3 {
-    background-position: -500% -400%;
+/*    background-position: -500% -400%; */
+    background-position: -500% -600%;
 }
 
 .bbl_pb_pool_label_4 {

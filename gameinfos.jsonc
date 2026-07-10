@@ -73,8 +73,8 @@
     "player_colors": [
       "2c2b28", // black-ish
       "219bba", // blue-ish
-      "91381b",  // rust-ish
-      "966905"  // ochre
+      "966905",  // ochre
+      "91381b"  // rust-ish
     ],
 
     // Favorite colors support : if set to "true", support attribution of favorite colors based on player"s preferences (see reattributeColorsBasedOnPreferences PHP method)
