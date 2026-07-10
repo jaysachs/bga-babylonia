@@ -431,13 +431,13 @@ body {
     opacity: 0.5;
     background-image: var(--bbl-sprites-file);
     background-size: 700% 700%;
-    background-position: -400% -100%%;
+    background-position: -600% -500%;
 }
 
 #bbl_hand>div.bbl_selected {
     background-image: var(--bbl-sprites-file);
     background-size: 700% 700%;
-    background-position: -500% -100%;
+    background-position: -600% -200%;
 }
 
 .bbl_unimportant {
