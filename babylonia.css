@@ -17,7 +17,7 @@
 /* inspired from https://css-tricks.com/hexagons-and-beyond-flexible-responsive-grid-patterns-sans-media-queries/ */
 body {
     --bbl-map-file: url(img/mapv3.jpg);
-    --bbl-sprites-file: url(img/spritesv3.png);
+    --bbl-sprites-file: url(img/spritesv4.png);
 
     /* current map dimensions: 3385 × 2709  */
     --bbl-map-aspect-ratio: calc(3385 / 2709);
@@ -153,7 +153,7 @@ body {
 #bbl_board>div.bbl_playable::after {
     background-image: var(--bbl-sprites-file);
     background-size: 700% 700%;
-    background-position: -600% -100%;
+    background-position: -600% -200%;
     cursor: pointer;
     content: '';
     display: inline;
@@ -180,14 +180,14 @@ body {
     aspect-ratio: calc(var(--bbl-hex-ratio));
     background-image: var(--bbl-sprites-file);
     background-size: 700% 700%;
-    background-position: 0% -200%;
+    background-position: -600% -300%;
 }
 
 /* does this need the same ::after treatment as bbl_selected? */
 #bbl_board>div.bbl_in_network {
     background-image: var(--bbl-sprites-file);
     background-size: 700% 700%;
-    background-position: -500% -100%;
+    background-position: -600% -300%;
 }
 
 #pagemaintitletext span[bbl_piece] {
@@ -259,39 +259,39 @@ body {
 }
 
 [bbl_piece="ziggurat2"] {
-    background-position: -600% -500%;
+    background-position: -400% -100%;
 }
 
 [bbl_piece="ziggurat"] {
 
-    background-position: -500% -500%;
+    background-position: -500% -100%;
 }
 
 /*
  * Player piece sprites
  */
 [bbl_piece="hidden_1"] {
-    background-position: -100% -200%;
-}
-
-[bbl_piece="hidden_2"] {
-    background-position: -200% -200%;
-}
-
-[bbl_piece="hidden_3"] {
-    background-position: -300% -200%;
-}
-
-[bbl_piece="hidden_4"] {
     background-position: -400% -200%;
 }
 
+[bbl_piece="hidden_2"] {
+    background-position: -400% -300%;
+}
+
+[bbl_piece="hidden_3"] {
+    background-position: -400% -400%;
+}
+
+[bbl_piece="hidden_4"] {
+    background-position: -400% -500%;
+}
+
 [bbl_piece="farmer_1"] {
-    background-position: -200% -300%;
+    background-position: -300% -200%;
 }
 
 [bbl_piece="farmer_2"] {
-    background-position: -600% -300%;
+    background-position: -300% -300%;
 }
 
 [bbl_piece="farmer_3"] {
@@ -299,15 +299,15 @@ body {
 }
 
 [bbl_piece="farmer_4"] {
-    background-position: -400% -400%;
+    background-position: -300% -500%;
 }
 
 [bbl_piece="merchant_1"] {
-    background-position: -100% -300%;
+    background-position: -200% -200%;
 }
 
 [bbl_piece="merchant_2"] {
-    background-position: -500% -300%;
+    background-position: -200% -300%;
 }
 
 [bbl_piece="merchant_3"] {
@@ -315,15 +315,15 @@ body {
 }
 
 [bbl_piece="merchant_4"] {
-    background-position: -600% -400%;
+    background-position: -200% -500%;
 }
 
 [bbl_piece="servant_1"] {
-    background-position: -600% -200%;
+    background-position: -0% -200%;
 }
 
 [bbl_piece="servant_2"] {
-    background-position: -300% -300%;
+    background-position: -0% -300%;
 }
 
 [bbl_piece="servant_3"] {
@@ -331,23 +331,23 @@ body {
 }
 
 [bbl_piece="servant_4"] {
-    background-position: -300% -400%;
+    background-position: -0% -500%;
 }
 
 [bbl_piece="priest_1"] {
-    background-position: -0% -300%;
+    background-position: -100% -200%;
 }
 
 [bbl_piece="priest_2"] {
-    background-position: -400% -300%;
+    background-position: -100% -300%;
 }
 
 [bbl_piece="priest_3"] {
-    background-position: -500% -400%;
+    background-position: -100% -400%;
 }
 
 [bbl_piece="priest_4"] {
-    background-position: 0% -500%;
+    background-position: -100% -500%;
 }
 
 /*
