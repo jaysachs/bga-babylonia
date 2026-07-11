@@ -117,7 +117,7 @@ export class View {
 
         // FIXME: this doesn't work for spectators!
         console.log('setting up player hand', gamedatas.hand);
-        gamedatas.hand.forEach((piece, i) => {
+        gamedatas.hand?.forEach((piece, i) => {
             const hpd = this.handPosDiv(i);
             if (piece && piece != Piece.EMPTY) {
                 hpd.appendChild(this.createPieceDiv(piece, this.bga.gameui.player_id));

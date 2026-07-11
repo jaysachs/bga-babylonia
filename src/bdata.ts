@@ -28,7 +28,7 @@ export interface Zcard {
 
 export interface BGamedatas extends Gamedatas<BblPlayer> {
   board: Hex[];
-  hand: PieceType[];
+  hand: PieceType[] | undefined;
   ziggurat_cards: Zcard[];
   translated_pieces: Record<PieceType,string>;
 }

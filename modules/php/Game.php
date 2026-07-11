@@ -174,14 +174,19 @@ class Game extends Table
             $players[$pid]["color_index"] = array_search($color, $colors) + 1;
         }
 
-        return [
-            "players" => $players,
-            'hand' => array_map(
+        $pis = $model->allPlayerInfo();
+        $hand = null;
+        $cpid = intval($this->getCurrentPlayerId());
+        if (isset($pis[$cpid])) {
+            $hand = array_map(
                 function ($p) {
                     return $p->value;
                 },
-                $model->allPlayerInfo()[intval($this->getCurrentPlayerId())]->hand->pieces()
-            ),
+                $pis[$cpid]->hand->pieces());
+        }
+        return [
+            "players" => $players,
+            'hand' => $hand,
             'board' => $board_data,
             'translated_pieces' => $translated,
             'ziggurat_cards' =>
