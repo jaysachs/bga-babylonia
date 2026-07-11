@@ -158,8 +158,7 @@ class Game extends Table
 			$translated[$tiletype->value] = $tiletype->translated();
 		}
 
-        $gameinfos = $this->getGameinfos();
-        $colors = array_values($gameinfos['player_colors']);
+        $colors = array_values($this->globals->get(self::GLOBALS_PLAYER_COLORS, []));
 
         /** @var array<int,array{captured_city_count:int,hand_size:int,pool_size:int,player_id:int,score:string,color_index:int}> */
         $players = [];
@@ -198,6 +197,8 @@ class Game extends Table
         ];
     }
 
+    private const GLOBALS_PLAYER_COLORS = "player_colors";
+
     /**
      * This method is called only once, when a new game is
      *  launched. In this method, you must setup the game according to
@@ -210,7 +211,8 @@ class Game extends Table
         // number of colors defined here must correspond to the
         // maximum number of players allowed for the gams.
         $gameinfos = $this->getGameinfos();
-        $colors = array_values($gameinfos['player_colors']);
+        $colors = array_values($gameinfos[self::GLOBALS_PLAYER_COLORS]);
+        $this->globals->set("player_colors", $colors);
         Arrays::shuffle($colors);
         $query_values = [];
         foreach ($players as $player_id => $player) {
