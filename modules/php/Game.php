@@ -66,7 +66,7 @@ class GameLogger implements Logger {
 class Game extends Table
 {
 
-	public Stats $stats;
+	private Stats $stats;
     private PersistentStore $ps;
 
     public function __construct()
@@ -158,7 +158,9 @@ class Game extends Table
 			$translated[$tiletype->value] = $tiletype->translated();
 		}
 
-        $colors = array_values($this->globals->get(self::GLOBALS_PLAYER_COLORS, []));
+        /** @var string[] */
+        $orig_colors = $this->globals->get(self::GLOBALS_PLAYER_COLORS, []);
+        $colors = array_values($orig_colors);
 
         /** @var array<int,array{captured_city_count:int,hand_size:int,pool_size:int,player_id:int,score:string,color_index:int}> */
         $players = [];

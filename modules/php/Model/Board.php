@@ -50,7 +50,6 @@ class Board
         throw new \InvalidArgumentException("No hex at $rc");
     }
 
-    /** @phpstan-ignore return.unusedType */
     private function maybeHexAt(int $rc): ?Hex
     {
         if (!isset($this->hexes[$rc])) {
