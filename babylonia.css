@@ -86,12 +86,33 @@ body {
     display: flex;
     flex-direction:column;
     row-gap: calc(var(--bbl-hex-height) * 0.10);
-    background-size: 100% 100%;
+    border-radius: 20px;
+    border-style: solid;
+    border-color: black;
+    border-width: 1px;
+}
+
+#bbl_hand_title {
+    display: inline;
+    position: relative;
+    left: 10px;
+    top: 10px;
+}
+
+#bbl_available_zcards_title {
+    display: inline;
+    position: relative;
+    left: 10px;
+    top: 10px;
 }
 
 #bbl_available_zcards {
     display: grid;
     grid-template-columns: 1fr 1fr;
+    border-radius: 20px;
+    border-style: solid;
+    border-color: black;
+    border-width: 1px;
 }
 
 #bbl_main:not(.bbl_altflow) #bbl_available_zcards > div:nth-child(7) {

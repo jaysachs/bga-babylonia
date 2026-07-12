@@ -279,8 +279,8 @@ export class View {
             Html.div({id:IDS.MAIN},
                 Html.div({id: 'bbl_rightpadding'}),
                 Html.div({id: 'bbl_pieces'},
-                    Html.div({id: IDS.HAND }),
-                    Html.div({id:IDS.AVAILABLE_ZCARDS})
+                    Html.div({id: IDS.HAND, classes: "whiteblock" }),
+                    Html.div({id:IDS.AVAILABLE_ZCARDS, classes: "whiteblock" })
                 ),
                 Html.div({id:'bbl_board_container'},
                     Html.div({id:IDS.BOARD})
