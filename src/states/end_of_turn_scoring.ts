@@ -95,8 +95,7 @@ export class EndOfTurnScoringState extends BabyloniaState {
 
     let dest = (args.player_id != 0)
       ? $(IDS.citycount(args.player_id))
-      // TODO: find a better location for 'off the board' but not to any player?
-      : this.bga.gameArea.getElement();
+      : $(IDS.OFF_BOARD);
 
     await this.animationManager.slideOutAndDestroy(
       hex.firstElementChild as HTMLElement, dest, {}).then(() => {

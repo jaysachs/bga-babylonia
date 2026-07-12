@@ -53,6 +53,7 @@ export class Piece {
 export class IDS {
   static readonly AVAILABLE_ZCARDS: string = 'bbl_available_zcards';
   static readonly BOARD = 'bbl_board';
+  static readonly OFF_BOARD = 'bbl_offboard';
   static readonly HAND = 'bbl_hand';
   static readonly MAIN = 'bbl_main';
 
@@ -274,15 +275,18 @@ export class View {
     }
 
     private base_html(): HTMLElement {
-        return Html.div({id:IDS.MAIN},
-            Html.div({id: 'bbl_rightpadding'}),
-            Html.div({id: 'bbl_pieces'},
-                Html.div({id: IDS.HAND }),
-                Html.div({id:IDS.AVAILABLE_ZCARDS})
+        return Html.div({},
+            Html.div({id:IDS.MAIN},
+                Html.div({id: 'bbl_rightpadding'}),
+                Html.div({id: 'bbl_pieces'},
+                    Html.div({id: IDS.HAND }),
+                    Html.div({id:IDS.AVAILABLE_ZCARDS})
+                ),
+                Html.div({id:'bbl_board_container'},
+                    Html.div({id:IDS.BOARD})
+                )
             ),
-            Html.div({id:'bbl_board_container'},
-                Html.div({id:IDS.BOARD})
-            ),
+            Html.div({id:IDS.OFF_BOARD})
         );
     }
 
