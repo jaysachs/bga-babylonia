@@ -311,9 +311,9 @@ class PersistentStore
     public function updateExtendedHand(int $player_id, array $added): void {
         $values = [];
         foreach ($added as $pos) {
-            $value[] = "('HAND', $pos, 'empty', $player_id)";
+            $values[] = "('HAND', $pos, 'empty', $player_id)";
         }
-        $this->db->execute("INSERT INTO pieces (location, location_id, type, player_id
+        $this->db->execute("INSERT INTO pieces (location, location_id, type, player_id)
                             VALUES " . implode(',', $values));
     }
 }
