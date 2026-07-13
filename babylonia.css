@@ -589,7 +589,7 @@ div.bbl_pb_zcards {
 
 .bbl_pb_zcard_label {
     display: inline-block;
-    background-position: 0% -600%;
+    background-position: -400% -100%;
 }
 
 div.bbl_pb_zcards>div {
