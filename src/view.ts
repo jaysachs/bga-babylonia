@@ -254,14 +254,14 @@ export class View {
     }
 
     private player_board_ext(player_id: number): HTMLElement[] {
-        const color = this.bga.players.getPlayerById(player_id)?.color;
+        const colorIndex = this.bga.players.getPlayerById(player_id)?.color_index;
         return [
             Html.div({},
-                Html.span({classes:`bbl_pb_hand_label_${color}`}),
+                Html.span({classes:`bbl_pb_hand_label_${colorIndex}`}),
                 Html.span({id: IDS.handcount(player_id)}),
             ),
             Html.div({},
-                Html.span({classes:`bbl_pb_pool_label_${color}`}),
+                Html.span({classes:`bbl_pb_pool_label_${colorIndex}`}),
                 Html.span({id: IDS.poolcount(player_id)}),
             ),
             Html.div({},
