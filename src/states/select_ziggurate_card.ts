@@ -72,10 +72,8 @@ export class SelectZigguratCardState extends BabyloniaState {
       player_id: number;
       cardused: boolean;
       // points: number;
-      hex: number;
     }
   ) {
-    this.view.unmarkHexSelected(args.hex);
     const dest = $(IDS.playerBoardZcards(args.player_id));
     const zelem = $(IDS.zcard(args.zcard));
     zelem.classList.remove(CSS.SELECTED);

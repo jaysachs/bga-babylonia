@@ -33,6 +33,7 @@ use Bga\GameFramework\Table;
 use Bga\Games\babylonia\Model\Hex;
 use Bga\Games\babylonia\Model\PieceType;
 use Bga\Games\babylonia\Model\RowCol;
+use Bga\Games\babylonia\Model\ZigguratCardType;
 use Bga\Games\babylonia\States\StartTurn;
 use Bga\Games\babylonia\Utils\Arrays;
 use Bga\Games\babylonia\Utils\DefaultDb;
@@ -264,18 +265,18 @@ class Game extends Table
         return $this->tableOptions->get($option->value) > 0;
     }
 
-    public function debug_zc(string $zctype, int $points, bool $used, int $row, int $col): void {
+    public function debug_zc(string $zctype, int $points = 0, bool $used = false): void {
         $active_player_id = intval($this->getActivePlayerId());
+        $model = new Model($this->ps, $this->stats, $active_player_id);
+        $model->selectZigguratCard(ZigguratCardType::from($zctype));
         $this->notify->all(
             "zigguratCardSelection",
             clienttranslate('${player_name} chose ziggurat card ${zcard}'),
             [
                 "player_id" => $active_player_id,
-                "player_name" => $this->getPlayerNameById($active_player_id),
                 "zcard" => $zctype,
                 "cardused" => $used,
                 "points" => $points,
-                "hex" => RowCol::fromRowCol($row, $col),
             ]
         );
     }

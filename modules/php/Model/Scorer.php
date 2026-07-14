@@ -27,8 +27,6 @@ declare(strict_types=1);
 
 namespace Bga\Games\babylonia\Model;
 
-use Bga\Games\babylonia\Stats;
-
 class Scorer
 {
 
@@ -36,8 +34,7 @@ class Scorer
     public function __construct(
         private Board $board,
         private array $player_infos,
-        private Components $components,
-        private Stats $stats
+        private Components $components
     ) {}
 
     public function computeHexWinner(Hex $hex): HexWinner
@@ -78,24 +75,23 @@ class Scorer
         }
         $this->computeCapturedCityPoints($result);
 
-        $no_zc_land_result = ScoredCity::makeEmpty($hexWinner, array_keys($this->player_infos));
-        foreach (array_keys($this->player_infos) as $pid) {
+        $pid = $this->components->zigguratCardOwner(ZigguratCardType::EMPTY_CENTER_LAND_CONNECTS);
+        if ($pid > 0) {
+            $no_zc_land_result = ScoredCity::makeEmpty($hexWinner, array_keys($this->player_infos));
             $this->computeNetwork($no_zc_land_result, $pid, ZigguratCardType::EMPTY_CENTER_LAND_CONNECTS);
-        }
-
-        $no_zc_river_result = ScoredCity::makeEmpty($hexWinner, array_keys($this->player_infos));
-        foreach (array_keys($this->player_infos) as $pid) {
-            $this->computeNetwork($no_zc_river_result, $pid, ZigguratCardType::EMPTY_RIVER_CONNECTS);
-        }
-
-        foreach ($this->player_infos as $pid => $_) {
             $r8 = $result->networkPointsForPlayer($pid) - $no_zc_land_result->networkPointsForPlayer($pid);
             if ($r8 > 0) {
-                $this->stats->PLAYER_ZC_POINTS_EMPTY_CENTER_LAND->inc($pid, $r8);
+                $result->setZigguratCardPoints(ZigguratCardType::EMPTY_CENTER_LAND_CONNECTS, $r8);
             }
+        }
+
+        $pid = $this->components->zigguratCardOwner(ZigguratCardType::EMPTY_RIVER_CONNECTS);
+        if ($pid > 0) {
+            $no_zc_river_result = ScoredCity::makeEmpty($hexWinner, array_keys($this->player_infos));
+            $this->computeNetwork($no_zc_river_result, $pid, ZigguratCardType::EMPTY_RIVER_CONNECTS);
             $r9 = $result->networkPointsForPlayer($pid) - $no_zc_river_result->networkPointsForPlayer($pid);
             if ($r9 > 0) {
-                $this->stats->PLAYER_ZC_POINTS_EMPTY_RIVER->inc($pid, $r9);
+                $result->setZigguratCardPoints(ZigguratCardType::EMPTY_RIVER_CONNECTS, $r9);
             }
         }
 
@@ -132,11 +128,9 @@ class Scorer
             if ($result->hex_winner->captured_by == $pid) {
                 $points++;
             }
-            if ($pid == $this->components->zigguratCardOwner(
-                ZigguratCardType::EXTRA_CITY_POINTS
-            )) {
+            if ($pid == $this->components->zigguratCardOwner(ZigguratCardType::EXTRA_CITY_POINTS)) {
                 $extra_points = intval(floor($points / 2));
-                $this->stats->PLAYER_ZC_POINTS_EXTRA_CITY->inc($pid, $extra_points);
+                $result->setZigguratCardPoints(ZigguratCardType::EXTRA_CITY_POINTS, $extra_points);
                 $points += $extra_points;
             }
             $result->captured_city_points[$pid] = $points;

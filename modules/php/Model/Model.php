@@ -58,7 +58,7 @@ namespace Bga\Games\babylonia\Model {
 
 use Bga\GameFramework\UserException;
 use Bga\Games\babylonia\Model\ModelImpl\PlayAllowedResult;
-    use Bga\Games\babylonia\Stats;
+use Bga\Games\babylonia\Stats;
 
 class Model
 {
@@ -88,8 +88,7 @@ class Model
         return new Scorer(
             $this->board(),
             $this->allPlayerInfo(),
-            $this->components(),
-            $this->stats
+            $this->components()
         );
     }
 
@@ -482,10 +481,24 @@ class Model
             $playerInfos[$captured_by]->captured_city_count++;
         }
         // Give players points for connected pieces
-        foreach ($playerInfos as $pid => $pi) {
+        foreach ($playerInfos as $pid => $_pi) {
             $this->stats->PLAYER_POINTS_FROM_CITY_NETWORKS->inc($pid, $scoredCity->networkPointsForPlayer($pid));
             $this->stats->PLAYER_POINTS_FROM_CAPTURED_CITIES->inc($pid, $scoredCity->capturePointsForPlayer($pid));
             $this->ps->incPlayerScore($pid, $scoredCity->networkPointsForPlayer($pid) + $scoredCity->capturePointsForPlayer($pid));
+        }
+
+        $components = $this->components();
+        $pid = $components->zigguratCardOwner(ZigguratCardType::EMPTY_CENTER_LAND_CONNECTS);
+        if ($pid > 0) {
+            $this->stats->PLAYER_ZC_POINTS_EMPTY_CENTER_LAND->inc($pid, $scoredCity->zigguratCardPoints(ZigguratCardType::EMPTY_CENTER_LAND_CONNECTS));
+        }
+        $pid = $components->zigguratCardOwner(ZigguratCardType::EMPTY_RIVER_CONNECTS);
+        if ($pid > 0) {
+            $this->stats->PLAYER_ZC_POINTS_EMPTY_RIVER->inc($pid, $scoredCity->zigguratCardPoints(ZigguratCardType::EMPTY_RIVER_CONNECTS));
+        }
+        $pid = $components->zigguratCardOwner(ZigguratCardType::EXTRA_CITY_POINTS);
+        if ($pid > 0) {
+            $this->stats->PLAYER_ZC_POINTS_EXTRA_CITY->inc($pid, $scoredCity->zigguratCardPoints(ZigguratCardType::EXTRA_CITY_POINTS));
         }
 
         $_unused = $hex->captureCity();

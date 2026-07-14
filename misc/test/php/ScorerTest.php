@@ -51,8 +51,7 @@ END;
         $this->board = Board::fromTestMap($map);
         $this->scorer = new Scorer($this->board,
                                    $this->playerInfos(),
-                                   new Components([]),
-                                   Stats::createForTest());
+                                   new Components([]));
     }
 
     private function hexWinner(int $r, int $c, int $captured_by): HexWinner {

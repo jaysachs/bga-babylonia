@@ -34,15 +34,17 @@ class ScoredCity
      * all are from player_id -> ...
      * @param HexWinner $hex_winner
      * @param array<int,int> $captured_city_points
-     * @param array<int,list<Hex>> $scoringHexes,
+     * @param array<int,list<Hex>> $scoringHexes
      * @param array<int,list<Hex>> $networkHexes
+     * @param array<string,int>  $extraPointsForZigguratCard
      */
     public function __construct(
         public HexWinner $hex_winner,
         public array $captured_city_points,
         private array $scoringHexes,
-        private array $networkHexes
-    ) {}
+        private array $networkHexes,
+        private array $extraPointsForZigguratCard = []) {
+    }
 
     /** @param int[] $player_ids */
     public static function makeEmpty(HexWinner $hex_winner, array $player_ids): ScoredCity
@@ -57,6 +59,17 @@ class ScoredCity
         ksort($sc->scoringHexes);
         ksort($sc->captured_city_points);
         return $sc;
+    }
+
+    public function zigguratCardPoints(ZigguratCardType $zc): int {
+        if (isset($this->extraPointsForZigguratCard[$zc->value])) {
+            return $this->extraPointsForZigguratCard[$zc->value];
+        }
+        return 0;
+    }
+
+    public function setZigguratCardPoints(ZigguratCardType $zc, int $points): void {
+        $this->extraPointsForZigguratCard[$zc->value] = $points;
     }
 
     public function addIfInNetwork(Hex $hex, int $player_id): bool
@@ -131,6 +144,7 @@ class ScoredCity
         return $this->hex_winner == $other->hex_winner
             && $this->scoringHexes == $other->scoringHexes
             && $this->networkHexes == $other->networkHexes
-            && $this->captured_city_points == $other->captured_city_points;
+            && $this->captured_city_points == $other->captured_city_points
+            && $this->extraPointsForZigguratCard == $other->extraPointsForZigguratCard;
     }
 }
