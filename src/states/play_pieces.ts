@@ -9,10 +9,11 @@ interface PlayStateArgs {
   canEndTurn: boolean;
   allowedMoves: Record<string, number[]>;
   canUndo: boolean;
+  potentialCityScoring: Record<string, Record<string, number>>;
 }
 
 export class PlayPiecesState extends BabyloniaState {
-  private playStateArgs: PlayStateArgs| null = null;
+  private playStateArgs: PlayStateArgs | null = null;
   private handHandler: (e: Event) => void;
   private boardHandler: (e: Event) => void;
 
@@ -20,6 +21,7 @@ export class PlayPiecesState extends BabyloniaState {
     super(bga, view, animationManager);
     this.handHandler = (e) => this.onHandClicked(e);
     this.boardHandler = (e) => this.onBoardClicked(e);
+    this.cityController = new AbortController();
   }
 
   private hexForRc(rc: number): Hex | undefined {
@@ -35,11 +37,16 @@ export class PlayPiecesState extends BabyloniaState {
       this.playStateArgs = playStateArgs;
       this.view.markAllHexesUnplayable();
       this.setStatusBarForPlayState();
+      this.attachCityHandlers(playStateArgs.potentialCityScoring);
   }
 
   override onEnteringState(args: { playState: PlayStateArgs }, isCurrentPlayerActive: boolean) {
+    console.log("onEnteringState play_pieces", args, isCurrentPlayerActive);
     if (isCurrentPlayerActive) {
       this.doEnterState(args.playState);
+    } else {
+      this.playStateArgs = args.playState;
+      this.attachCityHandlers(this.playStateArgs.potentialCityScoring);
     }
   }
 
@@ -159,6 +166,26 @@ export class PlayPiecesState extends BabyloniaState {
       this.removeBoardHandler();
       this.removeHandHandler();
     }
+    this.removeCityHandlers();
+  }
+
+  private cityController: AbortController;
+  private removeCityHandlers() {
+    this.cityController?.abort();
+    this.cityController = new AbortController();
+  }
+
+  private attachCityHandlers(potentialCityScoring: Record<string, Record<string, number>>) {
+    console.log("attaching city handlers", potentialCityScoring);
+    console.log(Object.keys(potentialCityScoring));
+    const rcs = Object.keys(potentialCityScoring).map(rc => Number(rc))
+    rcs.forEach((rc) => $(IDS.hexDiv(rc)).addEventListener('click', (e) => this.showCityScore(rc), { signal: this.cityController.signal, capture: true }));
+  }
+
+  private showCityScore(rc: number) {
+    console.log("showcityScore", rc, this.playStateArgs);
+    const scores = this.playStateArgs?.potentialCityScoring[String(rc)];
+    console.log(scores);
   }
 
   private attachHandHandler() {

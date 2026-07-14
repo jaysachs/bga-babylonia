@@ -658,6 +658,25 @@ class Model
         $this->ps->updateUndoneMove($move);
         return $move;
     }
+
+    /** @return array<int,array<int,int>> */
+    public function potentialCityScoring(): array {
+        $scorer = $this->makeScorer();
+        $result = [];
+        foreach ($this->board()->allHexes() as $hex) {
+            if (!$hex->piece->isCity()) { continue; }
+            $sc = $scorer->computeCityScores($hex);
+            $detail = [];
+            foreach ($this->allPlayerInfo() as $pid => $_unused) {
+                $pts = $sc->networkPointsForPlayer($pid);
+                if ($pts > 0) {
+                    $detail[$pid] = $pts;
+                }
+            }
+            $result[$sc->hex_winner->hex->rc] = $detail;
+        }
+        return $result;
+    }
 }
 
 }

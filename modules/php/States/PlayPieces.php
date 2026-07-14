@@ -27,7 +27,6 @@ declare(strict_types=1);
 
 namespace Bga\Games\babylonia\States;
 
-use Bga\GameFramework\NotificationMessage;
 use Bga\GameFramework\StateType;
 use Bga\GameFramework\States\PossibleAction;
 use Bga\GameFramework\UserException;
@@ -55,17 +54,20 @@ class PlayPieces extends AbstractState
      * @return mixed[]
      */
     private function addStateArgs(array $args, Model $model, int $active_player_id): array {
-        $playState = [
-            "allowedMoves" => $model->getAllowedMoves(),
-            "canEndTurn" => $model->canEndTurn(),
-            "canUndo" => $model->canUndo(),
-        ];
+        $args["playState"]["potentialCityScoring"] = $model->potentialCityScoring();
 
         $priv = &$args["_private"];
         /** @phpstan-ignore offsetAccess.nonOffsetAccessible */
         $apid = &$priv[$active_player_id];
         /** @phpstan-ignore offsetAccess.nonOffsetAccessible */
-        $apid["playState"] = $playState;
+        $apid["playState"] = [
+            "allowedMoves" => $model->getAllowedMoves(),
+            "canEndTurn" => $model->canEndTurn(),
+            "canUndo" => $model->canUndo(),
+            // FIXME:need to do this because private subargs don't merge, they replace :-(
+            "potentialCityScoring" => $args["playState"]["potentialCityScoring"],
+        ];
+
         return $args;
     }
 
