@@ -136,7 +136,7 @@ class ScoreHex extends AbstractState
         $details = [];
         foreach ($player_infos as $pid => $pi) {
             $points = $scored_city->pointsForPlayer($pid);
-            $details[$pid] = [
+            $details[] = [
                 "player_id" => $pid,
                 "captured_city_count" => $pi->captured_city_count,
                 "scored_locations" => $scored_city->scoringLocationsForPlayer($pid),

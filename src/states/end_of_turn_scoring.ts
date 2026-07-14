@@ -66,8 +66,8 @@ export class EndOfTurnScoringState extends BabyloniaState {
     const hex = $(IDS.hexDiv(args.rc));
 
     let aa = this.animationManager.animationsActive();
-    for (const playerId in args.details) {
-      const details = args.details[playerId]!;
+    for (const details of args.details) {
+      // const details = args.details[playerId]!;
       if (aa) {
         for (const nh of details.network_locations) {
           let cl =  this.view.hexDiv(nh).classList;
@@ -79,7 +79,7 @@ export class EndOfTurnScoringState extends BabyloniaState {
         await this.animationManager.displayScoring(
           hex,
           details.network_points,
-          this.bga.gameui.gamedatas.players[playerId]!.color,
+          this.bga.gameui.gamedatas.players[details.player_id]!.color,
           { extraClass: 'bbl_city_scoring' });
         details.network_locations.forEach(
           (rc: number) => {
@@ -100,8 +100,7 @@ export class EndOfTurnScoringState extends BabyloniaState {
     await this.animationManager.slideOutAndDestroy(
       hex.firstElementChild as HTMLElement, dest, {}).then(() => {
         this.view.unmarkHexSelected(args.rc);
-        for (const playerId in args.details) {
-          const details = args.details[playerId]!;
+        for (const details of args.details) {
           this.bga.playerPanels.getScoreCounter(details.player_id).incValue(details.capture_points);
           this.view.updateCapturedCityCount(details);
         }
