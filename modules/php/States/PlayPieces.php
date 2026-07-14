@@ -188,11 +188,11 @@ class PlayPieces extends AbstractState
         // Find empty land spaces. River play is so situational that we just don't do it.
         /** @var list<int> */
         $rcs = [];
-        $model->board()->visitAll(function (Hex $hex) use (&$rcs): void {
+        foreach ($model->board()->allHexes() as $hex) {
             if ($hex->piece->isEmpty() && !$hex->isWater()) {
                 $rcs[] = $hex->rc;
             }
-        });
+        }
         Arrays::shuffle($rcs);
         return $this->actPlayPiece($playerId, $handpos, $rcs[0]);
 

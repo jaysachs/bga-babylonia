@@ -144,16 +144,14 @@ class Game extends Table
 
         /** @var list<array{row:int,col:int,hextype:string,piece:string,board_player:int}> */
         $board_data = [];
-        $model->board()->visitAll(
-            function (Hex &$hex) use (&$board_data) {
-                $board_data[] = [
-                    "rc" => $hex->rc,
-                    "terrain" => $hex->terrain->value,
-                    "piece" => $hex->piece->value,
-                    "board_player" => $hex->player_id,
-                ];
-            }
-        );
+        foreach ($model->board()->allHexes() as $hex) {
+            $board_data[] = [
+                "rc" => $hex->rc,
+                "terrain" => $hex->terrain->value,
+                "piece" => $hex->piece->value,
+                "board_player" => $hex->player_id,
+            ];
+        }
 		$translated = [];
 		foreach (PieceType::cases() as $tiletype) {
 			$translated[$tiletype->value] = $tiletype->translated();

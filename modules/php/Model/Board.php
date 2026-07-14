@@ -63,7 +63,7 @@ class Board
         $lines = [];
         $row = -1;
         $col = -2;
-        $this->visitAll(function (Hex $hex) use (&$row, &$col, &$lines): void {
+        foreach ($this->allHexes() as $hex) {
             if (RowCol::row($hex->rc) != $row) {
                 $lines[] = [];
                 $row = RowCol::row($hex->rc);
@@ -106,7 +106,7 @@ class Board
                 PieceType::HIDDEN => 'h-' . $hex->player_id,
             };
             $lines[$z][] = $r;
-        });
+        }
 
         $x = '';
         $row = 0;
@@ -300,18 +300,18 @@ END;
     public function cityCount(): int
     {
         $city_count = 0;
-        $this->visitAll(function (Hex $hex) use (&$city_count): void {
+        foreach ($this->allHexes() as $hex) {
             if ($hex->piece->isCity()) {
                 $city_count++;
             }
-        });
+        }
         return $city_count;
     }
 
-    public function visitAll(\Closure $visit): void
-    {
+    /** @return \Generator<int, Hex, Hex, void> */
+    public function allHexes() : \Generator {
         foreach ($this->hexes as $hex) {
-            $visit($hex);
+            yield $hex;
         }
     }
 
@@ -379,7 +379,7 @@ END;
     public function touchedZiggurats(int $player_id): array
     {
         $adjacent = [];
-        $this->visitAll(function (Hex $hex) use ($player_id, &$adjacent): void {
+        foreach ($this->allHexes() as $hex) {
             if ($hex->piece == PieceType::ZIGGURAT) {
                 $nb = $this->neighbors($hex, function (Hex $nh) use ($player_id): bool {
                     return $nh->player_id == $player_id;
@@ -388,7 +388,7 @@ END;
                     $adjacent[] = $hex->rc;
                 }
             }
-        });
+        }
         return $adjacent;
     }
 

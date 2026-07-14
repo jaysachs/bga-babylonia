@@ -84,14 +84,14 @@ class PersistentStore
     /** @param array<int,PlayerInfo> $pinfos */
     public function insertAll(Board $board, Components $components, array $pinfos): void {
         $sql_values = [];
-        $board->visitAll(function (Hex $hex) use (&$sql_values) {
+        foreach ($board->allHexes() as $hex) {
             $piece = $hex->piece->value;
             $player_id = $hex->player_id;
             $sc = self::boolValue($hex->scored);
             $t = $hex->terrain->value;
             $rc = $hex->rc;
             $sql_values[] = "('BOARD', $rc, '$piece', $player_id, $sc, '$t')";
-        });
+        }
 
         foreach ($components->allZigguratCards() as $id => $zc) {
             $t = $zc->type->value;

@@ -236,7 +236,7 @@ class Model
             $result[$piece->value] = [];
         }
         $handPieces = array_filter($allPieces, fn ($p) => $hand->contains($p));
-        $this->board()->visitAll(function (Hex $hex) use (&$result, &$handPieces, &$allPieces): void {
+        foreach ($this->board()->allHexes() as $hex) {
             $all = count(array_filter($allPieces, fn ($p) => $this->checkPlay($this->player_id, $p, $hex)->isAllowed()))
                     == count($allPieces);
             if ($all) {
@@ -249,7 +249,7 @@ class Model
                     }
                 }
             }
-        });
+        }
         return array_filter($result, fn ($am) => count($am) > 0);
     }
 
@@ -543,13 +543,11 @@ class Model
             }
             throw new \InvalidArgumentException("hex should be a city or ziggurat but is $hex");
         };
-        $this->board()->visitAll(
-            function (Hex $hex) use (&$result, $val) {
-                if ($this->hexRequiresScoring($hex)) {
-                    $result[$hex->rc] = [$hex->rc, $val($hex)];
-                }
+        foreach ($this->board()->allHexes() as $hex) {
+            if ($this->hexRequiresScoring($hex)) {
+                $result[$hex->rc] = [$hex->rc, $val($hex)];
             }
-        );
+        }
         usort(
             $result,
             /**
