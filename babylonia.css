@@ -90,20 +90,22 @@ body {
     border-style: solid;
     border-color: black;
     border-width: 1px;
+    background-color: #ffffff80;
+    padding: 20px;
 }
 
 #bbl_hand_title {
     display: inline;
     position: relative;
     left: 10px;
-    top: 10px;
+    top: 0px;
 }
 
 #bbl_available_zcards_title {
     display: inline;
     position: relative;
     left: 10px;
-    top: 10px;
+    top: 0px;
 }
 
 #bbl_available_zcards {
@@ -113,6 +115,8 @@ body {
     border-style: solid;
     border-color: black;
     border-width: 1px;
+    background-color: #ffffff80;
+    padding: 10px;
 }
 
 #bbl_main:not(.bbl_altflow) #bbl_available_zcards > div:nth-child(7) {

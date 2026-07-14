@@ -281,11 +281,11 @@ export class View {
                 Html.div({id: 'bbl_pieces'},
                     Html.div({id: "bbl_hand_container"},
                         Html.span({id: "bbl_hand_title", text: _("Hand")}),
-                        Html.div({id: IDS.HAND, classes: "whiteblock" })
+                        Html.div({id: IDS.HAND })
                     ),
                     Html.div({id:"bbl_available_zcards_container"},
                         Html.span({id: "bbl_available_zcards_title", text: _("Ziggurat Cards")}),
-                        Html.div({id:IDS.AVAILABLE_ZCARDS, classes: "whiteblock" })
+                        Html.div({id:IDS.AVAILABLE_ZCARDS })
                     )
                 ),
                 Html.div({id:'bbl_board_container'},
