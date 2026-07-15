@@ -109,7 +109,7 @@ export class PlayPiecesState extends BabyloniaState {
         .then(() => this.bga.playerPanels.getScoreCounter(args.player_id).incValue(args.points));
 
     this.view.updateHandCount(args);
-    if (args.playState) {
+    if (args.playState?.allowedMoves) {
       this.doEnterState(args.playState);
     }
   }
@@ -156,7 +156,7 @@ export class PlayPiecesState extends BabyloniaState {
       this.bga.playerPanels.getScoreCounter(args.player_id).incValue(-args.points);
     });
 
-    if (args.playState) {
+    if (args.playState?.allowedMoves) {
       this.doEnterState(args.playState);
     };
   }
