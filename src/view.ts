@@ -217,10 +217,12 @@ export class View {
             if (zcard.used) {
                 zelem.setAttribute(Attrs.ZUSED, "");
             }
+            const zcont = Html.div({});
+            available.appendChild(zcont);
             if (zcard.owning_player_id != 0) {
                 $(IDS.playerBoardZcards(zcard.owning_player_id)).appendChild(zelem);
             } else {
-                available.appendChild(zelem);
+                zcont.appendChild(zelem);
             }
             this.zcardTooltips.set(zcard.type, zcard.tooltip);
             this.bga.gameui.addTooltip(zelem.id, zcard.tooltip, '');

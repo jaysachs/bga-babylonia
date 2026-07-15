@@ -177,9 +177,8 @@ export class PlayPiecesState extends BabyloniaState {
 
   private attachCityHandlers(potentialCityScoring: Record<string, Record<string, number>>) {
     console.log("attaching city handlers", potentialCityScoring);
-    console.log(Object.keys(potentialCityScoring));
-    const rcs = Object.keys(potentialCityScoring).map(rc => Number(rc))
-    rcs.forEach((rc) => $(IDS.hexDiv(rc)).addEventListener('click', (e) => this.showCityScore(rc), { signal: this.cityController.signal, capture: true }));
+    const rcs = Object.keys(potentialCityScoring).map(Number)
+    rcs.forEach((rc) => $(IDS.hexDiv(rc)).firstElementChild?.addEventListener('pointerover', (e) => this.showCityScore(rc), { signal: this.cityController.signal, capture: true }));
   }
 
   private showCityScore(rc: number) {

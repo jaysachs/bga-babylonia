@@ -383,10 +383,8 @@ body {
 [bbl_ztype] {
     background-size: 900% 100%;
     background-image: url(img/zcards.png);
-
     height: calc(1*var(--bbl-hex-height));
     width: calc(.8*var(--bbl-hex-height));
-
 }
 
 [bbl_ztype=""] {
@@ -472,8 +470,6 @@ body {
 /* available ziggurat cards panel */
 
 #bbl_available_zcards>div {
-    border-color: transparent;
-    clip-path: padding-box;
     display: inline-block;
     margin: 1px;
 }
@@ -484,8 +480,20 @@ body {
 }
 
 
-#bbl_available_zcards.bbl_selecting>div[bbl_ztype] {
+#bbl_available_zcards.bbl_selecting>div>div[bbl_ztype] {
     cursor: pointer;
+}
+
+#bbl_available_zcards>div {
+    height: calc(1*var(--bbl-hex-height));
+    width: calc(.8*var(--bbl-hex-height));
+    border-style: dashed;
+    border-width: 1px;
+    border-color: transparent;
+}
+
+#bbl_available_zcards>div:not(:has(>div)) {
+    border-color: black;
 }
 
 /*

@@ -76,6 +76,7 @@ export class SelectZigguratCardState extends BabyloniaState {
   ) {
     const dest = $(IDS.playerBoardZcards(args.player_id));
     const zelem = $(IDS.zcard(args.zcard));
+
     zelem.classList.remove(CSS.SELECTED);
     await this.animationManager.slideAndAttach(zelem, dest, { toPlaceholder: 'off' })
         .then(() => {
