@@ -430,7 +430,7 @@ body {
     background-size: 900% 100%;
     background-image: url(img/zcards.png);
    */
-    background-size: 100%;
+    background-size: contain;
     height: calc(1*var(--bbl-hex-height));
     width: calc(.8*var(--bbl-hex-height));
 }
@@ -683,7 +683,7 @@ div.bbl_pb_zcards>div {
     display: inline-block;
     margin: 3px;
     height: calc(var(--bbl-label-height));
-    width: calc(var(--bbl-label-height) * 0.67);
+    width: calc(var(--bbl-label-height) * 0.8);
 }
 
 /*
