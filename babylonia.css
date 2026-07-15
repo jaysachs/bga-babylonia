@@ -40,6 +40,8 @@ body {
     */
     --bbl-hex-height: calc(var(--bbl-board-height)/13);
     --bbl-hex-width: calc(var(--bbl-hex-ratio) * var(--bbl-hex-height));
+
+    --bbl-zcard-aspect-ratio: 0.8;
 }
 
 #bbl_main {
@@ -91,7 +93,7 @@ body {
     border-color: black;
     border-width: 1px;
     background-color: #ffffff80;
-    padding: 20px;
+    padding: 27px;
 }
 
 #bbl_hand_title {
@@ -432,7 +434,8 @@ body {
    */
     background-size: contain;
     height: calc(1*var(--bbl-hex-height));
-    width: calc(.8*var(--bbl-hex-height));
+    width: auto;
+    aspect-ratio: var(--bbl-zcard-aspect-ratio);
 }
 
 [bbl_ztype=""] {
@@ -550,8 +553,9 @@ body {
 }
 
 #bbl_available_zcards>div {
-    height: calc(1*var(--bbl-hex-height));
-    width: calc(.8*var(--bbl-hex-height));
+    height: calc(var(--bbl-hex-height));
+    width: auto;
+    aspect-ratio: var(--bbl-zcard-aspect-ratio);
     border-style: dashed;
     border-width: 1px;
     border-color: transparent;
@@ -683,7 +687,8 @@ div.bbl_pb_zcards>div {
     display: inline-block;
     margin: 3px;
     height: calc(var(--bbl-label-height));
-    width: calc(var(--bbl-label-height) * 0.8);
+    width: auto;
+    aspect-ratio: var(--bbl-zcard-aspect-ratio);
 }
 
 /*
