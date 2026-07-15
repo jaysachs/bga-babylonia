@@ -111,7 +111,7 @@ body {
 #bbl_available_zcards {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    border-radius: 20px;
+    border-radius: 10px;
     border-style: solid;
     border-color: black;
     border-width: 1px;
@@ -289,7 +289,7 @@ body {
 
 [bbl_piece="ziggurat"] {
 
-    background-position: -500% -100%;
+    background-position: -600% -100%;
 }
 
 /*
