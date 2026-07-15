@@ -16,7 +16,7 @@
 
 /* inspired from https://css-tricks.com/hexagons-and-beyond-flexible-responsive-grid-patterns-sans-media-queries/ */
 body {
-    --bbl-map-file: url(img/mapv2.jpg);
+    --bbl-map-file: url(img/map.jpg);
     --bbl-sprites-file: url(img/spritesv4.png);
 
     /* current map dimensions: 3385 × 2709  */
@@ -176,9 +176,12 @@ body {
 }
 
 #bbl_board>div.bbl_playable::after {
+    /*
     background-image: var(--bbl-sprites-file);
     background-size: 700% 700%;
     background-position: -600% -200%;
+   */
+    background-image: url(img/hand_highlight.png);
     cursor: pointer;
     content: '';
     display: inline;
@@ -203,16 +206,22 @@ body {
     top: 0;
     height: calc(var(--bbl-hex-height));
     aspect-ratio: calc(var(--bbl-hex-ratio));
+    /*
     background-image: var(--bbl-sprites-file);
     background-size: 700% 700%;
     background-position: -600% -300%;
+   */
+    background-image: url(img/hex_highlight.png);
 }
 
 /* does this need the same ::after treatment as bbl_selected? */
 #bbl_board>div.bbl_in_network {
+    /*
     background-image: var(--bbl-sprites-file);
     background-size: 700% 700%;
     background-position: -600% -300%;
+   */
+    background-image: url(img/hex_highlight.png);
 }
 
 #pagemaintitletext span[bbl_piece] {
@@ -224,8 +233,10 @@ body {
 [bbl_piece] {
     aspect-ratio: calc(var(--bbl-hex-ratio));
     clip-path: none;
+    background-size: 100%;
+    /*
     background-image: var(--bbl-sprites-file);
-    background-size: 700% 700%;
+    background-size: 700% 700%; */
     /*
     filter:
         drop-shadow(2px -2px #573404)
@@ -240,140 +251,174 @@ body {
  * Cities and fields sprites
  */
 [bbl_piece="city_m"] {
+    /*
     background-position: -100% 0%;
+   */
+    background-image: url(img/City-T-2.png);
+
 }
 
 [bbl_piece="city_p"] {
-    background-position: 0% 0%;
+    /* background-position: 0% 0%; */
+    background-image: url(img/City-T-1.png);
 }
 
 [bbl_piece="city_s"] {
-    background-position: -200% 0%;
+    /* background-position: -200% 0%; */
+    background-image: url(img/City-T-3.png);
 }
 
 [bbl_piece="city_mp"] {
-    background-position: -300% 0%;
+    /* background-position: -300% 0%; */
+    background-image: url(img/City-T-4.png);
 }
 
 [bbl_piece="city_ms"] {
-    background-position: -500% 0%;
+    /*background-position: -500% 0%; */
+    background-image: url(img/City-T-6.png);
 }
 
 [bbl_piece="city_sp"] {
-    background-position: -400% 0%;
+    /* background-position: -400% 0%; */
+    background-image: url(img/City-T-5.png);
 }
 
 [bbl_piece="city_msp"] {
-    background-position: -600% 0%;
+    /* background-position: -600% 0%; */
+    background-image: url(img/City-T-7.png);
 }
 
 [bbl_piece="field_5"] {
-    background-position: 0% -100%;
+    /* background-position: 0% -100%; */
+    background-image: url(img/Crop-T-5.png);
 }
 
 [bbl_piece="field_6"] {
-    background-position: -100% -100%;
+    /*background-position: -100% -100%; */
+    background-image: url(img/Crop-T-6.png);
 }
 
 [bbl_piece="field_7"] {
-    background-position: -200% -100%;
+    /* background-position: -200% -100%; */
+    background-image: url(img/Crop-T-7.png);
 }
 
 [bbl_piece="field_x"] {
-    background-position: -300% -100%;
+    /* background-position: -300% -100%; */
+    background-image: url(img/Crop-T-c.png);
 }
 
 [bbl_piece="ziggurat2"] {
-    background-position: -400% -100%;
+    /* background-position: -400% -100%; */
+    background-image: url(img/Ziggurat-T-1.png);
 }
 
 [bbl_piece="ziggurat"] {
-
-    background-position: -600% -100%;
+    /* background-position: -600% -100%; */
+    background-image: url(img/Ziggurat-T-3.png);
 }
 
 /*
  * Player piece sprites
  */
 [bbl_piece="hidden_1"] {
-    background-position: -400% -200%;
+    /* background-position: -400% -200%; */
+    background-image: url(img/P-1-hidden.png);
 }
 
 [bbl_piece="hidden_2"] {
-    background-position: -400% -300%;
+    /* background-position: -400% -300%;*/
+    background-image: url(img/P-2-hidden.png);
 }
 
 [bbl_piece="hidden_3"] {
-/*    background-position: -400% -400%; */
-    background-position: -400% -600%;
+    /* background-position: -400% -600%;*/
+    background-image: url(img/P-3-hidden.png);
 }
 
 [bbl_piece="hidden_4"] {
-    background-position: -400% -500%;
+    /* background-position: -400% -500%; */
+    background-image: url(img/P-4-hidden.png);
 }
 
 [bbl_piece="farmer_1"] {
-    background-position: -300% -200%;
+    /* background-position: -300% -200%; */
+    background-image: url(img/P-1-farmer.png);
 }
 
 [bbl_piece="farmer_2"] {
-    background-position: -300% -300%;
+/*    background-position: -300% -300%; */
+    background-image: url(img/P-2-farmer.png);
 }
 
 [bbl_piece="farmer_3"] {
-    background-position: -300% -600%;
+/*    background-position: -300% -600%; */
+    background-image: url(img/P-3-farmer.png);
 }
 
 [bbl_piece="farmer_4"] {
-    background-position: -300% -500%;
+/*     background-position: -300% -500%;*/
+    background-image: url(img/P-4-farmer.png);
 }
 
 [bbl_piece="merchant_1"] {
-    background-position: -200% -200%;
+    /*background-position: -200% -200%; */
+    background-image: url(img/P-1-merchant.png);
 }
 
 [bbl_piece="merchant_2"] {
-    background-position: -200% -300%;
+    /*background-position: -200% -300%; */
+    background-image: url(img/P-2-merchant.png);
 }
 
 [bbl_piece="merchant_3"] {
-    background-position: -200% -600%;
+    /* background-position: -200% -600%; */
+    background-image: url(img/P-3-merchant.png);
 }
 
 [bbl_piece="merchant_4"] {
-    background-position: -200% -500%;
+    /* background-position: -200% -500%; */
+    background-image: url(img/P-4-merchant.png);
 }
 
 [bbl_piece="servant_1"] {
-    background-position: -0% -200%;
+    /*background-position: -0% -200%;*/
+    background-image: url(img/P-1-servant.png);
 }
 
 [bbl_piece="servant_2"] {
-    background-position: -0% -300%;
+    /*background-position: -0% -300%;*/
+    background-image: url(img/P-2-servant.png);
 }
 
 [bbl_piece="servant_3"] {
-    background-position: -0% -600%;
+    /* background-position: -0% -600%; */
+    background-image: url(img/P-3-merchant.png);
 }
 
 [bbl_piece="servant_4"] {
-    background-position: -0% -500%;
+    /* background-position: -0% -500%;*/
+    background-image: url(img/P-4-merchant.png);
 }
 
 [bbl_piece="priest_1"] {
-    background-position: -100% -200%;
+    /*background-position: -100% -200%; */
+    background-image: url(img/P-1-priest.png);
 }
 
 [bbl_piece="priest_2"] {
-    background-position: -100% -300%;
+    /*background-position: -100% -300%;*/
+    background-image: url(img/P-2-priest.png);
 }
 
 [bbl_piece="priest_3"] {
-    background-position: -100% -600%;
+    /*background-position: -100% -600%;*/
+    background-image: url(img/P-3-priest.png);
 }
 
 [bbl_piece="priest_4"] {
-    background-position: -100% -500%;
+    /*background-position: -100% -500%; */
+    background-image: url(img/P-4-priest.png);
 }
 
 /*
@@ -381,8 +426,11 @@ body {
  */
 /* button.action-button[bbl_ztype], */
 [bbl_ztype] {
+    /*
     background-size: 900% 100%;
     background-image: url(img/zcards.png);
+   */
+    background-size: 100%;
     height: calc(1*var(--bbl-hex-height));
     width: calc(.8*var(--bbl-hex-height));
 }
@@ -392,44 +440,54 @@ body {
 }
 
 [bbl_zused] {
-    background-image: repeating-linear-gradient(45deg, rgb(127 127 127 / 90%), rgb(127 127 127 / 80%) 2px, transparent 2px, transparent 4px),
-        url(img/zcards.png);
+    background-image: repeating-linear-gradient(45deg, rgb(127 127 127 / 90%), rgb(127 127 127 / 80%) 2px, transparent 2px, transparent 4px)
+                      /*                      ,        url(img/zcards.png) */
+    ;
 }
 
 [bbl_ztype="zc_10pts"] {
-    background-position: 0% 0%;
+    /*background-position: 0% 0%;*/
+    background-image: url(img/ZigCard-1.png);
 }
 
 [bbl_ztype="zc_xturn"] {
-    background-position: -100% 0%;
+    /*background-position: -100% 0%;*/
+    background-image: url(img/ZigCard-2.png);
 }
 
 [bbl_ztype="zc_hand7"] {
-    background-position: -200% 0%;
+    /*background-position: -200% 0%;*/
+    background-image: url(img/ZigCard-3.png);
 }
 
 [bbl_ztype="zc_3nobles"] {
-    background-position: -300% 0%;
+    /*background-position: -300% 0%;*/
+    background-image: url(img/ZigCard-4.png);
 }
 
 [bbl_ztype="zc_3farmers"] {
-    background-position: -400% 0%;
+    /*background-position: -400% 0%;*/
+    background-image: url(img/ZigCard-5.png);
 }
 
 [bbl_ztype="zc_fields"] {
-    background-position: -500% 0%;
+    /*background-position: -500% 0%;*/
+    background-image: url(img/ZigCard-6.png);
 }
 
 [bbl_ztype="zc_citypts"] {
-    background-position: -600% 0%;
+    /*background-position: -600% 0%;*/
+    background-image: url(img/ZigCard-7.png);
 }
 
 [bbl_ztype="zc_land"] {
-    background-position: -700% 0%;
+    /*background-position: -700% 0%;*/
+    background-image: url(img/ZigCard-8.png);
 }
 
 [bbl_ztype="zc_river"] {
-    background-position: -800% 0%;
+    /*    background-position: -800% 0%;*/
+    background-image: url(img/ZigCard-9.png);
 }
 
 
@@ -452,15 +510,22 @@ body {
 .bbl_unplayable {
     cursor: not-allowed;
     opacity: 0.5;
+    /*
     background-image: var(--bbl-sprites-file);
     background-size: 700% 700%;
     background-position: -600% -500%;
+   */
+    background-image: url(img/empty_hand.png);
+
 }
 
 #bbl_hand>div.bbl_selected {
+    background-image: url(img/hand_highlight.png);
+    /*
     background-image: var(--bbl-sprites-file);
     background-size: 700% 700%;
     background-position: -600% -200%;
+*/
 }
 
 .bbl_unimportant {
@@ -532,47 +597,57 @@ body {
 .bbl_pb_zcard_label {
     width: calc(var(--bbl-label-width));
     height: calc(var(--bbl-label-height));
+    background-size: 100%;
+    /*
     background-image: var(--bbl-sprites-file);
     background-size: 700% 700%;
+*/
 }
 
 .bbl_pb_hand_label_1 {
-    background-position: -400% -200%;
+    /*background-position: -400% -200%;*/
+    background-image: url(img/P-1-hidden.png);
 }
 
 .bbl_pb_hand_label_2 {
-    background-position: -400% -300%;
+    /*background-position: -400% -300%;*/
+    background-image: url(img/P-2-hidden.png);
 }
 
 .bbl_pb_hand_label_3 {
-/*    background-position: -400% -400%; */
-    background-position: -400% -600%;
+    /*background-position: -400% -600%; */
+    background-image: url(img/P-3-hidden.png);
 }
 
 .bbl_pb_hand_label_4 {
-    background-position: -400% -500%;
+    /*background-position: -400% -500%; */
+    background-image: url(img/P-4-hidden.png);
 }
 
 .bbl_pb_pool_label_1 {
-    background-position: -500% -200%;
+    background-image: url(img/P-1-pool.png);
+/*    background-position: -500% -200%; */
 }
 
 .bbl_pb_pool_label_2 {
-    background-position: -500% -300%;
+    background-image: url(img/P-2-pool.png);
+/*    background-position: -500% -300%; */
 }
 
 .bbl_pb_pool_label_3 {
-/*    background-position: -500% -400%; */
-    background-position: -500% -600%;
+    background-image: url(img/P-3-pool.png);
+    /*background-position: -500% -600%;*/
 }
 
 .bbl_pb_pool_label_4 {
-    background-position: -500% -500%;
+    background-image: url(img/P-4-pool.png);
+    /* background-position: -500% -500%;*/
 }
 
 .bbl_pb_city_label {
+    background-image: url(img/City-T-1.png);
     /** FIXME */
-    background-position: 0% 0%;
+    /* background-position: 0% 0%; */
 }
 
 .bbl_pb_hand,
