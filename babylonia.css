@@ -184,6 +184,7 @@ body {
     background-position: -600% -200%;
    */
     background-image: url(img/hand_highlight.png);
+    background-size: 100%;
     cursor: pointer;
     content: '';
     display: inline;
@@ -213,7 +214,8 @@ body {
     background-size: 700% 700%;
     background-position: -600% -300%;
    */
-    background-image: url(img/hex_highlight.png);
+    background-image: url(img/hex_scoring.png);
+    background-size: 100%;
 }
 
 /* does this need the same ::after treatment as bbl_selected? */
@@ -224,6 +226,7 @@ body {
     background-position: -600% -300%;
    */
     background-image: url(img/hex_highlight.png);
+    background-size: 100%;
 }
 
 #pagemaintitletext span[bbl_piece] {
