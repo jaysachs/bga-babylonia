@@ -162,7 +162,7 @@ export class View {
         }
 
         // "vertical" "alt" layout
-        var h2 = vertAvail * 0.875;
+        var h2 = vertAvail * 0.85;
         var w2 = h2 / View.map_aspect_ratio;
         if (w2 > pageRect.width) {
             w2 = pageRect.width - 12;
