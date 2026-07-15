@@ -23,7 +23,9 @@ export class Attrs implements AttrLike {
     return new Attrs().zused(u);
   }
   zused(u: boolean): Attrs {
-    this.r[Attrs.ZUSED] = ""+u;
+    if (u) {
+        this.r[Attrs.ZUSED] = "";
+    }
     return this;
   }
 
@@ -211,12 +213,7 @@ export class View {
     private setupZcards(zcards: Zcard[]): void {
         const available = $(IDS.AVAILABLE_ZCARDS);
         for (let zcard of zcards) {
-            const zelem = Html.div({});
-            zelem.id = IDS.zcard(zcard.type);
-            zelem.setAttribute(Attrs.ZTYPE, zcard.type);
-            if (zcard.used) {
-                zelem.setAttribute(Attrs.ZUSED, "");
-            }
+            const zelem = Html.div({id: IDS.zcard(zcard.type), attrs: Attrs.ztype(zcard.type).zused(zcard.used)});
             const zcont = Html.div({});
             available.appendChild(zcont);
             if (zcard.owning_player_id != 0) {
@@ -231,9 +228,9 @@ export class View {
 
     private updateCounter(counter: Counter, value: number, animate: boolean) {
         if (animate) {
-        counter.toValue(value);
+            counter.toValue(value);
         } else {
-        counter.setValue(value);
+            counter.setValue(value);
         }
     }
 

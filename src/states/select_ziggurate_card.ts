@@ -82,7 +82,7 @@ export class SelectZigguratCardState extends BabyloniaState {
         .then(() => {
           // this.bga.playerPanels.getScoreCounter(args.player_id).incValue(args.points);
           if (args.cardused) {
-            zelem.setAttribute(Attrs.ZUSED, "true");
+            zelem.setAttribute(Attrs.ZUSED, "");
           }
         });
   }
