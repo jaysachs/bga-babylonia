@@ -81,7 +81,7 @@ function selectHex(event) {
     }
     if (e.parentElement != null) {
         let x = e.id.split("_");
-        console.log("selected hex " + x[2] + ", " + x[3]);
+        console.log("selected hex " + x[2]);
         // e.classList.toggle("selected");
         cycleThings(e);
     }
@@ -204,6 +204,174 @@ const View = {
 
 const CSS = {
     LAYOUT_UNDER_BOARD: 'bbl_altflow'
+}
+
+function clearMap() {
+    document.querySelectorAll('#bbl_board > div > div').forEach(e => e.remove());
+    document.querySelectorAll('#bbl_board > div').forEach(e => e.classList = []);
+}
+
+function hexDiv(rc) {
+    return document.getElementById(`bbl_hex_${rc}`);
+}
+
+function setPiece(rc, piece) {
+    const hex = hexDiv(rc);
+    if (!hex.firstElementChild) {
+        hex.append(document.createElement('div'));
+    }
+    hex.firstElementChild.setAttribute('bbl_piece', piece);
+}
+
+function initialize2p() {
+}
+
+function shuffleArray(array) {
+    for (var i = array.length - 1; i > 0; i--) {
+        var j = Math.floor(Math.random() * (i + 1));
+        var temp = array[i];
+        array[i] = array[j];
+        array[j] = temp;
+    }
+}
+
+function rowcol(row, col) { return row * 100 + col; }
+
+const river = [
+    rowcol(2,2),
+    rowcol(4,2),
+    rowcol(6,2),
+    rowcol(7,3),
+    rowcol(8,4),
+    rowcol(9,5),
+    rowcol(11,5),
+    rowcol(13,5),
+    rowcol(15,5),
+    rowcol(17,5),
+    rowcol(18,4),
+    rowcol(17,3),
+    rowcol(16,2),
+    rowcol(15,1),
+    rowcol(16,0),
+    rowcol(18,0),
+    rowcol(20,0),
+
+    rowcol(0, 8),
+    rowcol(2,8),
+    rowcol(4,8),
+    rowcol(5,9),
+    rowcol(6,10),
+    rowcol(8,10),
+    rowcol(10,10),
+    rowcol(12,10),
+    rowcol(14,10),
+    rowcol(15,9),
+    rowcol(17,9),
+    rowcol(19,9),
+    rowcol(20,10),
+    rowcol(22,10),
+
+];
+
+function addRandomPieces(n, p) {
+    console.log(river);
+    const vacant = Array.from(document.querySelectorAll('#bbl_board > div:not(:has(div))')).map(e => e.id.split('_')[2]);
+    shuffleArray(vacant);
+    const types = [
+        'priest', 'farmer', 'merchant', 'servant'
+    ];
+    for (let i = 0; i < n; i++) {
+        const rc = vacant.pop();
+        if (rc == null) { break; }
+        const player = p == null ? Math.floor(Math.random() * 4 - 0.5) + 1 : p;
+        const ty = river.indexOf(Number(rc)) >= 0 ? 'hidden' : types[Math.floor(Math.random() * 4)];
+        setPiece(rc, `${ty}_${player}`);
+    }
+}
+
+function initialize4p() {
+    clearMap();
+
+    const zigs = [
+        rowcol( 18, 14 ),
+        rowcol( 18, 2 ),
+        rowcol( 12, 8 ),
+        rowcol( 5, 11 ),
+        rowcol( 3, 1 )
+    ];
+
+    zigs.forEach(rc => setPiece(rc, 'ziggurat'));
+
+    const others = [
+        rowcol( 1, 9 ),
+        rowcol( 2, 12 ),
+        rowcol( 3, 3 ),
+        rowcol( 4, 6 ),
+        rowcol( 4, 14 ),
+        rowcol( 6, 0 ),
+        rowcol( 6, 8 ),
+        rowcol( 7, 5 ),
+        rowcol( 7, 15 ),
+        rowcol( 8, 12 ),
+        rowcol( 9, 1 ),
+        rowcol( 9, 9 ),
+        rowcol( 10, 4 ),
+        rowcol( 11, 13 ),
+        rowcol( 12, 0 ),
+        rowcol( 12, 6 ),
+        rowcol( 12, 16 ),
+        rowcol( 13, 11 ),
+        rowcol( 14, 2 ),
+        rowcol( 14, 4 ),
+        rowcol( 14, 14 ),
+        rowcol( 16, 8 ),
+        rowcol( 16, 12 ),
+        rowcol( 18, 10 ),
+        rowcol( 18, 16 ),
+        rowcol( 19, 5 ),
+        rowcol( 19, 7 ),
+        rowcol( 21, 1 ),
+        rowcol( 22, 4 ),
+        rowcol( 22, 8 ),
+        rowcol( 22, 12 ),
+        rowcol( 22, 14 )
+    ];
+
+    const pieces = [];
+    for (let i = 0; i < 3; ++i) {
+        pieces.push('city_p');
+        pieces.push('city_m');
+        pieces.push('city_s');
+        pieces.push('city_mp');
+        pieces.push('city_sp');
+        pieces.push('city_ms');
+    }
+    pieces.push('city_msp');
+    for (let i = 0; i < 2; ++i) {
+        pieces.push('field_5');
+        pieces.push('field_6');
+        pieces.push('field_7');
+    }
+    for (let i = 0; i < 7; ++i) {
+        pieces.push('field_x');
+    }
+
+    shuffleArray(pieces);
+
+    for (let i = 0; i < pieces.length; ++i) {
+        setPiece(others[i], pieces[i]);
+    }
+
+
+}
+
+function foobar() {
+    occupied.forEach(e => {
+        const t = e.getAttribute('bbl_piece');
+        if (!t.startsWith('city') && !t.startsWith('field') && !t.startsWith('zig')) {
+            e.remove();
+        }
+    })
 }
 
 function handleResize(evt) {
