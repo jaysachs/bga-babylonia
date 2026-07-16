@@ -161,7 +161,6 @@ export class View {
         let n = 0;
         this.playersInPlayerNoOrder().map(
             p =>  {
-                console.log(p);
                 ($(IDS.CITY_SCORING_HOVER_DETAILS).children.item(n++) as HTMLElement).innerText =
                   String(scores[String(p.player_id)] ?? 0);
             }
