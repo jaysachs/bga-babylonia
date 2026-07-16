@@ -280,11 +280,17 @@ function addRandomPieces(n, p) {
     const types = [
         'priest', 'farmer', 'merchant', 'servant'
     ];
+    var usedRiver = false;
     for (let i = 0; i < n; i++) {
         const rc = vacant.pop();
         if (rc == null) { break; }
         const player = p == null ? Math.floor(Math.random() * 4 - 0.5) + 1 : p;
-        const ty = river.indexOf(Number(rc)) >= 0 ? 'hidden' : types[Math.floor(Math.random() * 4)];
+        var ty = types[Math.floor(Math.random() * 4)];
+        if (river.indexOf(Number(rc)) >= 0) {
+            if (usedRiver) { i--; continue; }
+            usedRiver = true;
+            ty = 'hidden';
+        }
         setPiece(rc, `${ty}_${player}`);
     }
 }
