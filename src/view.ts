@@ -158,14 +158,20 @@ export class View {
         if (!piece) { return; }
 
         const scores = this.bga.gameui.gamedatas.potential_city_scoring[String(rc)]!;
-        let p = 1;
-        $(IDS.CITY_SCORING_HOVER_DETAILS).childNodes.forEach(e => {
-            (e as HTMLElement).innerText = String(scores[String(this.bga.players.getPlayerIdByNo(p++))] ?? 0);
-        })
+        let n = 0;
+        this.playersInPlayerNoOrder().map(
+            p =>  {
+                console.log(p);
+                ($(IDS.CITY_SCORING_HOVER_DETAILS).children.item(n++) as HTMLElement).innerText =
+                  String(scores[String(p.player_id)] ?? 0);
+            }
+        )
 
-        // FIXME: adjust positioning based on quadrant of board
+        // FIXME: determine which quadrant of the viewport (or board?) the center of the hex is in
+        //  and make these +/- as appropriate
         $(IDS.CITY_SCORING_HOVER).style.left = `${div.offsetLeft + 50}px`;
         $(IDS.CITY_SCORING_HOVER).style.top = `${div.offsetTop + 50}px`;
+
         $(IDS.CITY_SCORING_HOVER).style.display = 'initial';
     }
 
@@ -323,15 +329,18 @@ export class View {
         );
     }
 
+    private playersInPlayerNoOrder(): BblPlayer[] {
+        return [...Array(Object.keys(this.bga.gameui.gamedatas.players).length).keys()]
+            .map(n => n+1)
+            .map(n => this.bga.players.getPlayerByNo(n)!);
+    }
+
     private scoringHover(): HTMLElement {
         const pnos = [...Array(Object.keys(this.bga.gameui.gamedatas.players).length).keys()].map(n => n+1);
         return Html.div({id:IDS.CITY_SCORING_HOVER},
             Html.span({text:_("Potential scores")}),
             Html.div({id:IDS.CITY_SCORING_HOVER_DETAILS},
-                ...pnos.map(n => {
-                    const ty = "hidden_" + this.bga.players.getPlayerByNo(n)?.color_index;
-                    return Html.div({attrs: Attrs.piece(ty), text: "0"})
-                })
+                ... this.playersInPlayerNoOrder().map(p => Html.div({attrs: Attrs.piece("hidden", p), text: "0"}))
             )
         )
     }
