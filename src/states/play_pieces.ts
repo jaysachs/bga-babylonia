@@ -21,7 +21,6 @@ export class PlayPiecesState extends BabyloniaState {
     super(bga, view, animationManager);
     this.handHandler = (e) => this.onHandClicked(e);
     this.boardHandler = (e) => this.onBoardClicked(e);
-    this.cityController = new AbortController();
   }
 
   private hexForRc(rc: number): Hex | undefined {
@@ -35,8 +34,7 @@ export class PlayPiecesState extends BabyloniaState {
 
   private doEnterState(playStateArgs: PlayStateArgs) {
       this.playStateArgs = playStateArgs;
-      // FIXME: these should probably always be attached. we should just update the associated data (or the hovercard divs directly).
-      this.attachCityHandlers();
+      this.bga.gameui.gamedatas.potential_city_scoring = playStateArgs.potentialCityScoring;
       this.view.markAllHexesUnplayable();
       if (this.bga.players.isCurrentPlayerActive()) {
         this.setStatusBarForPlayState();
@@ -159,28 +157,6 @@ export class PlayPiecesState extends BabyloniaState {
       this.removeBoardHandler();
       this.removeHandHandler();
     }
-    this.removeCityHandlers();
-  }
-
-  private cityController: AbortController;
-  private removeCityHandlers() {
-    this.cityController?.abort();
-    this.cityController = new AbortController();
-  }
-
-  private attachCityHandlers() {
-    this.removeCityHandlers();
-    const rcs = Object.keys(this.playStateArgs.potentialCityScoring).map(Number)
-    rcs.forEach(rc => $(IDS.hexDiv(rc)).firstElementChild?.addEventListener(
-        'click', // 'pointerover'
-        e => this.showCityScore(rc),
-        { signal: this.cityController.signal })
-    );
-  }
-
-  private showCityScore(rc: number) {
-    const scores = this.playStateArgs.potentialCityScoring[String(rc)];
-    console.log(scores);
   }
 
   private attachHandHandler() {

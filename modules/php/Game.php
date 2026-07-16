@@ -188,18 +188,19 @@ class Game extends Table
             'hand' => $hand,
             'board' => $board_data,
             'translated_pieces' => $translated,
+            'potentialCityScoring' => $model->potentialCityScoring(),
             'ziggurat_cards' =>
-            array_map(
-                function ($z) {
-                    return [
-                        "type" => $z->type->value,
-                        "owning_player_id" => $z->owning_player_id,
-                        "used" => $z->used,
-                        "tooltip" => $z->type->translated(),
-                    ];
-                },
-                $model->components()->allZigguratCards()
-            ),
+                array_map(
+                    function ($z) {
+                        return [
+                            "type" => $z->type->value,
+                            "owning_player_id" => $z->owning_player_id,
+                            "used" => $z->used,
+                            "tooltip" => $z->type->translated(),
+                        ];
+                    },
+                    $model->components()->allZigguratCards()
+                ),
         ];
     }
 

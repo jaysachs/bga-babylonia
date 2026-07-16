@@ -58,6 +58,8 @@ export class IDS {
   static readonly OFF_BOARD = 'bbl_offboard';
   static readonly HAND = 'bbl_hand';
   static readonly MAIN = 'bbl_main';
+  static readonly CITY_SCORING_HOVER = 'bbl_city_scoring_hover';
+  static readonly CITY_SCORING_HOVER_DETAILS = 'bbl_city_scoring_hover_details';
 
   static handcount(playerId: number): string {
     return `bbl_handcount_${playerId}`;
@@ -141,9 +143,34 @@ export class View {
     private makeHexDiv(hex: Hex): HTMLElement {
         const row = Math.trunc(hex.rc / 100);
         const col = Math.trunc(hex.rc % 100);
-        let top = 100 * (View.vstart + row * View.vdelta / 2) / 2709.0;
-        let left = 100 * (View.hstart + col * View.hdelta) / 3385.0;
-        return Html.div({ id:  IDS.hexDiv(hex.rc), style: [`top:${top}%`, `left:${left}%`] });
+        const  top = 100 * (View.vstart + row * View.vdelta / 2) / 2709.0;
+        const left = 100 * (View.hstart + col * View.hdelta) / 3385.0;
+        const div = Html.div({ id:  IDS.hexDiv(hex.rc), style: [`top:${top}%`, `left:${left}%`] });
+        if (hex.piece?.startsWith('city_')) {
+            div.addEventListener('pointerover', e => this.showScoringHover(div, hex.rc));
+            div.addEventListener('pointerout', e => this.hideScoringHover());
+        }
+        return div;
+    }
+
+    private showScoringHover(div: HTMLElement, rc: number) {
+        const piece = div.firstElementChild;
+        if (!piece) { return; }
+
+        const scores = this.bga.gameui.gamedatas.potential_city_scoring[String(rc)]!;
+        let p = 1;
+        $(IDS.CITY_SCORING_HOVER_DETAILS).childNodes.forEach(e => {
+            (e as HTMLElement).innerText = String(scores[String(this.bga.players.getPlayerIdByNo(p++))] ?? 0);
+        })
+
+        // FIXME: adjust positioning based on quadrant of board
+        $(IDS.CITY_SCORING_HOVER).style.left = `${div.offsetLeft + 50}px`;
+        $(IDS.CITY_SCORING_HOVER).style.top = `${div.offsetTop + 50}px`;
+        $(IDS.CITY_SCORING_HOVER).style.display = 'initial';
+    }
+
+    private hideScoringHover() {
+        $(IDS.CITY_SCORING_HOVER).style.display = 'none';
     }
 
     private handleResize() {
@@ -288,11 +315,25 @@ export class View {
                     )
                 ),
                 Html.div({id:'bbl_board_container'},
+                    this.scoringHover(),
                     Html.div({id:IDS.BOARD})
                 )
             ),
             Html.div({id:IDS.OFF_BOARD})
         );
+    }
+
+    private scoringHover(): HTMLElement {
+        const pnos = [...Array(Object.keys(this.bga.gameui.gamedatas.players).length).keys()].map(n => n+1);
+        return Html.div({id:IDS.CITY_SCORING_HOVER},
+            Html.span({text:_("Potential scores")}),
+            Html.div({id:IDS.CITY_SCORING_HOVER_DETAILS},
+                ...pnos.map(n => {
+                    const ty = "hidden_" + this.bga.players.getPlayerByNo(n)?.color_index;
+                    return Html.div({attrs: Attrs.piece(ty), text: "0"})
+                })
+            )
+        )
     }
 
     public createPieceDiv(piece: PieceType, player_id: number) : HTMLElement {
