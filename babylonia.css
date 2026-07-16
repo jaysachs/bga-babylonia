@@ -733,31 +733,33 @@ div.bbl_pb_zcards>div {
 }
 
 .bbl_cityscore_hover {
+    display: none;
+    z-index: 100;
+
     position: absolute;
     left: calc(var(--bbl-hex-width) / 2);
     top: calc(var(--bbl-hex-height) / 2);
+
     font-size: 20pt;
     background-color: beige;
     padding: 5px;
     border: 1px solid black;
-    display: none;
 }
 
-.bbl_cityscore_hover {
-    z-index: 100;
-}
-
-.bbl_city:hover > .bbl_cityscore_hover {
+#bbl_board .bbl_city:hover > .bbl_cityscore_hover {
     display: initial;
 }
 
 .bbl_cityscore_hover_details {
-    text-align: center;
-    vertical-align: middle;
     display: grid;
     grid-template-columns: 1fr 1fr 1fr 1fr;
     color: white;
     font-size: 20pt;
-    text-align: center;
-    vertical-align: middle;
+}
+
+.bbl_cityscore_hover_details > div {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
 }
