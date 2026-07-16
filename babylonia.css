@@ -173,7 +173,6 @@ body {
     text-align: center;
     align-items: center;
     color: #000000;
-    clip-path: polygon(0 50%, 25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%);
     position: absolute;
 }
 
@@ -193,12 +192,6 @@ body {
     top: 0;
     height: calc(var(--bbl-hex-height));
     aspect-ratio: calc(var(--bbl-hex-ratio));
-}
-
-#bbl_board>div>div {
-    position: absolute;
-    left: 0;
-    top: 0;
 }
 
 #bbl_board>div.bbl_selected::after {
@@ -237,7 +230,6 @@ body {
 
 [bbl_piece] {
     aspect-ratio: calc(var(--bbl-hex-ratio));
-    clip-path: none;
     background-size: 100%;
     /*
     background-image: var(--bbl-sprites-file);
@@ -738,4 +730,34 @@ div.bbl_pb_zcards>div {
 
 #bbl_offboard {
     width: 100%;
+}
+
+.bbl_cityscore_hover {
+    position: absolute;
+    left: calc(var(--bbl-hex-width) / 2);
+    top: calc(var(--bbl-hex-height) / 2);
+    font-size: 20pt;
+    background-color: beige;
+    padding: 5px;
+    border: 1px solid black;
+    display: none;
+}
+
+.bbl_cityscore_hover {
+    z-index: 100;
+}
+
+.bbl_city:hover > .bbl_cityscore_hover {
+    display: initial;
+}
+
+.bbl_cityscore_hover_details {
+    text-align: center;
+    vertical-align: middle;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    color: white;
+    font-size: 20pt;
+    text-align: center;
+    vertical-align: middle;
 }
