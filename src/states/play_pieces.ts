@@ -13,7 +13,7 @@ interface PlayStateArgs {
 }
 
 export class PlayPiecesState extends BabyloniaState {
-  private playStateArgs: PlayStateArgs | null = null;
+  private playStateArgs: PlayStateArgs = { canEndTurn: false, allowedMoves: {}, canUndo: false, potentialCityScoring: {}};
   private handHandler: (e: Event) => void;
   private boardHandler: (e: Event) => void;
 
@@ -35,19 +35,16 @@ export class PlayPiecesState extends BabyloniaState {
 
   private doEnterState(playStateArgs: PlayStateArgs) {
       this.playStateArgs = playStateArgs;
+      // FIXME: these should probably always be attached. we should just update the associated data (or the hovercard divs directly).
+      this.attachCityHandlers();
       this.view.markAllHexesUnplayable();
-      this.setStatusBarForPlayState();
-      this.attachCityHandlers(playStateArgs.potentialCityScoring);
+      if (this.bga.players.isCurrentPlayerActive()) {
+        this.setStatusBarForPlayState();
+      }
   }
 
   override onEnteringState(args: { playState: PlayStateArgs }, isCurrentPlayerActive: boolean) {
-    console.log("onEnteringState play_pieces", args, isCurrentPlayerActive);
-    if (isCurrentPlayerActive) {
-      this.doEnterState(args.playState);
-    } else {
-      this.playStateArgs = args.playState;
-      this.attachCityHandlers(this.playStateArgs.potentialCityScoring);
-    }
+    this.doEnterState(args.playState);
   }
 
   async notif_piecePlayed(
@@ -62,7 +59,7 @@ export class PlayPiecesState extends BabyloniaState {
       field_points: number;
       ziggurat_points: number;
       touched_ziggurats: number[];
-      playState: PlayStateArgs | undefined;
+      playState: PlayStateArgs;
     }
   ) {
     let anims: AnimationList = [];
@@ -98,7 +95,7 @@ export class PlayPiecesState extends BabyloniaState {
         () => this.animationManager.displayScoring(
                 this.view.hexDiv(rc),
                 1,
-                this.bga.gameui.gamedatas.players[args.player_id]!.color,
+                this.bga.players.getPlayerById(args.player_id)!.color,
                 { extraClass: 'bbl_city_scoring', duration: 700 })
                 .then(() => args.touched_ziggurats.forEach(z => this.view.unmarkHexSelected(z)))
               )
@@ -109,9 +106,7 @@ export class PlayPiecesState extends BabyloniaState {
         .then(() => this.bga.playerPanels.getScoreCounter(args.player_id).incValue(args.points));
 
     this.view.updateHandCount(args);
-    if (args.playState?.allowedMoves) {
-      this.doEnterState(args.playState);
-    }
+    this.doEnterState(args.playState);
   }
 
   async notif_undoMove(
@@ -119,7 +114,7 @@ export class PlayPiecesState extends BabyloniaState {
       points: number;
       player_id: number;
       rc: number;
-      playState: PlayStateArgs | undefined;
+      playState: PlayStateArgs;
       original_piece: PieceType | undefined;
       handpos: number | undefined;
       captured_piece: PieceType;
@@ -156,9 +151,7 @@ export class PlayPiecesState extends BabyloniaState {
       this.bga.playerPanels.getScoreCounter(args.player_id).incValue(-args.points);
     });
 
-    if (args.playState?.allowedMoves) {
-      this.doEnterState(args.playState);
-    };
+    this.doEnterState(args.playState);
   }
 
   override onLeavingState(args: any, isCurrentPlayerActive: boolean): void {
@@ -175,15 +168,18 @@ export class PlayPiecesState extends BabyloniaState {
     this.cityController = new AbortController();
   }
 
-  private attachCityHandlers(potentialCityScoring: Record<string, Record<string, number>>) {
-    console.log("attaching city handlers", potentialCityScoring);
-    const rcs = Object.keys(potentialCityScoring).map(Number)
-    rcs.forEach((rc) => $(IDS.hexDiv(rc)).firstElementChild?.addEventListener('pointerover', (e) => this.showCityScore(rc), { signal: this.cityController.signal, capture: true }));
+  private attachCityHandlers() {
+    this.removeCityHandlers();
+    const rcs = Object.keys(this.playStateArgs.potentialCityScoring).map(Number)
+    rcs.forEach(rc => $(IDS.hexDiv(rc)).firstElementChild?.addEventListener(
+        'click', // 'pointerover'
+        e => this.showCityScore(rc),
+        { signal: this.cityController.signal })
+    );
   }
 
   private showCityScore(rc: number) {
-    console.log("showcityScore", rc, this.playStateArgs);
-    const scores = this.playStateArgs?.potentialCityScoring[String(rc)];
+    const scores = this.playStateArgs.potentialCityScoring[String(rc)];
     console.log(scores);
   }
 
@@ -205,8 +201,8 @@ export class PlayPiecesState extends BabyloniaState {
   private allowedMovesFor(div: Element | null): number[] {
     if (!div) { return []; }
     const piece = div.getAttribute(Attrs.PIECE)!.split('_')[0]!;
-    return (this.playStateArgs!.allowedMoves[""] ?? [])
-      .concat(this.playStateArgs!.allowedMoves[piece] ?? []);
+    return (this.playStateArgs.allowedMoves[""] ?? [])
+      .concat(this.playStateArgs.allowedMoves[piece] ?? []);
     ;
   }
 
@@ -348,9 +344,9 @@ export class PlayPiecesState extends BabyloniaState {
 
   private setStatusBarForPlayState(): void {
     this.bga.statusBar.removeActionButtons();
-    if (this.playStateArgs!.canEndTurn) {
+    if (this.playStateArgs.canEndTurn) {
       let mustEnd = false;
-      if (Object.keys(this.playStateArgs!.allowedMoves).length == 0) {
+      if (Object.keys(this.playStateArgs.allowedMoves).length == 0) {
         this.bga.statusBar.setTitle(_('${you} must end your turn'));
         mustEnd = true;
         this.setPlayablePieces();
@@ -373,7 +369,7 @@ export class PlayPiecesState extends BabyloniaState {
       this.attachHandHandler();
       this.setPlayablePieces();
     }
-    if (this.playStateArgs?.canUndo) {
+    if (this.playStateArgs.canUndo) {
       this.bga.statusBar.addActionButton(
         _('Undo'),
         () => this.bga.actions.performAction('actUndoPlay'),
