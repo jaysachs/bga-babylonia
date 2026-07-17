@@ -53,7 +53,7 @@ export class PlayPiecesState extends BabyloniaState {
       handpos?: number;
       rc: number;
       hand_size: number;
-      captured_piece: string;
+      captured_piece: PieceType | null;
       field_points: number;
       ziggurat_points: number;
       touched_ziggurats: number[];
@@ -67,7 +67,7 @@ export class PlayPiecesState extends BabyloniaState {
     // Either not active player, or another window of the active player (so piece still in hand)
     if (args.handpos === undefined  || pieceDiv) {
       // Check for field capture
-      if (args.captured_piece != Piece.EMPTY /* .startsWith('field') */) {
+      if (Piece.isNonEmpty(args.captured_piece) /* .startsWith('field') */) {
         let field = hexDiv.firstElementChild as HTMLElement;
         if (!field) { // or field is not F567X
           console.error("attempt to capture a field that is not there");
@@ -122,7 +122,7 @@ export class PlayPiecesState extends BabyloniaState {
     let anims: AnimationList = [];
     let hexDiv = $(IDS.hexDiv(args.rc));
 
-    if (args.captured_piece != Piece.EMPTY) {
+    if (Piece.isNonEmpty(args.captured_piece)) {
       // slide the previously captured field back
       let field = this.view.createPieceDiv(args.captured_piece, 0);
       anims.push(() => {
@@ -282,8 +282,8 @@ export class PlayPiecesState extends BabyloniaState {
     ev.preventDefault();
     ev.stopPropagation();
     const pieceDiv = ev.target as HTMLElement;
-    let p = pieceDiv.getAttribute(Attrs.PIECE);
-    if (!p || p == Piece.EMPTY) { return false; }
+    let p = pieceDiv.getAttribute(Attrs.PIECE) as PieceType;
+    if (!Piece.isNonEmpty(p)) { return false; }
 
     let parentDiv = pieceDiv.parentElement!;
     let cl = parentDiv.classList;

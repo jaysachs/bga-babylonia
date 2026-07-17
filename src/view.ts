@@ -29,7 +29,7 @@ export class Attrs implements AttrLike {
     return this;
   }
 
-  static piece(p: string, pl? : BblPlayer) : Attrs {
+  static piece(p: PieceType, pl? : BblPlayer) : Attrs {
     return new Attrs().piece(p, pl);
   }
 
@@ -37,19 +37,20 @@ export class Attrs implements AttrLike {
     el.setAttribute(Attrs.PIECE, Attrs.pieceVal(p, pl));
   }
 
-  /* private */ static pieceVal(p: string, pl?: BblPlayer): string {
-    return (pl && p != Piece.EMPTY)
+  /* private */ static pieceVal(p: PieceType, pl?: BblPlayer): string {
+    return (pl && Piece.isNonEmpty(p))
       ? p + '_' + pl.color_index
       : p;
   }
-  piece(p: string, pl?: BblPlayer): Attrs {
+  piece(p: PieceType, pl?: BblPlayer): Attrs {
     this.r[Attrs.PIECE] = Attrs.pieceVal(p, pl);
     return this;
   }
 }
 
 export class Piece {
-  static readonly EMPTY = 'empty'
+  static isNonEmpty(p: PieceType | null): boolean { return p != 'empty' }
+  static isCity(p: PieceType): boolean { return p?.startsWith('city_') }
 }
 
 export class IDS {
@@ -124,7 +125,7 @@ export class View {
         console.log('setting up player hand', gamedatas.hand);
         gamedatas.hand?.forEach((piece, i) => {
             const hpd = this.handPosDiv(i);
-            if (piece && piece != Piece.EMPTY) {
+            if (Piece.isNonEmpty(piece)) {
                 hpd.appendChild(this.createPieceDiv(piece, this.bga.gameui.player_id));
             }
         });
@@ -145,18 +146,10 @@ export class View {
         const col = Math.trunc(hex.rc % 100);
         const  top = 100 * (View.vstart + row * View.vdelta / 2) / 2709.0;
         const left = 100 * (View.hstart + col * View.hdelta) / 3385.0;
-        const div = Html.div({ id:  IDS.hexDiv(hex.rc), style: [`top:${top}%`, `left:${left}%`] });
-        if (hex.piece?.startsWith('city_')) {
-            div.addEventListener('pointerover', e => this.showScoringHover(div, hex.rc));
-            div.addEventListener('pointerout', e => this.hideScoringHover());
-        }
-        return div;
+        return Html.div({ id:  IDS.hexDiv(hex.rc), style: [`top:${top}%`, `left:${left}%`] });
     }
 
     private showScoringHover(div: HTMLElement, rc: number) {
-        const piece = div.firstElementChild;
-        if (!piece) { return; }
-
         const scores = this.bga.gameui.gamedatas.potential_city_scoring[String(rc)]!;
         let n = 0;
         this.playersInPlayerNoOrder().map(
@@ -168,8 +161,8 @@ export class View {
 
         // FIXME: determine which quadrant of the viewport (or board?) the center of the hex is in
         //  and make these +/- as appropriate
-        $(IDS.CITY_SCORING_HOVER).style.left = `${div.offsetLeft + 50}px`;
-        $(IDS.CITY_SCORING_HOVER).style.top = `${div.offsetTop + 50}px`;
+        $(IDS.CITY_SCORING_HOVER).style.left = `${div.parentElement!.offsetLeft + 50}px`;
+        $(IDS.CITY_SCORING_HOVER).style.top = `${div.parentElement!.offsetTop + 50}px`;
 
         $(IDS.CITY_SCORING_HOVER).style.display = 'initial';
     }
@@ -217,8 +210,12 @@ export class View {
         for (const hex of boardData) {
             const hexDiv = this.makeHexDiv(hex);
             boardDiv.appendChild(hexDiv);
-            if (hex.piece != null && hex.piece != Piece.EMPTY) {
+            if (Piece.isNonEmpty(hex.piece)) {
                 let pieceDiv = this.createPieceDiv(hex.piece, hex.board_player)
+                if (Piece.isCity(hex.piece)) {
+                    pieceDiv.addEventListener('pointerover', e => this.showScoringHover(pieceDiv, hex.rc));
+                    pieceDiv.addEventListener('pointerout', e => this.hideScoringHover());
+                }
                 hexDiv.appendChild(pieceDiv);
             }
         }
@@ -389,7 +386,7 @@ export class View {
         return this.translatedPieces[piece] ?? '';
     }
 
-    public renderedPiece(piece: string, player_id: number = 0): HTMLElement {
+    public renderedPiece(piece: PieceType, player_id: number = 0): HTMLElement {
         return Html.span({ title: this.translatedPiece(piece), attrs: Attrs.piece(piece, this.bga.players.getPlayerById(player_id)) });
     }
 

@@ -29,7 +29,7 @@ export class FinishTurnState extends BabyloniaState {
       }
       let pieceDiv = handPosDiv!.firstElementChild as HTMLElement;
       if (!pieceDiv) {
-        if (newPiece && newPiece != Piece.EMPTY) {
+        if (Piece.isNonEmpty(newPiece)) {
           let destDiv = handPosDiv! as HTMLElement;
           anims.push(() => {
             pieceDiv = this.view.createPieceDiv(newPiece, pid);
