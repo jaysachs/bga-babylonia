@@ -390,12 +390,12 @@ body {
 
 [bbl_piece="servant_3"] {
     /* background-position: -0% -600%; */
-    background-image: url(img/P-3-merchant.png);
+    background-image: url(img/P-3-servant.png);
 }
 
 [bbl_piece="servant_4"] {
     /* background-position: -0% -500%;*/
-    background-image: url(img/P-4-merchant.png);
+    background-image: url(img/P-4-servant.png);
 }
 
 [bbl_piece="priest_1"] {
