@@ -151,10 +151,9 @@ export class View {
 
     private showScoringHover(div: HTMLElement, rc: number) {
         const scores = this.bga.gameui.gamedatas.potential_city_scoring[String(rc)]!;
-        let n = 0;
         this.playersInPlayerNoOrder().map(
-            p =>  {
-                ($(IDS.CITY_SCORING_HOVER_DETAILS).children.item(n++) as HTMLElement).innerText =
+            (p, n) =>  {
+                ($(IDS.CITY_SCORING_HOVER_DETAILS).children.item(n) as HTMLElement).innerText =
                   String(scores[String(p.player_id)] ?? 0);
             }
         )
@@ -341,9 +340,9 @@ export class View {
     }
 
     private playersInPlayerNoOrder(): BblPlayer[] {
-        return [...Array(Object.keys(this.bga.gameui.gamedatas.players).length).keys()]
-            .map(n => n+1)
-            .map(n => this.bga.players.getPlayerByNo(n)!);
+        return this.bga.gameui.gamedatas.playerorder.map(
+            pid => this.bga.players.getPlayerById(Number(pid))!
+        );
     }
 
     private scoringHover(): HTMLElement {
