@@ -352,7 +352,7 @@ export class View {
 
     private scoringHover(): HTMLElement {
         return Html.div({id:IDS.CITY_SCORING_HOVER},
-            Html.span({text:_("Potential scores")}),
+            Html.span({text:_("Current points")}),
             Html.div({id:IDS.CITY_SCORING_HOVER_DETAILS},
                 ... this.playersInPlayerNoOrder().map(p => Html.div({attrs: Attrs.piece("hidden", p), text: "0"}))
             )
