@@ -159,12 +159,27 @@ export class View {
             }
         )
 
-        // FIXME: determine which quadrant of the viewport (or board?) the center of the hex is in
-        //  and make these +/- as appropriate
-        $(IDS.CITY_SCORING_HOVER).style.left = `${div.parentElement!.offsetLeft + 50}px`;
-        $(IDS.CITY_SCORING_HOVER).style.top = `${div.parentElement!.offsetTop + 50}px`;
+        const hexDiv = div.parentElement!;
+        const boardDiv = hexDiv.parentElement!;
 
-        $(IDS.CITY_SCORING_HOVER).style.display = 'initial';
+        const style = $(IDS.CITY_SCORING_HOVER).style;
+        const extra = 4;
+        if (hexDiv.offsetWidth / 2 + hexDiv.offsetLeft > boardDiv.offsetWidth / 2) {
+            style.right = `${boardDiv.offsetWidth - hexDiv.offsetLeft - hexDiv.offsetWidth / extra}px`;
+            style.left = '';
+        } else {
+            style.left = `${hexDiv.offsetLeft + hexDiv.offsetWidth - hexDiv.offsetWidth / extra}px`;
+            style.right = '';
+        }
+        if (hexDiv.offsetHeight / 2 + hexDiv.offsetTop > boardDiv.offsetHeight / 2) {
+            style.bottom = `${boardDiv.offsetHeight - hexDiv.offsetTop - hexDiv.offsetHeight / extra}px`;
+            style.top = '';
+        } else {
+            style.top = `${hexDiv.offsetTop + hexDiv.offsetHeight - hexDiv.offsetHeight / extra}px`;
+            style.bottom = '';
+        }
+
+        style.display = 'initial';
     }
 
     private hideScoringHover() {
@@ -332,7 +347,6 @@ export class View {
     }
 
     private scoringHover(): HTMLElement {
-        const pnos = [...Array(Object.keys(this.bga.gameui.gamedatas.players).length).keys()].map(n => n+1);
         return Html.div({id:IDS.CITY_SCORING_HOVER},
             Html.span({text:_("Potential scores")}),
             Html.div({id:IDS.CITY_SCORING_HOVER_DETAILS},
