@@ -733,8 +733,9 @@ div.bbl_pb_zcards>div {
 }
 
 #bbl_city_scoring_hover {
-    display: none;
+    content-visibility: hidden;
     z-index: 100;
+    opacity: 0%;
 
     position: absolute;
 
@@ -744,8 +745,10 @@ div.bbl_pb_zcards>div {
     border: 1px solid black;
 }
 
-#bbl_board .bbl_city:hover #bbl_city_scoring_hover {
-    display: initial;
+#bbl_board_container .bbl_city:hover #bbl_city_scoring_hover {
+    content-visibility: initial;
+    opacity: 100%;
+    transition: all 500ms 250ms allow-discrete;
 }
 
 #bbl_city_scoring_hover_details {

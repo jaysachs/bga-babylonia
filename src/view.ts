@@ -178,11 +178,16 @@ export class View {
             style.bottom = '';
         }
 
-        style.display = 'initial';
+        style.contentVisibility = 'visible';
+        style.opacity = '100%';
+        style.transition = 'content-visibility 200ms 200ms allow-discrete, opacity 400ms 200ms';
     }
 
     private hideScoringHover() {
-        $(IDS.CITY_SCORING_HOVER).style.display = 'none';
+        const style = $(IDS.CITY_SCORING_HOVER).style;
+        style.transition = '';
+        style.opacity = '0';
+        style.contentVisibility = 'hidden';
     }
 
     private handleResize() {
