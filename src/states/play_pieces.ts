@@ -14,12 +14,10 @@ interface PlayStateArgs {
 
 export class PlayPiecesState extends BabyloniaState {
   private playStateArgs: PlayStateArgs = { canEndTurn: false, allowedMoves: {}, canUndo: false, potentialCityScoring: {}};
-  private handHandler: (e: Event) => void;
   private boardHandler: (e: Event) => void;
 
   constructor(bga: Bga<BblPlayer, BGamedatas>, view: View, animationManager: AnimationManager) {
     super(bga, view, animationManager);
-    this.handHandler = (e) => this.onHandClicked(e);
     this.boardHandler = (e) => this.onBoardClicked(e);
   }
 
@@ -160,16 +158,21 @@ export class PlayPiecesState extends BabyloniaState {
   }
 
   private attachHandHandler() {
-    $(IDS.HAND).addEventListener('click', this.handHandler);
+    this.handController = new AbortController();
+    $(IDS.HAND).childNodes.forEach(e =>
+        e.firstChild?.addEventListener('click', p => this.onHandClicked(p), { signal: this.handController.signal })
+    );
   }
 
+  private handController: AbortController = new AbortController();
   private removeHandHandler() {
-    $(IDS.HAND).removeEventListener('click', this.handHandler);
+    this.handController.abort();
   }
 
   private attachBoardHandler() {
     $(IDS.BOARD).addEventListener('click', this.boardHandler);
   }
+
   private removeBoardHandler() {
     $(IDS.BOARD).removeEventListener('click', this.boardHandler);
   }
