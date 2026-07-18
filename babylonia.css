@@ -13,6 +13,9 @@
  *
  */
 
+html {
+    background-image: url(img/background-dark.jpg);
+}
 
 /* inspired from https://css-tricks.com/hexagons-and-beyond-flexible-responsive-grid-patterns-sans-media-queries/ */
 body {
@@ -497,7 +500,7 @@ body {
     display: inline-block;
     aspect-ratio: calc(var(--bbl-hex-ratio));
     height: calc(var(--bbl-hex-height));
-    background-size: 700% 700%;
+    background-size: 100%;
     border-style: none;
 }
 
