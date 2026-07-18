@@ -520,9 +520,10 @@ body {
 
 }
 
-#bbl_hand>div.bbl_selected::after {
+#bbl_hand>div.bbl_selected::before {
     background-image: url(img/hand_highlight.png);
     background-size: 100%;
+    pointer-events: none;
     /*
     background-image: var(--bbl-sprites-file);
     background-size: 700% 700%;
