@@ -108,7 +108,7 @@ export class View {
         this.translatedPieces = {};
     }
 
-     public setup(gamedatas: BGamedatas): void {
+     public async setup(gamedatas: BGamedatas) {
         this.bga.gameui.onScreenWidthChange = () => this.handleResize();
         this.translatedPieces = gamedatas.translated_pieces;
         this.bga.gameArea.getElement().appendChild(this.base_html());
@@ -132,7 +132,7 @@ export class View {
 
         console.log('Setting up ziggurat cards', gamedatas.ziggurat_cards);
         this.setupZcards(gamedatas.ziggurat_cards);
-        this.handleResize();
+        this.bga.gameui.wait(1500).then (() => this.handleResize());
     }
 
     static readonly map_aspect_ratio = 2709 / 3385;

@@ -18,7 +18,7 @@ export class Game extends BaseGame<BblPlayer, BGamedatas> {
     this.view = new View(bga);
   }
 
-  setup(gamedatas: BGamedatas) {
+  async setup(gamedatas: BGamedatas) {
     this.view = new View(this.bga);
     this.registerLogArgs();
 
@@ -29,7 +29,7 @@ export class Game extends BaseGame<BblPlayer, BGamedatas> {
       handlers: [this, ...this.bga.states.getStateClasses()],
     });
 
-    this.view.setup(gamedatas);
+    await this.view.setup(gamedatas);
     console.log('Game setup done');
   }
 
