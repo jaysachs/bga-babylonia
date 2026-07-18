@@ -49,7 +49,7 @@ export class Attrs implements AttrLike {
 }
 
 export class Piece {
-  static isNonEmpty(p: PieceType | null): boolean { return p != 'empty' }
+  static isNonEmpty(p: PieceType | null): boolean { return p !== null && p !== undefined && p != 'empty' }
   static isCity(p: PieceType): boolean { return p?.startsWith('city_') }
 }
 
