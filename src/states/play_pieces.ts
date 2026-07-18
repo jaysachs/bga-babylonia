@@ -158,6 +158,7 @@ export class PlayPiecesState extends BabyloniaState {
   }
 
   private attachHandHandler() {
+    this.handController.abort();
     this.handController = new AbortController();
     $(IDS.HAND).childNodes.forEach(e =>
         e.firstChild?.addEventListener('click', p => this.onHandClicked(p), { signal: this.handController.signal })
