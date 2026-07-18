@@ -139,7 +139,7 @@ export class PlayPiecesState extends BabyloniaState {
         Attrs.setPiece(pieceDiv, args.original_piece, this.bga.players.getPlayerById(args.player_id));
     }
     // slide the played piece back to the hand
-    anims.push(() => this.animationManager.slideAndAttach(pieceDiv, destDiv));
+    anims.push(() => this.animationManager.slideAndAttach(pieceDiv, destDiv, { fromPlaceholder: 'off' }));
 
     await this.animationManager.playParallel(anims).then(() => {
       if (args.handpos) {
