@@ -1,5 +1,4 @@
 * (NEVER DONE) Add more unit tests.
-* Visual bug sometimes on undoing 2nd placement.
 * ?? "uncommitted" turns only visible to active player
 * ?? Animate piece moves before sending action (i.e. assume success action). This will give the UI a
   "peppier" feel.
@@ -25,3 +24,8 @@ div {
 }
 
 and also try for hexes too.
+
+
+* UX:
+  * highlight around pieces in hand is too small. Make pieces standard size? Or put circle on top in z-order?
+  * black pieces played in some parts of river are hard to tell they are not river, even though white "foam" is interrupted -- that was too subtle.

@@ -189,12 +189,11 @@ body {
     background-size: 100%;
     cursor: pointer;
     content: '';
-    display: inline;
     position: absolute;
     left: 0;
     top: 0;
-    height: calc(var(--bbl-hex-height));
-    aspect-ratio: calc(var(--bbl-hex-ratio));
+    height: 100%;
+    width: 100%;
 }
 
 #bbl_board>div.bbl_selected::after {
@@ -498,6 +497,7 @@ body {
 
 #bbl_hand>div {
     display: inline-block;
+    position: relative;
     aspect-ratio: calc(var(--bbl-hex-ratio));
     height: calc(var(--bbl-hex-height));
     background-size: 100%;
@@ -520,13 +520,20 @@ body {
 
 }
 
-#bbl_hand>div.bbl_selected {
+#bbl_hand>div.bbl_selected::after {
     background-image: url(img/hand_highlight.png);
+    background-size: 100%;
     /*
     background-image: var(--bbl-sprites-file);
     background-size: 700% 700%;
     background-position: -600% -200%;
 */
+    cursor: pointer;
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%; width: 100%;
 }
 
 .bbl_unimportant {
