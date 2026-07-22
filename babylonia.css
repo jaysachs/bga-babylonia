@@ -87,6 +87,10 @@ body {
     align-items: center;
 }
 
+#bbl_main.bbl_is_spectator #bbl_hand {
+    display: none;
+}
+
 #bbl_hand {
     display: flex;
     flex-direction:column;
@@ -616,22 +620,22 @@ body {
 
 .bbl_pb_hand_label_1 {
     /*background-position: -400% -200%;*/
-    background-image: url(img/P-1-hidden.png);
+    background-image: url(img/P-1-hand.png);
 }
 
 .bbl_pb_hand_label_2 {
     /*background-position: -400% -300%;*/
-    background-image: url(img/P-2-hidden.png);
+    background-image: url(img/P-2-hand.png);
 }
 
 .bbl_pb_hand_label_3 {
     /*background-position: -400% -600%; */
-    background-image: url(img/P-3-hidden.png);
+    background-image: url(img/P-3-hand.png);
 }
 
 .bbl_pb_hand_label_4 {
     /*background-position: -400% -500%; */
-    background-image: url(img/P-4-hidden.png);
+    background-image: url(img/P-4-hand.png);
 }
 
 .bbl_pb_pool_label_1 {

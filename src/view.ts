@@ -94,6 +94,7 @@ export class CSS {
   static readonly UNPLAYABLE = 'bbl_unplayable';
   static readonly UNIMPORTANT = 'bbl_unimportant';
   static readonly LAYOUT_UNDER_BOARD = 'bbl_altflow';
+  static readonly IS_SPECTATOR = 'bbl_is_spectator';
 }
 
 export class View {
@@ -113,6 +114,10 @@ export class View {
         this.translatedPieces = gamedatas.translated_pieces;
         this.bga.gameArea.getElement().appendChild(this.base_html());
 
+        if (this.bga.players.isCurrentPlayerSpectator()) {
+            $(IDS.MAIN).classList.add(CSS.IS_SPECTATOR);
+        }
+
         console.log('setting up player boards');
         for (const pid in gamedatas.players) {
             this.setupPlayerBoard(gamedatas.players[pid]!);
@@ -121,7 +126,6 @@ export class View {
         console.log('setting the the game board');
         this.setupGameBoard(gamedatas.board);
 
-        // FIXME: this doesn't work for spectators!
         console.log('setting up player hand', gamedatas.hand);
         gamedatas.hand?.forEach((piece, i) => {
             const hpd = this.handPosDiv(i);
@@ -304,16 +308,13 @@ export class View {
         const colorIndex = this.bga.players.getPlayerById(player_id)?.color_index;
         return [
             Html.div({},
-                Html.span({classes:`bbl_pb_hand_label_${colorIndex}`}),
-                Html.span({id: IDS.handcount(player_id)}),
+                Html.span({id: IDS.handcount(player_id), classes:['bbl_pb_hand', `bbl_pb_hand_label_${colorIndex}`]}),
             ),
             Html.div({},
-                Html.span({classes:`bbl_pb_pool_label_${colorIndex}`}),
-                Html.span({id: IDS.poolcount(player_id)}),
+                Html.span({id: IDS.poolcount(player_id), classes:['bbl_pb_pool', `bbl_pb_pool_label_${colorIndex}`]}),
             ),
             Html.div({},
-                Html.span({classes:'bbl_pb_city_label'}),
-                Html.span({id: IDS.citycount(player_id)}),
+                Html.span({id: IDS.citycount(player_id), classes:['bbl_pb_city', 'bbl_pb_city_label']}),
             ),
             Html.div({id:IDS.playerBoardZcards(player_id), classes: 'bbl_pb_zcards'},
                 Html.span({classes:'bbl_pb_zcard_label'})

@@ -6,7 +6,7 @@ HEX4="8,86 48,8 148,8 190,86 148,164 48,164"
 INNERHEX="0,43 12,22 88,22 99,43 88,66 12,66"
 SMALLHEX="21,68 29,54 71,54 79,68 71,82 29,82"
 
-COLORS=("${(@f)$(strip-json-comments ../../../gameinfos.jsonc | jq '.["player_colors"].[]')}" bcb7a8)
+COLORS=("${(@f)$(strip-json-comments ../gameinfos.jsonc | jq '.["player_colors"].[]')}" bcb7a8)
 
 # tile back
 # addCanvas "-stroke none -fill \#D6C6B5 -draw 'polygon ${HEX}'"
@@ -28,8 +28,13 @@ I=1
 for COLOR in ${COLORS[*]}
 do
     C=${COLOR//\"/}
+
     magick -size ${SIZE} -gravity center canvas:none -stroke black -fill \#${C} -draw 'circle 100,86 100,168' +append P-${I}-hidden.png
+
+    #    magick -size ${SIZE} -gravity center canvas:none -stroke black -fill \#${C} -draw 'circle 19,86 37,86' -draw 'circle 59,86 77,86' -draw 'circle 99,86 117,86' -draw 'circle 139,86 157,86' -draw 'circle 179,86 197,86'  +append P-${I}-hand.png
+    magick -size ${SIZE} -gravity center canvas:none -stroke black -strokewidth 3 -fill \#${C} -draw 'circle 55,86 100,86' -draw 'circle 80,86 125,86' -draw 'circle 105,86 150,86' -draw 'circle 130,86 175,86' -draw 'circle 155,86 200,86'  +append P-${I}-hand.png
+
     # the player board "pool" icon
-    magick -size ${SIZE} -gravity center canvas:none -stroke black -fill \#${C} -draw 'circle 62,60 102,86' -stroke black -fill \#${C} -draw 'circle 100,120 140,146' -stroke black -fill \#${C} -draw 'circle 138,60 178,86' -transparent \#000001 +append P-${I}-pool.png
+    magick -size ${SIZE} -gravity center canvas:none -stroke black -strokewidth 3 -fill \#${C} -draw 'circle 62,70 102,96' -draw 'circle 100,120 140,146' -draw 'circle 138,50 178,76' -transparent \#000001 +append P-${I}-pool.png
     I=$((I+1))
 done
