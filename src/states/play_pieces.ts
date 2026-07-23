@@ -14,11 +14,9 @@ interface PlayStateArgs {
 
 export class PlayPiecesState extends BabyloniaState {
   private playStateArgs: PlayStateArgs = { canEndTurn: false, allowedMoves: {}, canUndo: false, potentialCityScoring: {}};
-  private boardHandler: (e: Event) => void;
 
   constructor(bga: Bga<BblPlayer, BGamedatas>, view: View, animationManager: AnimationManager) {
     super(bga, view, animationManager);
-    this.boardHandler = (e) => this.onBoardClicked(e);
   }
 
   private hexForRc(rc: number): Hex | undefined {
@@ -150,13 +148,7 @@ export class PlayPiecesState extends BabyloniaState {
     this.doEnterState(args.playState);
   }
 
-  override onLeavingState(args: any, isCurrentPlayerActive: boolean): void {
-    if (isCurrentPlayerActive) {
-      this.removeBoardHandler();
-      this.removeHandHandler();
-    }
-  }
-
+  private handController: AbortController = new AbortController();
   private attachHandHandler() {
     this.handController.abort();
     this.handController = new AbortController();
@@ -165,17 +157,19 @@ export class PlayPiecesState extends BabyloniaState {
     );
   }
 
-  private handController: AbortController = new AbortController();
   private removeHandHandler() {
     this.handController.abort();
   }
 
+  private boardController: AbortController = new AbortController();
   private attachBoardHandler() {
-    $(IDS.BOARD).addEventListener('click', this.boardHandler);
+    this.boardController.abort();
+    this.boardController = new AbortController();
+    $(IDS.BOARD).addEventListener('click', e => this.onBoardClicked(e), { signal: this.boardController.signal });
   }
 
   private removeBoardHandler() {
-    $(IDS.BOARD).removeEventListener('click', this.boardHandler);
+    this.boardController.abort();
   }
 
   private allowedMovesFor(div: Element | null): number[] {
@@ -301,6 +295,7 @@ export class PlayPiecesState extends BabyloniaState {
       this.markHexesPlayableForPiece(pieceDiv);
       this.chooseDestination();
     } else {
+      this.removeBoardHandler();
       this.unmarkHexesPlayableForPiece(pieceDiv);
       this.setStatusBarForPlayState();
     }
