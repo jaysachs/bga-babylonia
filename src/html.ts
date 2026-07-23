@@ -44,12 +44,11 @@ export class Html {
   public static p(args: {id?: string, text?: string, title?: string, attrs?: Record<string, string> | AttrLike, classes?: (string | string[]), style?: (string|string[])}, ...children: (Node | undefined) []) {
       return this.makeElem('p', args, ...children);
   }
-}
 
-/**
-* Returns the index of the given element among its parent's child elements or -1 if no parent.
-*/
-export function indexInParent(el: Element): number {
-  return Array.from(el.parentElement?.children ?? []).findIndex(e => e == el);
+  /**
+  * Returns the index of the given element among its parent's child elements or -1 if no parent.
+  */
+  static indexInParent(el: Element): number {
+    return Array.from(el.parentElement?.children ?? []).findIndex(e => e == el);
+  }
 }
-

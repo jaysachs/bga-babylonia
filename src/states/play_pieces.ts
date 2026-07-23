@@ -1,9 +1,9 @@
 import { BblPlayer, BGamedatas, Hex, PieceType } from "../bdata";
 import { AnimationManager } from "../bga-animations";
 import { Attrs, CSS, IDS, Piece, View } from "../view";
-import { indexInParent } from "../html";
 import { AnimationList } from "../more-animations";
 import { BabyloniaState } from "./base";
+import { Html } from "../html";
 
 interface PlayStateArgs {
   canEndTurn: boolean;
@@ -278,7 +278,7 @@ export class PlayPiecesState extends BabyloniaState {
     // FIXME: do we need to await?
     await Promise.all([
       this.animationManager.playParallel(anims),
-      this.bga.actions.performAction('actPlayPiece', { handpos: indexInParent(handDiv), rc: hex })
+      this.bga.actions.performAction('actPlayPiece', { handpos: Html.indexInParent(handDiv), rc: hex })
     ]);
   }
 
