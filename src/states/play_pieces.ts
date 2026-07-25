@@ -82,7 +82,10 @@ export class PlayPiecesState extends BabyloniaState {
       });
     }
 
+    await this.animationManager.playParallel(anims)
+
     // animate the ziggurat scoring, if any
+    anims = [];
     if (args.ziggurat_points > 0) {
       args.touched_ziggurats.forEach(z => this.view.markHexSelected(z));
       anims.push(... args.touched_ziggurats.map((rc: number) =>
@@ -91,13 +94,12 @@ export class PlayPiecesState extends BabyloniaState {
                 1,
                 this.bga.players.getPlayerById(args.player_id)!.color,
                 { extraClass: 'bbl_city_scoring', duration: 700 })
-                .then(() => args.touched_ziggurats.forEach(z => this.view.unmarkHexSelected(z)))
               )
       );
     }
-
     await this.animationManager.playParallel(anims)
-        .then(() => this.bga.playerPanels.getScoreCounter(args.player_id).incValue(args.points));
+    args.touched_ziggurats.forEach(z => this.view.unmarkHexSelected(z))
+    this.bga.playerPanels.getScoreCounter(args.player_id).incValue(args.points);
 
     this.view.updateHandCount(args);
     this.doEnterState(args.playState);
@@ -137,13 +139,12 @@ export class PlayPiecesState extends BabyloniaState {
     // slide the played piece back to the hand
     anims.push(() => this.animationManager.slideAndAttach(pieceDiv, destDiv, { fromPlaceholder: 'off' }));
 
-    await this.animationManager.playParallel(anims).then(() => {
-      if (args.handpos) {
-         destDiv.classList.add(CSS.PLAYABLE);
-      }
-      this.view.updateHandCount(args);
-      this.bga.playerPanels.getScoreCounter(args.player_id).incValue(-args.points);
-    });
+    await this.animationManager.playParallel(anims);
+    if (args.handpos) {
+        destDiv.classList.add(CSS.PLAYABLE);
+    }
+    this.view.updateHandCount(args);
+    this.bga.playerPanels.getScoreCounter(args.player_id).incValue(-args.points);
 
     this.doEnterState(args.playState);
   }
@@ -268,12 +269,9 @@ export class PlayPiecesState extends BabyloniaState {
     this.unselectAllHandPieces();
     this.removeHandHandler();
     this.removeBoardHandler();
-    // FIXME: is it fragile here to do the anim and action in parallel?
-    // FIXME: do we need to await?
-    await Promise.all([
-      this.animationManager.playParallel(anims),
-      this.bga.actions.performAction('actPlayPiece', { handpos: Html.indexInParent(handDiv), rc: hex })
-    ]);
+
+    await this.animationManager.playParallel(anims);
+    this.bga.actions.performAction('actPlayPiece', { handpos: Html.indexInParent(handDiv), rc: hex })
   }
 
   private onHandClicked(ev: Event): boolean {

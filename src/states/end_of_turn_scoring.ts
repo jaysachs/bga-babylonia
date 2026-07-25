@@ -41,8 +41,11 @@ export class EndOfTurnScoringState extends BabyloniaState {
       winner_hexes: number[];
       other_hexes: number[];
     }) {
-      // slight subtlety here; if there is a winner, leave the hex selected until after the cards is selected
-      await this.indicateNeighbors(args.winner_hexes, args.other_hexes).then(() => { if (!args.player_id) this.view.unmarkHexSelected(args.rc) });
+    // slight subtlety here; if there is a winner, leave the hex selected until after the cards is selected
+    await this.indicateNeighbors(args.winner_hexes, args.other_hexes)
+    if (!args.player_id) {
+      this.view.unmarkHexSelected(args.rc)
+    };
     // TODO: consider better visual treatments
   }
 
@@ -98,13 +101,13 @@ export class EndOfTurnScoringState extends BabyloniaState {
       : $(IDS.OFF_BOARD);
 
     await this.animationManager.slideOutAndDestroy(
-      hex.firstElementChild as HTMLElement, dest, {}).then(() => {
-        this.view.unmarkHexSelected(args.rc);
-        for (const details of args.details) {
-          this.bga.playerPanels.getScoreCounter(details.player_id).incValue(details.capture_points);
-          this.view.updateCapturedCityCount(details);
-        }
-      }).then(() => this.view.unmarkHexSelected(args.rc));
+      hex.firstElementChild as HTMLElement, dest, {})
+      this.view.unmarkHexSelected(args.rc);
+      for (const details of args.details) {
+        this.bga.playerPanels.getScoreCounter(details.player_id).incValue(details.capture_points);
+        this.view.updateCapturedCityCount(details);
+      }
+      this.view.unmarkHexSelected(args.rc);
   }
 
 }

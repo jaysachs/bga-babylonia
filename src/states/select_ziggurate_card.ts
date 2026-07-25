@@ -3,6 +3,11 @@ import { AnimationManager } from "../bga-animations";
 import { Attrs, CSS, IDS, View } from "../view";
 import { BabyloniaState } from "./base";
 
+type StateArgs = {
+  hex: number;
+  available_cards: string[];
+}
+
 export class SelectZigguratCardState extends BabyloniaState {
   private handler: (e: Event) => void;
   constructor(bga: Bga<BblPlayer, BGamedatas>, view: View, animationManager: AnimationManager) {
@@ -10,7 +15,8 @@ export class SelectZigguratCardState extends BabyloniaState {
     this.handler = (e) => this.onZcardClicked(e);
   }
 
-  override onEnteringState(args: any, isCurrentPlayerActive: boolean) {
+  override onEnteringState(args: StateArgs, isCurrentPlayerActive: boolean) {
+    this.view.markHexSelected(args.hex);
     if (isCurrentPlayerActive) {
       const div = $(IDS.AVAILABLE_ZCARDS) as HTMLElement;
       div.scrollIntoView(false);
@@ -18,7 +24,8 @@ export class SelectZigguratCardState extends BabyloniaState {
     }
   }
 
-  override onLeavingState(args: any, isCurrentPlayerActive: boolean) {
+  override onLeavingState(args: StateArgs, isCurrentPlayerActive: boolean) {
+    this.view.unmarkHexSelected(args.hex);
     if (isCurrentPlayerActive) {
       $(IDS.AVAILABLE_ZCARDS).removeEventListener('click', this.handler);
     }
@@ -79,11 +86,9 @@ export class SelectZigguratCardState extends BabyloniaState {
 
     zelem.classList.remove(CSS.SELECTED);
     await this.animationManager.slideAndAttach(zelem, dest, { toPlaceholder: 'off' })
-        .then(() => {
-          // this.bga.playerPanels.getScoreCounter(args.player_id).incValue(args.points);
-          if (args.cardused) {
-            zelem.setAttribute(Attrs.ZUSED, "");
-          }
-        });
+    // this.bga.playerPanels.getScoreCounter(args.player_id).incValue(args.points);
+    if (args.cardused) {
+      zelem.setAttribute(Attrs.ZUSED, "");
+    }
   }
 }
