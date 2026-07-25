@@ -92,7 +92,7 @@ class Model
         );
     }
 
-    /** @return array{player_infos:array<int,PlayerInfo>,board:Board,components:Components,turnProgress:TurnProgress} */
+    /** @return array{player_infos:array<int,PlayerInfo>,board:Board,components:Components,turnProgress:TurnProgress,scored_city_count:int} */
     private function &allData(): array {
         if ($this->_allData == null) {
             $this->_allData = $this->ps->retrieveAllData($this->player_id);
@@ -121,13 +121,24 @@ class Model
      * can improve based on taking the max of that and cities scored.
      */
     public function getProgressionPercent(): int {
-        $player_infos = $this->allPlayerInfo();
-        $total_pieces = 30 * count($player_infos);
-        $remaining_pieces = 0;
-        foreach ($player_infos as $pi) {
-            $remaining_pieces += $pi->hand->size() + $pi->pool->size();
+        $max = 0;
+        foreach ($this->allPlayerInfo() as $pi) {
+            $remaining = $pi->pool->size() + $pi->hand->size();
+            $pct_pool_remaining = 100 - intval(100.0 * $remaining / 30.0);
+            if ($pct_pool_remaining > $max) {
+                $max = $pct_pool_remaining;
+            }
         }
-        return intval(100.0 - ($remaining_pieces * 100.0) / floatval($total_pieces));
+        if ($max == 100) { $max = 99; }
+
+        $remaining_cities = $this->board()->cityCount();
+        $starting_cities = $remaining_cities + $this->_allData["scored_city_count"];
+        // subtract 1 because game ends with 0 or 1 cities left.
+        $cmax = 100 - intval(100.0 * ($remaining_cities - 1) / $starting_cities);
+        if ($cmax > $max) {
+            $max = $cmax;
+        }
+        return $max;
     }
 
     /** @return array<int,PlayerInfo> */

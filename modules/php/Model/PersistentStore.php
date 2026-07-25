@@ -119,7 +119,7 @@ class PersistentStore
         $this->db->execute($sql);
     }
 
-    /** @return array{player_infos:array<int,PlayerInfo>,board:Board,components:Components,turnProgress:TurnProgress} */
+    /** @return array{player_infos:array<int,PlayerInfo>,board:Board,components:Components,turnProgress:TurnProgress,scored_city_count:int} */
     public function retrieveAllData(int $player_id): array {
         $rows = $this->db->getObjectList("SELECT location, location_id, type, player_id, used, terrain FROM pieces ORDER BY location, location_id, player_id");
 
@@ -136,6 +136,7 @@ class PersistentStore
         $captured = [];
 
         $player_ids = [];
+        $scored_city_count = 0;
 
         foreach ($rows as $row) {
             $pid = intval($row["player_id"]);
@@ -149,10 +150,12 @@ class PersistentStore
             switch ($row["location"]) {
                 case "DISCARD":
                     $pt = PieceType::from($row["type"]);
-                    if ($pt->isCity() && $pid > 0) {
-                        $captured[$pid]++;
+                    if ($pt->isCity()) {
+                        $scored_city_count++;
+                        if ($pid > 0) {
+                            $captured[$pid]++;
+                        }
                     }
-                    // use this to compute captured city count
                     break;
                 case "HAND":
                     $hands[$pid][$locid] = PieceType::from($row['type']);
@@ -188,6 +191,7 @@ class PersistentStore
             'board' => Board::fromHexes($hexes),
             'components' => new Components($cards),
             'turnProgress' => $this->retrieveTurnProgress(),
+            "scored_city_count" => $scored_city_count,
         ];
     }
 
