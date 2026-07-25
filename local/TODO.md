@@ -29,3 +29,6 @@ and also try for hexes too.
 * UX:
   * highlight around pieces in hand is too small. Make pieces standard size? Or put circle on top in z-order?
   * black pieces played in some parts of river are hard to tell they are not river, even though white "foam" is interrupted -- that was too subtle.
+  * Where do ziggurat cards go? Nice if on board to reduce "clutter"
+  * Better ziggurat card selection experience ... "pop-up"? shrink/scroll?
+    Definitely improve selection highlighting, and confirmation.
