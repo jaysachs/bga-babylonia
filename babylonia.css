@@ -44,7 +44,7 @@ body {
     --bbl-hex-height: calc(var(--bbl-board-height)/13);
     --bbl-hex-width: calc(var(--bbl-hex-ratio) * var(--bbl-hex-height));
 
-    --bbl-zcard-aspect-ratio: 0.8;
+    --bbl-zcard-aspect-ratio: calc(327/526);
 }
 
 #bbl_main {
@@ -451,47 +451,47 @@ body {
 
 [bbl_ztype="zc_10pts"] {
     /*background-position: 0% 0%;*/
-    background-image: url(img/ZigCard-1.png);
+    background-image: url(img/zcard-1.png);
 }
 
 [bbl_ztype="zc_xturn"] {
     /*background-position: -100% 0%;*/
-    background-image: url(img/ZigCard-2.png);
+    background-image: url(img/zcard-2.png);
 }
 
 [bbl_ztype="zc_hand7"] {
     /*background-position: -200% 0%;*/
-    background-image: url(img/ZigCard-3.png);
+    background-image: url(img/zcard-3.png);
 }
 
 [bbl_ztype="zc_3nobles"] {
     /*background-position: -300% 0%;*/
-    background-image: url(img/ZigCard-4.png);
+    background-image: url(img/zcard-4.png);
 }
 
 [bbl_ztype="zc_3farmers"] {
     /*background-position: -400% 0%;*/
-    background-image: url(img/ZigCard-5.png);
+    background-image: url(img/zcard-5.png);
 }
 
 [bbl_ztype="zc_fields"] {
     /*background-position: -500% 0%;*/
-    background-image: url(img/ZigCard-6.png);
+    background-image: url(img/zcard-6.png);
 }
 
 [bbl_ztype="zc_citypts"] {
     /*background-position: -600% 0%;*/
-    background-image: url(img/ZigCard-7.png);
+    background-image: url(img/zcard-7.png);
 }
 
 [bbl_ztype="zc_land"] {
     /*background-position: -700% 0%;*/
-    background-image: url(img/ZigCard-8.png);
+    background-image: url(img/zcard-8.png);
 }
 
 [bbl_ztype="zc_river"] {
     /*    background-position: -800% 0%;*/
-    background-image: url(img/ZigCard-9.png);
+    background-image: url(img/zcard-9.png);
 }
 
 
@@ -599,11 +599,20 @@ body {
     justify-content: space-evenly;
 }
 
-.bbl_pb_city_label,
 .bbl_pb_hand_label_1,
 .bbl_pb_hand_label_2,
 .bbl_pb_hand_label_3,
-.bbl_pb_hand_label_4,
+.bbl_pb_hand_label_4 {
+    width: calc(2.5*var(--bbl-label-width));
+    height: calc(var(--bbl-label-height));
+    background-size: 100%;
+    /*
+    background-image: var(--bbl-sprites-file);
+    background-size: 700% 700%;
+*/
+}
+
+.bbl_pb_city_label,
 .bbl_pb_pool_label_1,
 .bbl_pb_pool_label_2,
 .bbl_pb_pool_label_3,

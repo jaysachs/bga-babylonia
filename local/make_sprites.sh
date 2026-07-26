@@ -32,7 +32,7 @@ do
     magick -size ${SIZE} -gravity center canvas:none -stroke black -fill \#${C} -draw 'circle 100,86 100,168' +append P-${I}-hidden.png
 
     #    magick -size ${SIZE} -gravity center canvas:none -stroke black -fill \#${C} -draw 'circle 19,86 37,86' -draw 'circle 59,86 77,86' -draw 'circle 99,86 117,86' -draw 'circle 139,86 157,86' -draw 'circle 179,86 197,86'  +append P-${I}-hand.png
-    magick -size ${SIZE} -gravity center canvas:none -stroke black -strokewidth 3 -fill \#${C} -draw 'circle 55,86 100,86' -draw 'circle 80,86 125,86' -draw 'circle 105,86 150,86' -draw 'circle 130,86 175,86' -draw 'circle 155,86 200,86'  +append P-${I}-hand.png
+    magick -size 500x173 -gravity center canvas:none -stroke black -strokewidth 3 -fill \#${C} -draw 'circle 55,86 100,86' -draw 'circle 150,86 195,86' -draw 'circle 245,86 290,86' -draw 'circle 340,86 385,86' -draw 'circle 435,86 480,86'  +append P-${I}-hand.png
 
     # the player board "pool" icon
     magick -size ${SIZE} -gravity center canvas:none -stroke black -strokewidth 3 -fill \#${C} -draw 'circle 62,70 102,96' -draw 'circle 100,120 140,146' -draw 'circle 138,50 178,76' -transparent \#000001 +append P-${I}-pool.png
