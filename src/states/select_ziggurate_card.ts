@@ -9,10 +9,9 @@ type StateArgs = {
 }
 
 export class SelectZigguratCardState extends BabyloniaState {
-  private handler: (e: Event) => void;
+  private controller = new AbortController();
   constructor(bga: Bga<BblPlayer, BGamedatas>, view: View, animationManager: AnimationManager) {
     super(bga, view, animationManager);
-    this.handler = (e) => this.onZcardClicked(e);
   }
 
   override onEnteringState(args: StateArgs, isCurrentPlayerActive: boolean) {
@@ -20,45 +19,42 @@ export class SelectZigguratCardState extends BabyloniaState {
     if (isCurrentPlayerActive) {
       const div = $(IDS.AVAILABLE_ZCARDS) as HTMLElement;
       div.scrollIntoView(false);
-      $(IDS.AVAILABLE_ZCARDS).addEventListener('click', this.handler);
+      this.attachHandler();
     }
   }
 
   override onLeavingState(args: StateArgs, isCurrentPlayerActive: boolean) {
     this.view.unmarkHexSelected(args.hex);
     if (isCurrentPlayerActive) {
-      $(IDS.AVAILABLE_ZCARDS).removeEventListener('click', this.handler);
+      this.controller.abort();
     }
   }
 
-  private toggleZcardSelected(e: Element) {
-    const zt = e.getAttribute(Attrs.ZTYPE)!;
-    let promptForConfirmation = () => {
-      this.bga.statusBar.setTitle(_('Select ziggurat card ${zcard}?'), { zcard: zt });
+  private attachHandler() {
+      this.controller.abort();
+      this.controller = new AbortController();
+      $(IDS.AVAILABLE_ZCARDS).addEventListener('click', e => this.onZcardClicked(e), { signal: this.controller.signal });
+  }
 
-      this.bga.statusBar.addActionButton(_('Confirm'),
-        () => this.bga.actions.performAction('actSelectZigguratCard', { zctype: zt }),
-        { autoclick: true }
-      );
-
-      this.bga.statusBar.addActionButton(
-        _('Cancel'),
-        () => this.toggleZcardSelected(e),
-        { color: "secondary"});
-    };
-    let cancel = () => this.bga.states.restoreServerGameState();
-
-    let alreadySelected = document.querySelector(`#${IDS.AVAILABLE_ZCARDS} > .${CSS.SELECTED}`);
+  private confirmSelection(e: Element) {
     e.classList.toggle(CSS.SELECTED);
-    if (alreadySelected == null) {
-      promptForConfirmation();
-    } else if (alreadySelected == e) {
-      cancel();
-    } else {
-      alreadySelected.classList.toggle(CSS.SELECTED);
-      cancel();
-      promptForConfirmation();
-    }
+    this.controller.abort();
+    const zt = e.getAttribute(Attrs.ZTYPE)!;
+    this.bga.statusBar.removeActionButtons();
+    this.bga.statusBar.setTitle(_('Select ziggurat card ${zcard}?'), { zcard: zt });
+
+    this.bga.statusBar.addActionButton(_('Confirm'),
+      () => this.bga.actions.performAction('actSelectZigguratCard', { zctype: zt }),
+      { autoclick: true }
+    );
+
+    this.bga.statusBar.addActionButton(
+      _('Cancel'),
+      () => {
+        e.classList.toggle(CSS.SELECTED);
+        this.bga.states.restoreServerGameState();
+      },
+      { color: "secondary"});
   }
 
   private onZcardClicked(event: Event) {
@@ -68,7 +64,7 @@ export class SelectZigguratCardState extends BabyloniaState {
     let z = e.getAttribute(Attrs.ZTYPE);
     if (!z) { return false; }
     if (e.getAttribute(Attrs.ZTYPE)) {
-      this.toggleZcardSelected(e);
+      this.confirmSelection(e);
     }
     return false;
   }
