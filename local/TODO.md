@@ -32,3 +32,13 @@ and also try for hexes too.
   * Where do ziggurat cards go? Nice if on board to reduce "clutter"
   * Better ziggurat card selection experience ... "pop-up"? shrink/scroll?
     Definitely improve selection highlighting, and confirmation.
+  * City colors: not enough contrast between city and board. Also, dark band
+    possibly too close to river color.
+  * What if river color didn't take up whole tile but was a clear band of
+    (darker) blue?
+
+* User preferences for:
+  * timed auto-confirms
+  * Location of pieces: top/bottom left/right
+
+* Bug: canceling zcard selection does not work!
