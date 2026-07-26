@@ -396,17 +396,18 @@ function handleResize(evt) {
         }
 
         // "vertical" "alt" layout
-        var h2 = vertAvail * 0.85;
+        var h2 = vertAvail * 0.89;
         var w2 = h2 / View.map_aspect_ratio;
-        if (w2 > pageRect.width) {
-            w2 = pageRect.width - 12;
+        const extra = w2 / 18;
+        if (w2 > pageRect.width - extra) {
+            w2 = pageRect.width - extra;
             h2 = w2 * View.map_aspect_ratio;
         }
 
         const mainElCl = document.getElementById(IDS.MAIN).classList;
         if (w1 >= w2) {
             mainElCl.remove(CSS.LAYOUT_UNDER_BOARD);
-            document.body.style.setProperty('--bbl-board-width', (w1 - 12) + 'px');
+            document.body.style.setProperty('--bbl-board-width', (w1 - extra) + 'px');
         } else {
             mainElCl.add(CSS.LAYOUT_UNDER_BOARD);
             document.body.style.setProperty('--bbl-board-width', w2 + 'px');

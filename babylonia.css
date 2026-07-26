@@ -45,11 +45,12 @@ body {
     --bbl-hex-width: calc(var(--bbl-hex-ratio) * var(--bbl-hex-height));
 
     --bbl-zcard-aspect-ratio: calc(327/526);
+    --bbl-zcard-height: calc(var(--bbl-board-height / 8));
 }
 
 #bbl_main {
     display: flex;
-    flex-direction: row-reverse;
+    flex-direction: row;
     align-items: center;
     height: calc(var(--bbl-board-height) + 2 * var(--bbl-board-margin));
 }
@@ -63,6 +64,8 @@ body {
 */
 #bbl_board_container {
     flex: 1;
+    display: flex;
+    flex-direction: row-reverse;
     flex-grow: 0;
     position: relative;
     margin: calc(var(--bbl-board-margin));
@@ -95,12 +98,14 @@ body {
     display: flex;
     flex-direction:column;
     row-gap: calc(var(--bbl-hex-height) * 0.10);
-    border-radius: 20px;
+    border-radius: 8px;
+    /*
     border-style: solid;
-    border-color: black;
+    border-color: transparent;
     border-width: 1px;
+*/
     background-color: #ffffff80;
-    padding: 27px;
+    padding: 8px;
 }
 
 #bbl_hand_title {
@@ -119,24 +124,29 @@ body {
 
 #bbl_available_zcards {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    height: 100%;
+    grid-template-columns: 1fr;
     border-radius: 10px;
     border-style: solid;
     border-color: black;
     border-width: 1px;
-    background-color: #ffffff80;
-    padding: 10px;
+/*    background-color: #ffffff80; */
+    padding: 0px;
 }
 
+/*
 #bbl_main:not(.bbl_altflow) #bbl_available_zcards > div:nth-child(7) {
     position: relative;
     left: 50%;
 }
+*/
 
+/*
 #bbl_main.bbl_altflow #bbl_available_zcards {
     display: flex;
     flex-direction: row;
 }
+*/
 
 #bbl_rightpadding {
     display: flex;
@@ -434,7 +444,7 @@ body {
     background-image: url(img/zcards.png);
    */
     background-size: contain;
-    height: calc(1*var(--bbl-hex-height));
+    height: var(--bbl-zcard-height);
     width: auto;
     aspect-ratio: var(--bbl-zcard-aspect-ratio);
 }
@@ -547,11 +557,6 @@ body {
 
 /* available ziggurat cards panel */
 
-#bbl_available_zcards>div {
-    display: inline-block;
-    margin: 1px;
-}
-
 #bbl_available_zcards>div.bbl_selected {
     border-color: green;
     clip-path: margin-box;
@@ -563,7 +568,9 @@ body {
 }
 
 #bbl_available_zcards>div {
-    height: calc(var(--bbl-hex-height));
+    display: inline-block;
+    margin: 1px;
+    height: calc(var(--bbl-board-height) / 8);
     width: auto;
     aspect-ratio: var(--bbl-zcard-aspect-ratio);
     border-style: dashed;
