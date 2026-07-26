@@ -45,7 +45,7 @@ export class SelectZigguratCardState extends BabyloniaState {
 
     this.bga.statusBar.addActionButton(_('Confirm'),
       () => this.bga.actions.performAction('actSelectZigguratCard', { zctype: zt }),
-      { autoclick: true }
+      { autoclick: this.autoConfirmEnabled() }
     );
 
     this.bga.statusBar.addActionButton(

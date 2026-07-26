@@ -38,7 +38,6 @@ and also try for hexes too.
     (darker) blue?
 
 * User preferences for:
-  * timed auto-confirms
   * Location of pieces: top/bottom left/right
 
-* Bug: canceling zcard selection does not work!
+* Bug: zcard selection does not highlight current selected one.

@@ -40,7 +40,7 @@ export class SelectScoringHexState extends BabyloniaState {
     });
     this.bga.statusBar.addActionButton(_('Confirm'),
       () => this.bga.actions.performAction('actSelectHexToScore', { rc: hex }).then(() =>  this.view.unmarkHexPlayable(hex)),
-      { autoclick: true });
+      { autoclick: this.autoConfirmEnabled() });
     this.bga.statusBar.addActionButton(_('Cancel'),
       () => {
         div.classList.remove(CSS.SELECTED);

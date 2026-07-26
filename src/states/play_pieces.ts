@@ -335,7 +335,7 @@ export class PlayPiecesState extends BabyloniaState {
           this.unselectAllHandPieces();
           this.bga.actions.performAction('actDonePlayPieces');
         }, {
-          autoclick: mustEnd,
+          autoclick: mustEnd && this.autoConfirmEnabled(),
         });
     } else {
       this.bga.statusBar.setTitle(_('${you} must select a piece to play'));
