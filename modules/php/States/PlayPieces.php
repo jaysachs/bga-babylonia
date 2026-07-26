@@ -54,7 +54,9 @@ class PlayPieces extends AbstractState
      * @return mixed[]
      */
     private function addStateArgs(array $args, Model $model, int $active_player_id): array {
-        $args["playState"]["potentialCityScoring"] = $model->potentialCityScoring();
+        $args["playState"] = [
+            "potentialCityScoring" => $model->potentialCityScoring()
+        ];
 
         $priv = &$args["_private"];
         /** @phpstan-ignore offsetAccess.nonOffsetAccessible */

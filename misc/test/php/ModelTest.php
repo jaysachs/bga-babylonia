@@ -67,7 +67,8 @@ class TestStore extends PersistentStore {
             'board' => $this->board,
             'components' => $this->components,
             'player_infos' => $this->player_infos,
-            'turnProgress' => $this->turnProgress,
+            'turn_progress' => $this->turnProgress,
+            'scored_city_count' => 0,
             'pool' => new Pool([]),
         ];
     }

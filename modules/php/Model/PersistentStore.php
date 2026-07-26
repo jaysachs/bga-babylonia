@@ -119,7 +119,7 @@ class PersistentStore
         $this->db->execute($sql);
     }
 
-    /** @return array{player_infos:array<int,PlayerInfo>,board:Board,components:Components,turnProgress:TurnProgress,scored_city_count:int} */
+    /** @return array{player_infos:array<int,PlayerInfo>,board:Board,components:Components,turn_progress:TurnProgress,scored_city_count:int} */
     public function retrieveAllData(int $player_id): array {
         $rows = $this->db->getObjectList("SELECT location, location_id, type, player_id, used, terrain FROM pieces ORDER BY location, location_id, player_id");
 
@@ -190,7 +190,7 @@ class PersistentStore
             'player_infos' => $pinfos,
             'board' => Board::fromHexes($hexes),
             'components' => new Components($cards),
-            'turnProgress' => $this->retrieveTurnProgress(),
+            'turn_progress' => $this->retrieveTurnProgress(),
             "scored_city_count" => $scored_city_count,
         ];
     }

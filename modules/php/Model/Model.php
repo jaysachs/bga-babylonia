@@ -62,7 +62,7 @@ use Bga\Games\babylonia\Stats;
 
 class Model
 {
-    /** @var array{player_infos:array<int,PlayerInfo>,board:Board,components:Components,turnProgress:TurnProgress} */
+    /** @var array{player_infos:array<int,PlayerInfo>,board:Board,components:Components,turn_progress:TurnProgress,scored_city_count:int} */
     private ?array $_allData = null;
 
     public function __construct(private PersistentStore $ps, private Stats $stats, private int $player_id) {
@@ -92,18 +92,18 @@ class Model
         );
     }
 
-    /** @return array{player_infos:array<int,PlayerInfo>,board:Board,components:Components,turnProgress:TurnProgress,scored_city_count:int} */
+    /** @return array{player_infos:array<int,PlayerInfo>,board:Board,components:Components,turn_progress:TurnProgress,scored_city_count:int} */
     private function &allData(): array {
         if ($this->_allData == null) {
             $this->_allData = $this->ps->retrieveAllData($this->player_id);
-            $turnProgress = $this->_allData["turnProgress"];
+            $turnProgress = $this->_allData["turn_progress"];
             $moves = [];
-            $this->_allData["turnProgress"] = new TurnProgress($moves);
+            $this->_allData["turn_progress"] = new TurnProgress($moves);
             foreach ($turnProgress->moves as $move) {
                 $this->doPlayPiece($move->player_id, $move->handpos, $move->rc);
                 $this->_allData["player_infos"][$move->player_id]->score += $move->points();
             }
-            $this->_allData["turnProgress"] = $turnProgress;
+            $this->_allData["turn_progress"] = $turnProgress;
         }
         return $this->_allData;
     }
@@ -132,7 +132,7 @@ class Model
         if ($max == 100) { $max = 99; }
 
         $remaining_cities = $this->board()->cityCount();
-        $starting_cities = $remaining_cities + $this->_allData["scored_city_count"];
+        $starting_cities = $remaining_cities + $this->allData()["scored_city_count"];
         // subtract 1 because game ends with 0 or 1 cities left.
         $cmax = 100 - intval(100.0 * ($remaining_cities - 1) / $starting_cities);
         if ($cmax > $max) {
@@ -158,7 +158,7 @@ class Model
 
     private function turnProgress(): TurnProgress
     {
-        return $this->allData()['turnProgress'];
+        return $this->allData()['turn_progress'];
     }
 
     public function checkPlay(int $player_id, PieceType $piece, Hex $hex): PlayAllowedResult
@@ -364,7 +364,7 @@ class Model
         $this->_allData = $this->ps->retrieveAllData($this->player_id);
         $turnProgress = $this->turnProgress();
         $moves = [];
-        $this->_allData["turnProgress"] = new TurnProgress($moves);
+        $this->_allData["turn_progress"] = new TurnProgress($moves);
         return $turnProgress;
     }
 
