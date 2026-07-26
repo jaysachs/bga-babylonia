@@ -30,7 +30,7 @@ export class PlayPiecesState extends BabyloniaState {
 
   private doEnterState(playStateArgs: PlayStateArgs) {
       this.playStateArgs = playStateArgs;
-      this.bga.gameui.gamedatas.potential_city_scoring = playStateArgs.potentialCityScoring;
+      this.bga.gameui.gamedatas.potentialCityScoring = playStateArgs.potentialCityScoring;
       this.view.markAllHexesUnplayable();
       if (this.bga.players.isCurrentPlayerActive()) {
         this.setStatusBarForPlayState();

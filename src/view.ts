@@ -154,7 +154,7 @@ export class View {
     }
 
     private showScoringHover(div: HTMLElement, rc: number) {
-        const scores = this.bga.gameui.gamedatas.potential_city_scoring[String(rc)]!;
+        const scores = this.bga.gameui.gamedatas.potentialCityScoring[String(rc)]!;
         this.playersInPlayerNoOrder().map(
             (p, n) =>  {
                 ($(IDS.CITY_SCORING_HOVER_DETAILS).children.item(n) as HTMLElement).innerText =
