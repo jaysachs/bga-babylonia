@@ -327,12 +327,10 @@ export class View {
         return Html.div({},
             Html.div({id:IDS.MAIN},
                 Html.div({id: "bbl_hand_container"},
-                    Html.span({id: "bbl_hand_title", text: _("Hand")}),
                     Html.div({id: IDS.HAND })
                 ),
                 Html.div({id:'bbl_board_container'},
                     Html.div({id:"bbl_available_zcards_container"},
-                        Html.span({id: "bbl_available_zcards_title", text: _("Ziggurat Cards")}),
                         Html.div({id:IDS.AVAILABLE_ZCARDS })
                     ),
                     this.scoringHover(),
