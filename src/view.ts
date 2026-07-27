@@ -210,17 +210,18 @@ export class View {
         }
 
         // "vertical" "alt" layout
-        var h2 = vertAvail * 0.85;
+        var h2 = vertAvail * 0.89;
         var w2 = h2 / View.map_aspect_ratio;
-        if (w2 > pageRect.width) {
-            w2 = pageRect.width - 12;
+        const extra = w2 / 18;
+        if (w2 > pageRect.width - extra) {
+            w2 = pageRect.width - extra;
             h2 = w2 * View.map_aspect_ratio;
         }
 
         const mainElCl = document.getElementById(IDS.MAIN)!.classList;
         let width = w2;
         if (w1 >= w2) {
-            width = w1 - 12;
+            width = w1 - extra;
             mainElCl.remove(CSS.LAYOUT_UNDER_BOARD);
         } else {
             mainElCl.add(CSS.LAYOUT_UNDER_BOARD);
@@ -325,18 +326,15 @@ export class View {
     private base_html(): HTMLElement {
         return Html.div({},
             Html.div({id:IDS.MAIN},
-                Html.div({id: 'bbl_rightpadding'}),
-                Html.div({id: 'bbl_pieces'},
-                    Html.div({id: "bbl_hand_container"},
-                        Html.span({id: "bbl_hand_title", text: _("Hand")}),
-                        Html.div({id: IDS.HAND })
-                    ),
+                Html.div({id: "bbl_hand_container"},
+                    Html.span({id: "bbl_hand_title", text: _("Hand")}),
+                    Html.div({id: IDS.HAND })
+                ),
+                Html.div({id:'bbl_board_container'},
                     Html.div({id:"bbl_available_zcards_container"},
                         Html.span({id: "bbl_available_zcards_title", text: _("Ziggurat Cards")}),
                         Html.div({id:IDS.AVAILABLE_ZCARDS })
-                    )
-                ),
-                Html.div({id:'bbl_board_container'},
+                    ),
                     this.scoringHover(),
                     Html.div({id:IDS.BOARD})
                 )
