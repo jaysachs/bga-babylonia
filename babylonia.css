@@ -45,7 +45,10 @@ body {
     --bbl-hex-width: calc(var(--bbl-hex-ratio) * var(--bbl-hex-height));
 
     --bbl-zcard-aspect-ratio: calc(327/526);
-    --bbl-zcard-height: calc(var(--bbl-board-height / 8));
+    /* FIXME: why doesn't this work? */
+    /*    --bbl-zcard-height: calc(var(--bbl-board-height / 8)); */
+    /* but this does: */
+    --bbl-zcard-height: calc(var(--bbl-board-width) / var(--bbl-map-aspect-ratio) / 8);
 }
 
 #bbl_main {
@@ -99,28 +102,16 @@ body {
     padding: 8px;
 }
 
-#bbl_hand_title {
-    display: inline;
-    position: relative;
-    left: 10px;
-    top: 0px;
-}
-
-#bbl_available_zcards_title {
-    display: inline;
-    position: relative;
-    left: 10px;
-    top: 0px;
-}
-
 #bbl_available_zcards {
     display: grid;
     height: 100%;
     grid-template-columns: 1fr;
+    /*
     border-radius: 10px;
     border-style: solid;
     border-color: black;
     border-width: 1px;
+*/
 /*    background-color: #ffffff80; */
     padding: 0px;
 }
@@ -527,10 +518,12 @@ body {
 
 /* available ziggurat cards panel */
 
+/*
 #bbl_available_zcards>div.bbl_selected {
     border-color: green;
     clip-path: margin-box;
 }
+*/
 
 
 #bbl_available_zcards.bbl_selecting>div>div[bbl_ztype] {
@@ -540,16 +533,19 @@ body {
 #bbl_available_zcards>div {
     display: inline-block;
     margin: 1px;
-    height: calc(var(--bbl-board-height) / 8);
+    height: var(--bbl-zcard-height);
     width: auto;
     aspect-ratio: var(--bbl-zcard-aspect-ratio);
+    /*
     border-style: dashed;
     border-width: 1px;
     border-color: transparent;
+*/
 }
 
 #bbl_available_zcards>div:not(:has(>div)) {
     border-color: black;
+    background-color: #ffffff60;
 }
 
 /*
