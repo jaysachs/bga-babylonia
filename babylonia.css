@@ -14,7 +14,7 @@
  */
 
 html {
-    background-image: url(img/background-dark.jpg);
+/*    background-image: url(img/background-dark.jpg); */
 }
 
 /* inspired from https://css-tricks.com/hexagons-and-beyond-flexible-responsive-grid-patterns-sans-media-queries/ */
@@ -103,8 +103,12 @@ body {
 }
 
 #bbl_available_zcards {
+    background-image: url(img/background-dark.jpg);
+    padding: 10px;
     display: grid;
+    align-items: center;
     height: 100%;
+    width: 110%;
     grid-template-columns: 1fr;
     /*
     border-radius: 10px;
