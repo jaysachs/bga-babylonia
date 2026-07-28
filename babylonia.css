@@ -53,8 +53,9 @@ body {
 
 #bbl_main {
     display: flex;
-    flex-direction: row;
+    flex-direction: row-reverse;
     align-items: center;
+    justify-content: center;
     height: calc(var(--bbl-board-height) + 2 * var(--bbl-board-margin));
 }
 
