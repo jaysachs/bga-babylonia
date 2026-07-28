@@ -19,7 +19,7 @@ magick -size ${SIZE} -gravity center canvas:none -stroke yellow -strokewidth 10 
 
 # empty hand position alpha mask
 # remember this technique -- can specify alpha channel directly w/ 4-byte hex colors
-magick -size ${SIZE} -gravity center canvas:none -background none -stroke \#FFFFFF30 -strokewidth 4 -fill \#FFFFFF30 -draw 'circle 100,86 100,168' +append empty_hand.png
+magick -size ${SIZE} -gravity center canvas:none -background none -stroke \#00000040 -strokewidth 2 -fill \#00000020 -draw 'circle 100,86 100,168' +append empty_hand.png
 
 # hex scoring
 magick -size ${SIZE} -gravity center canvas:none -stroke \#FF2222 -strokewidth 18 -fill none -draw "polygon ${HEX4}" +append hex_scoring.png
