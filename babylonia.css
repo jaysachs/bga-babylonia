@@ -15,7 +15,7 @@
 
 html {
 /*    background-image: url(img/background-dark.jpg); */
-    background: content-box radial-gradient(#cea648, #9e7d5e);
+    background: linear-gradient(10deg, #cea648, #a7855d, #cea648);
 }
 
 /* inspired from https://css-tricks.com/hexagons-and-beyond-flexible-responsive-grid-patterns-sans-media-queries/ */
@@ -54,7 +54,7 @@ body {
 
 #bbl_main {
     display: flex;
-    flex-direction: row-reverse;
+    flex-direction: row;
     align-items: center;
     justify-content: center;
     height: calc(var(--bbl-board-height) + 2 * var(--bbl-board-margin));

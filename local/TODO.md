@@ -41,3 +41,5 @@ and also try for hexes too.
   * Location of pieces: top/bottom left/right
 
 * Bug: zcard selection does not highlight current selected one.
+
+* Rework CSS to have fixed size elements, with a computed zoom on `#bbl_main`
