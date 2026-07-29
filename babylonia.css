@@ -15,6 +15,7 @@
 
 html {
 /*    background-image: url(img/background-dark.jpg); */
+    background: content-box radial-gradient(#cea648, #9e7d5e);
 }
 
 /* inspired from https://css-tricks.com/hexagons-and-beyond-flexible-responsive-grid-patterns-sans-media-queries/ */
@@ -101,8 +102,13 @@ body {
    */
     /*
     background-color: #ffffff80;
-*/
-    padding: 8px;
+   */
+/*    padding: 8px; */
+    margin: 10px;
+    border-width: 10px;
+    background-color: #ddddddc0;
+    border-style: ridge;
+    border-color: #2189c2;
 }
 
 #bbl_available_zcards {
@@ -597,9 +603,9 @@ body {
 .bbl_pb_hand_label_2,
 .bbl_pb_hand_label_3,
 .bbl_pb_hand_label_4 {
-    width: calc(2.5*var(--bbl-label-width));
+    width: calc(2.5/2.5*var(--bbl-label-width));
     height: calc(var(--bbl-label-height));
-    background-size: 100%;
+    background-size: cover;
     /*
     background-image: var(--bbl-sprites-file);
     background-size: 700% 700%;
@@ -633,12 +639,12 @@ body {
 
 .bbl_pb_hand_label_3 {
     /*background-position: -400% -600%; */
-    background-image: url(img/P-3-hand.png);
+    background-image: url(img/P-3-hidden.png);
 }
 
 .bbl_pb_hand_label_4 {
     /*background-position: -400% -500%; */
-    background-image: url(img/P-4-hand.png);
+    background-image: url(img/P-4-hidden.png);
 }
 
 .bbl_pb_pool_label_1 {
