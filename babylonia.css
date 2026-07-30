@@ -14,12 +14,15 @@
  */
 
 html {
-/*    background-image: url(img/background-dark.jpg); */
-    background: linear-gradient(10deg, #cea648, #a7855d, #cea648);
+    /*    background-image: url(img/background-dark.jpg); */
+    /*    background: linear-gradient(190deg, #a7855d, #b2afa4); */
+    /*  #a7855d, #cea648); */
+    background: url(img/Ziggurat-T-1.png) 50% 30% / 150% 150% no-repeat;
 }
 
 /* inspired from https://css-tricks.com/hexagons-and-beyond-flexible-responsive-grid-patterns-sans-media-queries/ */
 body {
+/*    background: #aabb7720; */
     --bbl-map-file: url(img/map.jpg);
     --bbl-sprites-file: url(img/spritesv4.png);
 
@@ -33,7 +36,7 @@ body {
     /* 2/sqrt(3) */
     --bbl-hex-ratio: 1.155;
 
-    --bbl-board-width: 1000vw;
+    --bbl-board-width: 100vw;
 
     --bbl-board-height: calc(var(--bbl-board-width) / var(--bbl-map-aspect-ratio));
 
