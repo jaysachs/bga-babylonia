@@ -102,18 +102,23 @@
                       <button class="action-button bgabutton bgabutton_darkgray" type="button" onclick="toggleMobile()">Mobile</button>
                       <button class="action-button bgabutton bgabutton_red" type="button" onclick="clearMap()">Clear</button>
                       <button class="action-button bgabutton bgabutton_blue" type="button" onclick="initialize4p()">Initialize 4p</button>
-                      <button class="action-button bgabutton bgabutton_blue" type="button" onclick="addRandomPieces(1, 1)">+1 (p1)</button>
-                      <button class="action-button bgabutton bgabutton_blue" type="button" onclick="addRandomPieces(1, 2)">+1 (p2)</button>
-                      <button class="action-button bgabutton bgabutton_blue" type="button" onclick="addRandomPieces(1, 3)">+1 (p3)</button>
-                      <button class="action-button bgabutton bgabutton_blue" type="button" onclick="addRandomPieces(1, 4)">+1 (p4)</button>
-                      <button class="action-button bgabutton bgabutton_blue" type="button" onclick="addRandomPieces(10, 1)">+10 (p1)</button>
-                      <button class="action-button bgabutton bgabutton_blue" type="button" onclick="addRandomPieces(10, 2)">+10 (p2)</button>
-                      <button class="action-button bgabutton bgabutton_blue" type="button" onclick="addRandomPieces(10, 3)">+10 (p3)</button>
-                      <button class="action-button bgabutton bgabutton_blue" type="button" onclick="addRandomPieces(10, 4)">+10 (p4)</button>
-                      <!--
-                      <button class="action-button bgabutton bgabutton_blue" type="button" onclick="toggleMockupPieces()">Mockup pieces</button>
-                      <button class="action-button bgabutton bgabutton_blue" type="button" onclick="toggleMockupBoard()">Mockup board</button>
-                      -->
+                      <select id="bbl_whichplayer">
+                        <button>
+                          <selectedcontent></selectedcontent>
+                        </button>
+                        <option value="1"><span style="color:#2c2b28">p1</span></option>
+                        <option value="2"><span bbl_piece="hidden_2">p2</span></option>
+                        <option value="3" style="color:#966905">p3</option>
+                        <option value="4" style="color:#91381b">p4</option>
+                      </select>
+                      <button class="action-button bgabutton bgabutton_blue" type="button" onclick="addRandomPieces(1, 1)">+1p</button>
+                      <button class="action-button bgabutton bgabutton_blue" type="button" onclick="addRandomPieces(10, 1)">+10p</button>
+                      <select id="bbl_mockup_bg" onchange="bgchange()">
+                        <option value="">BGA Default</option>
+                        <option value="bblbg1">Dark</option>
+                        <option value="bblbg2">Gradient</option>
+                        <option value="bblbg3">Image</option>
+                      </select>
 </div>
                     <span id="gotonexttable_wrap">&nbsp;
                       <a id="go_to_next_table_inactive_player" class="bgabutton bgabutton_red" href="https://studio.boardgamearena.com/play?from=779594"><span id="go_to_next_player_label">Go to next table</span> <i class="fa fa-arrow-right" aria-hidden="true"></i></a>

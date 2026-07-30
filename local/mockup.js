@@ -1,3 +1,11 @@
+function bgchange() {
+    const c = document.documentElement.classList;
+    c.remove('bblbg1');
+    c.remove('bblbg2');
+    c.remove('bblbg3');
+    c.add(document.getElementById('bbl_mockup_bg').value);
+}
+
 const hstart = 38.0; // this is related to board width but not sure how
 const vstart = 9.0; // depends on board size too
 const height = 768 / 12.59;
@@ -273,8 +281,8 @@ const river = [
 
 ];
 
-function addRandomPieces(n, p) {
-    console.log(river);
+function addRandomPieces(n) {
+    p = Number(document.getElementById("bbl_whichplayer").value);
     const vacant = Array.from(document.querySelectorAll('#bbl_board > div:not(:has(div))')).map(e => e.id.split('_')[2]);
     shuffleArray(vacant);
     const types = [

@@ -17,6 +17,18 @@ html {
     /*    background-image: url(img/background-dark.jpg); */
     /*    background: linear-gradient(190deg, #a7855d, #b2afa4); */
     /*  #a7855d, #cea648); */
+    /* background: url(img/Ziggurat-T-1.png) 50% 30% / 150% 150% no-repeat; */
+}
+
+html.bblbg1 {
+    background-image: url(img/background-dark.jpg);
+}
+
+html.bblbg2 {
+    background: linear-gradient(190deg, #a7855d, #b2afa4);
+}
+
+html.bblbg3 {
     background: url(img/Ziggurat-T-1.png) 50% 30% / 150% 150% no-repeat;
 }
 
