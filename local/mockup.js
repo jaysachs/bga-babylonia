@@ -1,5 +1,5 @@
 function bgchange() {
-    const c = document.documentElement.classList;
+    const c = document.body.classList;
     c.remove('bblbg1');
     c.remove('bblbg2');
     c.remove('bblbg3');
