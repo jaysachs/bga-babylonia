@@ -20,21 +20,22 @@ html {
     /* background: url(img/Ziggurat-T-1.png) 50% 30% / 150% 150% no-repeat; */
 }
 
-html.bblbg1 {
+body.bblbg1 {
     background-image: url(img/background-dark.jpg);
 }
 
-html.bblbg2 {
+body.bblbg2 {
     background: linear-gradient(190deg, #a7855d, #b2afa4);
 }
 
-html.bblbg3 {
+body.bblbg3 {
     background: url(img/Ziggurat-T-1.png) 50% 30% / 150% 150% no-repeat;
 }
 
 /* inspired from https://css-tricks.com/hexagons-and-beyond-flexible-responsive-grid-patterns-sans-media-queries/ */
 body {
-/*    background: #aabb7720; */
+    /*    background: #aabb7720; */
+    height: 100vh;
     --bbl-map-file: url(img/map.jpg);
     --bbl-sprites-file: url(img/spritesv4.png);
 
@@ -83,6 +84,7 @@ body {
  possible" but no more.
 */
 #bbl_board_container {
+    border: 8px solid #ffffffbb;
     flex: 1;
     display: flex;
     flex-direction: row-reverse;
@@ -128,11 +130,9 @@ body {
 
 #bbl_available_zcards {
     background-image: url(img/background-dark.jpg);
-    padding: 10px;
     display: grid;
     align-items: center;
     height: 100%;
-    width: 110%;
     grid-template-columns: 1fr;
     /*
     border-radius: 10px;
@@ -141,7 +141,7 @@ body {
     border-width: 1px;
 */
 /*    background-color: #ffffff80; */
-    padding: 0px;
+    padding-right: 6px;
 }
 
 #bbl_rightpadding {
