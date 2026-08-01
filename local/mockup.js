@@ -1,9 +1,9 @@
-function bgchange() {
+function bgchange(event) {
     const c = document.body.classList;
     c.remove('bblbg1');
     c.remove('bblbg2');
     c.remove('bblbg3');
-    c.add(document.getElementById('bbl_mockup_bg').value);
+    c.add(event.target.value);
 }
 
 const hstart = 38.0; // this is related to board width but not sure how
@@ -391,9 +391,8 @@ function foobar() {
 function handleResize(evt) {
         const pageEl = document.getElementById('page-content');
         const pageRect = pageEl.getBoundingClientRect();
-        const viewPort = window.visualViewport;
 
-        const vertAvail = viewPort.height - pageRect.top;
+        const vertAvail = window.visualViewport.height - pageRect.top;
 
         // "horizontal" "default" layout
         var w1 = pageRect.width * 0.875;
@@ -404,22 +403,23 @@ function handleResize(evt) {
         }
 
         // "vertical" "alt" layout
-        var h2 = vertAvail * 0.89;
+        var h2 = vertAvail * 0.85;
         var w2 = h2 / View.map_aspect_ratio;
         const extra = w2 / 18;
         if (w2 > pageRect.width - extra) {
             w2 = pageRect.width - extra;
-            h2 = w2 * View.map_aspect_ratio;
         }
 
         const mainElCl = document.getElementById(IDS.MAIN).classList;
+        let width = w1;
         if (w1 >= w2) {
+            width = w1 - extra;
             mainElCl.remove(CSS.LAYOUT_UNDER_BOARD);
-            document.body.style.setProperty('--bbl-board-width', (w1 - extra) + 'px');
         } else {
+            width = w2 - extra / 2;
             mainElCl.add(CSS.LAYOUT_UNDER_BOARD);
-            document.body.style.setProperty('--bbl-board-width', w2 + 'px');
         }
+        document.body.style.setProperty('--bbl-board-width', `${width}px`);
    }
 
 window.onload = () => handleResize();

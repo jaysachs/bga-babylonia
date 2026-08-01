@@ -84,6 +84,7 @@ body {
  possible" but no more.
 */
 #bbl_board_container {
+    box-sizing: border-box;
     border: 8px solid #ffffffbb;
     flex: 1;
     display: flex;

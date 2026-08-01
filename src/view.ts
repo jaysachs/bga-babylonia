@@ -195,11 +195,10 @@ export class View {
     }
 
     private handleResize() {
-        const pageEl = document.getElementById('page-content');
+       const pageEl = document.getElementById('page-content');
         const pageRect = pageEl!.getBoundingClientRect();
-        const viewPort = window.visualViewport!;
 
-        const vertAvail = viewPort.height - pageRect.top;
+        const vertAvail = window.visualViewport!.height - pageRect.top;
 
         // "horizontal" "default" layout
         var w1 = pageRect.width * 0.875;
@@ -210,20 +209,20 @@ export class View {
         }
 
         // "vertical" "alt" layout
-        var h2 = vertAvail * 0.89;
+        var h2 = vertAvail * 0.85;
         var w2 = h2 / View.map_aspect_ratio;
         const extra = w2 / 18;
         if (w2 > pageRect.width - extra) {
             w2 = pageRect.width - extra;
-            h2 = w2 * View.map_aspect_ratio;
         }
 
         const mainElCl = document.getElementById(IDS.MAIN)!.classList;
-        let width = w2;
+        let width = w1;
         if (w1 >= w2) {
             width = w1 - extra;
             mainElCl.remove(CSS.LAYOUT_UNDER_BOARD);
         } else {
+            width = w2 - extra / 2;
             mainElCl.add(CSS.LAYOUT_UNDER_BOARD);
         }
         document.body.style.setProperty('--bbl-board-width', `${width}px`);
