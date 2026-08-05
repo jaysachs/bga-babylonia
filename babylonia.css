@@ -582,7 +582,7 @@ body {
 
 #bbl_available_zcards>div {
     display: inline-block;
-    margin: 1px;
+    border: 4px solid transparent;
     height: var(--bbl-zcard-height);
     width: auto;
     aspect-ratio: var(--bbl-zcard-aspect-ratio);
@@ -591,6 +591,10 @@ body {
     border-width: 1px;
     border-color: transparent;
 */
+}
+
+#bbl_available_zcards>div:has(>div.bbl_selected) {
+    border: 4px solid yellow;
 }
 
 #bbl_available_zcards>div:not(:has(>div)) {
