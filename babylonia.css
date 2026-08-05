@@ -29,7 +29,11 @@ body.bblbg2 {
 }
 
 body.bblbg3 {
-    background: url(img/Ziggurat-T-1.png) 50% 30% / 150% 150% no-repeat;
+    background: url(img/zback.png) 50% 30% / 150% 150% no-repeat;
+}
+
+body.bblbg4 {
+    background: conic-gradient(#6a6, #a7855d, #6a6, #b2afa4, #6a6);
 }
 
 /* inspired from https://css-tricks.com/hexagons-and-beyond-flexible-responsive-grid-patterns-sans-media-queries/ */
