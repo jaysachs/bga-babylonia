@@ -241,6 +241,9 @@ body {
 [bbl_piece] {
     aspect-ratio: calc(var(--bbl-hex-ratio));
     background-size: 100%;
+    position: absolute;
+    left: 0;
+    top: 0;
     /*
     background-image: var(--bbl-sprites-file);
     background-size: 700% 700%; */
