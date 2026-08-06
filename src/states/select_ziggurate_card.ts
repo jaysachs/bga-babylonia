@@ -18,7 +18,7 @@ export class SelectZigguratCardState extends BabyloniaState {
     this.view.markHexSelected(args.hex);
     if (isCurrentPlayerActive) {
       const div = $(IDS.AVAILABLE_ZCARDS) as HTMLElement;
-      div.scrollIntoView(false);
+      div.classList.add(CSS.SELECTING);
       this.attachHandler();
     }
   }
@@ -26,6 +26,8 @@ export class SelectZigguratCardState extends BabyloniaState {
   override onLeavingState(args: StateArgs, isCurrentPlayerActive: boolean) {
     this.view.unmarkHexSelected(args.hex);
     if (isCurrentPlayerActive) {
+      const div = $(IDS.AVAILABLE_ZCARDS) as HTMLElement;
+      div.classList.remove(CSS.SELECTING);
       this.controller.abort();
     }
   }

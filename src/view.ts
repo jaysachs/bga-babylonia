@@ -90,6 +90,7 @@ export class IDS {
 export class CSS {
   static readonly IN_NETWORK = 'bbl_in_network';
   static readonly SELECTED = 'bbl_selected';
+  static readonly SELECTING = 'bbl_selecting';
   static readonly PLAYABLE = 'bbl_playable';
   static readonly UNPLAYABLE = 'bbl_unplayable';
   static readonly UNIMPORTANT = 'bbl_unimportant';

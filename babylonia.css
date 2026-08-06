@@ -576,8 +576,9 @@ body {
 */
 
 
-#bbl_available_zcards.bbl_selecting>div>div[bbl_ztype] {
+#bbl_available_zcards.bbl_selecting>div:has(>div[bbl_ztype]) {
     cursor: pointer;
+    border: 4px solid #44dd4fcc;
 }
 
 #bbl_available_zcards>div {
@@ -593,7 +594,7 @@ body {
 */
 }
 
-#bbl_available_zcards>div:has(>div.bbl_selected) {
+#bbl_available_zcards.bbl_selecting>div:has(>div.bbl_selected) {
     border: 4px solid yellow;
 }
 
