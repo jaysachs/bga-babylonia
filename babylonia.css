@@ -128,7 +128,11 @@ body {
 /*    padding: 8px; */
     margin: 10px;
     border-width: 10px;
-    background-color: #ddddddc0;
+    /*
+    background: url(https://studio.boardgamearena.com/data/themereleases/260722-1430/img/layout/back-main.jpg);
+*/
+/*    background: url(../img/layout/back-main.jpg); */ /*  var(--palette-main-bg); */ /* transparent; #bdb5a8;*/
+    background-color: #eccc9e;
     border-style: ridge;
     border-color: #2189c2;
 }
@@ -550,6 +554,7 @@ body {
 
 #bbl_hand>div.bbl_selected::before {
     background-image: url(img/hand_highlight.png);
+    z-index: 10;
     background-size: 100%;
     pointer-events: none;
     /*

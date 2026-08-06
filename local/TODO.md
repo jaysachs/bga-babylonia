@@ -25,7 +25,7 @@
 
 
 * UX:
-  * highlight around pieces in hand is too small. Make pieces standard size? Or put circle on top in z-order?
+  * hand background adapts to player color? or just use board color?
 
 * ?? User preferences for:
   * Location of pieces: top/bottom left/right
