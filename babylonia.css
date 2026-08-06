@@ -238,12 +238,15 @@ body {
     height: 32px;
 }
 
-[bbl_piece] {
-    aspect-ratio: calc(var(--bbl-hex-ratio));
-    background-size: 100%;
+#bbl_board [bbl_piece] {
     position: absolute;
     left: 0;
     top: 0;
+}
+
+[bbl_piece] {
+    aspect-ratio: calc(var(--bbl-hex-ratio));
+    background-size: 100%;
     /*
     background-image: var(--bbl-sprites-file);
     background-size: 700% 700%; */
