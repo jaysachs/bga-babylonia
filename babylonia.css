@@ -321,7 +321,7 @@ body {
     background-image: url(img/Crop-T-c.png);
 }
 
-[bbl_piece="ziggurat2"] {
+[bbl_piece="ziggurat"].bbl_scored {
     /* background-position: -400% -100%; */
     background-image: url(img/Ziggurat-T-1.png);
 }

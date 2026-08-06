@@ -96,6 +96,7 @@ export class CSS {
   static readonly UNIMPORTANT = 'bbl_unimportant';
   static readonly LAYOUT_UNDER_BOARD = 'bbl_altflow';
   static readonly IS_SPECTATOR = 'bbl_is_spectator';
+  static readonly SCORED = 'bbl_scored';
 }
 
 export class View {
@@ -131,7 +132,8 @@ export class View {
         gamedatas.hand?.forEach((piece, i) => {
             const hpd = this.handPosDiv(i);
             if (Piece.isNonEmpty(piece)) {
-                hpd.appendChild(this.createPieceDiv(piece, this.bga.gameui.player_id));
+                const pieceDiv = this.createPieceDiv(piece, this.bga.gameui.player_id)
+                hpd.appendChild(pieceDiv);
             }
         });
 
@@ -239,6 +241,9 @@ export class View {
                 if (Piece.isCity(hex.piece)) {
                     pieceDiv.addEventListener('pointerover', e => this.showScoringHover(pieceDiv, hex.rc));
                     pieceDiv.addEventListener('pointerout', e => this.hideScoringHover());
+                }
+                if (hex.scored) {
+                    pieceDiv.classList.add(CSS.SCORED);
                 }
                 hexDiv.appendChild(pieceDiv);
             }
@@ -370,6 +375,10 @@ export class View {
             hand.appendChild(Html.div({}));
         }
         return $(IDS.HAND).childNodes.item(i)! as HTMLElement;
+    }
+
+    public markHexScored(rc: number): void {
+        this.hexDiv(rc).firstElementChild?.classList.add(CSS.SCORED);
     }
 
     public markHexPlayable(rc: number): void {

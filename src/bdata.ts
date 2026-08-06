@@ -16,6 +16,7 @@ export interface Hex {
   rc: number;
   board_player: number;
   piece: PieceType;
+  scored: boolean;
   terrain: 'NORTH' | 'SOUTH' | 'CENTRAL' | 'RIVER';
 }
 

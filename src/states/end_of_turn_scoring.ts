@@ -46,6 +46,7 @@ export class EndOfTurnScoringState extends BabyloniaState {
     if (!args.player_id) {
       this.view.unmarkHexSelected(args.rc)
     };
+    this.view.markHexScored(args.rc);
     // TODO: consider better visual treatments
   }
 

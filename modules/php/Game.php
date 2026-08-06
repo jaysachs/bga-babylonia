@@ -30,9 +30,7 @@ namespace Bga\Games\babylonia;
 use Bga\Games\babylonia\Model\Model;
 use Bga\Games\babylonia\Model\PersistentStore;
 use Bga\GameFramework\Table;
-use Bga\Games\babylonia\Model\Hex;
 use Bga\Games\babylonia\Model\PieceType;
-use Bga\Games\babylonia\Model\RowCol;
 use Bga\Games\babylonia\Model\ZigguratCardType;
 use Bga\Games\babylonia\States\StartTurn;
 use Bga\Games\babylonia\Utils\Arrays;
@@ -150,6 +148,7 @@ class Game extends Table
                 "terrain" => $hex->terrain->value,
                 "piece" => $hex->piece->value,
                 "board_player" => $hex->player_id,
+                "scored" => $hex->scored,
             ];
         }
 		$translated = [];
