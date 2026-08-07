@@ -1,3 +1,14 @@
+function handchange(n) {
+    document.querySelectorAll('#bbl_hand > div > div')
+        .forEach(d => {
+            let a = d.getAttribute('bbl_piece');
+            if (a) {
+                let p = a.split('_');
+                d.setAttribute('bbl_piece', p[0] + '_' + n);
+            }
+        });
+}
+
 function bgchange(event) {
     const c = document.body.classList;
     c.remove('bblbg1');
