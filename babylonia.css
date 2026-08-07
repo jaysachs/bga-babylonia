@@ -619,13 +619,8 @@ body {
     --bbl-label-height: 2em;
     --bbl-label-width: calc(var(--bbl-hex-ratio) * var(--bbl-label-height));
     padding-top: 7px;
-    display: flex;
-}
-
-.bbl_pb {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    grid-row-gap: 7px;
+    grid-template-columns: repeat(3, 1.25fr) 3fr;
 }
 
 .player-board-game-specific-content>div {
@@ -718,28 +713,31 @@ body {
     text-align: center;
 }
 
-div.bbl_pb_zcards {
-    display: flex;
-    /* TODO, these are hardcoded weirdness */
-    margin-left: 7px;
-    /* TODO: figure out how to lay this out to enable border */
-    /*
-    border: 1px solid black;
-    width: 100%;
-*/
+.bbl_pb_hand_label_2, .bbl_pb_pool_label_2,
+.bbl_pb_hand_label_4, .bbl_pb_pool_label_4 {
+    color: black;
 }
 
-.bbl_pb_zcard_label {
-    display: inline-block;
-    background-position: -400% -100%;
+div.bbl_pb_zcards {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    /*
+    border: 1px solid #333;
+*/
+    background: #0002;
+
+    justify-items: center;
+
+    /* TODO, these are hardcoded, may be better way to accomplish  */
+    margin-left: 1em;
+    margin-right: 0.5em;
+    padding: 3px;
+    row-gap: 6px;
+    min-height: 32px;
 }
 
 div.bbl_pb_zcards>div {
-    display: inline-block;
-    margin: 3px;
     height: calc(var(--bbl-label-height));
-    width: auto;
-    aspect-ratio: var(--bbl-zcard-aspect-ratio);
 }
 
 /*
