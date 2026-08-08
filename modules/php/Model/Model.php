@@ -166,7 +166,11 @@ class Model
         $zcardsUsed = [];
         if ($hex->piece->isField()) {
             if ($piece->isFarmer()) {
-                // ensure player has at least one non-hidden piece adjacent.
+                // ensure player has at least one non-hidden piece
+                // adjacent.  Not explicitly in the rules, which say
+                // "a Noble and/or a Farmer adjacent" but
+                // https://boardgamegeek.com/thread/3597748/claiming-a-crop-field
+                // claims to have received clarification from Knizia about this.
                 $is_non_hidden = function (Hex $h) use (&$player_id) : bool {
                     return $h->player_id == $player_id
                         && !$h->piece->isHidden();
