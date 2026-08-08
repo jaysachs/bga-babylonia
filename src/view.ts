@@ -322,9 +322,8 @@ export class View {
             Html.div({},
                 Html.span({id: IDS.citycount(player_id), classes:['bbl_pb_city', 'bbl_pb_city_label']}),
             ),
-            Html.div({id:IDS.playerBoardZcards(player_id), classes: 'bbl_pb_zcards'},
-                Html.span({classes:'bbl_pb_zcard_label'})
-            )
+            Html.div({id:IDS.playerBoardZcards(player_id), classes: 'bbl_pb_zcards'}
+            ),
         ];
     }
 
