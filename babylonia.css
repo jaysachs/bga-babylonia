@@ -64,10 +64,7 @@ body {
     --bbl-hex-width: calc(var(--bbl-hex-ratio) * var(--bbl-hex-height));
 
     --bbl-zcard-aspect-ratio: calc(327/526);
-    /* FIXME: why doesn't this work? */
-    /*    --bbl-zcard-height: calc(var(--bbl-board-height / 8)); */
-    /* but this does: */
-    --bbl-zcard-height: calc(var(--bbl-board-width) / var(--bbl-map-aspect-ratio) / 8);
+    --bbl-zcard-height: calc(var(--bbl-board-height) / 8);
 }
 
 #bbl_main {
