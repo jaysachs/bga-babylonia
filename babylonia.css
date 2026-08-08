@@ -53,6 +53,7 @@ body {
     --bbl-board-width: 100vw;
 
     --bbl-board-height: calc(var(--bbl-board-width) / var(--bbl-map-aspect-ratio));
+    --bbl-hand-bg: url(../../../img/layout/back-main.jpg);
 
     /*
       the denominator here works for height. but somehow width gets
@@ -117,7 +118,7 @@ body {
     padding: 10px;
     margin: 8px;
     border-width: 10px;
-    background: var(--palette-main-bg);
+    background: var(--bbl-hand-bg);
 }
 
 #bbl_available_zcards {
