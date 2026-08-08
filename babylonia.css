@@ -457,7 +457,11 @@ body {
     background-image: none;
 }
 
-[bbl_zused] {
+[bbl_zused="true"]::after {
+    width: 100%;
+    height: 100%;
+    display: inline-block;
+    content: '';
     background-image: repeating-linear-gradient(45deg, rgb(127 127 127 / 90%), rgb(127 127 127 / 80%) 2px, transparent 2px, transparent 4px)
                       /*                      ,        url(img/zcards.png) */
     ;
@@ -616,7 +620,7 @@ body {
  */
 
 .player-board-game-specific-content {
-    --bbl-label-height: 2em;
+    --bbl-label-height: 2.4em;
     --bbl-label-width: calc(var(--bbl-hex-ratio) * var(--bbl-label-height));
     padding-top: 7px;
     display: grid;
