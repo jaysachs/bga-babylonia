@@ -724,24 +724,24 @@ body {
 
 div.bbl_pb_zcards {
     display: grid;
+    direction: rtl;
     grid-template-columns: repeat(3, 1fr);
     /*
     border: 1px solid #333;
 */
-    background: #0002;
+/*    background: #0002; */
 
     justify-items: center;
 
     /* TODO, these are hardcoded, may be better way to accomplish  */
     margin-left: 1em;
-    margin-right: 0.5em;
-    padding: 3px;
     row-gap: 6px;
     min-height: 32px;
 }
 
 div.bbl_pb_zcards>div {
     height: calc(var(--bbl-label-height));
+    border: 1px solid #888;
 }
 
 /*
