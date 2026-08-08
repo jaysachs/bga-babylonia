@@ -660,22 +660,22 @@ body {
 
 .bbl_pb_hand_label_1 {
     /*background-position: -400% -200%;*/
-    background-image: url(img/P-1-hidden.png);
+    background-image: url(img/P-1-hand.png);
 }
 
 .bbl_pb_hand_label_2 {
     /*background-position: -400% -300%;*/
-    background-image: url(img/P-2-hidden.png);
+    background-image: url(img/P-2-hand.png);
 }
 
 .bbl_pb_hand_label_3 {
     /*background-position: -400% -600%; */
-    background-image: url(img/P-3-hidden.png);
+    background-image: url(img/P-3-hand.png);
 }
 
 .bbl_pb_hand_label_4 {
     /*background-position: -400% -500%; */
-    background-image: url(img/P-4-hidden.png);
+    background-image: url(img/P-4-hand.png);
 }
 
 .bbl_pb_pool_label_1 {
@@ -801,7 +801,13 @@ div.bbl_pb_zcards>div {
 #bbl_board_container.bbl_mockup:has( div[bbl_piece^="city_"]:hover) #bbl_city_scoring_hover {
     content-visibility: initial;
     opacity: 100%;
-    transition: all 500ms 250ms allow-discrete;
+    transition: all 100ms 500ms allow-discrete;
+}
+
+#bbl_board_container.bbl_mockup:not(:has( div[bbl_piece^="city_"]:hover)) #bbl_city_scoring_hover {
+    content-visibility: initial;
+    opacity: 0%;
+    transition: all 100ms 350ms allow-discrete;
 }
 
 #bbl_city_scoring_hover > span {
