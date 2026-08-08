@@ -14,10 +14,7 @@
  */
 
 html {
-    /*    background-image: url(img/background-dark.jpg); */
-    /*    background: linear-gradient(190deg, #a7855d, #b2afa4); */
-    /*  #a7855d, #cea648); */
-    /* background: url(img/Ziggurat-T-1.png) 50% 30% / 150% 150% no-repeat; */
+    background-image: url(img/background-dark.jpg);
 }
 
 body.bblbg1 {
@@ -117,24 +114,10 @@ body {
     flex-direction:column;
     row-gap: calc(var(--bbl-hex-height) * 0.10);
     border-radius: 8px;
-    /*
-    border-style: solid;
-    border-color: transparent;
-    border-width: 1px;
-   */
-    /*
-    background-color: #ffffff80;
-   */
     padding: 10px;
-    margin: 10px;
+    margin: 8px;
     border-width: 10px;
-    /*
-    background: url(https://studio.boardgamearena.com/data/themereleases/260722-1430/img/layout/back-main.jpg);
-*/
-/*    background: url(../img/layout/back-main.jpg); */ /*  var(--palette-main-bg); */ /* transparent; #bdb5a8;*/
-    background-color: #eccc9e;
-    border-style: ridge;
-    border-color: #2189c2;
+    background: var(--palette-main-bg);
 }
 
 #bbl_available_zcards {
@@ -462,9 +445,7 @@ body {
     height: 100%;
     display: inline-block;
     content: '';
-    background-image: repeating-linear-gradient(45deg, rgb(127 127 127 / 90%), rgb(127 127 127 / 80%) 2px, transparent 2px, transparent 4px)
-                      /*                      ,        url(img/zcards.png) */
-    ;
+    background-image: repeating-linear-gradient(45deg, rgb(127 127 127 / 90%), rgb(127 127 127 / 80%) 2px, transparent 2px, transparent 4px);
 }
 
 [bbl_ztype="zc_10pts"] {
@@ -520,23 +501,17 @@ body {
 #bbl_hand>div {
     display: inline-block;
     position: relative;
-    aspect-ratio: calc(var(--bbl-hex-ratio));
-    height: calc(var(--bbl-hex-height));
-    background-size: 100%;
+    aspect-ratio: var(--bbl-hex-ratio);
+    height: calc(1.05*var(--bbl-hex-height));
+    background-size: contain;
     border-style: none;
+    background-image: url(img/empty_hand.png);
 }
 
-#bbl_hand div:not(div[bbl_piece]) {
-    background-image: url(img/empty_hand.png);
-    /*    background-color: #00000040; */
-
-    /*
-    border: 1px dashed #666666;
-    aspect-ratio: 1.0;
-    height: 90%;
-    border-radius: 50%;
-    */
-/*    clip-path: circle(45%); */
+#bbl_hand>div>div {
+    position: absolute;
+    top: calc(0.025*var(--bbl-hex-height));
+    left: calc(var(--bbl-hex-ratio)*0.025*var(--bbl-hex-height));
 }
 
 
@@ -579,14 +554,6 @@ body {
 }
 
 /* available ziggurat cards panel */
-
-/*
-#bbl_available_zcards>div.bbl_selected {
-    border-color: green;
-    clip-path: margin-box;
-}
-*/
-
 
 #bbl_available_zcards.bbl_selecting>div:has(>div[bbl_ztype]) {
     cursor: pointer;
