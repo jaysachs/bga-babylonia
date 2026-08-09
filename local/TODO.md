@@ -31,3 +31,9 @@
   * Location of pieces: top/bottom left/right
 
 * Rework CSS to have fixed size elements, with a computed zoom on `#bbl_main`
+
+* Need rules clarification needed on zcard #5:
+  1. must the noble be played after all farmers (at least 3) are played?
+  2. must the noble be played after 3 farmers (but more farmers can be played after?)
+  3. can the noble be played at any time as long as 3 farmers are eventually played?
+  Really, it's all answered by "can I play the noble first?"
