@@ -201,7 +201,7 @@ export class View {
        const pageEl = document.getElementById('page-content');
         const pageRect = pageEl!.getBoundingClientRect();
 
-        const vertAvail = window.visualViewport.height * window.visualViewport.scale - pageRect.top;
+        const vertAvail = window.visualViewport!.height * window.visualViewport!.scale - pageRect.top;
 
         // "horizontal" "default" layout
         var w1 = pageRect.width * 0.875;
