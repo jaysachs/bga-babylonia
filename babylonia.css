@@ -110,11 +110,10 @@ body {
 #bbl_hand {
     display: flex;
     flex-direction:column;
-    row-gap: calc(var(--bbl-hex-height) * 0.10);
-    border-radius: 8px;
-    padding: 10px;
+    row-gap: calc(var(--bbl-hex-height) * 0.15);
+    border-radius: calc(var(--bbl-hex-width));
+    padding: calc(0.15 * var(--bbl-hex-width));
     margin: 8px;
-    border-width: 10px;
     background: var(--bbl-hand-bg);
 }
 
