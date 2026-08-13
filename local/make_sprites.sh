@@ -14,15 +14,16 @@ COLORS=("${(@f)$(strip-json-comments ../gameinfos.jsonc | jq '.["player_colors"]
 # hex highlight
 magick -size ${SIZE} -gravity center canvas:none -stroke yellow -strokewidth 10 -fill none -draw "polygon ${HEX2}" +append hex_highlight.png
 
-# hand piece highlight
-magick -size ${SIZE} -gravity center canvas:none -stroke yellow -strokewidth 10 -fill none -draw 'circle 100,86 100,168' +append hand_highlight.png
-
 # empty hand position alpha mask
 # remember this technique -- can specify alpha channel directly w/ 4-byte hex colors
 magick -size ${SIZE} -gravity center canvas:none -background none -stroke \#00000040 -strokewidth 4 -fill \#00000020 -draw 'circle 100,86 100,170' +append empty_hand.png
 
 # hex scoring
 magick -size ${SIZE} -gravity center canvas:none -stroke \#FF2222 -strokewidth 18 -fill none -draw "polygon ${HEX4}" +append hex_scoring.png
+
+
+exit
+
 
 I=1
 for COLOR in ${COLORS[*]}

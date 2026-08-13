@@ -172,20 +172,15 @@ body {
 }
 
 #bbl_board>div.bbl_playable::after {
-    /*
-    background-image: var(--bbl-sprites-file);
-    background-size: 700% 700%;
-    background-position: -600% -200%;
-   */
-    background-image: url(img/hand_highlight.png);
-    background-size: 100%;
-    cursor: pointer;
-    content: '';
     position: absolute;
-    left: 0;
+    left: calc((var(--bbl-hex-width) - var(--bbl-hex-height)) / 2);
     top: 0;
-    height: 100%;
-    width: 100%;
+    content: '';
+    width: calc(var(--bbl-hex-height));
+    height: calc(var(--bbl-hex-height));
+    border-radius: calc(var(--bbl-hex-height)/2);
+    box-shadow: 0px 0px calc(var(--bbl-hex-height)*0.10) calc(var(--bbl-hex-height)*0.10) #ffffee inset;
+    cursor: pointer;
 }
 
 #bbl_board>div.bbl_selected::after {
@@ -528,22 +523,16 @@ body {
 
 }
 
-#bbl_hand>div.bbl_selected::before {
-    background-image: url(img/hand_highlight.png);
-    z-index: 10;
-    background-size: 100%;
-    pointer-events: none;
-    /*
-    background-image: var(--bbl-sprites-file);
-    background-size: 700% 700%;
-    background-position: -600% -200%;
-*/
-    cursor: pointer;
-    content: '';
+#bbl_hand>div.bbl_selected>div::before {
     position: absolute;
-    left: 0;
+    left: calc((var(--bbl-hex-width) - var(--bbl-hex-height)) / 2);
     top: 0;
-    height: 100%; width: 100%;
+    content: '';
+    width: calc(var(--bbl-hex-height));
+    height: calc(var(--bbl-hex-height));
+    border-radius: calc(var(--bbl-hex-height)/2);
+    box-shadow: 0px 0px calc(var(--bbl-hex-height)*0.10) calc(var(--bbl-hex-height)*0.10) #ffffee;
+    cursor: pointer;
 }
 
 .bbl_unimportant {
