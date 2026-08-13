@@ -46,8 +46,6 @@ class LogDecorator {
                     if (!isset($args['i18n'])) {
                         $args['i18n'] = [];
                     }
-                    // FIXME: not sure why this is needed.
-                    /** @phpstan-ignore offsetAccess.nonOffsetAccessible */
                     $args['i18n'][] = $pnm;
                 }
             }
