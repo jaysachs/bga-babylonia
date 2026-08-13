@@ -14,7 +14,7 @@
  */
 
 html {
-    background-image: url(img/background-dark.jpg);
+    background: url(img/zback.png) 50% 30% / 150% 150% no-repeat;
 }
 
 body.bblbg1 {
@@ -604,7 +604,7 @@ body {
 .bbl_pb_hand_label_4 {
     width: calc(var(--bbl-label-width));
     height: calc(var(--bbl-label-height));
-    background-size: cover;
+    background-size: cover; /* 100% 100%; */
     /*
     background-image: var(--bbl-sprites-file);
     background-size: 700% 700%;
@@ -628,22 +628,22 @@ body {
 
 .bbl_pb_hand_label_1 {
     /*background-position: -400% -200%;*/
-    background-image: url(img/P-1-hand.png);
+    background-image: url(img/P-1-hidden.png);
 }
 
 .bbl_pb_hand_label_2 {
     /*background-position: -400% -300%;*/
-    background-image: url(img/P-2-hand.png);
+    background-image: url(img/P-2-hidden.png);
 }
 
 .bbl_pb_hand_label_3 {
     /*background-position: -400% -600%; */
-    background-image: url(img/P-3-hand.png);
+    background-image: url(img/P-3-hidden.png);
 }
 
 .bbl_pb_hand_label_4 {
     /*background-position: -400% -500%; */
-    background-image: url(img/P-4-hand.png);
+    background-image: url(img/P-4-hidden.png);
 }
 
 .bbl_pb_pool_label_1 {
