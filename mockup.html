@@ -102,6 +102,7 @@
                       <button class="action-button bgabutton bgabutton_darkgray" type="button" onclick="toggleMobile()">Mobile</button>
                       <button class="action-button bgabutton bgabutton_red" type="button" onclick="clearMap()">Clear</button>
                       <button class="action-button bgabutton bgabutton_blue" type="button" onclick="initialize4p()">Initialize 4p</button>
+                      <button class="action-button bgabutton bgabutton_blue" type="button" onclick="(function (e) { let h = document.getElementById('samplezcardhover'); h.style.display = (h.style.display == 'none') ? 'initial' : 'none'; })()">zcardHover</button>
                       <select id="bbl_whichplayer">
                         <button>
                           <selectedcontent></selectedcontent>
@@ -209,6 +210,10 @@
                                  <div><div id="bbl_zc_fields" bbl_ztype="zc_fields"></div></div>
                                  <div><div id="bbl_zc_citypts" bbl_ztype="zc_citypts"></div></div>
                                </div>
+                             </div>
+                             <div id="samplezcardhover" class="bbl_zcard_hover" style="right:200px; top: 100px; display: none">
+                               <div bbl_ztype="zc_xturn"></div>
+                               <div class="bbl_zcard_description">Play an additional turn at the end of one of your turns (that is, after refilling your Stand). Next, turn the card face down: you can not use it any longer.</div>
                              </div>
                              <div id="bbl_city_scoring_hover" style="left:200px; top: 200px;">
                                <span>Current points</span>

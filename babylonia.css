@@ -14,7 +14,7 @@
  */
 
 html {
-    background: url(img/zback.png) 50% 30% / 150% 150% no-repeat;
+/*    background: url(img/zback.png) 50% 30% / 150% 150% no-repeat; */
 }
 
 body.bblbg1 {
@@ -35,6 +35,7 @@ body.bblbg4 {
 
 /* inspired from https://css-tricks.com/hexagons-and-beyond-flexible-responsive-grid-patterns-sans-media-queries/ */
 body {
+    background: url(img/zback2.png) 0% 40% / 100% 100% no-repeat;
     /*    background: #aabb7720; */
     height: 100vh;
     --bbl-map-file: url(img/map.jpg);
@@ -179,7 +180,7 @@ body {
     width: calc(var(--bbl-hex-height));
     height: calc(var(--bbl-hex-height));
     border-radius: calc(var(--bbl-hex-height)/2);
-    box-shadow: 0px 0px calc(var(--bbl-hex-height)*0.10) calc(var(--bbl-hex-height)*0.10) #ffffee inset;
+    box-shadow: 0px 0px calc(var(--bbl-hex-height)*0.10) calc(var(--bbl-hex-height)*0.10) #ffffeeaa inset;
     cursor: pointer;
 }
 
@@ -740,6 +741,37 @@ div.bbl_pb_zcards>div {
 
 #bbl_offboard {
     width: 100%;
+}
+
+@font-face {
+    font-family: 'ParchmentMf'; /* set name */
+    src: url(fonts/ParchmentMf-Vqge.ttf);
+}
+
+.bbl_zcard_hover {
+    display: none;
+/*    content-visibility: hidden; */
+    z-index: 100;
+    opacity: 100%;
+    position: absolute;
+    width: 330px;
+    font-family: 'ParchmentMf';
+    font-weight: bold;
+    font-size: 22pt;
+    background-color: beige;
+    padding: 5px;
+    border: 1px solid black;
+}
+
+.bbl_zcard_hover div[bbl_ztype] {
+    width: 100%;
+    height: 530px;
+}
+
+.bbl_zcard_hover .bbl_zcard_description {
+    border-top: 1px solid;
+    margin: 0.5em;
+    padding-top: 0.5em;
 }
 
 #bbl_city_scoring_hover {
