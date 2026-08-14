@@ -280,9 +280,17 @@ export class View {
                 zcont.appendChild(zelem);
             }
             this.zcardTooltips.set(zcard.type, zcard.tooltip);
-            this.bga.gameui.addTooltip(zelem.id, zcard.tooltip, '');
+
+            this.bga.gameui.addTooltipHtml(zelem.id, this.zcardTooltip(zcard).outerHTML);
         }
-  }
+    }
+
+    private zcardTooltip(zcard: Zcard): HTMLElement {
+        return Html.div({classes: 'bbl_zcard_hover'},
+            Html.div({ attrs: Attrs.ztype(zcard.type) }),
+            Html.div({ classes: 'bbl_zcard_description', text: zcard.tooltip })
+        );
+    }
 
     private updateCounter(counter: Counter, value: number, animate: boolean) {
         if (animate) {

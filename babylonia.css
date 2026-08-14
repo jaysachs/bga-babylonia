@@ -743,19 +743,15 @@ div.bbl_pb_zcards>div {
     width: 100%;
 }
 
+/* FIXME: only needed for mockup */
 @font-face {
-    font-family: 'ParchmentMf'; /* set name */
+    font-family: 'ParchmentMf Vqge';
     src: url(fonts/ParchmentMf-Vqge.ttf);
 }
 
 .bbl_zcard_hover {
-    display: none;
-/*    content-visibility: hidden; */
-    z-index: 100;
-    opacity: 100%;
-    position: absolute;
     width: 330px;
-    font-family: 'ParchmentMf';
+    font-family: 'ParchmentMf Vqge';
     font-weight: bold;
     font-size: 22pt;
     background-color: beige;
@@ -764,7 +760,7 @@ div.bbl_pb_zcards>div {
 }
 
 .bbl_zcard_hover div[bbl_ztype] {
-    width: 100%;
+    width: 330px;
     height: 530px;
 }
 
