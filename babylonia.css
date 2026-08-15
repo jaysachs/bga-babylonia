@@ -423,6 +423,7 @@ body {
     background-size: 900% 100%;
     background-image: url(img/zcards.png);
    */
+    background-repeat: no-repeat;
     background-size: contain;
     height: var(--bbl-zcard-height);
     width: auto;
@@ -750,25 +751,29 @@ div.bbl_pb_zcards>div {
 }
 
 .bbl_zcard_hover {
-    width: 265px;
+    /*
     font-family: 'ParchmentMf Vqge';
-    font-weight: bold;
-    font-size: 18pt;
+    font-weight: bold; 
+    */
+    width: calc(min(30vw,265px));
+    font-size: 12pt;
     background-color: beige;
     padding: 5px;
     border: 1px solid black;
 }
 
 .bbl_zcard_hover div[bbl_ztype] {
-    width: 165px;
-    height: 265px;
-    position: relative;
-    left: 50px;
+    height: calc(min(30vw,265px));
+    width: 100%;
+    background-position: center;
+    margin-bottom: 0.5em;
 }
 
 .bbl_zcard_hover .bbl_zcard_description {
+    width: 100%;
     border-top: 1px solid;
-    margin: 0.5em;
+    margin-top: 0.5em;
+    margin: 0.05em;
     padding-top: 0.5em;
 }
 
