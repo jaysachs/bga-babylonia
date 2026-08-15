@@ -156,7 +156,39 @@ export class View {
         return Html.div({ id:  IDS.hexDiv(hex.rc), style: [`top:${top}%`, `left:${left}%`] });
     }
 
-    private showScoringHover(div: HTMLElement, rc: number) {
+    private hideHoverCard(hoverCardElem: HTMLElement) {
+        const style = hoverCardElem.style;
+        style.transition = '';
+        style.opacity = '0';
+        style.contentVisibility = 'hidden';
+    }
+
+    private positionAndShowHoverCard(hoverCardElem: HTMLElement, targetElem: HTMLElement, containerElem?: HTMLElement) {
+        if (!containerElem) {
+            containerElem = targetElem.parentElement!
+        }
+        const style = hoverCardElem.style;
+        if (targetElem.offsetWidth / 2 + targetElem.offsetLeft > containerElem.offsetWidth / 2) {
+            style.right = `${containerElem.offsetWidth - targetElem.offsetLeft + targetElem.offsetWidth}px`;
+            style.left = '';
+        } else {
+            style.left = `${targetElem.offsetLeft + targetElem.offsetWidth}px`;
+            style.right = '';
+        }
+        if (targetElem.offsetHeight / 2 + targetElem.offsetTop > containerElem.offsetHeight / 2) {
+            // FIXME: why is this assymetric with right, and not have  `+ targetElem.offsetHeight`?
+            style.bottom = `${containerElem.offsetHeight - targetElem.offsetTop}px`;
+            style.top = '';
+        } else {
+            style.top = `${targetElem.offsetTop + targetElem.offsetHeight}px`;
+            style.bottom = '';
+        }
+        style.contentVisibility = 'visible';
+        style.opacity = '100%';
+        style.transition = 'content-visibility 200ms 200ms allow-discrete, opacity 400ms 200ms';
+    }
+
+    private showScoringHover(cityDiv: HTMLElement, rc: number) {
         const scores = this.bga.gameui.gamedatas.potentialCityScoring[String(rc)]!;
         this.playersInPlayerNoOrder().map(
             (p, n) =>  {
@@ -164,37 +196,11 @@ export class View {
                   String(scores[String(p.player_id)] ?? 0);
             }
         )
-
-        const hexDiv = div.parentElement!;
-        const boardDiv = hexDiv.parentElement!;
-
-        const style = $(IDS.CITY_SCORING_HOVER).style;
-        const extra = 4;
-        if (hexDiv.offsetWidth / 2 + hexDiv.offsetLeft > boardDiv.offsetWidth / 2) {
-            style.right = `${boardDiv.offsetWidth - hexDiv.offsetLeft - hexDiv.offsetWidth / extra}px`;
-            style.left = '';
-        } else {
-            style.left = `${hexDiv.offsetLeft + hexDiv.offsetWidth - hexDiv.offsetWidth / extra}px`;
-            style.right = '';
-        }
-        if (hexDiv.offsetHeight / 2 + hexDiv.offsetTop > boardDiv.offsetHeight / 2) {
-            style.bottom = `${boardDiv.offsetHeight - hexDiv.offsetTop - hexDiv.offsetHeight / extra}px`;
-            style.top = '';
-        } else {
-            style.top = `${hexDiv.offsetTop + hexDiv.offsetHeight - hexDiv.offsetHeight / extra}px`;
-            style.bottom = '';
-        }
-
-        style.contentVisibility = 'visible';
-        style.opacity = '100%';
-        style.transition = 'content-visibility 200ms 200ms allow-discrete, opacity 400ms 200ms';
+        this.positionAndShowHoverCard($(IDS.CITY_SCORING_HOVER), cityDiv.parentElement!);
     }
 
     private hideScoringHover() {
-        const style = $(IDS.CITY_SCORING_HOVER).style;
-        style.transition = '';
-        style.opacity = '0';
-        style.contentVisibility = 'hidden';
+        this.hideHoverCard($(IDS.CITY_SCORING_HOVER));
     }
 
     private handleResize() {
