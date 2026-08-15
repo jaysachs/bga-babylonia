@@ -245,8 +245,8 @@ export class View {
             if (Piece.isNonEmpty(hex.piece)) {
                 let pieceDiv = this.createPieceDiv(hex.piece, hex.board_player)
                 if (Piece.isCity(hex.piece)) {
-                    pieceDiv.addEventListener('pointerover', e => this.showScoringHover(pieceDiv, hex.rc));
-                    pieceDiv.addEventListener('pointerout', e => this.hideScoringHover());
+                    pieceDiv.addEventListener('pointerenter', e => this.showScoringHover(pieceDiv, hex.rc));
+                    pieceDiv.addEventListener('pointerleave', e => this.hideScoringHover());
                 }
                 if (hex.scored) {
                     pieceDiv.classList.add(CSS.SCORED);
@@ -288,6 +288,8 @@ export class View {
             this.zcardTooltips.set(zcard.type, zcard.tooltip);
 
             this.bga.gameui.addTooltipHtml(zelem.id, this.zcardTooltip(zcard).outerHTML);
+            const tooltip = (this.bga.gameui as any).tooltips[zelem.id];
+            zelem.addEventListener('pointerenter', (e) => tooltip.open(zelem.id) );
         }
     }
 
