@@ -753,7 +753,7 @@ div.bbl_pb_zcards>div {
 .bbl_zcard_hover {
     /*
     font-family: 'ParchmentMf Vqge';
-    font-weight: bold; 
+    font-weight: bold;
     */
     width: calc(min(30vw,265px));
     font-size: 12pt;
@@ -784,7 +784,7 @@ div.bbl_pb_zcards>div {
 
     position: absolute;
 
-    font-size: 12pt;
+    font-size: calc(var(--bbl-hex-height)/3);
     background-color: beige;
     padding: 5px;
     border: 1px solid black;
@@ -816,7 +816,7 @@ div.bbl_pb_zcards>div {
     padding-bottom: 3px;
     display: flex;
     color: white;
-    font-size: 20pt;
+    font-size: font-size: calc(var(--bbl-hex-height)/2);
 }
 
 #bbl_city_scoring_hover_details > div {
