@@ -750,18 +750,20 @@ div.bbl_pb_zcards>div {
 }
 
 .bbl_zcard_hover {
-    width: 330px;
+    width: 265px;
     font-family: 'ParchmentMf Vqge';
     font-weight: bold;
-    font-size: 22pt;
+    font-size: 18pt;
     background-color: beige;
     padding: 5px;
     border: 1px solid black;
 }
 
 .bbl_zcard_hover div[bbl_ztype] {
-    width: 330px;
-    height: 530px;
+    width: 165px;
+    height: 265px;
+    position: relative;
+    left: 50px;
 }
 
 .bbl_zcard_hover .bbl_zcard_description {
