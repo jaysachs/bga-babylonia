@@ -816,7 +816,7 @@ div.bbl_pb_zcards>div {
     padding-bottom: 3px;
     display: flex;
     color: white;
-    font-size: font-size: calc(var(--bbl-hex-height)/2);
+    font-size: calc(var(--bbl-hex-height)/2);
 }
 
 #bbl_city_scoring_hover_details > div {
