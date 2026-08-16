@@ -781,13 +781,11 @@ div.bbl_pb_zcards>div {
 }
 
 #bbl_board_container.bbl_mockup:has( div[bbl_piece^="city_"]:hover) .bbl_city_scoring_hover {
-    content-visibility: initial;
     opacity: 100%;
     transition: all 100ms 500ms allow-discrete;
 }
 
 #bbl_board_container.bbl_mockup:not(:has( div[bbl_piece^="city_"]:hover)) .bbl_city_scoring_hover {
-    content-visibility: initial;
     opacity: 0%;
     transition: all 100ms 350ms allow-discrete;
 }
