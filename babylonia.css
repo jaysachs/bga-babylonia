@@ -182,7 +182,7 @@ body {
     width: calc(var(--bbl-hex-height));
     height: calc(var(--bbl-hex-height));
     border-radius: calc(var(--bbl-hex-height)/2);
-    box-shadow: 0px 0px calc(var(--bbl-hex-height)*0.10) calc(var(--bbl-hex-height)*0.10) #ffffeeaa inset;
+    box-shadow: 0px 0px calc(var(--bbl-hex-height)*0.10) calc(var(--bbl-hex-height)*0.10) #f3f3b0aa inset;
     cursor: pointer;
 }
 
