@@ -751,8 +751,8 @@ div.bbl_pb_zcards>div {
 } */
 
 .bbl_zcard_hover {
-    width: calc(min(30vw,265px));
-    font-size: 12pt;
+    width: calc(min(50vw,265px));
+    font-size: calc(var(--bbl-hex-height)/2);
     background-color: beige;
     padding: 5px;
     border: 1px solid black;
@@ -774,12 +774,6 @@ div.bbl_pb_zcards>div {
 }
 
 .bbl_city_scoring_hover {
-    content-visibility: hidden;
-    z-index: 100;
-    opacity: 0%;
-
-    position: absolute;
-
     font-size: calc(var(--bbl-hex-height)/3);
     background-color: beige;
     padding: 5px;

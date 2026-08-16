@@ -59,8 +59,6 @@ export class IDS {
   static readonly OFF_BOARD = 'bbl_offboard';
   static readonly HAND = 'bbl_hand';
   static readonly MAIN = 'bbl_main';
-  static readonly CITY_SCORING_HOVER = 'bbl_city_scoring_hover';
-  static readonly CITY_SCORING_HOVER_DETAILS = 'bbl_city_scoring_hover_details';
 
   static handcount(playerId: number): string {
     return `bbl_handcount_${playerId}`;
@@ -97,7 +95,6 @@ export class CSS {
   static readonly LAYOUT_UNDER_BOARD = 'bbl_altflow';
   static readonly IS_SPECTATOR = 'bbl_is_spectator';
   static readonly SCORED = 'bbl_scored';
-  static readonly CITY_SCORING_HOVER_DETAILS = 'bbl_city_scoring_hover_details';
 }
 
 export class View {
@@ -163,59 +160,11 @@ export class View {
             this.bga.gameui.addTooltipHtml(id, content.outerHTML);
             tooltip = (this.bga.gameui as any).tooltips[id];
         } else {
-            tooltip = new dijit.Tooltip({
-               connectId: ["divItemId"],
-               getContent: (matchedNode: any) => content().outerHTML,
-           });
+            this.bga.gameui.addTooltipHtml(id, "placeholder");
+            tooltip = (this.bga.gameui as any).tooltips[id];
+            tooltip.getContent = () => content().outerHTML;
         }
         $(id).addEventListener('pointerenter', (e) => tooltip.open(id) );
-    }
-
-    private hideHoverCard(hoverCardElem: HTMLElement) {
-        const style = hoverCardElem.style;
-        style.transition = '';
-        style.opacity = '0';
-        style.contentVisibility = 'hidden';
-    }
-
-    private positionAndShowHoverCard(hoverCardElem: HTMLElement, targetElem: HTMLElement, containerElem?: HTMLElement) {
-        if (!containerElem) {
-            containerElem = targetElem.parentElement!
-        }
-        const style = hoverCardElem.style;
-        if (targetElem.offsetWidth / 2 + targetElem.offsetLeft > containerElem.offsetWidth / 2) {
-            style.right = `${containerElem.offsetWidth - targetElem.offsetLeft + targetElem.offsetWidth}px`;
-            style.left = '';
-        } else {
-            style.left = `${targetElem.offsetLeft + targetElem.offsetWidth}px`;
-            style.right = '';
-        }
-        if (targetElem.offsetHeight / 2 + targetElem.offsetTop > containerElem.offsetHeight / 2) {
-            // FIXME: why is this assymetric with right, and not have  `+ targetElem.offsetHeight`?
-            style.bottom = `${containerElem.offsetHeight - targetElem.offsetTop}px`;
-            style.top = '';
-        } else {
-            style.top = `${targetElem.offsetTop + targetElem.offsetHeight}px`;
-            style.bottom = '';
-        }
-        style.contentVisibility = 'visible';
-        style.opacity = '100%';
-        style.transition = 'content-visibility 200ms 200ms allow-discrete, opacity 400ms 200ms';
-    }
-
-    private showScoringHover(cityDiv: HTMLElement, rc: number) {
-        const scores = this.bga.gameui.gamedatas.potentialCityScoring[String(rc)]!;
-        this.playersInPlayerNoOrder().map(
-            (p, n) =>  {
-                ($(IDS.CITY_SCORING_HOVER_DETAILS).children.item(n) as HTMLElement).innerText =
-                  String(scores[String(p.player_id)] ?? 0);
-            }
-        )
-        this.positionAndShowHoverCard($(IDS.CITY_SCORING_HOVER), cityDiv.parentElement!);
-    }
-
-    private hideScoringHover() {
-        this.hideHoverCard($(IDS.CITY_SCORING_HOVER));
     }
 
     private handleResize() {
@@ -259,14 +208,14 @@ export class View {
             boardDiv.appendChild(hexDiv);
             if (Piece.isNonEmpty(hex.piece)) {
                 let pieceDiv = this.createPieceDiv(hex.piece, hex.board_player)
-                if (Piece.isCity(hex.piece)) {
-                    pieceDiv.addEventListener('pointerenter', e => this.showScoringHover(pieceDiv, hex.rc));
-                    pieceDiv.addEventListener('pointerleave', e => this.hideScoringHover());
-                }
                 if (hex.scored) {
                     pieceDiv.classList.add(CSS.SCORED);
                 }
                 hexDiv.appendChild(pieceDiv);
+                if (Piece.isCity(hex.piece)) {
+                    pieceDiv.id = `bbl_city_${hex.rc}`;
+                    this.addTooltip(pieceDiv.id, () => this.scoringHover(hex.rc));
+                }
             }
         }
     }
@@ -287,7 +236,6 @@ export class View {
         this.updateCapturedCityCount(player, false);
         this.bga.playerPanels.getScoreCounter(playerId).setValue(Number(player.score));
     }
-
 
     private setupZcards(zcards: Zcard[]): void {
         const available = $(IDS.AVAILABLE_ZCARDS);
@@ -368,7 +316,6 @@ export class View {
                     Html.div({id:"bbl_available_zcards_container"},
                         Html.div({id:IDS.AVAILABLE_ZCARDS })
                     ),
-                    this.scoringHover(),
                     Html.div({id:IDS.BOARD})
                 )
             ),
@@ -382,11 +329,13 @@ export class View {
         );
     }
 
-    private scoringHover(): HTMLElement {
-        return Html.div({id:IDS.CITY_SCORING_HOVER, classes:'bbl_city_scoring_hover'},
+    private scoringHover(rc: number): HTMLElement {
+        const scores = this.bga.gameui.gamedatas.potentialCityScoring[String(rc)]!;
+        return Html.div({classes:'bbl_city_scoring_hover'},
             Html.span({text:_("Current points")}),
-            Html.div({classes:CSS.CITY_SCORING_HOVER_DETAILS, id:IDS.CITY_SCORING_HOVER_DETAILS},
-                ... this.playersInPlayerNoOrder().map(p => Html.div({attrs: Attrs.piece("hidden", p), text: "0"}))
+            Html.div({classes:'bbl_city_scoring_hover_details'},
+                ... this.playersInPlayerNoOrder().map(
+                    p => Html.div({attrs: Attrs.piece("hidden", p), text: String(scores[String(p.player_id)] ?? 0)}))
             )
         )
     }
