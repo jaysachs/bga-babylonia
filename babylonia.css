@@ -817,3 +817,8 @@ div.bbl_pb_zcards>div {
     width: var(--bbl-hex-width);
     height: var(--bbl-hex-height);
 }
+
+.bbl_city_scoring_hover_details > div[bbl_piece="hidden_2"],
+.bbl_city_scoring_hover_details > div[bbl_piece="hidden_4"] {
+    color: black;
+}
