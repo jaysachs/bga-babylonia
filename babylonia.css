@@ -752,7 +752,7 @@ div.bbl_pb_zcards>div {
 
 .bbl_zcard_hover {
     width: calc(min(50vw,265px));
-    font-size: calc(var(--bbl-hex-height)/2);
+    font-size: calc(min(14pt, var(--bbl-hex-height)/2));
     background-color: beige;
     padding: 5px;
     border: 1px solid black;
