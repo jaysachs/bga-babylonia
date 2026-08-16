@@ -15,6 +15,8 @@
 
 html {
 /*    background: url(img/zback.png) 50% 30% / 150% 150% no-repeat; */
+    /* background: url(img/zback2.png) 0% 40% / 100% 100% no-repeat; */
+    background: conic-gradient(#a7855d, #97855d, #a7855d, #87855d, #a7855d);
 }
 
 body.bblbg1 {
@@ -35,7 +37,7 @@ body.bblbg4 {
 
 /* inspired from https://css-tricks.com/hexagons-and-beyond-flexible-responsive-grid-patterns-sans-media-queries/ */
 body {
-    background: url(img/zback2.png) 0% 40% / 100% 100% no-repeat;
+    /* background: url(img/zback2.png) 0% 40% / 100% 100% no-repeat; */
     /*    background: #aabb7720; */
     height: 100vh;
     --bbl-map-file: url(img/map.jpg);
