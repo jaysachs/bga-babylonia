@@ -97,6 +97,7 @@ export class CSS {
   static readonly LAYOUT_UNDER_BOARD = 'bbl_altflow';
   static readonly IS_SPECTATOR = 'bbl_is_spectator';
   static readonly SCORED = 'bbl_scored';
+  static readonly CITY_SCORING_HOVER_DETAILS = 'bbl_city_scoring_hover_details';
 }
 
 export class View {
@@ -154,6 +155,20 @@ export class View {
         const  top = 100 * (View.vstart + row * View.vdelta / 2) / 2709.0;
         const left = 100 * (View.hstart + col * View.hdelta) / 3385.0;
         return Html.div({ id:  IDS.hexDiv(hex.rc), style: [`top:${top}%`, `left:${left}%`] });
+    }
+
+    private addTooltip(id: string, content: HTMLElement | (() => (HTMLElement)) ) {
+        var tooltip: any;
+        if (content instanceof HTMLElement) {
+            this.bga.gameui.addTooltipHtml(id, content.outerHTML);
+            tooltip = (this.bga.gameui as any).tooltips[id];
+        } else {
+            tooltip = new dijit.Tooltip({
+               connectId: ["divItemId"],
+               getContent: (matchedNode: any) => content().outerHTML,
+           });
+        }
+        $(id).addEventListener('pointerenter', (e) => tooltip.open(id) );
     }
 
     private hideHoverCard(hoverCardElem: HTMLElement) {
@@ -287,9 +302,9 @@ export class View {
             }
             this.zcardTooltips.set(zcard.type, zcard.tooltip);
 
-            this.bga.gameui.addTooltipHtml(zelem.id, this.zcardTooltip(zcard).outerHTML);
-            const tooltip = (this.bga.gameui as any).tooltips[zelem.id];
-            zelem.addEventListener('pointerenter', (e) => tooltip.open(zelem.id) );
+            this.addTooltip(zelem.id, this.zcardTooltip(zcard));
+            // const tooltip = (this.bga.gameui as any).tooltips[zelem.id];
+            // zelem.addEventListener('pointerenter', (e) => tooltip.open(zelem.id) );
         }
     }
 
@@ -368,9 +383,9 @@ export class View {
     }
 
     private scoringHover(): HTMLElement {
-        return Html.div({id:IDS.CITY_SCORING_HOVER},
+        return Html.div({id:IDS.CITY_SCORING_HOVER, classes:'bbl_city_scoring_hover'},
             Html.span({text:_("Current points")}),
-            Html.div({id:IDS.CITY_SCORING_HOVER_DETAILS},
+            Html.div({classes:CSS.CITY_SCORING_HOVER_DETAILS, id:IDS.CITY_SCORING_HOVER_DETAILS},
                 ... this.playersInPlayerNoOrder().map(p => Html.div({attrs: Attrs.piece("hidden", p), text: "0"}))
             )
         )

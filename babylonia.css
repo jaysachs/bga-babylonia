@@ -744,17 +744,13 @@ div.bbl_pb_zcards>div {
     width: 100%;
 }
 
-/* FIXME: only needed for mockup */
+/* FIXME: only needed for mockup
 @font-face {
     font-family: 'ParchmentMf Vqge';
     src: url(fonts/ParchmentMf-Vqge.ttf);
-}
+} */
 
 .bbl_zcard_hover {
-    /*
-    font-family: 'ParchmentMf Vqge';
-    font-weight: bold;
-    */
     width: calc(min(30vw,265px));
     font-size: 12pt;
     background-color: beige;
@@ -777,7 +773,7 @@ div.bbl_pb_zcards>div {
     padding-top: 0.5em;
 }
 
-#bbl_city_scoring_hover {
+.bbl_city_scoring_hover {
     content-visibility: hidden;
     z-index: 100;
     opacity: 0%;
@@ -790,26 +786,26 @@ div.bbl_pb_zcards>div {
     border: 1px solid black;
 }
 
-#bbl_board_container.bbl_mockup:has( div[bbl_piece^="city_"]:hover) #bbl_city_scoring_hover {
+#bbl_board_container.bbl_mockup:has( div[bbl_piece^="city_"]:hover) .bbl_city_scoring_hover {
     content-visibility: initial;
     opacity: 100%;
     transition: all 100ms 500ms allow-discrete;
 }
 
-#bbl_board_container.bbl_mockup:not(:has( div[bbl_piece^="city_"]:hover)) #bbl_city_scoring_hover {
+#bbl_board_container.bbl_mockup:not(:has( div[bbl_piece^="city_"]:hover)) .bbl_city_scoring_hover {
     content-visibility: initial;
     opacity: 0%;
     transition: all 100ms 350ms allow-discrete;
 }
 
-#bbl_city_scoring_hover > span {
+.bbl_city_scoring_hover > span {
     display: grid;
     font-style: italic;
     text-align: center;
     width: 100%;
 }
 
-#bbl_city_scoring_hover_details {
+.bbl_city_scoring_hover_details {
     border-top: 1px solid darkgrey;
     border-bottom: 1px solid darkgrey;
     padding-top: 3px;
@@ -819,7 +815,7 @@ div.bbl_pb_zcards>div {
     font-size: calc(var(--bbl-hex-height)/2);
 }
 
-#bbl_city_scoring_hover_details > div {
+.bbl_city_scoring_hover_details > div {
     display: flex;
     justify-content: center;
     align-items: center;
