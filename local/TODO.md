@@ -31,9 +31,7 @@
   * Location of pieces: top/bottom left/right
 
 
-* Bug: when city hexes are scorable and chosen to score, rendered wrong with green hex "inset".
-
-* Give hover highlight over your own playerboard pool to show "what's left" in pool. Potentially also do for other players, but for combined hand & pool.
+* Give hover highlight over your own playerboard pool to show "what's left" in pool. Can't/won't do for other players because river pieces are unknown.
 
 * Rework CSS to have fixed size elements, with a computed zoom on `#bbl_main`
 

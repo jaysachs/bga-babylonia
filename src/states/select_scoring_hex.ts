@@ -58,7 +58,8 @@ export class SelectScoringHexState extends BabyloniaState {
       rc: number;
       city: string;
     }) {
-     this.view.markHexSelected(args.rc);
+      this.view.unmarkHexPlayable(args.rc);
+      this.view.markHexSelected(args.rc);
   }
 
 }
