@@ -46,6 +46,7 @@ export class Game extends BaseGame<BblPlayer, BGamedatas> {
   private registerLogArgs(): void {
     this.registerLogArg('piece', (args) => this.view.renderedPiece(args.piece, args.player_id));
     this.registerLogArg('city', (args) => this.view.renderedPiece(args.city));
+    // TODO: add tooltip here
     this.registerLogArg('zcard', (args) => this.view.renderedZcard(args.zcard));
     this.registerLogArg('original_piece', (args) => this.view.renderedPiece(args.original_piece, args.player_id));
   }

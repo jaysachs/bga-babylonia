@@ -9,6 +9,7 @@ export class ScoreHexState extends BabyloniaState {
   }
 
   override onEnteringState(args: { current_scoring_hex: number }, isCurrentPlayerActive: boolean) {
+    this.view.unmarkHexPlayable(args.current_scoring_hex);
     this.view.markHexSelected(args.current_scoring_hex);
   }
 

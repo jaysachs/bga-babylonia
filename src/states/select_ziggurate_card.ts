@@ -43,6 +43,7 @@ export class SelectZigguratCardState extends BabyloniaState {
     this.controller.abort();
     const zt = e.getAttribute(Attrs.ZTYPE)!;
     this.bga.statusBar.removeActionButtons();
+    // TODO: add tooltip
     this.bga.statusBar.setTitle(_('Select ziggurat card ${zcard}?'), { zcard: zt });
 
     this.bga.statusBar.addActionButton(_('Confirm'),

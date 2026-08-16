@@ -29,12 +29,13 @@ export class SelectScoringHexState extends BabyloniaState {
     if (hex == null) {
       return;
     }
-    let div =  this.view.hexDiv(hex);
-    let piece = div.firstElementChild!.getAttribute(Attrs.PIECE);
-    div.classList.add(CSS.SELECTED);
+    let piece = this.view.hexDiv(hex).firstElementChild!.getAttribute(Attrs.PIECE);
+    this.view.unmarkHexPlayable(hex);
+    this.view.markHexSelected(hex);
     // this.bga.statusBar.setTitle(_('Score ${city} at (${row},${col})?'), {
     //   row: hex.row, col: hex.col, city: piece,
     // });
+    // TODO: add tooltip
     this.bga.statusBar.setTitle(_('Score ${city}?'), {
       city: piece,
     });
@@ -43,7 +44,8 @@ export class SelectScoringHexState extends BabyloniaState {
       { autoclick: this.autoConfirmEnabled() });
     this.bga.statusBar.addActionButton(_('Cancel'),
       () => {
-        div.classList.remove(CSS.SELECTED);
+        this.view.unmarkHexSelected(hex);
+        this.view.markHexPlayable(hex);
         this.bga.states.restoreServerGameState();
       },
       { color: "secondary" });
