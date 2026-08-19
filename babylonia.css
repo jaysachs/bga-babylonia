@@ -148,25 +148,20 @@ body {
     position: absolute;
 }
 
-#bbl_board>div.bbl_playable:hover {
-    position: absolute;
-    filter: brightness(200%) saturate(500%) hue-rotate(90deg);
-    top: 0;
-    left: calc((var(--bbl-hex-width) - var(--bbl-hex-height)) / 2);
-    width: calc(var(--bbl-hex-height));
-    height: calc(var(--bbl-hex-height));
+#bbl_board>div.bbl_playable::after {
+    cursor: pointer;
 }
 
-#bbl_board>div.bbl_playable::after {
+#bbl_board>div.bbl_playable:hover::after {
     position: absolute;
-    left: calc((var(--bbl-hex-width) - var(--bbl-hex-height)) / 2);
-    top: 0;
+    left: calc((var(--bbl-hex-width) - var(--bbl-hex-height))*2);
+    top: calc(0.25*var(--bbl-hex-height));
     content: '';
-    width: calc(var(--bbl-hex-height));
-    height: calc(var(--bbl-hex-height));
+    width: calc(0.5*var(--bbl-hex-height));
+    height: calc(0.5*var(--bbl-hex-height));
+    line-height: calc(0.5*var(--bbl-hex-height));
     box-shadow: 0px 0px calc(var(--bbl-hex-height)*0.10) calc(var(--bbl-hex-height)*0.10) #f3f3b0aa inset;
     border-radius: calc(var(--bbl-hex-height)/2);
-    cursor: pointer;
 }
 
 #bbl_board>div.bbl_selected::after {
