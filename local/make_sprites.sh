@@ -12,7 +12,7 @@ COLORS=("${(@f)$(strip-json-comments ../gameinfos.jsonc | jq '.["player_colors"]
 # addCanvas "-stroke none -fill \#D6C6B5 -draw 'polygon ${HEX}'"
 
 # hex scoring
-magick -size ${SIZE} -gravity center canvas:none -stroke \#22FF88 -strokewidth 18 -fill none -draw "polygon ${HEX4}" +append hex_scoring.png
+magick -size ${SIZE} -gravity center canvas:none -stroke \#44ee44 -strokewidth 18 -fill none -draw "polygon ${HEX4}" +append hex_scoring.png
 
 exit
 
