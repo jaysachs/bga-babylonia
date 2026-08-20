@@ -11,7 +11,7 @@ export class SelectScoringHexState extends BabyloniaState {
   }
   override onEnteringState(args: { hexes: number[] }, isCurrentPlayerActive: boolean) {
     if (isCurrentPlayerActive) {
-       this.view.markHexesPlayable(args.hexes);
+       this.view.markHexesSelectable(args.hexes);
       $(IDS.BOARD).addEventListener('click', this.handler);
     }
   }
@@ -30,7 +30,7 @@ export class SelectScoringHexState extends BabyloniaState {
       return;
     }
     let piece = this.view.hexDiv(hex).firstElementChild!.getAttribute(Attrs.PIECE);
-    this.view.unmarkHexPlayable(hex);
+    this.view.unmarkHexSelectable(hex);
     this.view.markHexSelected(hex);
     // this.bga.statusBar.setTitle(_('Score ${city} at (${row},${col})?'), {
     //   row: hex.row, col: hex.col, city: piece,
@@ -45,7 +45,7 @@ export class SelectScoringHexState extends BabyloniaState {
     this.bga.statusBar.addActionButton(_('Cancel'),
       () => {
         this.view.unmarkHexSelected(hex);
-        this.view.markHexPlayable(hex);
+        this.view.markHexSelectable(hex);
         this.bga.states.restoreServerGameState();
       },
       { color: "secondary" });
@@ -58,7 +58,7 @@ export class SelectScoringHexState extends BabyloniaState {
       rc: number;
       city: string;
     }) {
-      this.view.unmarkHexPlayable(args.rc);
+      this.view.unmarkHexSelectable(args.rc);
       this.view.markHexSelected(args.rc);
   }
 

@@ -13,7 +13,7 @@ export abstract class BabyloniaState {
       return null;
     }
     // now check if it's allowed
-    if (!hexDiv.classList.contains(CSS.PLAYABLE)) {
+    if (!hexDiv.classList.contains(CSS.PLAYABLE) && !hexDiv.classList.contains(CSS.SELECTABLE)) {
       return null;
     }
     const id = hexDiv.id.split('_');

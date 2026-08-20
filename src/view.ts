@@ -88,8 +88,9 @@ export class IDS {
 export class CSS {
   static readonly IN_NETWORK = 'bbl_in_network';
   static readonly SELECTED = 'bbl_selected';
-  static readonly SELECTING = 'bbl_selecting';
   static readonly PLAYABLE = 'bbl_playable';
+  static readonly SELECTING = 'bbl_selecting';
+  static readonly SELECTABLE = 'bbl_selectable';
   static readonly UNPLAYABLE = 'bbl_unplayable';
   static readonly UNIMPORTANT = 'bbl_unimportant';
   static readonly LAYOUT_UNDER_BOARD = 'bbl_altflow';
@@ -180,7 +181,7 @@ export class View {
         // So this mess: when the page scrolls, pageRect.top shrinks from about 242 to 132
         //  because of the fixed location of the page title bar removes it from the flow.
         //  So we can't use pageRect.top. But we do know that when first loaded, it's in the
-        //  right place. 
+        //  right place.
         // But of course, for some it isn't right until after the *2nd* resize happens.
         // And it's inconsistent :-( )
         if (this.initialPageRectTop == 0) {
@@ -201,7 +202,7 @@ export class View {
             h1 = vertAvail;
         }
 
-        // "vertical" "alt" layout 
+        // "vertical" "alt" layout
         // 747 101
         // 1494 162
         var h2 = vertAvail * 1494 / (1494+182); // (882-92)/882;
@@ -394,6 +395,23 @@ export class View {
     public markAllHexesUnplayable(): void {
         $(IDS.BOARD).querySelectorAll('.' + CSS.PLAYABLE)
             .forEach(div => div.classList.remove(CSS.PLAYABLE));
+    }
+
+    public markHexSelectable(rc: number): void {
+        this.hexDiv(rc).classList.add(CSS.SELECTABLE);
+    }
+
+    public markHexesSelectable(hexes: number[]): void {
+        hexes.forEach((hex) => this.markHexSelectable(hex));
+    }
+
+    public unmarkHexSelectable(rc: number): void {
+        this.hexDiv(rc).classList.remove(CSS.SELECTABLE);
+    }
+
+    public markAllHexesUnselectable(): void {
+        $(IDS.BOARD).querySelectorAll('.' + CSS.SELECTABLE)
+            .forEach(div => div.classList.remove(CSS.SELECTABLE));
     }
 
     public markHexesPlayable(hexes: number[]): void {

@@ -33,7 +33,7 @@ body.bblbg4 {
 body {
     background-image: url(img/bback.jpg);
     background-repeat: no-repeat;
-    background-size: 100%;
+    background-size: 100% 100%;
 
     --bbl-map-file: url(img/map.jpg);
     --bbl-sprites-file: url(img/spritesv4.png);
@@ -43,7 +43,8 @@ body {
     /*
       define these all here so they're available even for "floating" elements.
      */
-    --bbl-board-margin: calc(max(6px, 0.005vw));
+    --bbl-board-margin: calc(var(--bbl-board-width) * 0.01);
+    --bbl-board-border: calc(var(--bbl-board-width) * 0.007);
 
     /* 2/sqrt(3) */
     --bbl-hex-ratio: 1.155;
@@ -70,7 +71,7 @@ body {
     flex-direction: row;
     align-items: center;
     justify-content: center;
-    height: calc(var(--bbl-board-height) + 2 * var(--bbl-board-margin));
+    height: calc(var(--bbl-board-height) + 2 * var(--bbl-board-margin) + 2 * var(--bbl-board-border));
 }
 
 /*
@@ -82,13 +83,12 @@ body {
 */
 #bbl_board_container {
     box-sizing: border-box;
-    border: 8px solid #ffffffbb;
+    border: calc(var(--bbl-board-border)) solid #ffffffbb;
     flex: 1;
     display: flex;
     flex-direction: row-reverse;
     flex-grow: 0;
     position: relative;
-    margin: calc(var(--bbl-board-margin));
 }
 
 
@@ -113,6 +113,7 @@ body {
     padding: calc(0.15 * var(--bbl-hex-width));
     margin: 8px;
     background: var(--bbl-hand-bg);
+    margin: var(--bbl-board-margin);
 }
 
 #bbl_rightpadding {
