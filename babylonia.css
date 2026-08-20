@@ -105,6 +105,10 @@ body {
     display: none;
 }
 
+#bbl_hand_container {
+    flex-grow: 0;
+}
+
 #bbl_hand {
     display: flex;
     flex-direction:column;
