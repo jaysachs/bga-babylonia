@@ -183,7 +183,8 @@ body {
 }
 
 /* does this need the same ::after treatment as bbl_selected? */
-#bbl_board>div.bbl_in_network {
+#bbl_board>div.bbl_in_network::after,
+#bbl_board>div.bbl_selectable::after {
     /*
     background-image: var(--bbl-sprites-file);
     background-size: 700% 700%;
@@ -191,6 +192,13 @@ body {
    */
     background-image: url(img/hex_highlight.png);
     background-size: 100%;
+    cursor: pointer;
+    height: calc(var(--bbl-hex-height));
+    aspect-ratio: calc(var(--bbl-hex-ratio));
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
 }
 
 #pagemaintitletext span[bbl_piece] {
