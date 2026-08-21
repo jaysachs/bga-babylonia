@@ -554,7 +554,7 @@ body {
 
 #bbl_available_zcards>div {
     display: inline-block;
-    border: 4px solid transparent;
+    border: 0.08vw solid transparent;
     height: var(--bbl-zcard-height);
     width: auto;
     aspect-ratio: var(--bbl-zcard-aspect-ratio);
