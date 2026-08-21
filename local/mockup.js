@@ -218,10 +218,6 @@ const IDS = {
     MAIN: 'bbl_main'
 }
 
-const View = {
-    map_aspect_ratio:  2709.0 / 3385.0
-}
-
 const CSS = {
     LAYOUT_UNDER_BOARD: 'bbl_altflow'
 }
@@ -400,37 +396,60 @@ function foobar() {
     })
 }
 
-function handleResize(evt) {
+const View = {
+    map_aspect_ratio:  2709.0 / 3385.0,
+    initialPageRectTop: null,
+    gotit: false,
+
+    handleResize: function (evt) {
         const pageEl = document.getElementById('page-content');
         const pageRect = pageEl.getBoundingClientRect();
-        const vertAvail = (window.visualViewport.height) * window.visualViewport.scale  - pageRect.top;
-
+        console.log(pageRect.top, pageRect.width);
+        console.log(window.visualViewport.height, window.visualViewport.scale);
+        // So this mess: when the page scrolls, pageRect.top shrinks from about 242 to 132
+        //  because of the fixed location of the page title bar removes it from the flow.
+        //  So we can't use pageRect.top. But we do know that when first loaded, it's in the
+        //  right place.
+        // But of course, for some it isn't right until after the *2nd* resize happens.
+    // And it's inconsistent :-( )
+        if (this.initialPageRectTop == 0) {
+            this.initialPageRectTop = pageRect.top;
+        }
+        if (!this.gotit && pageRect.top != this.initialPageRectTop) {
+            this.initialPageRectTop = pageRect.top;
+            this.gotit = true;
+        }
+        const vertAvail = window.visualViewport.height * window.visualViewport.scale - this.initialPageRectTop;
         // "horizontal" "default" layout
-        var w1 = pageRect.width * 0.875;
+        var w1 = pageRect.width * (1082 - 112) / 1082; // 0.889
+        // 1082 808
         var h1 = w1 * View.map_aspect_ratio;
         if (h1 > vertAvail) {
             w1 = vertAvail / View.map_aspect_ratio;
             h1 = vertAvail;
         }
-
         // "vertical" "alt" layout
-        var h2 = vertAvail * 0.85;
+        // 747 101
+        // 1494 162
+        var h2 = vertAvail * 1494 / (1494 + 182); // (882-92)/882;
         var w2 = h2 / View.map_aspect_ratio;
-        const extra = w2 / 18;
-        if (w2 > pageRect.width - extra) {
-            w2 = pageRect.width - extra;
+        if (w2 > pageRect.width) {
+            w2 = pageRect.width;
         }
-
         const mainElCl = document.getElementById(IDS.MAIN).classList;
-        let width = w1;
+        w1 = w1 * (1082 - 112) / 1082;
+        w2 = w2 * (1082 - 112) / 1082;
+        var width = w1;
         if (w1 >= w2) {
-            width = w1 - extra;
+            width = w1;
             mainElCl.remove(CSS.LAYOUT_UNDER_BOARD);
-        } else {
-            width = w2 - extra / 2;
+        }
+        else {
+            width = w2;
             mainElCl.add(CSS.LAYOUT_UNDER_BOARD);
         }
         document.body.style.setProperty('--bbl-board-width', `${width}px`);
-   }
+    }
+}
 
-window.onload = () => handleResize();
+window.onload = () => View.handleResize();
