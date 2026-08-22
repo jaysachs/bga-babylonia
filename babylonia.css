@@ -107,6 +107,7 @@ body {
 
 #bbl_hand_container {
     flex-grow: 0;
+    margin: var(--bbl-board-margin);
 }
 
 #bbl_hand {
@@ -115,9 +116,8 @@ body {
     row-gap: calc(var(--bbl-hex-height) * 0.15);
     border-radius: calc(var(--bbl-hex-width));
     padding: calc(0.15 * var(--bbl-hex-width));
-    margin: 8px;
+    width: calc(var(--bbl-hex-width));
     background: var(--bbl-hand-bg);
-    margin: var(--bbl-board-margin);
 }
 
 #bbl_rightpadding {
@@ -134,8 +134,9 @@ body {
     flex-direction: row;
     padding: 8px;
     column-gap: calc(var(--bbl-hex-width) * 0.10);
+    height: calc(var(--bbl-hex-height));
+    width: auto;
 }
-
 
 /* Board contents */
 
