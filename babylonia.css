@@ -477,30 +477,14 @@ body {
 */
 
 #bbl_hand>div {
-    display: inline-block;
-    position: relative;
+    position: relative; /* needed for highlight */
     aspect-ratio: var(--bbl-hex-ratio);
     height: calc(1.00*var(--bbl-hex-height));
     border-style: none;
-}
-
-#bbl_hand>div:not(:has(div))::after {
-    content: '';
     background-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='173' ><circle cx='101' cy='87' r='85' stroke='none' fill='black' fill-opacity='0.125' stroke-width='0'/></svg>");
     background-size: contain;
-    position: absolute;
-    aspect-ratio: var(--bbl-hex-ratio);
-    height: calc(1.00*var(--bbl-hex-height));
-    top: calc(0.025*var(--bbl-hex-height));
-    left: calc(var(--bbl-hex-ratio)*0.025*var(--bbl-hex-height));
+    background-position: center;
 }
-
-#bbl_hand>div>div {
-    position: absolute;
-    top: calc(0.025*var(--bbl-hex-height));
-    left: calc(var(--bbl-hex-ratio)*0.025*var(--bbl-hex-height));
-}
-
 
 .bbl_playable {
     cursor: pointer;
@@ -509,9 +493,9 @@ body {
 .bbl_unplayable {
     cursor: not-allowed;
     opacity: 0.5;
-    background-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='173' ><circle cx='103' cy='89' r='82' stroke='none' fill='black' fill-opacity='0.125' stroke-width='0'/></svg>");
-    background-image: url(img/empty_hand.png);
-
+    background-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='173' ><circle cx='101' cy='87' r='85' stroke='none' fill='black' fill-opacity='0.125' stroke-width='0'/></svg>");
+    background-size: contain;
+    background-position: center;
 }
 
 #bbl_hand>div.bbl_selected>div::before {
