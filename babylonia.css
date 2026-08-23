@@ -33,7 +33,7 @@ body.bblbg4 {
 body {
     background-image: url(img/bback.jpg);
     background-repeat: no-repeat;
-    background-size: 100% 100%;
+    background-size: 100% auto;
 
     --bbl-map-file: url(img/map.jpg);
     --bbl-sprites-file: url(img/spritesv4.png);
