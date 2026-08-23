@@ -32,7 +32,7 @@ body.bblbg4 {
 /* inspired from https://css-tricks.com/hexagons-and-beyond-flexible-responsive-grid-patterns-sans-media-queries/ */
 body {
     background-image: url(img/bback.jpg);
-    background-repeat: no-repeat;
+    background-repeat: repeat;
     background-size: 100% auto;
 
     --bbl-map-file: url(img/map.jpg);
