@@ -178,25 +178,15 @@ body {
     top: 0;
     height: calc(var(--bbl-hex-height));
     aspect-ratio: calc(var(--bbl-hex-ratio));
-    /*
-    background-image: var(--bbl-sprites-file);
-    background-size: 700% 700%;
-    background-position: -600% -300%;
-   */
-    background-image: url(img/hex_scoring.png);
-    background-size: 100%;
+    background-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='173' ><polygon points='8,86 48,8 148,8 190,86 148,164 48,164' fill='none' stroke='rgb(68,238,68)' stroke-width='18' /></svg>");
+    background-size: contain;
 }
 
 /* does this need the same ::after treatment as bbl_selected? */
 #bbl_board>div.bbl_in_network::after,
 #bbl_board>div.bbl_selectable::after {
-    /*
-    background-image: var(--bbl-sprites-file);
-    background-size: 700% 700%;
-    background-position: -600% -300%;
-   */
-    background-image: url(img/hex_highlight.png);
-    background-size: 100%;
+    background-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='173' ><polygon points='4,86 48,4 148,4 194,86 148,168 48,168' fill='none' stroke='yellow' stroke-width='10' /></svg>");
+    background-size: contain;
     cursor: pointer;
     height: calc(var(--bbl-hex-height));
     aspect-ratio: calc(var(--bbl-hex-ratio));
@@ -490,10 +480,19 @@ body {
     display: inline-block;
     position: relative;
     aspect-ratio: var(--bbl-hex-ratio);
-    height: calc(1.05*var(--bbl-hex-height));
-    background-size: contain;
+    height: calc(1.00*var(--bbl-hex-height));
     border-style: none;
-    background-image: url(img/empty_hand.png);
+}
+
+#bbl_hand>div:not(:has(div))::after {
+    content: '';
+    background-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='173' ><circle cx='101' cy='87' r='85' stroke='none' fill='black' fill-opacity='0.125' stroke-width='0'/></svg>");
+    background-size: contain;
+    position: absolute;
+    aspect-ratio: var(--bbl-hex-ratio);
+    height: calc(1.00*var(--bbl-hex-height));
+    top: calc(0.025*var(--bbl-hex-height));
+    left: calc(var(--bbl-hex-ratio)*0.025*var(--bbl-hex-height));
 }
 
 #bbl_hand>div>div {
@@ -510,11 +509,7 @@ body {
 .bbl_unplayable {
     cursor: not-allowed;
     opacity: 0.5;
-    /*
-    background-image: var(--bbl-sprites-file);
-    background-size: 700% 700%;
-    background-position: -600% -500%;
-   */
+    background-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='173' ><circle cx='103' cy='89' r='82' stroke='none' fill='black' fill-opacity='0.125' stroke-width='0'/></svg>");
     background-image: url(img/empty_hand.png);
 
 }
