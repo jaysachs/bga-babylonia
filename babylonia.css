@@ -83,7 +83,7 @@ body {
 */
 #bbl_board_container {
     box-sizing: border-box;
-    border: calc(var(--bbl-board-border)) solid #ffffffbb;
+    border: var(--bbl-board-border) solid #ffffffbb;
     flex: 1;
     display: flex;
     flex-direction: row-reverse;
@@ -96,8 +96,8 @@ body {
     font-size: 0;
     background: var(--bbl-map-file) no-repeat center;
     background-size: cover;
-    width: calc(var(--bbl-board-width));
-    height: calc(var(--bbl-board-height));
+    width: var(--bbl-board-width);
+    height: var(--bbl-board-height);
     position: relative;
 }
 
@@ -114,9 +114,9 @@ body {
     display: flex;
     flex-direction:column;
     row-gap: calc(var(--bbl-hex-height) * 0.15);
-    border-radius: calc(var(--bbl-hex-width));
+    border-radius: var(--bbl-hex-width);
     padding: calc(0.15 * var(--bbl-hex-width));
-    width: calc(var(--bbl-hex-width));
+    width: var(--bbl-hex-width);
     background: var(--bbl-hand-bg);
 }
 
@@ -134,15 +134,15 @@ body {
     flex-direction: row;
     padding: 8px;
     column-gap: calc(var(--bbl-hex-width) * 0.10);
-    height: calc(var(--bbl-hex-height));
+    height: var(--bbl-hex-height);
     width: auto;
 }
 
 /* Board contents */
 
 #bbl_board>div {
-    height: calc(var(--bbl-hex-height));
-    aspect-ratio: calc(var(--bbl-hex-ratio));
+    height: var(--bbl-hex-height);
+    aspect-ratio: var(--bbl-hex-ratio);
     margin: 0;
     padding: 0;
     background-color: transparent;
@@ -176,8 +176,8 @@ body {
     position: absolute;
     left: 0;
     top: 0;
-    height: calc(var(--bbl-hex-height));
-    aspect-ratio: calc(var(--bbl-hex-ratio));
+    height: var(--bbl-hex-height);
+    aspect-ratio: var(--bbl-hex-ratio);
     background-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='173' ><polygon points='8,86 48,8 148,8 190,86 148,164 48,164' fill='none' stroke='rgb(68,238,68)' stroke-width='18' /></svg>");
     background-size: contain;
 }
@@ -188,8 +188,8 @@ body {
     background-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='173' ><polygon points='4,86 48,4 148,4 194,86 148,168 48,168' fill='none' stroke='yellow' stroke-width='10' /></svg>");
     background-size: contain;
     cursor: pointer;
-    height: calc(var(--bbl-hex-height));
-    aspect-ratio: calc(var(--bbl-hex-ratio));
+    height: var(--bbl-hex-height);
+    aspect-ratio: var(--bbl-hex-ratio);
     content: '';
     position: absolute;
     left: 0;
@@ -209,7 +209,7 @@ body {
 }
 
 [bbl_piece] {
-    aspect-ratio: calc(var(--bbl-hex-ratio));
+    aspect-ratio: var(--bbl-hex-ratio);
     background-size: 100%;
     /*
     background-image: var(--bbl-sprites-file);
@@ -221,7 +221,7 @@ body {
 */
     /* so picked up for floating (animated) pieces */
     display: inline-block;
-    height: calc(var(--bbl-hex-height));
+    height: var(--bbl-hex-height);
 }
 
 /*
@@ -503,8 +503,8 @@ body {
     left: calc((var(--bbl-hex-width) - var(--bbl-hex-height)) / 2);
     top: 0;
     content: '';
-    width: calc(var(--bbl-hex-height));
-    height: calc(var(--bbl-hex-height));
+    width: var(--bbl-hex-height);
+    height: var(--bbl-hex-height);
     border-radius: calc(var(--bbl-hex-height)/2);
     box-shadow: 0px 0px calc(var(--bbl-hex-height)*0.10) calc(var(--bbl-hex-height)*0.10) #ffffee;
     cursor: pointer;
@@ -577,8 +577,8 @@ body {
 .bbl_pb_hand_label_2,
 .bbl_pb_hand_label_3,
 .bbl_pb_hand_label_4 {
-    width: calc(var(--bbl-label-width));
-    height: calc(var(--bbl-label-height));
+    width: var(--bbl-label-width);
+    height: var(--bbl-label-height);
     background-size: cover; /* 100% 100%; */
     /*
     background-image: var(--bbl-sprites-file);
@@ -592,8 +592,8 @@ body {
 .bbl_pb_pool_label_3,
 .bbl_pb_pool_label_4,
 .bbl_pb_zcard_label {
-    width: calc(var(--bbl-label-width));
-    height: calc(var(--bbl-label-height));
+    width: var(--bbl-label-width);
+    height: var(--bbl-label-height);
     background-size: 100%;
     /*
     background-image: var(--bbl-sprites-file);
@@ -679,7 +679,7 @@ div.bbl_pb_zcards {
 }
 
 div.bbl_pb_zcards>div {
-    height: calc(var(--bbl-label-height));
+    height: var(--bbl-label-height);
     border: 1px solid #888;
 }
 
