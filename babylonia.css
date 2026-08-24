@@ -446,7 +446,7 @@ body {
     background-image: url(img/zcard-4.png);
 }
 
-[bbl_ztype="zc_3farmers"] {
+[bbl_ztype="zc_farmers"] {
     /*background-position: -400% 0%;*/
     background-image: url(img/zcard-5.png);
 }
@@ -736,7 +736,7 @@ div.bbl_pb_zcards>div {
 
 .bbl_zcard_hover {
     width: calc(min(50vw,265px));
-    font-size: calc(min(14pt, var(--bbl-hex-height)/2));
+    font-size: calc(min(12pt, var(--bbl-hex-height)/2));
     background-color: beige;
     padding: 5px;
     border: 1px solid black;

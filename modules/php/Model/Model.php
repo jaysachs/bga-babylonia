@@ -190,40 +190,61 @@ class Model
             return PlayAllowedResult::failure("can't place in occupied non-field space");
         }
 
-        // if 0 or 1 moves made, can play in any valid hex
+        // if 0 or 1 moves made so far, can play in any valid hex
         if (count($this->turnProgress()->moves) < 2) {
             return PlayAllowedResult::success($zcardsUsed);
         }
+
+        // at least 2 pieces have been played at this point.
 
         // extra moves can not go in water
         if ($hex->isWater()) {
             return PlayAllowedResult::failure("can't place extra moves in river");
         }
 
-        $non_land_farmer_played =
-            !$this->turnProgress()->allMovesFarmersOnLand($this->board());
-        if ($piece->isFarmer()) {
-            if ($non_land_farmer_played) {
-                return PlayAllowedResult::failure("can't place extra farmers unless all previous moves were farmers onto land");
-            }
-            return PlayAllowedResult::success($zcardsUsed);
+        // and if any of the first moves were in water, no more moves allowed
+        if (!$this->turnProgress()->allMovesOnLand($this->board())) {
+            return PlayAllowedResult::failure("can't place more than two if any in river");
         }
-        if (
-            !$non_land_farmer_played
-            && count($this->turnProgress()->moves) >= 3
-            && $this->components()->hasUnusedZigguratCard(
+
+        $numNoblesPlayed = $this->turnProgress()->numberNoblesPlayed();
+        // a farmer can be played if either:
+        //   all previous moves have been farmers
+        //  OR
+        //   has NOBLE_WITH_FARMERS and at most one noble has been played.
+        if ($piece->isFarmer()) {
+            if ($numNoblesPlayed == 0) {
+                return PlayAllowedResult::success($zcardsUsed);
+            }
+            if ($numNoblesPlayed >= 2) {
+                return PlayAllowedResult::failure("no farmers can be played after 2 or more nobles");
+            }
+            if ($this->components()->hasUnusedZigguratCard(
+                    $player_id,
+                    ZigguratCardType::NOBLE_WITH_FARMERS) ) {
+                $zcardsUsed[]= ZigguratCardType::NOBLE_WITH_FARMERS;
+                return PlayAllowedResult::success($zcardsUsed);
+            }
+            return PlayAllowedResult::failure("no farmers can be played after 1 or more nobes");
+        }
+
+        // a noble can be played if either:
+        //    has NOBLE_WITH_FARMERS and no nobles have been played
+        //  OR
+        //    has NOBLES_3_KINDS and has played the other two kinds of nobles
+
+        if ($numNoblesPlayed == 0 &&
+            $this->components()->hasUnusedZigguratCard(
                 $player_id,
-                ZigguratCardType::NOBLE_WITH_3_FARMERS
-            )
-        ) {
-            $zcardsUsed[]= ZigguratCardType::NOBLE_WITH_3_FARMERS;
+                ZigguratCardType::NOBLE_WITH_FARMERS)) {
+            $zcardsUsed[]= ZigguratCardType::NOBLE_WITH_FARMERS;
             return PlayAllowedResult::success($zcardsUsed);
         }
 
-        $nobles_played = $this->turnProgress()->uniqueNoblesPlayed();
+        $unique_nobles_played = $this->turnProgress()->uniqueNoblesPlayed();
         if (
-            count($nobles_played) == 2
-            && !in_array($piece, $nobles_played)
+            count($unique_nobles_played) == 2
+            && !in_array($piece, $unique_nobles_played)
             && $this->components()->hasUnusedZigguratCard(
                 $player_id,
                 ZigguratCardType::NOBLES_3_KINDS
@@ -378,7 +399,7 @@ class Model
             $this->ps->updatePlayedPiece($move);
             foreach ($emove->activated_ziggurat_cards as $zctype) {
                 switch ($zctype) {
-                    case ZigguratCardType::NOBLE_WITH_3_FARMERS:
+                    case ZigguratCardType::NOBLE_WITH_FARMERS:
                         $this->stats->PLAYER_ZC_USED_NOBLE_WITH_3_FARMERS->inc($this->player_id);
                         break;
                     case ZigguratCardType::NOBLES_3_KINDS:
@@ -628,7 +649,7 @@ class Model
             ZigguratCardType::EXTRA_TURN => $this->stats->PLAYER_ZC_CHOSEN_EXTRA_TURN,
             ZigguratCardType::HAND_SIZE_7 => $this->stats->PLAYER_ZC_CHOSEN_HAND_SIZE_7,
             ZigguratCardType::NOBLES_3_KINDS => $this->stats->PLAYER_ZC_CHOSEN_NOBLES_3_KINDS,
-            ZigguratCardType::NOBLE_WITH_3_FARMERS => $this->stats->PLAYER_ZC_CHOSEN_NOBLE_WITH_3_FARMERS,
+            ZigguratCardType::NOBLE_WITH_FARMERS => $this->stats->PLAYER_ZC_CHOSEN_NOBLE_WITH_3_FARMERS,
             ZigguratCardType::NOBLES_IN_FIELDS => $this->stats->PLAYER_ZC_CHOSEN_NOBLES_IN_FIELDS,
             ZigguratCardType::EXTRA_CITY_POINTS => $this->stats->PLAYER_ZC_CHOSEN_EXTRA_CITY_POINTS,
             ZigguratCardType::EMPTY_CENTER_LAND_CONNECTS => $this->stats->PLAYER_ZC_CHOSEN_EMPTY_CENTER_LAND,

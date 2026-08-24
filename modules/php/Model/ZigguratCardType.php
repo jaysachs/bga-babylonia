@@ -34,7 +34,7 @@ enum ZigguratCardType: string
     case EXTRA_TURN = 'zc_xturn';
     case HAND_SIZE_7 = 'zc_hand7';
     case NOBLES_3_KINDS = 'zc_3nobles';
-    case NOBLE_WITH_3_FARMERS = 'zc_3farmers';
+    case NOBLE_WITH_FARMERS = 'zc_farmers';
     case NOBLES_IN_FIELDS = 'zc_fields';
     case EXTRA_CITY_POINTS = 'zc_citypts';
     case EMPTY_CENTER_LAND_CONNECTS = 'zc_land';
@@ -48,7 +48,7 @@ enum ZigguratCardType: string
             ZigguratCardType::EXTRA_TURN,
             ZigguratCardType::HAND_SIZE_7,
             ZigguratCardType::NOBLES_3_KINDS,
-            ZigguratCardType::NOBLE_WITH_3_FARMERS,
+            ZigguratCardType::NOBLE_WITH_FARMERS,
             ZigguratCardType::NOBLES_IN_FIELDS,
             ZigguratCardType::EXTRA_CITY_POINTS
         ];
@@ -72,8 +72,8 @@ enum ZigguratCardType: string
             clienttranslate("From now on you can have 7 Clan Tokens on your Stand instead of 5."),
             ZigguratCardType::NOBLES_3_KINDS =>
             clienttranslate("From now on you can play exactly 3 different Nobles face up instead of any 2 Clan Tokens."),
-            ZigguratCardType::NOBLE_WITH_3_FARMERS =>
-            clienttranslate("From now on you can also play a Noble face up when you play 3 or more Farmers."),
+            ZigguratCardType::NOBLE_WITH_FARMERS =>
+            clienttranslate("From now on you can also play a noble face up when you play any farmers on your turn. At least one farmer must be played before you can play the Noble."),
             ZigguratCardType::NOBLES_IN_FIELDS =>
             clienttranslate("From now on you can place the Nobles in the Crop Fields, even without having one of your Clan Tokens next to those Crop Fields."),
             ZigguratCardType::EXTRA_CITY_POINTS =>

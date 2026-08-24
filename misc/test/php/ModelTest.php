@@ -308,6 +308,26 @@ END;
         $this->assertEquals([ZigguratCardType::NOBLES_IN_FIELDS], $result->activatedCards());
     }
 
+    public function testPlayPieces_nobleWithFarmers(): void {
+        $this->setMap(ModelTest::MAP6);
+        $this->ps->setHand([PieceType::FARMER, PieceType::MERCHANT, PieceType::PRIEST, PieceType::FARMER, PieceType::MERCHANT]);
+        $this->model->playPiece(0, RowCol::fromRowCol(0, 0));
+        $this->model->playPiece(1, RowCol::fromRowCol(2, 0));
+
+        $result = $this->model->checkPlay(1, PieceType::FARMER, $this->ps->hex(0, 2));
+        $this->assertFalse($result->isAllowed());
+        $result = $this->model->checkPlay(1, PieceType::PRIEST, $this->ps->hex(0, 2));
+        $this->assertFalse($result->isAllowed());
+
+        $this->model->selectZigguratCard(ZigguratCardType::NOBLE_WITH_FARMERS);
+        $this->model->playPiece(3, RowCol::fromRowCol(0,2));
+        $result = $this->model->checkPlay(1, PieceType::FARMER, $this->ps->hex(1, 3));
+        $this->assertTrue($result->isAllowed());
+
+        $result = $this->model->checkPlay(1, PieceType::PRIEST, $this->ps->hex(2, 4));
+        $this->assertFalse($result->isAllowed());
+    }
+
     public function testPlayPieces_threeNoblesOnLand(): void {
         $this->setMap(ModelTest::MAP6);
         $this->model->selectZigguratCard(ZigguratCardType::NOBLES_3_KINDS);

@@ -63,25 +63,26 @@ class TurnProgress
                 $seen[$move->piece->value] = 1;
             }
         }
-        return array_map(
-            function ($p) {
-                return PieceType::from($p);
-            },
-            array_keys($seen)
-        );
+        return array_map(fn ($p) => PieceType::from($p), array_keys($seen));
     }
 
-    public function allMovesFarmersOnLand(Board $board): bool
-    {
+    public function allMovesOnLand(Board $board): bool {
         foreach ($this->moves as &$move) {
-            if ($move->piece != PieceType::FARMER) {
-                return false;
-            }
             $hex = $board->hexAt($move->rc);
             if ($hex->isWater()) {
                 return false;
             }
         }
         return true;
+    }
+
+    public function numberNoblesPlayed(): int {
+        $n = 0;
+        foreach ($this->moves as &$move) {
+            if ($move->piece != PieceType::FARMER) {
+                $n++;
+            }
+        }
+        return $n;
     }
 }
