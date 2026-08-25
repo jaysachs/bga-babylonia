@@ -73,7 +73,7 @@ enum ZigguratCardType: string
             ZigguratCardType::NOBLES_3_KINDS =>
             clienttranslate("From now on you can play exactly 3 different Nobles face up instead of any 2 Clan Tokens."),
             ZigguratCardType::NOBLE_WITH_FARMERS =>
-            clienttranslate("From now on you can also play a noble face up when you play any farmers on your turn. At least one farmer must be played before you can play the Noble."),
+            clienttranslate("From now on you can also play a Noble face up when you play any farmers on your turn. At least one farmer must be played before you can play the Noble."),
             ZigguratCardType::NOBLES_IN_FIELDS =>
             clienttranslate("From now on you can place the Nobles in the Crop Fields, even without having one of your Clan Tokens next to those Crop Fields."),
             ZigguratCardType::EXTRA_CITY_POINTS =>

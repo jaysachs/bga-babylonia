@@ -55,7 +55,7 @@ class Components
     }
 
     /** @return list<ZigguratCard> */
-    public function &allZigguratCards(): array
+    public function allZigguratCards(): array
     {
         return $this->ziggurat_cards;
     }
