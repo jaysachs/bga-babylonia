@@ -34,9 +34,9 @@ export class Game extends BaseGame<BblPlayer, BGamedatas> {
   }
 
   private registerStateClasses(): void {
-    this.bga.states.register('SelectExtraTurn', new SelectExtraTurnState (this.bga, this.view, this.animationManager));
+    this.bga.states.register('SelectExtraTurn', new SelectExtraTurnState(this.bga, this.view, this.animationManager));
     this.bga.states.register('FinishTurn', new FinishTurnState(this.bga, this.view, this.animationManager));
-    this.bga.states.register('EndOfTurnScoring', new EndOfTurnScoringState (this.bga, this.view, this.animationManager));
+    this.bga.states.register('EndOfTurnScoring', new EndOfTurnScoringState(this.bga, this.view, this.animationManager));
     this.bga.states.register('SelectZigguratCard', new SelectZigguratCardState(this.bga, this.view, this.animationManager));
     this.bga.states.register('PlayPieces', new PlayPiecesState(this.bga, this.view, this.animationManager));
     this.bga.states.register('SelectScoringHex', new SelectScoringHexState(this.bga, this.view, this.animationManager));

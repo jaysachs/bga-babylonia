@@ -21,11 +21,11 @@ export abstract class BabyloniaState {
   }
 
 
-  constructor(protected bga: Bga<BblPlayer, BGamedatas>, protected view: View, protected animationManager: AnimationManager) {}
+  constructor(protected bga: Bga<BblPlayer, BGamedatas>, protected view: View, protected animationManager: AnimationManager) { }
 
-  public onEnteringState(args: any, isCurrentPlayerActive: boolean) {}
+  public onEnteringState(args: any, isCurrentPlayerActive: boolean) { }
 
-  public onLeavingState(args: any, isCurrentPlayerActive: boolean) {}
+  public onLeavingState(args: any, isCurrentPlayerActive: boolean) { }
 
   protected autoConfirmEnabled(): boolean {
     let p = this.bga.userPreferences.get(100);

@@ -38,12 +38,12 @@ export class FinishTurnState extends BabyloniaState {
           });
         }
       } else {
-         let pt = pieceDiv.getAttribute(Attrs.PIECE);
-         if (!pt) {
-           console.error("hand had piece div but no attribute");
-         } else if (pt != Attrs.pieceVal(newPiece!, this.bga.players.getPlayerById(pid))) {
-           console.error("piece from args", newPiece, "not matches hand", pieceDiv);
-         }
+        let pt = pieceDiv.getAttribute(Attrs.PIECE);
+        if (!pt) {
+          console.error("hand had piece div but no attribute");
+        } else if (pt != Attrs.pieceVal(newPiece!, this.bga.players.getPlayerById(pid))) {
+          console.error("piece from args", newPiece, "not matches hand", pieceDiv);
+        }
       }
       handPosDiv = handPosDiv!.nextElementSibling as (HTMLElement | null);
     }

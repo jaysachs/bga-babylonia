@@ -16,12 +16,12 @@ export class SelectExtraTurnState extends BabyloniaState {
   }
 
   async notif_extraTurnUsed(args: { card: string; used: boolean; }) {
-      const carddiv = $(IDS.zcard(args.card));
-      if (carddiv == undefined) {
-        console.error(`Could not find div for owned ${args.card} card`, args.card);
-      } else {
-        carddiv.setAttribute(Attrs.ZUSED, '');
-      }
+    const carddiv = $(IDS.zcard(args.card));
+    if (carddiv == undefined) {
+      console.error(`Could not find div for owned ${args.card} card`, args.card);
+    } else {
+      carddiv.setAttribute(Attrs.ZUSED, '');
     }
+  }
 
 }

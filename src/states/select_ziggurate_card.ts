@@ -33,9 +33,9 @@ export class SelectZigguratCardState extends BabyloniaState {
   }
 
   private attachHandler() {
-      this.controller.abort();
-      this.controller = new AbortController();
-      $(IDS.AVAILABLE_ZCARDS).addEventListener('click', e => this.onZcardClicked(e), { signal: this.controller.signal });
+    this.controller.abort();
+    this.controller = new AbortController();
+    $(IDS.AVAILABLE_ZCARDS).addEventListener('click', e => this.onZcardClicked(e), { signal: this.controller.signal });
   }
 
   private confirmSelection(e: Element) {
@@ -57,7 +57,7 @@ export class SelectZigguratCardState extends BabyloniaState {
         e.classList.toggle(CSS.SELECTED);
         this.bga.states.restoreServerGameState();
       },
-      { color: "secondary"});
+      { color: "secondary" });
   }
 
   private onZcardClicked(event: Event) {

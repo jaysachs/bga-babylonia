@@ -4,31 +4,31 @@ import { BabyloniaState } from "./base";
 export class EndOfTurnScoringState extends BabyloniaState {
   override onEnteringState(args: any, isCurrentPlayerActive: boolean) {
     if (isCurrentPlayerActive) {
-       this.view.markAllHexesUnplayable();
+      this.view.markAllHexesUnplayable();
     }
   }
 
-    private async indicateNeighbors(
+  private async indicateNeighbors(
     winnerHexes: number[],
     otherHexes: number[]) {
     if (this.animationManager.animationsActive()) {
       for (const rc of otherHexes) {
-         this.view.hexDiv(rc).classList.add(CSS.IN_NETWORK);
-         this.view.hexDiv(rc).classList.add(CSS.UNIMPORTANT);
+        this.view.hexDiv(rc).classList.add(CSS.IN_NETWORK);
+        this.view.hexDiv(rc).classList.add(CSS.UNIMPORTANT);
       }
       for (let i = 0; i < 3; i++) {
         for (const rc of winnerHexes) {
-           this.view.hexDiv(rc).classList.add(CSS.IN_NETWORK);
+          this.view.hexDiv(rc).classList.add(CSS.IN_NETWORK);
         }
         await this.bga.gameui.wait(250);
         for (const rc of winnerHexes) {
-           this.view.hexDiv(rc).classList.remove(CSS.IN_NETWORK);
+          this.view.hexDiv(rc).classList.remove(CSS.IN_NETWORK);
         }
         await this.bga.gameui.wait(250);
       }
       for (const rc of otherHexes) {
-         this.view.hexDiv(rc).classList.remove(CSS.IN_NETWORK);
-         this.view.hexDiv(rc).classList.remove(CSS.UNIMPORTANT);
+        this.view.hexDiv(rc).classList.remove(CSS.IN_NETWORK);
+        this.view.hexDiv(rc).classList.remove(CSS.UNIMPORTANT);
       }
     }
   }
@@ -74,7 +74,7 @@ export class EndOfTurnScoringState extends BabyloniaState {
       // const details = args.details[playerId]!;
       if (aa) {
         for (const nh of details.network_locations) {
-          let cl =  this.view.hexDiv(nh).classList;
+          let cl = this.view.hexDiv(nh).classList;
           cl.add(CSS.IN_NETWORK);
           if (!details.scored_locations.some(sh => (nh == sh))) {
             cl.add(CSS.UNIMPORTANT);
@@ -87,7 +87,7 @@ export class EndOfTurnScoringState extends BabyloniaState {
           { extraClass: 'bbl_city_scoring' });
         details.network_locations.forEach(
           (rc: number) => {
-            let cl =  this.view.hexDiv(rc).classList;
+            let cl = this.view.hexDiv(rc).classList;
             cl.remove(CSS.IN_NETWORK);
             cl.remove(CSS.UNIMPORTANT);
           });
@@ -103,12 +103,12 @@ export class EndOfTurnScoringState extends BabyloniaState {
 
     await this.animationManager.slideOutAndDestroy(
       hex.firstElementChild as HTMLElement, dest, {})
-      this.view.unmarkHexSelected(args.rc);
-      for (const details of args.details) {
-        this.bga.playerPanels.getScoreCounter(details.player_id).incValue(details.capture_points);
-        this.view.updateCapturedCityCount(details);
-      }
-      this.view.unmarkHexSelected(args.rc);
+    this.view.unmarkHexSelected(args.rc);
+    for (const details of args.details) {
+      this.bga.playerPanels.getScoreCounter(details.player_id).incValue(details.capture_points);
+      this.view.updateCapturedCityCount(details);
+    }
+    this.view.unmarkHexSelected(args.rc);
   }
 
 }
