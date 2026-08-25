@@ -28,6 +28,10 @@ export abstract class BabyloniaState {
   public onLeavingState(args: any, isCurrentPlayerActive: boolean) {}
 
   protected autoConfirmEnabled(): boolean {
-    return this.bga.userPreferences.get(100) == 1
+    let p = this.bga.userPreferences.get(100);
+    if (p == 0) {
+      return this.bga.gameui.bRealtime;
+    }
+    return p == 2;
   }
 }

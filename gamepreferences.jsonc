@@ -4,12 +4,15 @@
     "needReload": false,
     "values": {
       "0": {
-        "name": "No"
+        "name": "Default"
       },
       "1": {
+        "name": "No"
+      },
+      "2": {
         "name": "Yes"
       }
     },
-    "default": 1
+    "default": 0
   },
 }
