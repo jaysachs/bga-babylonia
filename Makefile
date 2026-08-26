@@ -43,7 +43,7 @@ pull-boilerplate:
 	lftp -e 'cd $(GAME); set xfer:clobber true; get _ide_helper.php; get bga-framework.d.ts; exit' $(SFTP)
 
 clean:
-	rm -rf $(WORK) $(TS_STUBS) $(JS) $(STATS)
+	rm -rf $(WORK) $(TS_STUBS) $(JS) $(STATS) img/pieces.png img/zcards.png
 
 sprites: img/pieces.png img/zcards.png
 
