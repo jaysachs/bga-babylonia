@@ -25,12 +25,12 @@ export class Game extends BaseGame<BblPlayer, BGamedatas> {
     this.registerStateClasses();
 
     this.bga.notifications.setupPromiseNotifications({
-      logger: console.log,
+      // logger: console.log,
       handlers: [this, ...this.bga.states.getStateClasses()],
     });
 
     await this.view.setup(gamedatas);
-    console.log('Game setup done');
+    console.debug('Game setup done');
   }
 
   private registerStateClasses(): void {

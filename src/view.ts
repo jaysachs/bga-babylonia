@@ -119,15 +119,15 @@ export class View {
       $(IDS.MAIN).classList.add(CSS.IS_SPECTATOR);
     }
 
-    console.log('setting up player boards');
+    console.debug('setting up player boards');
     for (const pid in gamedatas.players) {
       this.setupPlayerBoard(gamedatas.players[pid]!);
     }
 
-    console.log('setting the the game board');
+    console.debug('setting the the game board');
     this.setupGameBoard(gamedatas.board);
 
-    console.log('setting up player hand', gamedatas.hand);
+    console.debug('setting up player hand', gamedatas.hand);
     gamedatas.hand?.forEach((piece, i) => {
       const hpd = this.handPosDiv(i);
       if (Piece.isNonEmpty(piece)) {
@@ -136,7 +136,7 @@ export class View {
       }
     });
 
-    console.log('Setting up ziggurat cards', gamedatas.ziggurat_cards);
+    console.debug('Setting up ziggurat cards', gamedatas.ziggurat_cards);
     this.setupZcards(gamedatas.ziggurat_cards);
     this.bga.gameui.wait(1500).then(() => this.handleResize());
   }
@@ -176,8 +176,11 @@ export class View {
     const pageEl = document.getElementById('page-content');
     const pageRect = pageEl!.getBoundingClientRect();
 
+    /*
     console.log(pageRect.top, pageRect.width);
     console.log(window.visualViewport!.height, window.visualViewport!.scale);
+    */
+   
     // So this mess: when the page scrolls, pageRect.top shrinks from about 242 to 132
     //  because of the fixed location of the page title bar removes it from the flow.
     //  So we can't use pageRect.top. But we do know that when first loaded, it's in the
@@ -246,7 +249,7 @@ export class View {
 
   private setupPlayerBoard(player: BblPlayer): void {
     const playerId = player.player_id;
-    console.log('Setting up board for player ' + playerId);
+    console.debug('Setting up board for player ' + playerId);
     this.bga.playerPanels.getElement(playerId).append(...this.player_board_ext(playerId));
     //  create counters per player
     this.handCounters[playerId] = new ebg.counter();
