@@ -12,13 +12,13 @@
     "game_name": "Babylonia",
 
     // Game publisher (use empty string if there is no publisher)
-    "publisher": "Ludonova",
+    "publisher": "BoardGameArena",
 
     // Url of game publisher website
-    "publisher_website": "http://ludonova.com/",
+    "publisher_website": "http://boardgamearena.com/",
 
     // Board Game Geek ID of the publisher
-    "publisher_bgg_id": 16826,
+    "publisher_bgg_id": 0,
 
     // Board game geek ID of the game
     "bgg_id": 266164,
