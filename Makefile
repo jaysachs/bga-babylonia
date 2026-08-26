@@ -45,13 +45,13 @@ pull-boilerplate:
 clean:
 	rm -rf $(WORK) $(TS_STUBS) $(JS) $(STATS)
 
-sprites: img/pieces.png img.zcards.png
+sprites: img/pieces.png img/zcards.png
 
 IMGSRCDIR=misc/img
 PIECEIMGSRCS=$(IMGSRCDIR)/P-*-*.png $(IMGSRCDIR)/Ziggurat-*.png $(IMGSRCDIR)/City-*.png $(IMGSRCDIR)/Crop-*.png
 img/pieces.png: $(PIECEIMGSRCS)
 	magick montage -background transparent -tile 6x7 -geometry 200x173+0+0 $(PIECEIMGSRCS) img/pieces.png
 
-ZCARDMGSRCS=$(IMGSRCDIR)/zcard-*.png
+ZCARDIMGSRCS=$(IMGSRCDIR)/zcard-*.png
 img/zcards.png: $(ZCARDIMGSRCS)
-	magick montage -background transparent -tile 1x9 -geometry 330x530+0+ $(ZCARDIMGSRCS) img/zcards.png
+	magick montage -background transparent -tile 9x1 -geometry 330x530+0+0 $(ZCARDIMGSRCS) img/zcards.png

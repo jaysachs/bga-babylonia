@@ -368,7 +368,7 @@ body {
 /*    background-size: contain; */
     height: var(--bbl-zcard-height);
     width: auto;
-/*    aspect-ratio: var(--bbl-zcard-aspect-ratio); */
+    aspect-ratio: var(--bbl-zcard-aspect-ratio);
 }
 
 [bbl_ztype=""] {
@@ -676,7 +676,6 @@ div.bbl_pb_zcards>div {
 
 .bbl_zcard_hover div[bbl_ztype] {
     height: calc(min(30vw,265px));
-    width: 100%;
     background-position: center;
     margin-bottom: 0.5em;
 }
