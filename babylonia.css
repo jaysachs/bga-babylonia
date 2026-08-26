@@ -179,7 +179,8 @@ body {
     bottom: 10%;
     content: '\2726';
     color: #f3f3a0c0;
-    /*
+    font-size: calc(0.33 * var(--bbl-hex-height));
+     /*
     animation: 3s infinite alternate playable;
     animation-timing-function: linear;
     */
