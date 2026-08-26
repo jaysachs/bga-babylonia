@@ -672,11 +672,14 @@ div.bbl_pb_zcards>div {
     background-color: beige;
     padding: 5px;
     border: 1px solid black;
+    display: flex;
+    flex-flow: column;
+    justify-content: center;
+    align-items: center;
 }
 
 .bbl_zcard_hover div[bbl_ztype] {
     height: calc(min(30vw,265px));
-    background-position: center;
     margin-bottom: 0.5em;
 }
 
