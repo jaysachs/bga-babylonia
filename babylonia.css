@@ -223,11 +223,11 @@ body {
  * Cities and fields sprites
  */
 [bbl_piece="city_m"] {
-    background-position: -400% -400%;
+    background-position: -500% -400%;
 }
 
 [bbl_piece="city_p"] {
-    background-position: -500% -400%;
+    background-position: -400% -400%;
 }
 
 [bbl_piece="city_s"] {
