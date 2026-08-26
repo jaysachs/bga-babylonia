@@ -14,7 +14,6 @@ function bgchange(event) {
     c.remove('bblbg1');
     c.remove('bblbg2');
     c.remove('bblbg3');
-    c.remove('bblbg4');
     c.add(event.target.value);
 }
 

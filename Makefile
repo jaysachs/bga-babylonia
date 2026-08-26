@@ -10,7 +10,7 @@ TS_STUBS=src/bga-framework.d.ts
 JS=modules/js/Game.js
 PHPSTAN_LEVEL=10
 
-.PHONY: build test phpstan deploy clean pull-boilerplate
+.PHONY: build test phpstan deploy clean pull-boilerplate sprites
 
 $(JS): src/**/*.ts src/*.ts tsconfig.json $(TS_STUBS)
 	npm run build:ts
@@ -28,7 +28,7 @@ $(STUBS): $(WORK) _ide_helper.php Makefile
 	mkdir -p $(WORK)/module/table
 	perl -p -e 's/type_arg=null,/type_arg,/;' -e 's/  exit/\/\/ exit/;' -e 's/APP_GAMEMODULE_PATH = ""/APP_GAMEMODULE_PATH = "work\/"/;' -e 's/{}\(\)\;/{}\;/;' _ide_helper.php > $(STUBS)
 
-build: $(JS) $(STUBS) $(STATS)
+build: $(JS) $(STUBS) $(STATS) $(SPRITES)
 
 test: build
 	phpunit --bootstrap misc/autoload.php misc --testdox
@@ -44,3 +44,14 @@ pull-boilerplate:
 
 clean:
 	rm -rf $(WORK) $(TS_STUBS) $(JS) $(STATS)
+
+sprites: img/pieces.png img.zcards.png
+
+IMGSRCDIR=misc/img
+PIECEIMGSRCS=$(IMGSRCDIR)/P-*-*.png $(IMGSRCDIR)/Ziggurat-*.png $(IMGSRCDIR)/City-*.png $(IMGSRCDIR)/Crop-*.png
+img/pieces.png: $(PIECEIMGSRCS)
+	magick montage -background transparent -tile 6x7 -geometry 200x173+0+0 $(PIECEIMGSRCS) img/pieces.png
+
+ZCARDMGSRCS=$(IMGSRCDIR)/zcard-*.png
+img/zcards.png: $(ZCARDIMGSRCS)
+	magick montage -background transparent -tile 1x9 -geometry 330x530+0+ $(ZCARDIMGSRCS) img/zcards.png
