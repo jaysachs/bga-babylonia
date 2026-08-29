@@ -319,13 +319,13 @@ export class View {
   private player_board_ext(player_id: number): HTMLElement[] {
     const colorIndex = this.bga.players.getPlayerById(player_id)?.color_index;
     return [
-      Html.div({},
+      Html.div({title: _('number of tiles in hand')},
         Html.span({ id: IDS.handcount(player_id), classes: ['bbl_pb_hand', `bbl_pb_hand_label_${colorIndex}`] }),
       ),
-      Html.div({},
+      Html.div({title: _('number of tiles in pool')},
         Html.span({ id: IDS.poolcount(player_id), classes: ['bbl_pb_pool', `bbl_pb_pool_label_${colorIndex}`] }),
       ),
-      Html.div({},
+      Html.div({title: _('number of captured cities')},
         Html.span({ id: IDS.citycount(player_id), classes: ['bbl_pb_city', 'bbl_pb_city_label'] }),
       ),
       Html.div({ id: IDS.playerBoardZcards(player_id), classes: 'bbl_pb_zcards' }
