@@ -18,17 +18,17 @@ body.bblbg1 {
 }
 
 body.bblbg2 {
-    background: linear-gradient(190deg, #a7855d, #b2afa4);
+    background: linear-gradient(60deg, #a7855d, #b2afa4);
 }
 
 body.bblbg3 {
-    background: conic-gradient(#6a6, #a7855d, #6a6, #b2afa4, #6a6);
+    background: conic-gradient(#666, #a7855d, #666, #b2afa4, #666);
 }
 
 /* inspired from https://css-tricks.com/hexagons-and-beyond-flexible-responsive-grid-patterns-sans-media-queries/ */
 body {
     background:
-       linear-gradient(60deg, #0af3, #0af4, #0af5, #0af4, #0af3)
+       linear-gradient(60deg, #6af3, #6af5, #6af7, #6af5, #6af3)
         ,
         conic-gradient(#9ac5a633,#9ac5a644,#9ac5a655,#9ac5a644,#9ac5a633)
         ,
