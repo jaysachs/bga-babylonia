@@ -24,7 +24,7 @@ export class Attrs implements AttrLike {
   }
   zused(u: boolean): Attrs {
     if (u) {
-      this.r[Attrs.ZUSED] = "";
+      this.r[Attrs.ZUSED] = "true";
     }
     return this;
   }
@@ -180,7 +180,7 @@ export class View {
     console.log(pageRect.top, pageRect.width);
     console.log(window.visualViewport!.height, window.visualViewport!.scale);
     */
-   
+
     // So this mess: when the page scrolls, pageRect.top shrinks from about 242 to 132
     //  because of the fixed location of the page title bar removes it from the flow.
     //  So we can't use pageRect.top. But we do know that when first loaded, it's in the
