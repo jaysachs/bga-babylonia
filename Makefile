@@ -28,7 +28,7 @@ $(STUBS): $(WORK) _ide_helper.php Makefile
 	mkdir -p $(WORK)/module/table
 	perl -p -e 's/type_arg=null,/type_arg,/;' -e 's/  exit/\/\/ exit/;' -e 's/APP_GAMEMODULE_PATH = ""/APP_GAMEMODULE_PATH = "work\/"/;' -e 's/{}\(\)\;/{}\;/;' _ide_helper.php > $(STUBS)
 
-build: $(JS) $(STUBS) $(STATS) $(SPRITES)
+build: $(JS) $(STUBS) $(STATS) sprites
 
 test: build
 	phpunit --bootstrap misc/autoload.php misc --testdox
