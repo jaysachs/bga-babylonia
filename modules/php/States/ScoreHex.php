@@ -43,7 +43,7 @@ class ScoreHex extends AbstractState
             game: $game,
             id: 7,
             type: StateType::GAME,
-            description: clienttranslate('${city} at ${row},${col} scoring'));
+            description: clienttranslate('${city} at ${hex} scoring'));
     }
 
     private function scoringHex(): int {
@@ -60,8 +60,7 @@ class ScoreHex extends AbstractState
         $model = $this->createModel(0);
         return [
             "current_scoring_hex" => $rc,
-            "row" => RowCol::row($rc),
-            "col" => RowCol::col($rc),
+            "hex" => RowCol::toUser($rc),
             "city" => $model->board()->hexAt($rc)->piece->value,
         ];
     }
@@ -73,17 +72,16 @@ class ScoreHex extends AbstractState
         $piece = $hexWinner->hex->piece;
         $data = array_merge($data, [
             "rc" =>  $rc,
-            "row" => RowCol::row($rc),
-            "col" => RowCol::col($rc),
+            "hex" => RowCol::toUSer($rc),
             "winner_hexes" => $hexWinner->winnerRowCols(),
             "other_hexes" => $hexWinner->othersRowCols(),
             "player_id" => $player_id,
             "city" => $piece->value,
         ]);
         if ($player_id == 0) {
-            $msg = clienttranslate('${city} at (${row},${col}) scored, no winner');
+            $msg = clienttranslate('${city} at ${hex} scored, no winner');
         } else {
-            $msg = clienttranslate('${city} at (${row},${col}) scored, winner is ${player_name}');
+            $msg = clienttranslate('${city} at ${hex} scored, winner is ${player_name}');
         }
         if ($piece->isZiggurat()) {
             $this->notify->all("zigguratScored", $msg, $data);

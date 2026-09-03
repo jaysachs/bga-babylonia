@@ -333,6 +333,10 @@ export class View {
     ];
   }
 
+  private static range(start: number, end: number): number[] {
+    return Array.from({length: (end - start + 1)}, (v, k) => k + start);
+  }
+
   private base_html(): HTMLElement {
     return Html.div({},
       Html.div({ id: IDS.MAIN },
@@ -343,7 +347,14 @@ export class View {
           Html.div({ id: "bbl_available_zcards_container" },
             Html.div({ id: IDS.AVAILABLE_ZCARDS })
           ),
-          Html.div({ id: IDS.BOARD })
+          Html.div({ id: 'bbl_column_headers'},
+            ... View.range('A'.charCodeAt(0), 'Q'.charCodeAt(0)).map(c => Html.span({ text: String.fromCharCode(c)})),
+          ),
+          Html.div({ id: 'bbl_row_headers'},
+            ... View.range(1, 23).map(c => Html.span({ text: String(c)})),
+          ),
+          Html.div({ id: IDS.BOARD },
+          )
         )
       ),
       Html.div({ id: IDS.OFF_BOARD })

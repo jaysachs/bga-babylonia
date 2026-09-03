@@ -88,8 +88,8 @@ class PlayPieces extends AbstractState
         $points = $move->points();
         $piece = $move->piece->value;
         $msg = ($points > 0)
-            ? clienttranslate('${player_name} plays ${piece} to (${row},${col}) scoring ${points}')
-            : clienttranslate('${player_name} plays ${piece} to (${row},${col})');
+            ? clienttranslate('${player_name} plays ${piece} to ${hex} scoring ${points}')
+            : clienttranslate('${player_name} plays ${piece} to ${hex}');
 
         $privateArgs =  [ $active_player_id => [ "handpos" => $handpos ] ];
         $this->notify->all(
@@ -101,8 +101,7 @@ class PlayPieces extends AbstractState
                     "player_id" => $active_player_id,
                     "piece" => $piece,
                     "rc" => $rc,
-                    "row" => RowCol::row($rc),
-                    "col" => RowCol::col($rc),
+                    "hex" => RowCol::toUser($rc),
                     "captured_piece" => $move->captured_piece->value,
                     "points" => $points,
                     "ziggurat_points" => $move->ziggurat_points,
@@ -145,13 +144,12 @@ class PlayPieces extends AbstractState
 
         $this->notify->all(
             "undoMove",
-            clienttranslate('${player_name} undid their move from ${row},${col}'),
+            clienttranslate('${player_name} undid their move from ${hex}'),
             $this->addStateArgs(
                 [
                     "player_id" => $active_player_id,
                     "rc" => $move->rc,
-                    "row" => RowCol::row($move->rc),
-                    "col" => RowCol::col($move->rc),
+                    "hex" => RowCol::toUser($move->rc),
                     "piece" => $move->piece->value,
                     "captured_piece" => $move->captured_piece->value,
                     "hand_size" => $model->activePlayerInfo()->hand->size(),

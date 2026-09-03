@@ -106,6 +106,36 @@ body {
     position: relative;
 }
 
+#bbl_column_headers {
+    position: absolute;
+    left: calc(var(--bbl-hex-width)*0.68);
+    top: 1px;
+    display: grid;
+    color:white;
+    font-size: calc(var(--bbl-hex-height)/6);
+    z-index:10;
+    justify-content: center;
+    align-items: center;
+    grid-template-columns: repeat(17, 1fr);
+    width: calc(17 * (3/4*(1.05* var(--bbl-hex-width))));
+}
+
+#bbl_row_headers {
+    position: absolute;
+    left: 2px;
+    top: calc(var(--bbl-hex-height)*0.53);
+    display: grid;
+    color:white;
+    font-size: calc(var(--bbl-hex-height)/6);
+    z-index:10;
+    height: calc(23 * 0.5 * var(--bbl-hex-height));
+    justify-content: center;
+    align-items: center;
+    width: 1%;
+    grid-template-rows: repeat(23, calc(0.5 * var(--bbl-hex-height) + 1px));
+    grid-template-columns: 1fr;
+}
+
 #bbl_main.bbl_is_spectator #bbl_hand {
     display: none;
 }

@@ -54,15 +54,14 @@ abstract class AbstractScoringSelection extends AbstractState
     {
         $model = $this->createModel($active_player_id);
         $hex = $model->selectScoringHex($rc);
-        $msg = clienttranslate('${city} at (${row},${col}) is selected to be scored');
+        $msg = clienttranslate('${city} at ${hex} is selected to be scored');
         $this->notify->all(
             "scoringSelection",
             $msg,
             [
                 "player_id" => $active_player_id,
                 "rc" => $hex->rc,
-                "row" => RowCol::row($rc),
-                "col" => RowCol::col($rc),
+                "hex" => RowCol::toUser($rc),
                 "city" => $hex->piece->value,
             ]
         );

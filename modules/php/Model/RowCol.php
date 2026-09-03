@@ -73,4 +73,7 @@ class RowCol
         return $row * 100 + $col;
     }
 
+    public static function toUser(int $rc): string {
+        return chr(self::col($rc) + 65) . strval(self::row($rc) + 1);
+    }
 }
