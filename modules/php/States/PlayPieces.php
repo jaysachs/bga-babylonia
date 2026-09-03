@@ -33,6 +33,7 @@ use Bga\GameFramework\UserException;
 use Bga\Games\babylonia\Game;
 use Bga\Games\babylonia\Model\Hex;
 use Bga\Games\babylonia\Model\Model;
+use Bga\Games\babylonia\Model\PieceType;
 use Bga\Games\babylonia\Model\RowCol;
 use Bga\Games\babylonia\Utils\Arrays;
 
@@ -87,9 +88,11 @@ class PlayPieces extends AbstractState
         $move = $model->playPiece($handpos, $rc);
         $points = $move->points();
         $piece = $move->piece->value;
-        $msg = ($points > 0)
-            ? clienttranslate('${player_name} plays ${piece} to ${hex} scoring ${points}')
-            : clienttranslate('${player_name} plays ${piece} to ${hex}');
+        $msg = $move->captured_piece->isEmpty()
+            ? (($points > 0)
+                ? clienttranslate('${player_name} plays ${piece} to ${hex} scoring ${points}')
+                : clienttranslate('${player_name} plays ${piece} to ${hex}'))
+            : clienttranslate('${player_name} plays ${piece} to ${hex} capturing ${captured_piece} scoring ${points}');
 
         $privateArgs =  [ $active_player_id => [ "handpos" => $handpos ] ];
         $this->notify->all(
