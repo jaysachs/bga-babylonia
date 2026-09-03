@@ -492,12 +492,12 @@ body {
 /* available ziggurat cards panel */
 
 #bbl_available_zcards {
-    padding-left: 3px;
-    padding-right: 3px;
-    background-image: url(img/background-dark.jpg);
+    padding-left: 0.4vw;
+    padding-right: 0.4vw;
+    background-image: url(img/zcardsbg.jpg);
+    background-size: cover;
     display: grid;
-    justify-items: center;
-    align-items: center;
+    align-content: space-evenly;
     height: 100%;
     grid-template-columns: 1fr;
 }
@@ -510,9 +510,10 @@ body {
 #bbl_available_zcards>div {
     display: inline-block;
     border: 0.08vw solid transparent;
-    height: var(--bbl-zcard-height);
     width: auto;
     aspect-ratio: var(--bbl-zcard-aspect-ratio);
+    background-clip: content-box;
+    background-color: #ffffff60;
     /*
     border-style: dashed;
     border-width: 1px;
@@ -522,11 +523,6 @@ body {
 
 #bbl_available_zcards.bbl_selecting>div:has(>div.bbl_selected) {
     border-color: yellow;
-}
-
-#bbl_available_zcards>div:not(:has(>div)) {
-    background-clip: content-box;
-    background-color: #ffffff60;
 }
 
 /*
