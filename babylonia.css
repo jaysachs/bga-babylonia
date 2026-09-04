@@ -109,7 +109,7 @@ body {
 #bbl_column_headers {
     position: absolute;
     left: calc(var(--bbl-hex-width)*0.68);
-    top: 1px;
+    top: 0.1vw;
     display: grid;
     color:white;
     font-size: calc(var(--bbl-hex-height)/6);
@@ -122,17 +122,17 @@ body {
 
 #bbl_row_headers {
     position: absolute;
-    left: 2px;
+    left: 0.1vw;
     top: calc(var(--bbl-hex-height)*0.53);
     display: grid;
     color:white;
     font-size: calc(var(--bbl-hex-height)/6);
     z-index:10;
-    height: calc(23 * 0.5 * var(--bbl-hex-height));
+    /* height: calc(23 * 0.5 * var(--bbl-hex-height)); */
     justify-content: center;
     align-items: center;
     width: 1%;
-    grid-template-rows: repeat(23, calc(0.5 * var(--bbl-hex-height) + 1px));
+    grid-template-rows: repeat(23, calc(0.52 * var(--bbl-hex-height)));
     grid-template-columns: 1fr;
 }
 
