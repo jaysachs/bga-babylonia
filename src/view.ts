@@ -164,7 +164,9 @@ export class View {
       tooltip = (this.bga.gameui as any).tooltips[id];
       tooltip.getContent = () => content().outerHTML;
     }
+    tooltip.removeTarget(id);
     $(id).addEventListener('pointerenter', (e) => tooltip.open(id));
+    $(id).addEventListener('pointerleave', (e) => tooltip.close());
   }
 
   // This includes spots for cards
