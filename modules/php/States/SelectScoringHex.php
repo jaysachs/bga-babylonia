@@ -30,6 +30,7 @@ namespace Bga\Games\babylonia\States;
 use Bga\GameFramework\StateType;
 use Bga\GameFramework\States\PossibleAction;
 use Bga\Games\babylonia\Game;
+use Bga\Games\babylonia\Model\RowCol;
 
 class SelectScoringHex extends AbstractScoringSelection
 {
@@ -48,8 +49,11 @@ class SelectScoringHex extends AbstractScoringSelection
     public function getArgs(int $active_player_id): array
     {
         $model = $this->createModel($active_player_id);
-        $rcs = $model->locationsRequiringScoring();
-        return ["hexes" => $rcs];
+        $hexes = [];
+        foreach($model->locationsRequiringScoring() as $rc) {
+            $hexes[$rc] = RowCol::toUser($rc);
+        }
+        return ["hexes" => $hexes];
     }
 
     #[PossibleAction]

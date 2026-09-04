@@ -5,13 +5,18 @@ import { BabyloniaState } from "./base";
 
 export class SelectScoringHexState extends BabyloniaState {
   private handler: (e: Event) => void;
+  private hexes: string[] = [];
+
   constructor(bga: Bga<BblPlayer, BGamedatas>, view: View, animationManager: AnimationManager) {
     super(bga, view, animationManager);
     this.handler = (e) => this.onBoardClicked(e);
   }
-  override onEnteringState(args: { hexes: number[] }, isCurrentPlayerActive: boolean) {
+
+  override onEnteringState(args: { hexes: string[] }, isCurrentPlayerActive: boolean) {
+    this.hexes = args.hexes;
     if (isCurrentPlayerActive) {
-      this.view.markHexesSelectable(args.hexes);
+      const rcs = Object.keys(args.hexes).map(Number);
+      this.view.markHexesSelectable(rcs);
       $(IDS.BOARD).addEventListener('click', this.handler);
     }
   }
@@ -26,18 +31,15 @@ export class SelectScoringHexState extends BabyloniaState {
     event.stopPropagation();
 
     const hex = this.selectedHex(event.target!);
-    if (hex == null) {
+    if (hex === null) {
       return;
     }
     let piece = this.view.hexDiv(hex).firstElementChild!.getAttribute(Attrs.PIECE);
     this.view.unmarkHexSelectable(hex);
     this.view.markHexSelected(hex);
-    // this.bga.statusBar.setTitle(_('Score ${city} at (${row},${col})?'), {
-    //   row: hex.row, col: hex.col, city: piece,
-    // });
     // TODO: add tooltip
-    this.bga.statusBar.setTitle(_('Score ${city}?'), {
-      city: piece,
+    this.bga.statusBar.setTitle(_('Score ${city} at ${hex}?'), {
+       hex : this.hexes[hex], city: piece,
     });
     this.bga.statusBar.addActionButton(_('Confirm'),
       () => this.bga.actions.performAction('actSelectHexToScore', { rc: hex }).then(() => this.view.unmarkHexPlayable(hex)),
