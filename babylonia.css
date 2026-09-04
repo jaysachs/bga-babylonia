@@ -128,7 +128,6 @@ body {
     color:white;
     font-size: calc(var(--bbl-hex-height)/6);
     z-index:10;
-    /* height: calc(23 * 0.5 * var(--bbl-hex-height)); */
     justify-content: center;
     align-items: center;
     width: 1%;
