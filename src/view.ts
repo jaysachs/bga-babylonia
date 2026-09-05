@@ -165,8 +165,18 @@ export class View {
       tooltip.getContent = () => content().outerHTML;
     }
     tooltip.removeTarget(id);
-    $(id).addEventListener('pointerenter', (e) => tooltip.open(id));
-    $(id).addEventListener('pointerleave', (e) => tooltip.close());
+
+    let timeoutId : null | number = null;
+    $(id).addEventListener('pointerenter', (e) => { 
+      timeoutId = setTimeout(() => { timeoutId = null; tooltip.open(id) }, 300);
+    });
+    $(id).addEventListener('pointerleave', (e) => {
+      if (timeoutId == null) {
+        tooltip.close();
+      } else {
+        clearTimeout(timeoutId);
+      }
+    })
   }
 
   // This includes spots for cards
