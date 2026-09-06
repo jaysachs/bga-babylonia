@@ -29,8 +29,7 @@ export class Game extends BaseGame<BblPlayer, BGamedatas> {
       handlers: [this, ...this.bga.states.getStateClasses()],
     });
 
-    await this.view.setup(gamedatas);
-    console.debug('Game setup done');
+    this.view.setup(gamedatas).then(() => console.debug('Game setup done'));
   }
 
   private registerStateClasses(): void {

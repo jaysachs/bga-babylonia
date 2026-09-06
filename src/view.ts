@@ -111,7 +111,6 @@ export class View {
   }
 
   public async setup(gamedatas: BGamedatas) {
-    this.bga.gameui.onScreenWidthChange = () => this.handleResize();
     this.translatedPieces = gamedatas.translated_pieces;
     this.bga.gameArea.getElement().appendChild(this.base_html());
 
@@ -138,8 +137,39 @@ export class View {
 
     console.debug('Setting up ziggurat cards', gamedatas.ziggurat_cards);
     this.setupZcards(gamedatas.ziggurat_cards);
-    // FIXME: this is still needed as the initial resize call happens "too soon"
-    this.bga.gameui.wait(1500).then(() => this.handleResize());
+    
+    this.bga.gameui.onScreenWidthChange = () => this.handleResize();
+    // FIXME: shouldn't need this but we do.
+    window.addEventListener('load', () => this.handleResize());
+  }
+
+  observeChanges(): (() => void) {
+    var targetNode = document.body;
+
+    // Callback function to execute when mutations are observed
+    const  callback = function(mutationsList: MutationRecord[]) {
+        for(let mutation of mutationsList) {
+            if (mutation.type == 'childList') {
+                if (mutation.addedNodes.length > 0) {
+                  console.log('ADDED', (mutation.target as any).id, mutation.addedNodes);
+                }
+                if (mutation.removedNodes.length > 0) {
+                  console.log('REMOVED', (mutation.target as any).id, mutation.removedNodes);
+                }
+            }
+            else if (mutation.type == 'attributes') {
+              const el = mutation.target as Element;
+              console.log('CHANGED', el.id, mutation.attributeName, mutation.oldValue, ' to ', el.getAttribute(mutation.attributeName!));
+            }
+        }
+    };
+
+    // Create an observer instance linked to the callback function
+    const observer = new MutationObserver(callback);
+
+    // Start observing the target node for configured mutations
+    observer.observe(targetNode, { attributes: true, attributeOldValue: true, childList: true, subtree: true });
+    return () => { observer.disconnect() };
   }
 
   static readonly hstart = 56.0; // this the (negative) offset on left of board
@@ -183,28 +213,26 @@ export class View {
   // This includes spots for cards
   static readonly map_aspect_ratio = 808 / 1082; // 2709 / 3385;
 
-  private handleResize() {
-    const pageRect = document.getElementById('page-content')!.getBoundingClientRect();
-    const availWidth = pageRect.width;
-
+  handleResize() {
+    const pageRect = this.bga.gameui.getBoundingClientRectIgnoreZoom('page-content');
     const vv = window.visualViewport!;
-    const headerHeight = pageRect.top + vv.pageTop;
 
-    const vertAvail = vv.height * vv.scale - headerHeight;
+    const availWidth = pageRect.width;
+    const availHeight = vv.height * vv.scale - (pageRect.top + vv.pageTop);
 
     // "horizontal" "default" layout
     var w1 = availWidth * (1082 - 112) / 1082; // 0.889
     // 1082 808
     var h1 = w1 * View.map_aspect_ratio;
-    if (h1 > vertAvail) {
-      w1 = vertAvail / View.map_aspect_ratio;
-      h1 = vertAvail;
+    if (h1 > availHeight) {
+      w1 = availHeight / View.map_aspect_ratio;
+      h1 = availHeight;
     }
 
     // "vertical" "alt" layout
     // 747 101
     // 1494 162
-    var h2 = vertAvail * 1494 / (1494 + 182); // (882-92)/882;
+    var h2 = availHeight * 1494 / (1494 + 182); // (882-92)/882;
     var w2 = h2 / View.map_aspect_ratio;
     if (w2 > availWidth) {
       w2 = availWidth;
