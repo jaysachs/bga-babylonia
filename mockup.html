@@ -114,12 +114,7 @@
                       </select>
                       <button class="action-button bgabutton bgabutton_blue" type="button" onclick="addRandomPieces(1, 1)">+1p</button>
                       <button class="action-button bgabutton bgabutton_blue" type="button" onclick="addRandomPieces(10, 1)">+10p</button>
-                      <select id="bbl_mockup_bg" onchange="bgchange(event)">
-                        <option value="">Image</option>
-                        <option value="bblbg1">Dark</option>
-                        <option value="bblbg2">Gradient</option>
-                        <option value="bblbg3">Conic gradient</option>
-                      </select>
+                      <button class="action-button bgabutton bgabutton_blue" type="button" onclick="document.getElementById('bbl_available_zcards').classList.toggle('bbl_selecting')">zcards</button>
 </div>
                     <span id="gotonexttable_wrap">&nbsp;
                       <a id="go_to_next_table_inactive_player" class="bgabutton bgabutton_red" href="https://studio.boardgamearena.com/play?from=779594"><span id="go_to_next_player_label">Go to next table</span> <i class="fa fa-arrow-right" aria-hidden="true"></i></a>
@@ -202,7 +197,7 @@
                              <div id="bbl_available_zcards_container">
                                <div id="bbl_available_zcards">
                                  <div><div id="bbl_zc_10pts" bbl_ztype="zc_10pts"></div></div>
-                                 <div><div id="bbl_zc_xturn" bbl_ztype="zc_xturn"></div></div>
+                                 <div><div id="bbl_zc_xturn" class="bbl_selected" bbl_ztype="zc_xturn"></div></div>
                                  <div><div id="bbl_zc_hand7" bbl_ztype="zc_hand7"></div></div>
                                  <div><div id="bbl_zc_3nobles" bbl_ztype="zc_3nobles"></div></div>
                                  <div></div>

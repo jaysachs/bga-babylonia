@@ -538,7 +538,7 @@ body {
 
 #bbl_available_zcards>div {
     display: inline-block;
-    border: 0.08vw solid transparent;
+    border: 0.18vw solid transparent;
     width: auto;
     aspect-ratio: var(--bbl-zcard-aspect-ratio);
     background-clip: content-box;
