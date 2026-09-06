@@ -401,40 +401,30 @@ const View = {
     gotit: false,
 
     handleResize: function (evt) {
-        const pageEl = document.getElementById('page-content');
-        const pageRect = pageEl.getBoundingClientRect();
-        console.log(pageRect.top, pageRect.width);
-        console.log(window.visualViewport.height, window.visualViewport.scale);
-        // So this mess: when the page scrolls, pageRect.top shrinks from about 242 to 132
-        //  because of the fixed location of the page title bar removes it from the flow.
-        //  So we can't use pageRect.top. But we do know that when first loaded, it's in the
-        //  right place.
-        // But of course, for some it isn't right until after the *2nd* resize happens.
-    // And it's inconsistent :-( )
-        if (this.initialPageRectTop == 0) {
-            this.initialPageRectTop = pageRect.top;
-        }
-        if (!this.gotit && pageRect.top != this.initialPageRectTop) {
-            this.initialPageRectTop = pageRect.top;
-            this.gotit = true;
-        }
-        const vertAvail = window.visualViewport.height * window.visualViewport.scale - this.initialPageRectTop;
+        const pageRect = document.getElementById('page-content').getBoundingClientRect();
+        const vv = window.visualViewport;
+
+        const availWidth = pageRect.width;
+        const availHeight = vv.height * vv.scale - (pageRect.top + vv.pageTop);
+
         // "horizontal" "default" layout
-        var w1 = pageRect.width * (1082 - 112) / 1082; // 0.889
+        var w1 = availWidth * (1082 - 112) / 1082; // 0.889
         // 1082 808
         var h1 = w1 * View.map_aspect_ratio;
-        if (h1 > vertAvail) {
-            w1 = vertAvail / View.map_aspect_ratio;
-            h1 = vertAvail;
+        if (h1 > availHeight) {
+            w1 = availHeight / View.map_aspect_ratio;
+            h1 = availHeight;
         }
+
         // "vertical" "alt" layout
         // 747 101
         // 1494 162
-        var h2 = vertAvail * 1494 / (1494 + 182); // (882-92)/882;
+        var h2 = availHeight * 1494 / (1494 + 182); // (882-92)/882;
         var w2 = h2 / View.map_aspect_ratio;
-        if (w2 > pageRect.width) {
-            w2 = pageRect.width;
+        if (w2 > availWidth) {
+            w2 = availWidth;
         }
+
         const mainElCl = document.getElementById(IDS.MAIN).classList;
         w1 = w1 * (1082 - 112) / 1082;
         w2 = w2 * (1082 - 112) / 1082;
@@ -442,8 +432,7 @@ const View = {
         if (w1 >= w2) {
             width = w1;
             mainElCl.remove(CSS.LAYOUT_UNDER_BOARD);
-        }
-        else {
+        } else {
             width = w2;
             mainElCl.add(CSS.LAYOUT_UNDER_BOARD);
         }
