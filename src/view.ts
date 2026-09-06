@@ -141,6 +141,8 @@ export class View {
     this.bga.gameui.onScreenWidthChange = () => this.handleResize();
     // FIXME: shouldn't need this but we do.
     window.addEventListener('load', () => this.handleResize());
+    // ... and this is needed for iOS ...
+    return this.bga.gameui.wait(500).then(() => this.handleResize());
   }
 
   observeChanges(): (() => void) {
