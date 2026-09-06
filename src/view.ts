@@ -138,6 +138,7 @@ export class View {
 
     console.debug('Setting up ziggurat cards', gamedatas.ziggurat_cards);
     this.setupZcards(gamedatas.ziggurat_cards);
+    // FIXME: this is still needed as the initial resize call happens "too soon"
     this.bga.gameui.wait(1500).then(() => this.handleResize());
   }
 
@@ -182,34 +183,17 @@ export class View {
   // This includes spots for cards
   static readonly map_aspect_ratio = 808 / 1082; // 2709 / 3385;
 
-  private initialPageRectTop = 0;
-  private gotit: boolean = false;
   private handleResize() {
-    const pageEl = document.getElementById('page-content');
-    const pageRect = pageEl!.getBoundingClientRect();
+    const pageRect = document.getElementById('page-content')!.getBoundingClientRect();
+    const availWidth = pageRect.width;
 
-    /*
-    console.log(pageRect.top, pageRect.width);
-    console.log(window.visualViewport!.height, window.visualViewport!.scale);
-    */
+    const vv = window.visualViewport!;
+    const headerHeight = pageRect.top + vv.pageTop;
 
-    // So this mess: when the page scrolls, pageRect.top shrinks from about 242 to 132
-    //  because of the fixed location of the page title bar removes it from the flow.
-    //  So we can't use pageRect.top. But we do know that when first loaded, it's in the
-    //  right place.
-    // But of course, for some it isn't right until after the *2nd* resize happens.
-    // And it's inconsistent :-( )
-    if (this.initialPageRectTop == 0) {
-      this.initialPageRectTop = pageRect.top;
-    }
-    if (!this.gotit && pageRect.top != this.initialPageRectTop) {
-      this.initialPageRectTop = pageRect.top;
-      this.gotit = true;
-    }
+    const vertAvail = vv.height * vv.scale - headerHeight;
 
-    const vertAvail = window.visualViewport!.height * window.visualViewport!.scale - this.initialPageRectTop;
     // "horizontal" "default" layout
-    var w1 = pageRect.width * (1082 - 112) / 1082; // 0.889
+    var w1 = availWidth * (1082 - 112) / 1082; // 0.889
     // 1082 808
     var h1 = w1 * View.map_aspect_ratio;
     if (h1 > vertAvail) {
@@ -222,8 +206,8 @@ export class View {
     // 1494 162
     var h2 = vertAvail * 1494 / (1494 + 182); // (882-92)/882;
     var w2 = h2 / View.map_aspect_ratio;
-    if (w2 > pageRect.width) {
-      w2 = pageRect.width;
+    if (w2 > availWidth) {
+      w2 = availWidth;
     }
 
     const mainElCl = document.getElementById(IDS.MAIN)!.classList;
