@@ -175,6 +175,24 @@ END;
             $this->model->locationsRequiringScoring());
     }
 
+    const MAP3A = <<<'END'
+        XXX   XXX  XXX
+           C.S   XXX
+        p-1   h-1   f-2
+           ZZZ   C.P
+        p-1   h-3   s-2
+           f-2   m-1
+        C.M   ZZZ
+           p-3
+        s-3
+    END;
+
+    public function testRequiringScoringMultipleSurrounded(): void {
+        $this->setMap(ModelTest::MAP3A);
+        $this->assertEqualsCanonicalizing(
+            [RowCol::fromRowCol(3, 1), RowCol::fromRowCol(1,1), RowCol::fromRowCol(3,3), RowCol::fromRowCol(6,0), RowCol::fromRowCol(6,2)],
+            $this->model->locationsRequiringScoring());
+    }
 
     const MAP7 = <<<'END'
         XXX   XXX  XXX

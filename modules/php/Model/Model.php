@@ -549,7 +549,7 @@ class Model
     {
         $result = [];
         $scorer = $this->makeScorer();
-        $val = function (Hex $hex) use (&$scorer): int {
+        $val = function (HexWinner $winner): int {
             // order is:
             // 0: ziggurats that player on turn is winning
             // 1: ziggurats no one is winning
@@ -558,8 +558,7 @@ class Model
             // 4: cities that other players are winning
             // 5: zigurats that other players are winning
 
-            $winner = $scorer->computeHexWinner($hex);
-            if ($hex->piece->isZiggurat()) {
+            if ($winner->hex->piece->isZiggurat()) {
                 if ($winner->captured_by == $this->player_id) {
                     return 0;
                 }
@@ -568,7 +567,7 @@ class Model
                 }
                 return 5;
             }
-            if ($hex->piece->isCity()) {
+            if ($winner->hex->piece->isCity()) {
                 if ($winner->captured_by == $this->player_id) {
                     return 2;
                 }
@@ -577,18 +576,18 @@ class Model
                 }
                 return 4;
             }
-            throw new \InvalidArgumentException("hex should be a city or ziggurat but is $hex");
+            throw new \InvalidArgumentException("hex should be a city or ziggurat but is {$winner->hex}");
         };
         foreach ($this->board()->allHexes() as $hex) {
             if ($this->hexRequiresScoring($hex)) {
-                $result[$hex->rc] = [$hex->rc, $val($hex)];
+                $result[$hex->rc] = [$hex->rc, $val($scorer->computeHexWinner($hex))];
             }
         }
         usort(
             $result,
             /**
-             * @param array{0:RowCol,1:int} $a
-             * @param array{0:RowCol,1:int} $b
+             * @param array{0:int,1:int} $a
+             * @param array{0:int,1:int} $b
              */
             function (array $a, array $b): int {
                 return $a[1] - $b[1];
