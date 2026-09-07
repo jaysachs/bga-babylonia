@@ -137,7 +137,7 @@ export class View {
 
     console.debug('Setting up ziggurat cards', gamedatas.ziggurat_cards);
     this.setupZcards(gamedatas.ziggurat_cards);
-    
+
     this.bga.gameui.onScreenWidthChange = () => this.handleResize();
     // FIXME: shouldn't need this but we do.
     window.addEventListener('load', () => this.handleResize());
@@ -200,7 +200,7 @@ export class View {
     tooltip.removeTarget(id);
 
     let timeoutId : null | number = null;
-    $(id).addEventListener('pointerenter', (e) => { 
+    $(id).addEventListener('pointerenter', (e) => {
       timeoutId = setTimeout(() => { timeoutId = null; tooltip.open(id) }, 300);
     });
     $(id).addEventListener('pointerleave', (e) => {
@@ -301,7 +301,7 @@ export class View {
       } else {
         zcont.appendChild(zelem);
       }
-      this.zcardTooltips.set(zcard.type, zcard.tooltip);
+      this.zcardTooltips.set(zcard.type, _(zcard.tooltip));
 
       this.addTooltip(zelem.id, this.zcardTooltip(zcard));
       // const tooltip = (this.bga.gameui as any).tooltips[zelem.id];
@@ -312,7 +312,7 @@ export class View {
   private zcardTooltip(zcard: Zcard): HTMLElement {
     return Html.div({ classes: 'bbl_zcard_hover' },
       Html.div({ attrs: Attrs.ztype(zcard.type) }),
-      Html.div({ classes: 'bbl_zcard_description', text: zcard.tooltip })
+      Html.div({ classes: 'bbl_zcard_description', text: _(zcard.tooltip) })
     );
   }
 
