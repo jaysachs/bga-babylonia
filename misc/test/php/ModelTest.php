@@ -117,7 +117,7 @@ final class ModelTest extends TestCase
         $this->ps->setBoardFromMap($map);
     }
 
-    public function testCitiesRequiringScoringNoPieces(): void
+    public function testLocationsRequiringScoring_NoPieces(): void
     {
         $this->assertEquals([], $this->model->locationsRequiringScoring());
     }
@@ -133,7 +133,7 @@ C.M   ---
 ---
 END;
 
-    public function testCitiesRequiringScoringNotSurrounded(): void {
+    public function testLocationsRequiringScoring_NotSurrounded(): void {
         $this->setMap(ModelTest::MAP1);
         $this->assertEquals([], $this->model->locationsRequiringScoring());
     }
@@ -150,7 +150,7 @@ END;
         s-3
     END;
 
-    public function testCitiesRequiringScoringOneSurrounded(): void {
+    public function testLocationsRequiringScoring_OneSurrounded(): void {
         $this->setMap(ModelTest::MAP2);
         $this->assertEquals([RowCol::fromRowCol(6, 0)],
                             $this->model->locationsRequiringScoring());
@@ -168,7 +168,7 @@ END;
         s-3
     END;
 
-    public function testCitiesRequiringScoringMultipleSurrounded(): void {
+    public function testLocationsRequiringScoring_MultipleSurrounded(): void {
         $this->setMap(ModelTest::MAP3);
         $this->assertEqualsCanonicalizing(
             [RowCol::fromRowCol(6, 0), RowCol::fromRowCol(3,3)],
@@ -187,7 +187,7 @@ END;
         s-3
     END;
 
-    public function testRequiringScoringMultipleSurrounded(): void {
+    public function testLocationsRequiringScoring_MultipleSurroundedDifferentPriorities(): void {
         $this->setMap(ModelTest::MAP3A);
         $this->assertEqualsCanonicalizing(
             [RowCol::fromRowCol(3, 1), RowCol::fromRowCol(1,1), RowCol::fromRowCol(3,3), RowCol::fromRowCol(6,0), RowCol::fromRowCol(6,2)],
@@ -206,7 +206,7 @@ END;
         s-3
     END;
 
-    public function testZigguratsRequiringScoring(): void
+    public function testLocationsRequiringScoring_Ziggurats(): void
     {
         $this->setMap(ModelTest::MAP7);
 
@@ -266,7 +266,7 @@ END;
         s-3
     END;
 
-    public function testPlayPiecesMoreThanTwoFarmers(): void {
+    public function testPlayPieces_MoreThanTwoFarmers(): void {
         $this->setMap(ModelTest::MAP5);
         $this->ps->setHand([PieceType::FARMER, PieceType::SERVANT, PieceType::FARMER, PieceType::FARMER, PieceType::FARMER]);
         $m1 = $this->model->playPiece(0, RowCol::fromRowCol(2, 0));
@@ -386,7 +386,7 @@ END;
         s-3
     END;
 
-    public function testRequiresScoring(): void {
+    public function testHexRequiresScoring_Simple(): void {
         $this->setMap(ModelTest::MAP8);
         $this->assertTrue($this->model->hexRequiresScoring($this->model->board()->hexAt(RowCol::fromRowCol(3, 1))));
     }
