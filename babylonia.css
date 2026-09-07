@@ -69,6 +69,8 @@ body {
 
     --bbl-zcard-aspect-ratio: calc(330/530);
     --bbl-zcard-height: calc(var(--bbl-board-height) / 8);
+
+    --bbl-piece-shadow: calc(var(--bbl-hex-height)/35);
 }
 
 #bbl_main {
@@ -260,6 +262,42 @@ body {
     left: 0;
     top: 0;
 }
+
+html.bbl_piece_shadows [bbl_piece$="_1"] {
+    filter: drop-shadow(#7777aa var(--bbl-piece-shadow) var(--bbl-piece-shadow));
+}
+
+html.bbl_piece_shadows [bbl_piece$="_2"] {
+    filter: drop-shadow(#b7981d  var(--bbl-piece-shadow) var(--bbl-piece-shadow));
+}
+
+html.bbl_piece_shadows [bbl_piece$="_3"] {
+    filter: drop-shadow(#772f0c var(--bbl-piece-shadow) var(--bbl-piece-shadow));
+}
+
+html.bbl_piece_shadows [bbl_piece$="_4"] {
+    filter: drop-shadow(#777777 var(--bbl-piece-shadow) var(--bbl-piece-shadow));
+}
+
+
+/*
+#bbl_board [bbl_piece^="farmer_"]::after,
+#bbl_board [bbl_piece^="hidden_"]::after,
+#bbl_board [bbl_piece^="merchant_"]::after,
+#bbl_board [bbl_piece^="servant_"]::after,
+#bbl_board [bbl_piece^="priest_"]::after {
+    position: relative;
+    border: 0.1vw solid #666666;
+    border-radius: 50%;
+    width: 80%;
+    height: 92%;
+    left: 0%;
+    top: 1.8%;
+    content: '';
+    display: inline-block;
+    z-index: 0;
+}
+*/
 
 [bbl_piece] {
     aspect-ratio: var(--bbl-hex-ratio);
@@ -673,10 +711,11 @@ div.bbl_pb_zcards>div {
  */
 
 .log [bbl_piece] {
-    height: 1.0em;
-    width: 1.15em;
+    --bbl-piece-shadow: calc(max(1px, 1.5em / 35.0));
+    height: 1.5em;
+    width: 1.725m;
+    vertical-align: bottom;
     display: inline-block;
-    filter: unset;
     margin: 0;
     padding: 0;
     background-color: transparent;

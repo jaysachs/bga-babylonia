@@ -1,3 +1,7 @@
+function toggleShadows() {
+    document.documentElement.classList.toggle('bbl_piece_shadows');
+}
+
 function handchange(n) {
     document.querySelectorAll('#bbl_hand > div > div')
         .forEach(d => {
