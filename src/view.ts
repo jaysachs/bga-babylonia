@@ -467,7 +467,8 @@ export class View {
   }
 
   private translatedPiece(piece: string): string {
-    return this.translatedPieces[piece] ?? '';
+    const tp = this.translatedPieces[piece];
+    return tp ? _(tp) : '';
   }
 
   public renderedPiece(piece: PieceType, player_id: number = 0): HTMLElement {
