@@ -266,11 +266,11 @@ body {
 }
 
 html.bbl_piece_shadows [bbl_piece$="_1"] {
-    filter: drop-shadow(#7777aa var(--bbl-piece-shadow) var(--bbl-piece-shadow));
+    filter: drop-shadow(#59412b var(--bbl-piece-shadow) var(--bbl-piece-shadow));
 }
 
 html.bbl_piece_shadows [bbl_piece$="_2"] {
-    filter: drop-shadow(#b7981d  var(--bbl-piece-shadow) var(--bbl-piece-shadow));
+    filter: drop-shadow(#877810  var(--bbl-piece-shadow) var(--bbl-piece-shadow));
 }
 
 html.bbl_piece_shadows [bbl_piece$="_3"] {
