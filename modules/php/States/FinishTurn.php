@@ -44,6 +44,8 @@ class FinishTurn extends AbstractState
 
         $result = $model->finishTurn();
         if ($result->gameOver()) {
+            // FIXME: maybe include message with winner name(s)?
+            /*
             $this->notify->all(
                 "gameEnded",
                 clienttranslate('Game has ended'),
@@ -51,6 +53,7 @@ class FinishTurn extends AbstractState
                     "player_id" => $active_player_id,
                 ]
             );
+            */
             // TODO: is there a nicer thing to put here?
             return 99;
         }
@@ -59,7 +62,7 @@ class FinishTurn extends AbstractState
         $this->notify->player(
             $active_player_id,
             "handRefilled",
-            clienttranslate("You refilled your hand"),
+            '',
             [
                 "player_id" => $active_player_id,
                 'hand' => array_map(
@@ -73,6 +76,7 @@ class FinishTurn extends AbstractState
 
         $this->notify->all(
             "turnFinished",
+            // FIXME: do we want this message?
             clienttranslate('${player_name} finished their turn'),
             [
                 "player_id" => $active_player_id,

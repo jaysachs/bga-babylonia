@@ -69,13 +69,6 @@ class EndOfTurnScoring extends AbstractState
             return AutomatedHexSelection::class;
         }
 
-        $this->notify->all(
-            "scoringHexChoice",
-            clienttranslate('${player_name} must select a hex to score'),
-            [
-                "player_id" => $active_player_id,
-            ]
-        );
         return SelectScoringHex::class;
     }
 }

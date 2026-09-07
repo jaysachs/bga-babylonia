@@ -127,15 +127,6 @@ class PlayPieces extends AbstractState
             throw new UserException("Attempt to end turn but less than 2 pieces played");
         }
         $model->donePlayPieces();
-
-        $this->notify->all(
-            "donePlayed",
-            clienttranslate('${player_name} finishes playing pieces'),
-            [
-                "player_id" => $active_player_id,
-            ]
-        );
-
         return EndOfTurnScoring::class;
     }
 
