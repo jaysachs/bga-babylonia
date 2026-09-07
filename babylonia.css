@@ -229,6 +229,7 @@ body {
     content: '';
     display: inline;
     position: absolute;
+    pointer-events: none;
     left: 0;
     top: 0;
     height: var(--bbl-hex-height);
@@ -243,6 +244,7 @@ body {
     background-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='173' ><polygon points='4,86 48,4 148,4 194,86 148,168 48,168' fill='none' stroke='yellow' stroke-width='10' /></svg>");
     background-size: contain;
     cursor: pointer;
+    pointer-events: none;
     height: var(--bbl-hex-height);
     aspect-ratio: var(--bbl-hex-ratio);
     content: '';
