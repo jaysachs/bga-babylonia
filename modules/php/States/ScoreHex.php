@@ -54,7 +54,7 @@ class ScoreHex extends AbstractState
         return $rc;
     }
 
-    /** @return array{row:int,col:int,city:string} */
+    /** @return array{hex:string,current_scoring_hex:int,city:string} */
     public function getArgs(): array {
         $rc = $this->scoringHex();
         $model = $this->createModel(0);
