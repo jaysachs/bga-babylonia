@@ -74,6 +74,8 @@ class RowCol
     }
 
     public static function toUser(int $rc): string {
-        return chr(self::col($rc) + 65) . strval(self::row($rc) + 1);
+        $col = self::col($rc);
+        if ($col < 0 || $col > 50) return "??";
+        return chr($col + 65) . strval(self::row($rc) + 1);
     }
 }
