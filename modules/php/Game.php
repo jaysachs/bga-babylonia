@@ -162,7 +162,9 @@ class Game extends Table
 
         /** @var array<int,array{captured_city_count:int,hand_size:int,pool_size:int,player_id:int,score:string,color_index:int}> */
         $players = [];
+        $total_captured_city_count = 0;
         foreach ($model->allPlayerInfo() as $pid => $pi) {
+            $total_captured_city_count += $pi->captured_city_count;
             $color = $this->getPlayerColorById($pid);
             $players[$pid]["captured_city_count"] = $pi->captured_city_count;
             $players[$pid]["hand_size"] = $pi->hand->size();
@@ -188,6 +190,7 @@ class Game extends Table
             'board' => $board_data,
             'translated_pieces' => $translated,
             'potentialCityScoring' => $model->potentialCityScoring(),
+            'captured_city_count' => $total_captured_city_count,
             'ziggurat_cards' =>
                 array_map(
                     function ($z) {

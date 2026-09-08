@@ -34,5 +34,6 @@ export interface BGamedatas extends Gamedatas<BblPlayer> {
   hand: PieceType[] | undefined;
   ziggurat_cards: Zcard[];
   translated_pieces: Record<PieceType, string>;
-  potentialCityScoring: PotentialCityScoring;
+  potential_city_scoring: PotentialCityScoring;
+  captured_city_count: number;
 }

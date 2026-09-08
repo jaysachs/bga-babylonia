@@ -109,6 +109,9 @@ export class EndOfTurnScoringState extends BabyloniaState {
       this.view.updateCapturedCityCount(details);
     }
     this.view.unmarkHexSelected(args.rc);
+    if (args.player_id) {
+      this.bga.gameui.gamedatas.captured_city_count++;
+    }
   }
 
 }

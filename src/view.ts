@@ -51,6 +51,7 @@ export class Attrs implements AttrLike {
 export class Piece {
   static isNonEmpty(p: PieceType | null): boolean { return p !== null && p !== undefined && p != 'empty' }
   static isCity(p: PieceType): boolean { return p?.startsWith('city_') }
+  static isField(p: PieceType): boolean { return p?.startsWith('field_') }
 }
 
 export class IDS {
@@ -267,7 +268,10 @@ export class View {
         hexDiv.appendChild(pieceDiv);
         if (Piece.isCity(hex.piece)) {
           pieceDiv.id = `bbl_city_${hex.rc}`;
-          this.addTooltip(pieceDiv.id, () => this.scoringHover(hex.rc));
+          this.addTooltip(pieceDiv.id, () => this.cityScoringHover(hex.rc));
+        } else if (Piece.isField(hex.piece)) {
+          pieceDiv.id = `bbl_field_${hex.rc}`;
+          this.addTooltip(pieceDiv.id, () => this.fieldScoringHover(hex.rc, hex.piece));
         }
       }
     }
@@ -393,8 +397,8 @@ export class View {
     );
   }
 
-  private scoringHover(rc: number): HTMLElement {
-    const scores = this.bga.gameui.gamedatas.potentialCityScoring[String(rc)]!;
+  private cityScoringHover(rc: number): HTMLElement {
+    const scores = this.bga.gameui.gamedatas.potential_city_scoring[String(rc)]!;
     return Html.div({ classes: 'bbl_city_scoring_hover' },
       Html.span({ text: _("Current points") }),
       Html.div({ classes: 'bbl_city_scoring_hover_details' },
@@ -402,6 +406,28 @@ export class View {
           p => Html.div({ attrs: Attrs.piece("hidden", p), text: String(scores[String(p.player_id)] ?? 0) }))
       )
     )
+  }
+
+  private fieldScoringHover(rc: number, piece: PieceType): HTMLElement {
+    return Html.div({ classes: 'bbl_field_scoring_hover' },
+      Html.span({ text: _("Field points") }),
+      Html.div({ classes: 'bbl_field_scoring_hover_details' },
+        Html.div({ id: "bbl_field_scoring_hover_piece", attrs: Attrs.piece(piece) }),
+        Html.div({ id:"bbl_field_scoring_hover_points", text: `${this.fieldPoints(piece)}`})
+      )
+    )
+  }
+
+  private fieldPoints(piece: PieceType): number {
+    switch (piece) {
+      case 'field_5': return 5;
+      case 'field_6': return 6;
+      case 'field_7': return 7;
+      case 'field_x': return this.bga.gameui.gamedatas.captured_city_count;
+      default:
+        console.error("asking field points for non-field: ", piece);
+        return 0;
+    }
   }
 
   public createPieceDiv(piece: PieceType, player_id: number): HTMLElement {
