@@ -45,7 +45,11 @@ class SelectScoringHex extends AbstractScoringSelection
         );
     }
 
-    /** @return array{hexes:list<int>} */
+    public function onEnteringState(int $active_player_id): void {
+        $this->giveExtraTime($active_player_id);
+    }
+
+    /** @return array{hexes:array<int,string>} */
     public function getArgs(int $active_player_id): array
     {
         $model = $this->createModel($active_player_id);

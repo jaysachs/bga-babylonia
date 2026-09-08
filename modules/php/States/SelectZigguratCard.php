@@ -47,6 +47,10 @@ class SelectZigguratCard extends AbstractState
         );
     }
 
+    public function onEnteringState(int $active_player_id): void {
+        $this->giveExtraTime($active_player_id);
+    }
+
     private function scoringHex(): int {
         $rc = $this->ps->rowColBeingScored();
         if ($rc === null) {
