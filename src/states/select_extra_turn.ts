@@ -20,7 +20,7 @@ export class SelectExtraTurnState extends BabyloniaState {
     if (carddiv == undefined) {
       console.error(`Could not find div for owned ${args.card} card`, args.card);
     } else {
-      carddiv.setAttribute(Attrs.ZUSED, '');
+      carddiv.setAttribute(Attrs.ZUSED, 'true');
     }
   }
 

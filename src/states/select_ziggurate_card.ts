@@ -77,7 +77,7 @@ export class SelectZigguratCardState extends BabyloniaState {
       zcard: string;
       player_id: number;
       cardused: boolean;
-      // points: number;
+      points: number;
     }
   ) {
     const dest = $(IDS.playerBoardZcards(args.player_id));
@@ -85,9 +85,9 @@ export class SelectZigguratCardState extends BabyloniaState {
 
     zelem.classList.remove(CSS.SELECTED);
     await this.animationManager.slideAndAttach(zelem, dest, { toPlaceholder: 'off' })
-    // this.bga.playerPanels.getScoreCounter(args.player_id).incValue(args.points);
+    this.bga.playerPanels.getScoreCounter(args.player_id).incValue(args.points);
     if (args.cardused) {
-      zelem.setAttribute(Attrs.ZUSED, "");
+      zelem.setAttribute(Attrs.ZUSED, 'true');
     }
   }
 }
