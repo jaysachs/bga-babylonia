@@ -798,6 +798,7 @@ div.bbl_pb_zcards>div {
 
 #bbl_board_container.bbl_mockup:not(:has( div[bbl_piece^="city_"]:hover)) .bbl_city_scoring_hover {
     opacity: 0%;
+    pointer-events: none;
     transition: all 100ms 350ms allow-discrete;
 }
 
@@ -830,4 +831,43 @@ div.bbl_pb_zcards>div {
 .bbl_city_scoring_hover_details > div[bbl_piece="hidden_2"],
 .bbl_city_scoring_hover_details > div[bbl_piece="hidden_4"] {
     color: black;
+}
+
+/* field scoring hover */
+
+.bbl_field_scoring_hover {
+    font-size: calc(var(--bbl-hex-height)/3);
+    background-color: beige;
+    padding: 5px;
+    border: 1px solid black;
+}
+
+#bbl_board_container.bbl_mockup:has( div[bbl_piece^="field_"]:hover) .bbl_field_scoring_hover {
+    opacity: 100%;
+    transition: all 100ms 500ms allow-discrete;
+}
+
+#bbl_board_container.bbl_mockup:not(:has( div[bbl_piece^="field_"]:hover)) .bbl_field_scoring_hover {
+    opacity: 0%;
+    pointer-events: none;
+    transition: all 100ms 350ms allow-discrete;
+}
+
+.bbl_field_scoring_hover > span {
+    display: grid;
+    font-style: italic;
+    text-align: center;
+    width: 100%;
+}
+
+.bbl_field_scoring_hover_details {
+    border-top: 1px solid darkgrey;
+    border-bottom: 1px solid darkgrey;
+    padding-top: 3px;
+    padding-bottom: 3px;
+    display: flex;
+    font-size: calc(var(--bbl-hex-height)/1.5);
+    justify-content: space-around;
+    align-items: center;
+    flex-direction: row;
 }
