@@ -132,8 +132,8 @@ class Model
         if ($max == 100) { $max = 99; }
 
         $remaining_cities = $this->board()->cityCount();
-        $starting_cities = $remaining_cities + $this->allData()["scored_city_count"];
         // subtract 1 because game ends with 0 or 1 cities left.
+        $starting_cities = $remaining_cities + $this->allData()["scored_city_count"] - 1;
         $cmax = 100 - intval(100.0 * ($remaining_cities - 1) / $starting_cities);
         if ($cmax > $max) {
             $max = $cmax;
