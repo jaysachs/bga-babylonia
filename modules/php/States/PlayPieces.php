@@ -78,7 +78,10 @@ class PlayPieces extends AbstractState
     public function getArgs(int $active_player_id): array
     {
         $model = $this->createModel($active_player_id);
-        return $this->addStateArgs([], $model, $active_player_id);
+        return $this->addStateArgs([
+            "must_end_game" => $model->playersWhoMustEndGame(),
+            "may_end_game" => $model->playersWhoMayEndGame(),
+        ], $model, $active_player_id);
     }
 
     #[PossibleAction]

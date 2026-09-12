@@ -46,6 +46,14 @@ class TestStore extends PersistentStore {
         $this->board = $board;
     }
 
+    public function setComponents(Components $components): void {
+        $this->components = $components;
+    }
+
+    public function setHandAndPool(int $player_id, array $handPieces, array $poolPieces): void {
+        $this->player_infos[$player_id] = new PlayerInfo($player_id, 0, new Hand($handPieces), new Pool($poolPieces), 0);
+    }
+
     public function __construct() {
         PersistentStore::__construct(new TestDb(), new TestGlobals(), new TestCounter(), new TestCounter());
         for ($i = 3; $i >= 1; $i--) {
@@ -390,4 +398,136 @@ END;
         $this->setMap(ModelTest::MAP8);
         $this->assertTrue($this->model->hexRequiresScoring($this->model->board()->hexAt(RowCol::fromRowCol(3, 1))));
     }
+
+    public function testMustEndGame_none(): void {
+        $this->assertEquals([], $this->model->playersWhoMustEndGame());
+    }
+
+    public function testMustEndGame_threeFarmersLeft(): void {
+        $this->ps->setHandAndPool(1, [PieceType::FARMER, PieceType::FARMER, PieceType::FARMER], []);
+        $this->assertEquals([], $this->model->playersWhoMustEndGame());
+    }
+
+    public function testMustEndGame_poolNotEmpty(): void {
+        $this->ps->setHandAndPool(1, [PieceType::FARMER, PieceType::FARMER], [PieceType::FARMER]);
+        $this->assertEquals([], $this->model->playersWhoMustEndGame());
+    }
+
+    public function testMustEndGame_one(): void {
+        $this->ps->setHandAndPool(1, [PieceType::FARMER, PieceType::MERCHANT], []);
+        $this->assertEquals([1], $this->model->playersWhoMustEndGame());
+    }
+
+    public function testMustEndGame_multiple(): void {
+        $this->ps->setHandAndPool(1, [PieceType::FARMER, PieceType::MERCHANT], []);
+        $this->ps->setHandAndPool(2, [], []);
+        $this->assertEqualsCanonicalizing([1, 2], $this->model->playersWhoMustEndGame());
+    }
+
+    const MAP9 = <<<'END'
+        ---   ---  XXX
+           C.S   ---
+        ---   ===   ---
+           ZZZ   C.P
+        ---   ===   ---
+           ---   ---
+        C.M   ---
+           ---
+        ---
+    END;
+
+    public function testMayEndGame_none(): void {
+        $this->setMap(self::MAP9);
+        $this->assertEquals([], $this->model->playersWhoMayEndGame());
+    }
+
+    public function testMayEndGame_noCitiesCapturable(): void {
+        $this->setMap(self::MAP9);
+        $this->ps->setHandAndPool(1, [PieceType::FARMER, PieceType::FARMER], self::BIGPOOL);
+        $this->ps->setHandAndPool(2, [PieceType::SERVANT, PieceType::SERVANT, PieceType::MERCHANT], self::BIGPOOL);
+        $this->assertEquals([], $this->model->playersWhoMayEndGame());
+    }
+
+    const MAP10 = <<<'END'
+        p-1   m-2   XXX
+           C.S   ---
+        ---   ===   s-3
+           ZZZ   C.P
+        ---   ===   s-2
+           ---   m-2
+        C.M   ---
+           ---
+        ---
+    END;
+
+    public function testMayEndGame_someCitiesCompletable(): void {
+        $this->setMap(self::MAP10);
+        $this->ps->setHandAndPool(1, [PieceType::FARMER, PieceType::FARMER], self::BIGPOOL);
+        $this->ps->setHandAndPool(2, [PieceType::SERVANT, PieceType::SERVANT, PieceType::MERCHANT], self::BIGPOOL);
+        $this->assertEqualsCanonicalizing([1, 2], $this->model->playersWhoMayEndGame());
+    }
+
+    private const array BIGPOOL = [PieceType::MERCHANT, PieceType::MERCHANT, PieceType::MERCHANT, PieceType::MERCHANT, PieceType::MERCHANT, PieceType::MERCHANT, PieceType::MERCHANT, PieceType::MERCHANT, PieceType::MERCHANT, PieceType::MERCHANT, PieceType::MERCHANT, PieceType::MERCHANT, PieceType::MERCHANT, PieceType::MERCHANT, PieceType::MERCHANT, PieceType::MERCHANT, PieceType::MERCHANT, PieceType::MERCHANT];
+
+    public function testMayEndGame_someCitiesCompletableByOnePlayer(): void {
+        $this->setMap(self::MAP10);
+        $this->ps->setHandAndPool(1, [PieceType::SERVANT, PieceType::MERCHANT], self::BIGPOOL);
+        $this->ps->setHandAndPool(2, [PieceType::SERVANT], []);
+        $this->assertEqualsCanonicalizing([1, 2], $this->model->playersWhoMayEndGame());
+    }
+
+    const MAP11 = <<<'END'
+        p-1   m-2   XXX
+           C.S   ---
+        ---   ===   s-3
+           ZZZ   C.P
+        ---   ===   ---
+           ---   p-2
+        C.M   ---
+           ---
+        ---
+    END;
+
+    public function testMayEndGame_notEnoughCitiesCompletable(): void {
+        $this->setMap(self::MAP11);
+        $this->ps->setHandAndPool(1, [PieceType::SERVANT, PieceType::MERCHANT], self::BIGPOOL);
+        $this->ps->setHandAndPool(2, [PieceType::SERVANT], []);
+        $this->assertEqualsCanonicalizing([2], $this->model->playersWhoMayEndGame());
+    }
+
+    public function testMayEndGame_citiesCompletableZcard3nobles(): void {
+        $this->setMap(self::MAP11);
+        $this->ps->setComponents(new Components([
+            new ZigguratCard(ZigguratCardType::NOBLES_3_KINDS, 1),
+            new ZigguratCard(ZigguratCardType::NOBLES_3_KINDS, 2)
+        ]));
+        $this->ps->setHandAndPool(1, [PieceType::SERVANT, PieceType::MERCHANT, PieceType::PRIEST], self::BIGPOOL);
+        $this->ps->setHandAndPool(2, [PieceType::SERVANT, PieceType::MERCHANT, PieceType::SERVANT], self::BIGPOOL);
+        $this->assertEqualsCanonicalizing([1, 2], $this->model->playersWhoMayEndGame());
+    }
+
+
+    const MAP12 = <<<'END'
+        p-1   m-2   XXX
+           C.S   ---
+        ---   ===   m-2
+           ZZZ   C.P
+        ---   ===   ---
+           ---   m-2
+        C.M   ---
+           m-2   m-2
+        m-2   m-2
+    END;
+
+    public function testMayEndGame_citiesCompletableZcard3noblesOnePlayerCant(): void {
+        $this->setMap(self::MAP12);
+        $this->ps->setComponents(new Components([
+            new ZigguratCard(ZigguratCardType::NOBLES_3_KINDS, 1),
+            new ZigguratCard(ZigguratCardType::NOBLES_3_KINDS, 2)
+        ]));
+        $this->ps->setHandAndPool(1, [PieceType::SERVANT, PieceType::MERCHANT, PieceType::PRIEST], self::BIGPOOL);
+        $this->ps->setHandAndPool(2, [PieceType::SERVANT, PieceType::MERCHANT, PieceType::SERVANT], self::BIGPOOL);
+        $this->assertEqualsCanonicalizing([1], $this->model->playersWhoMayEndGame());
+    }
+
 }

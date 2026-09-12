@@ -694,6 +694,96 @@ class Model
         return $move;
     }
 
+    /** @return list<int> */
+    public function playersWhoMustEndGame(): array {
+        $enders = [];
+        foreach ($this->allPlayerInfo() as $pid => $pi) {
+            if ($pi->hand->size() <= 2 && $pi->pool->size() == 0) {
+                $enders[] = $pid;
+            }
+        }
+        return $enders;
+    }
+
+    /** @return list<int> */
+    public function playersWhoMayEndGame(): array {
+        $enders = [];
+
+        $emptyCityNeighbors = [];
+        foreach ($this->board()->allHexes() as $hex) {
+            if (!$hex->piece->isCity()) {
+                continue;
+            }
+            $emptyCityNeighbors[] = count($this->board()->neighbors($hex, fn (Hex $h) => $h->isLand() && $h->piece->isEmpty() ));
+        }
+        sort($emptyCityNeighbors);
+        $emptyCityNeighbors = array_slice($emptyCityNeighbors, 0, 2);
+        $playsNeededToEndGame = array_sum($emptyCityNeighbors);
+
+        var_dump($playsNeededToEndGame);
+
+        foreach ($this->allPlayerInfo() as $pid => $pi) {
+            $farmers = 0;
+            $merchants = 0;
+            $servants = 0;
+            $priests = 0;
+            $pool = Pool::new();
+            foreach ($pool->pieces() as $piece) {
+                switch ($piece) {
+                    case PieceType::FARMER:
+                        $farmers++;
+                        break;
+                    case PieceType::MERCHANT:
+                        $merchants++;
+                        break;
+                    case PieceType::PRIEST:
+                        $priests++;
+                        break;
+                    case PieceType::SERVANT:
+                        $servants++;
+                        break;
+                }
+            }
+            foreach ($this->board()->allHexes() as $hex) {
+                if ($hex->player_id == $pid) {
+                    switch ($hex->piece) {
+                        case PieceType::FARMER:
+                            $farmers--;
+                            break;
+                        case PieceType::MERCHANT:
+                            $merchants--;
+                            break;
+                        case PieceType::PRIEST:
+                            $priests--;
+                            break;
+                        case PieceType::SERVANT:
+                            $servants--;
+                            break;
+                    }
+                }
+            }
+            $playable = 2;
+            if ($this->components()->getOwnedCard($pid, ZigguratCardType::NOBLES_3_KINDS)
+                && $priests > 0
+                && $servants > 0
+                && $merchants > 0) {
+                $playable = 3;
+            }
+
+            if ($this->components()->getOwnedCard($pid, ZigguratCardType::NOBLE_WITH_FARMERS)
+                && $farmers > 0
+                && ($merchants > 0 || $servants > 0 || $priests > 0)) {
+                $playable = max($playable, $farmers + 1);
+            }
+
+            $playable = min($playable, $pi->hand->size());
+            if ($playable >= $playsNeededToEndGame || ($pi->pool->size() == 0 && $playable >= $pi->hand->size())) {
+                $enders[] = $pid;
+            }
+        }
+        return $enders;
+    }
+
     /** @return array<int,array<int,int>> */
     public function potentialCityScoring(): array {
         $scorer = $this->makeScorer();
