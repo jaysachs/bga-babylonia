@@ -50,6 +50,10 @@ class TestStore extends PersistentStore {
         $this->components = $components;
     }
 
+    /**
+     * @param list<PieceType> $handPieces
+     * @param list<PieceType> $poolPieces
+     */
     public function setHandAndPool(int $player_id, array $handPieces, array $poolPieces): void {
         $this->player_infos[$player_id] = new PlayerInfo($player_id, 0, new Hand($handPieces), new Pool($poolPieces), 0);
     }
