@@ -59,6 +59,7 @@ namespace Bga\Games\babylonia\Model {
 use Bga\GameFramework\UserException;
 use Bga\Games\babylonia\Model\ModelImpl\PlayAllowedResult;
 use Bga\Games\babylonia\Stats;
+    use Bga\Games\babylonia\Utils\Log;
 
 class Model
 {
@@ -409,7 +410,7 @@ class Model
                         $this->stats->PLAYER_ZC_USED_NOBLES_IN_FIELDS->inc($this->player_id);
                         break;
                     default:
-                        error_log("Unexpected used ziggurat card during move: $zctype->value");
+                        Log::error("Unexpected used ziggurat card during move: $zctype->value");
                 }
             }
 
@@ -719,8 +720,6 @@ class Model
         sort($emptyCityNeighbors);
         $emptyCityNeighbors = array_slice($emptyCityNeighbors, 0, 2);
         $playsNeededToEndGame = array_sum($emptyCityNeighbors);
-
-        var_dump($playsNeededToEndGame);
 
         foreach ($this->allPlayerInfo() as $pid => $pi) {
             $farmers = 0;
