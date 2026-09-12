@@ -39,7 +39,7 @@ export class PlayPiecesState extends BabyloniaState {
 
   override onEnteringState(args: { playState: PlayStateArgs; must_end_game: number[]; may_end_game: number[]; }, isCurrentPlayerActive: boolean) {
     console.log(args);
-    if (this.bga.players.isCurrentPlayerActive()) {
+    if (isCurrentPlayerActive) {
       if (args.must_end_game.length > 0) {
         this.bga.gameArea.addLastTurnBanner(_("This is your last turn"));
       } else if (args.may_end_game.length > 0) {
