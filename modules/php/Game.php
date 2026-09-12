@@ -266,6 +266,10 @@ class Game extends Table
         return $this->tableOptions->get($option->value) > 0;
     }
 
+    public function debug_empty_pool(int $player_id): void {
+        $this->ps->debugEmptyPool($player_id);
+    }
+
     public function debug_take_ziggurat_card(string $zctype, int $points = 0, bool $used = false): void {
         $active_player_id = intval($this->getActivePlayerId());
         $model = new Model($this->ps, $this->stats, $active_player_id);

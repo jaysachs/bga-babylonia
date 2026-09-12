@@ -311,6 +311,10 @@ class PersistentStore
         }
     }
 
+    public function debugEmptyPool(int $player_id): void {
+        $this->db->execute("UPDATE pieces SET location='DISCARD',location_id=(location_id + $player_id) WHERE player_id=$player_id AND location='POOL'");
+    }
+
     /** @param array<int> $added */
     public function updateExtendedHand(int $player_id, array $added): void {
         $values = [];
