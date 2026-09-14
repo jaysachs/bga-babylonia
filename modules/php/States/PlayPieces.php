@@ -80,7 +80,9 @@ class PlayPieces extends AbstractState
         $model = $this->createModel($active_player_id);
         return $this->addStateArgs([
             "must_end_game" => $model->playersWhoMustEndGame(),
-            "may_end_game" => $model->playersWhoMayEndGame(),
+            // FIXME: unsure if this should be included, or if it should be game option
+            //   or possibly "only if friendly mode"
+            "may_end_game" => [], // $model->playersWhoMayEndGame(),
         ], $model, $active_player_id);
     }
 
