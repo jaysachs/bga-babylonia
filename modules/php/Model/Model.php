@@ -63,7 +63,7 @@ use Bga\Games\babylonia\Stats;
 
 class Model
 {
-    /** @var array{player_infos:array<int,PlayerInfo>,board:Board,components:Components,turn_progress:TurnProgress,scored_city_count:int} */
+    /** @var array{player_infos:array<int,PlayerInfo>,board:Board,components:Components,turn_progress:TurnProgress,scored_city_count:int,turn_number:int} */
     private ?array $_allData = null;
 
     public function __construct(private PersistentStore $ps, private Stats $stats, private int $player_id) {
@@ -93,7 +93,7 @@ class Model
         );
     }
 
-    /** @return array{player_infos:array<int,PlayerInfo>,board:Board,components:Components,turn_progress:TurnProgress,scored_city_count:int} */
+    /** @return array{player_infos:array<int,PlayerInfo>,board:Board,components:Components,turn_progress:TurnProgress,scored_city_count:int,turn_number:int} */
     private function &allData(): array {
         if ($this->_allData == null) {
             $this->_allData = $this->ps->retrieveAllData($this->player_id);
@@ -162,8 +162,19 @@ class Model
         return $this->allData()['turn_progress'];
     }
 
+    public function maxMovesAllowed(int $player_id): int {
+        switch ($this->allData()['turn_number']) {
+            case 1: return 1;
+            case 2: return 2;
+            default: return 30;
+        }
+    }
+
     public function checkPlay(int $player_id, PieceType $piece, Hex $hex): PlayAllowedResult
     {
+        if (count($this->turnProgress()->moves) >= $this->maxMovesAllowed($player_id)) {
+            return PlayAllowedResult::failure("no more moves permitted");
+        }
         $zcardsUsed = [];
         if ($hex->piece->isField()) {
             if ($piece->isFarmer()) {
@@ -435,7 +446,7 @@ class Model
         $this->stats->PLAYER_AVERAGE_PIECES_PLAYED_PER_TURN->set($pid, ($sum + $numplayed) / $numturns);
 
         // delete turn progress
-        $this->ps->deleteAllMoves($this->player_id);
+        $this->ps->markTurnCompleted($this->player_id);
     }
 
     /* return true if game should end */
@@ -622,10 +633,8 @@ class Model
 
     public function canEndTurn(): bool
     {
-        // NOTE: could check that there allowed moves but given the
-        // board size and piece count, there are always allowed moves.
         return count($this->turnProgress()->moves) >= 2
-            || $this->activePlayerInfo()->hand->size() == 0;
+            || count($this->getAllowedMoves()) == 0;
     }
 
     public function selectZigguratCard(ZigguratCardType $card_type): ZigguratCardSelection

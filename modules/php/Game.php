@@ -248,6 +248,7 @@ class Game extends Table
         // Init game statistics.
         $this->stats->initAll();
 
+        $this->ps->initializeGlobals();
         // Create the game.
         Model::createNewGame(
             $this->ps,

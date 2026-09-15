@@ -31,6 +31,7 @@ class TestGlobals extends Globals {}
 class TestCounter extends PlayerCounter {}
 
 class TestStore extends PersistentStore {
+    private int $turn_number = 3;
     private Board $board;
     /** @var array<int,PlayerInfo> */
     private array $player_infos = [];
@@ -81,6 +82,7 @@ class TestStore extends PersistentStore {
             'player_infos' => $this->player_infos,
             'turn_progress' => $this->turnProgress,
             'scored_city_count' => 0,
+            'turn_number' => $this->turn_number,
             'pool' => new Pool([]),
         ];
     }

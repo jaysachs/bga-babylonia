@@ -41,12 +41,13 @@ class PersistentStore
     private const GLOBAL_PLAYER_ON_TURN = 'player_on_turn';
     /** @var string */
     private const GLOBAL_ROW_COL_BEING_SCORED = 'row_col_being_scored';
+    /** @var string */
+    private const GLOBAL_TURN = 'turn';
 
     public function __construct(private Db $db, private Globals $globals, private PlayerCounter $playerScore, private PlayerCounter $playerScoreAux) {}
 
-    public function initializeGlobals(\Closure $initFn): void {
-        $initFn([self::GLOBAL_PLAYER_ON_TURN => 10,
-                 self::GLOBAL_ROW_COL_BEING_SCORED => 11]);
+    public function initializeGlobals(): void {
+        $this->globals->set(self::GLOBAL_TURN, 1);
     }
 
     private static function boolValue(bool $b): string
@@ -119,7 +120,7 @@ class PersistentStore
         $this->db->execute($sql);
     }
 
-    /** @return array{player_infos:array<int,PlayerInfo>,board:Board,components:Components,turn_progress:TurnProgress,scored_city_count:int} */
+    /** @return array{player_infos:array<int,PlayerInfo>,board:Board,components:Components,turn_progress:TurnProgress,scored_city_count:int,turn_number:int} */
     public function retrieveAllData(int $player_id): array {
         $rows = $this->db->getObjectList("SELECT location, location_id, type, player_id, used, terrain FROM pieces ORDER BY location, location_id, player_id");
 
@@ -186,12 +187,24 @@ class PersistentStore
         foreach ($player_ids as $pid => $_) {
             $pinfos[$pid] = new PlayerInfo($pid, $captured[$pid], new Hand($hands[$pid]), new Pool($pools[$pid]), $this->playerScore->get($pid));
         }
+        $board = Board::fromHexes($hexes);
+        /** @var array<int,bool> */
+        $player_played = [];
+        foreach ($board->allHexes() as $hex) {
+            $pid = $hex->player_id;
+            if ($pid) {
+                $player_played[$pid] = true;
+            }
+        }
+        $defaultTurnNum = count($player_played) + 1;
+
         return [
             'player_infos' => $pinfos,
-            'board' => Board::fromHexes($hexes),
+            'board' => $board,
             'components' => new Components($cards),
             'turn_progress' => $this->retrieveTurnProgress(),
             "scored_city_count" => $scored_city_count,
+            'turn_number' => $this->globals->get(self::GLOBAL_TURN, $defaultTurnNum)
         ];
     }
 
@@ -220,11 +233,21 @@ class PersistentStore
         $this->db->execute("UPDATE pieces SET used=TRUE WHERE location='BOARD' and location_id=$rc");
     }
 
-    public function deleteAllMoves(int $player_id): void
+    public function markTurnCompleted(int $player_id): void
     {
         $sql = "DELETE FROM turn_progress
                 WHERE player_id=$player_id";
         $this->db->execute($sql);
+
+        // FIXME: only need short term for compatibility.
+        // should be simply 
+        //    $this->globals->inc(self::GLOBAL_TURN, 1);
+
+        if ($this->globals->has(self::GLOBAL_TURN)) {
+            $this->globals->inc(self::GLOBAL_TURN, 1);
+        } else {
+            $this->globals->set(self::GLOBAL_TURN, 4);
+        }
     }
 
     public function deleteSingleMove(Move $move): void
