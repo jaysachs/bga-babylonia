@@ -270,6 +270,10 @@ class Game extends Table
         $this->ps->debugEmptyPool($player_id);
     }
 
+    public function debug_hand_to_farmers(int $player_id): void {
+        $this->ps->handToFarmers($player_id);
+    }
+
     public function debug_take_ziggurat_card(string $zctype, int $points = 0, bool $used = false): void {
         $active_player_id = intval($this->getActivePlayerId());
         $model = new Model($this->ps, $this->stats, $active_player_id);
