@@ -188,23 +188,14 @@ class PersistentStore
             $pinfos[$pid] = new PlayerInfo($pid, $captured[$pid], new Hand($hands[$pid]), new Pool($pools[$pid]), $this->playerScore->get($pid));
         }
         $board = Board::fromHexes($hexes);
-        /** @var array<int,bool> */
-        $player_played = [];
-        foreach ($board->allHexes() as $hex) {
-            $pid = $hex->player_id;
-            if ($pid) {
-                $player_played[$pid] = true;
-            }
-        }
-        $defaultTurnNum = count($player_played) + 1;
-
         return [
             'player_infos' => $pinfos,
             'board' => $board,
             'components' => new Components($cards),
             'turn_progress' => $this->retrieveTurnProgress(),
             "scored_city_count" => $scored_city_count,
-            'turn_number' => $this->globals->get(self::GLOBAL_TURN, $defaultTurnNum)
+            /** @phpstan-ignore argument.type */
+            'turn_number' => intval($this->globals->get(self::GLOBAL_TURN, 1))
         ];
     }
 
@@ -238,16 +229,7 @@ class PersistentStore
         $sql = "DELETE FROM turn_progress
                 WHERE player_id=$player_id";
         $this->db->execute($sql);
-
-        // FIXME: only need short term for compatibility.
-        // should be simply 
-        //    $this->globals->inc(self::GLOBAL_TURN, 1);
-
-        if ($this->globals->has(self::GLOBAL_TURN)) {
-            $this->globals->inc(self::GLOBAL_TURN, 1);
-        } else {
-            $this->globals->set(self::GLOBAL_TURN, 4);
-        }
+        $this->globals->inc(self::GLOBAL_TURN, 1);
     }
 
     public function deleteSingleMove(Move $move): void
