@@ -406,7 +406,8 @@ class Model
     }
 
     public function donePlayPieces(): void {
-        foreach ($this->fetchCommittedOnly()->moves as $move) {
+        $moves = $this->fetchCommittedOnly()->moves;
+        foreach ($moves as $move) {
             $emove = $this->doPlayPiece($move->player_id, $move->handpos, $move->rc);
             $this->ps->updatePlayedPiece($move);
             foreach ($emove->activated_ziggurat_cards as $zctype) {
@@ -440,7 +441,7 @@ class Model
         // adjust avg pieces player per turn statistic
         $pid = $this->player_id;
 
-        $numplayed = floatval(count($this->turnProgress()->moves));
+        $numplayed = floatval(count($moves));
         $numturns = floatval($this->stats->PLAYER_NUMBER_TURNS->get($pid));
         $sum = $this->stats->PLAYER_AVERAGE_PIECES_PLAYED_PER_TURN->get($pid) * ($numturns - 1.0);
         $this->stats->PLAYER_AVERAGE_PIECES_PLAYED_PER_TURN->set($pid, ($sum + $numplayed) / $numturns);
