@@ -78,7 +78,7 @@ class Model
         foreach ($player_ids as $player_id) {
             $hand = Hand::new();
             $pool = Pool::new();
-            Model::refill($hand, $pool);
+            self::refill($hand, $pool);
             $pinfos[$player_id] = new PlayerInfo($player_id, 0, $hand, $pool, 0);
         }
         $ps->insertAll($board, $components, $pinfos);
