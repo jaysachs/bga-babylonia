@@ -1,37 +1,31 @@
 import { BblPlayer, BGamedatas } from "../bdata";
 import { AnimationManager } from "../bga-animations";
-import { CSS, IDS, View } from "../view";
+import { BoardManager } from "../board";
+import { Css } from "../css";
+import { HandManager } from "../hand";
+import { IDS } from "../ids";
+import { PlayerPanelManager } from "../player_panel";
+import { TooltipManager } from "../tooltips";
+import { ZCardManager } from "../zcards";
 
 export abstract class BabyloniaState {
-  // Returns the hex (row,col) clicked on, or null if not a playable hex
-  protected selectedHex(target: EventTarget): number | null {
-    let hexDiv = target as Element;
-    while (hexDiv.parentElement != null && hexDiv.parentElement.id != IDS.BOARD) {
-      hexDiv = hexDiv.parentElement;
+    constructor(protected bga: Bga<BblPlayer, BGamedatas>,
+        protected readonly animationManager: AnimationManager,
+        protected readonly boardManager: BoardManager,
+        protected readonly handManager: HandManager,
+        protected readonly zcardManager: ZCardManager,
+        protected readonly playerPanelManager: PlayerPanelManager) {
     }
-    if (hexDiv.parentElement == null) {
-      return null;
+
+    public onEnteringState(args: any, isCurrentPlayerActive: boolean) { }
+
+    public onLeavingState(args: any, isCurrentPlayerActive: boolean) { }
+
+    protected autoConfirmEnabled(): boolean {
+        let p = this.bga.userPreferences.get(100);
+        if (p == 0) {
+            return this.bga.gameui.bRealtime;
+        }
+        return p == 2;
     }
-    // now check if it's allowed
-    if (!hexDiv.classList.contains(CSS.PLAYABLE) && !hexDiv.classList.contains(CSS.SELECTABLE)) {
-      return null;
-    }
-    const id = hexDiv.id.split('_');
-    return Number(id[2]);
-  }
-
-
-  constructor(protected bga: Bga<BblPlayer, BGamedatas>, protected view: View, protected animationManager: AnimationManager) { }
-
-  public onEnteringState(args: any, isCurrentPlayerActive: boolean) { }
-
-  public onLeavingState(args: any, isCurrentPlayerActive: boolean) { }
-
-  protected autoConfirmEnabled(): boolean {
-    let p = this.bga.userPreferences.get(100);
-    if (p == 0) {
-      return this.bga.gameui.bRealtime;
-    }
-    return p == 2;
-  }
 }

@@ -6,44 +6,44 @@ import { MoreAnimations } from './more-animations';
  */
 
 export abstract class BaseGame<P extends Player, T extends Gamedatas<P>> {
-  public readonly animationManager: AnimationManager;
-  public readonly moreAnimations: MoreAnimations;
-  public readonly bga: Bga<P, T>;
-  private readonly special_log_args = new Map<string, (x: any) => HTMLElement>();
+    public readonly animationManager: AnimationManager;
+    public readonly moreAnimations: MoreAnimations;
+    public readonly bga: Bga<P, T>;
+    private readonly special_log_args = new Map<string, (x: any) => HTMLElement>();
 
-  constructor(bga: Bga<P, T>) {
-    this.bga = bga;
-    this.animationManager = new BgaAnimations.Manager({
-      animationsActive: () => this.bgaAnimationsActive(),
-    });
-    this.moreAnimations = new MoreAnimations(this.animationManager);
-  }
-
-  protected bgaAnimationsActive(): boolean {
-    return this.bga.gameui.bgaAnimationsActive();
-  }
-
-  protected registerLogArg(arg: string, xform: (x: any) => HTMLElement): void {
-    this.special_log_args.set(arg, xform);
-  }
-
-  bgaFormatText(log: string, args: any): { log: string, args: any } {
-    try {
-      const shadowParent = document.createElement('span');
-      if (log && args && !args.processed) {
-        args.processed = true;
-        this.special_log_args.forEach((xform, key) => {
-          if (key in args) {
-            const e = xform(args);
-            shadowParent.appendChild(e);
-            args[key] = shadowParent.getHTML();
-            e.remove();
-          }
+    constructor(bga: Bga<P, T>) {
+        this.bga = bga;
+        this.animationManager = new BgaAnimations.Manager({
+            animationsActive: () => this.bgaAnimationsActive(),
         });
-      }
-    } catch (e: any) {
-      console.error(log, args, 'Exception thrown', e.stack);
+        this.moreAnimations = new MoreAnimations(this.animationManager);
     }
-    return { log, args };
-  }
+
+    protected bgaAnimationsActive(): boolean {
+        return this.bga.gameui.bgaAnimationsActive();
+    }
+
+    protected registerLogArg(arg: string, xform: (x: any) => HTMLElement): void {
+        this.special_log_args.set(arg, xform);
+    }
+
+    bgaFormatText(log: string, args: any): { log: string, args: any } {
+        try {
+            const shadowParent = document.createElement('span');
+            if (log && args && !args.processed) {
+                args.processed = true;
+                this.special_log_args.forEach((xform, key) => {
+                    if (key in args) {
+                        const e = xform(args);
+                        shadowParent.appendChild(e);
+                        args[key] = shadowParent.getHTML();
+                        e.remove();
+                    }
+                });
+            }
+        } catch (e: any) {
+            console.error(log, args, 'Exception thrown', e.stack);
+        }
+        return { log, args };
+    }
 }
