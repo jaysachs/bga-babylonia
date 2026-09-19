@@ -18,7 +18,8 @@ export class HandManager {
                 hpd.appendChild(pieceDiv);
             }
         });
-        // FIXME: why does this fail?
+        // FIXME: this fails because it has async animations that
+        //  don't finish by the time play_pieces state starts.
         // if (hand) {
         //     this.refill(hand);
         // }
