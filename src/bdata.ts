@@ -15,9 +15,9 @@ export type PieceType = 'empty' | 'hidden' | 'merchant' | 'priest' | 'servant' |
 export interface Hex {
     rc: number;
     board_player: number;
-    piece: PieceType;
+    piece?: PieceType;
     scored: boolean;
-    terrain: 'NORTH' | 'SOUTH' | 'CENTRAL' | 'RIVER';
+    terrain: 'NORTH' | 'SOUTH' | 'CENTRAL' | 'RIVER' | 'UNUSED';
 }
 
 export interface Zcard {

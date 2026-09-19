@@ -71,7 +71,7 @@ CREATE TABLE IF NOT EXISTS `pieces` (
   `used` BOOLEAN,
 
   -- landmass for board locations only
-  --    north, center, south, river
+  --    north, center, south, river, unused
   `terrain` VARCHAR(6),
 
   PRIMARY KEY(`location`, `location_id`, `player_id`)

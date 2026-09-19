@@ -8,24 +8,29 @@ import { TooltipManager } from "./tooltips";
 export class BoardManager {
 
     public constructor(private bga: Bga<BblPlayer, BGamedatas>, private readonly tooltipManager: TooltipManager) {
-        const boardData = this.bga.gameui.gamedatas.board;
         const boardDiv = $(IDS.BOARD);
-        for (const hex of boardData) {
+        for (const hex of this.bga.gameui.gamedatas.board) {
             const hexDiv = this.makeHexDiv(hex);
             boardDiv.appendChild(hexDiv);
-            if (Piece.isNonEmpty(hex.piece)) {
-                let pieceDiv = Piece.createDiv(hex.piece, this.bga.players.getPlayerById(hex.board_player));
-                if (hex.scored) {
-                    pieceDiv.classList.add(Css.SCORED);
+            if (hex.piece) {
+                const piece = hex.piece;
+                if (Piece.isNonEmpty(piece)) {
+                    let pieceDiv = Piece.createDiv(piece, this.bga.players.getPlayerById(hex.board_player));
+                    if (hex.scored) {
+                        pieceDiv.classList.add(Css.SCORED);
+                    }
+                    hexDiv.appendChild(pieceDiv);
+                    if (Piece.isCity(piece)) {
+                        pieceDiv.id = `bbl_city_${hex.rc}`;
+                        this.tooltipManager.add(pieceDiv.id, () => this.cityScoringHover(hex.rc));
+                    } else if (Piece.isField(hex.piece)) {
+                        pieceDiv.id = `bbl_field_${hex.rc}`;
+                        this.tooltipManager.add(pieceDiv.id, () => this.fieldScoringHover(hex.rc, piece));
+                    }
                 }
-                hexDiv.appendChild(pieceDiv);
-                if (Piece.isCity(hex.piece)) {
-                    pieceDiv.id = `bbl_city_${hex.rc}`;
-                    this.tooltipManager.add(pieceDiv.id, () => this.cityScoringHover(hex.rc));
-                } else if (Piece.isField(hex.piece)) {
-                    pieceDiv.id = `bbl_field_${hex.rc}`;
-                    this.tooltipManager.add(pieceDiv.id, () => this.fieldScoringHover(hex.rc, hex.piece));
-                }
+            } else {
+                hexDiv.classList.add(Css.OUT_OF_PLAY);
+                // mark "out of play"
             }
         }
     }

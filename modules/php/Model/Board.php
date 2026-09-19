@@ -55,7 +55,11 @@ class Board
         if (!isset($this->hexes[$rc])) {
             return null;
         }
-        return $this->hexes[$rc];
+        $hex = $this->hexes[$rc];
+        if ($hex->terrain == Terrain::UNUSED) {
+            return null;
+        }
+        return $hex;
     }
 
     public function asTestMap(): string
@@ -85,6 +89,7 @@ class Board
                     Terrain::SOUTH => '---',
                     Terrain::RIVER => '≈≈≈',
                     // FIXME
+                    Terrain::UNUSED => '!!!',
                     Terrain::UNKNOWN => '!!!',
                 },
                 PieceType::CITY_P => 'C.P',
@@ -309,9 +314,11 @@ END;
     }
 
     /** @return \Generator<int, Hex, Hex, void> */
-    public function allHexes() : \Generator {
+    public function allHexes(bool $includeOutOfPlay = false) : \Generator {
         foreach ($this->hexes as $hex) {
-            yield $hex;
+            if ($includeOutOfPlay || $hex->terrain != Terrain::UNUSED) {
+                yield $hex;
+            }
         }
     }
 
@@ -366,7 +373,7 @@ END;
     {
         foreach ($this->hexes as $hex) {
             if ($hex->terrain == $terrain) {
-                unset($this->hexes[$hex->rc]);
+                $hex->terrain = Terrain::UNUSED;
                 $v = array_search($hex->rc, $development_locations);
                 if ($v !== false) {
                     array_splice($development_locations, intval($v), 1);

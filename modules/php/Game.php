@@ -31,6 +31,7 @@ use Bga\Games\babylonia\Model\Model;
 use Bga\Games\babylonia\Model\PersistentStore;
 use Bga\GameFramework\Table;
 use Bga\Games\babylonia\Model\PieceType;
+use Bga\Games\babylonia\Model\Terrain;
 use Bga\Games\babylonia\Model\ZigguratCardType;
 use Bga\Games\babylonia\States\StartTurn;
 use Bga\Games\babylonia\Utils\Arrays;
@@ -142,11 +143,11 @@ class Game extends Table
 
         /** @var list<array{row:int,col:int,hextype:string,piece:string,board_player:int}> */
         $board_data = [];
-        foreach ($model->board()->allHexes() as $hex) {
+        foreach ($model->board()->allHexes(true) as $hex) {
             $board_data[] = [
                 "rc" => $hex->rc,
                 "terrain" => $hex->terrain->value,
-                "piece" => $hex->piece->value,
+                "piece" => $hex->terrain == Terrain::UNUSED ? null : $hex->piece->value,
                 "board_player" => $hex->player_id,
                 "scored" => $hex->scored,
             ];

@@ -85,7 +85,7 @@ class PersistentStore
     /** @param array<int,PlayerInfo> $pinfos */
     public function insertAll(Board $board, Components $components, array $pinfos): void {
         $sql_values = [];
-        foreach ($board->allHexes() as $hex) {
+        foreach ($board->allHexes(true) as $hex) {
             $piece = $hex->piece->value;
             $player_id = $hex->player_id;
             $sc = self::boolValue($hex->scored);

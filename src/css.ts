@@ -9,4 +9,5 @@ export class Css {
     static readonly LAYOUT_UNDER_BOARD = 'bbl_altflow';
     static readonly IS_SPECTATOR = 'bbl_is_spectator';
     static readonly SCORED = 'bbl_scored';
+    static readonly OUT_OF_PLAY = 'bbl_outofplay';
 }

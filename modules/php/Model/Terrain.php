@@ -34,5 +34,7 @@ enum Terrain: string
     case CENTER = 'CENTER';
     case RIVER = 'RIVER';
 
+    case UNUSED = 'UNUSED';
+
     case UNKNOWN = 'UNKNOWN';
 }

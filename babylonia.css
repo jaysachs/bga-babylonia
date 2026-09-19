@@ -871,3 +871,8 @@ div.bbl_pb_zcards>div {
     align-items: center;
     flex-direction: row;
 }
+
+.bbl_outofplay {
+    background-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='173' ><polygon points='8,86 48,8 148,8 190,86 148,164 48,164' fill='black' fill-opacity='0.3' stroke='none'/></svg>");
+    background-size: contain;
+}

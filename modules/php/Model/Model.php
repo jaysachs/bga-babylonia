@@ -172,6 +172,9 @@ class Model
 
     public function checkPlay(int $player_id, PieceType $piece, Hex $hex): PlayAllowedResult
     {
+        if ($hex->terrain == Terrain::UNUSED) {
+            return PlayAllowedResult::failure("Cannot play to out of play unused hexes");
+        }
         if (count($this->turnProgress()->moves) >= $this->maxMovesAllowed($player_id)) {
             return PlayAllowedResult::failure("no more moves permitted");
         }
