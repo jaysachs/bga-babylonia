@@ -35,8 +35,8 @@ export class Game extends BaseGame<BblPlayer, BGamedatas> {
         const tooltipManager = new TooltipManager(this.bga);
         const playerPanelManager = new PlayerPanelManager(this.bga);
         const boardManager = new BoardManager(this.bga, tooltipManager);
-        const handManager = new HandManager(this.bga, this.animationManager, this.bga.players.getPlayerById(gameui.player_id))
-        const zcardManager = new ZCardManager(this.bga, tooltipManager);
+        const handManager = new HandManager(this.bga, this.animationManager, playerPanelManager, this.bga.players.getPlayerById(gameui.player_id))
+        const zcardManager = new ZCardManager(this.bga, playerPanelManager, tooltipManager);
 
         this.registerLogArgs(zcardManager);
 

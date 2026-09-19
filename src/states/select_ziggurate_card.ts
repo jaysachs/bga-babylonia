@@ -74,8 +74,8 @@ export class SelectZigguratCardState extends BabyloniaState {
             points: number;
         }
     ) {
-        const dest = $(IDS.playerBoardZcards(args.player_id));
-        const zelem = $(IDS.zcard(args.zcard));
+        const dest = this.playerPanelManager.zcardsElement(args.player_id);
+        const zelem = this.zcardManager.getZCardElement(args.zcard);
 
         zelem.classList.remove(Css.SELECTED);
         await this.animationManager.slideAndAttach(zelem, dest, { toPlaceholder: 'off' })

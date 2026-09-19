@@ -74,13 +74,13 @@ export class PlayPiecesState extends BabyloniaState {
                     console.error("attempt to capture a field that is not there");
                 }
                 // slide the captured field to the player board
-                anims.push(() => this.animationManager.slideOutAndDestroy(field, $(IDS.handcount(args.player_id)), {}))
+                anims.push(() => this.animationManager.slideOutAndDestroy(field, this.playerPanelManager.handcountElement(args.player_id), {}))
             }
             anims.push(() => {
                 if (!pieceDiv) {
                     // slide piece from hand count to hex
                     pieceDiv = Piece.createDiv(args.piece, this.bga.players.getPlayerById(args.player_id));
-                    $(IDS.handcount(args.player_id)).appendChild(pieceDiv);
+                    this.playerPanelManager.handcountElement(args.player_id).appendChild(pieceDiv);
                 }
                 return this.animationManager.slideAndAttach(pieceDiv, hexDiv, { fromPlaceholder: 'off' })
                     .then(() => Piece.set(pieceDiv, args.piece, this.bga.players.getPlayerById(args.player_id)));
@@ -123,13 +123,13 @@ export class PlayPiecesState extends BabyloniaState {
         }
     ) {
         let anims: AnimationList = [];
-        let hexDiv = $(IDS.hexDiv(args.rc));
+        let hexDiv = this.boardManager.hexDiv(args.rc);
 
         if (Piece.isNonEmpty(args.captured_piece)) {
             // slide the previously captured field back
             let field = Piece.createDiv(args.captured_piece);
             anims.push(() => {
-                $(IDS.handcount(args.player_id)).appendChild(field);
+                this.playerPanelManager.handcountElement(args.player_id).appendChild(field);
                 return this.animationManager.slideAndAttach(field, hexDiv, { fromPlaceholder: 'off' });
             })
         }
@@ -137,7 +137,7 @@ export class PlayPiecesState extends BabyloniaState {
         let pieceDiv = hexDiv.firstElementChild as HTMLElement;
         // Note that handpos is private data, only set for the active player
         //  so its existence is equivalent to "isCurrentPlayerActive()"
-        let destDiv = args.handpos !== undefined ? this.handManager.handPosDiv(args.handpos) : $(IDS.handcount(args.player_id));
+        let destDiv = args.handpos !== undefined ? this.handManager.handPosDiv(args.handpos) : this.playerPanelManager.handcountElement(args.player_id);
 
         if (args.original_piece) {
             // restore piece value, e.g. if it was originally hidden
@@ -257,7 +257,7 @@ export class PlayPiecesState extends BabyloniaState {
         if (hexDiv.firstElementChild) /* and is field */ {
             let field = hexDiv.firstElementChild as HTMLElement;
             // slide the captured field to the player board
-            anims.push(() => this.animationManager.slideOutAndDestroy(field, $(IDS.handcount(this.bga.players.getCurrentPlayerId())), {}));
+            anims.push(() => this.animationManager.slideOutAndDestroy(field, this.playerPanelManager.handcountElement(this.bga.players.getCurrentPlayerId()), {}));
         }
 
         const pieceDiv = handDiv.firstElementChild as HTMLElement;

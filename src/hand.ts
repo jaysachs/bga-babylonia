@@ -4,10 +4,11 @@ import { Html } from "./html";
 import { IDS } from "./ids";
 import { AnimationList } from "./more-animations";
 import { Piece } from "./piece";
+import { PlayerPanelManager } from "./player_panel";
 
 export class HandManager {
 
-    public constructor(private bga: Bga<BblPlayer, BGamedatas>, private animationManager: AnimationManager, private player?: BblPlayer) {
+    public constructor(private bga: Bga<BblPlayer, BGamedatas>, private animationManager: AnimationManager, private playerPanelManger: PlayerPanelManager, private player?: BblPlayer) {
         const hand = this.bga.gameui.gamedatas.hand;
         const handDiv = $(IDS.HAND);
         hand?.forEach((piece, i) => {
@@ -17,6 +18,10 @@ export class HandManager {
                 hpd.appendChild(pieceDiv);
             }
         });
+        // FIXME: why does this fail?
+        // if (hand) {
+        //     this.refill(hand);
+        // }
     }
 
     public handPosDiv(i: number): HTMLElement {
@@ -48,7 +53,7 @@ export class HandManager {
                     let destDiv = handPosDiv! as HTMLElement;
                     anims.push(() => {
                         pieceDiv = Piece.createDiv(newPiece, this.player);
-                        $(IDS.poolcount(pid)).appendChild(pieceDiv);
+                        this.playerPanelManger.poolcountElement(pid).appendChild(pieceDiv);
                         return this.animationManager.slideAndAttach(pieceDiv, destDiv, { fromPlaceholder: 'off' })
                     });
                 }

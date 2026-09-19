@@ -1,6 +1,7 @@
 import { BblPlayer, BGamedatas, Zcard } from "./bdata";
 import { Html } from "./html";
 import { IDS } from "./ids";
+import { PlayerPanelManager } from "./player_panel";
 import { TooltipManager } from "./tooltips";
 
 export type ZType = string;
@@ -9,17 +10,21 @@ export class ZCardManager {
 
     private zcardTooltips = new Map<string, string>();
 
-    constructor(private bga: Bga<BblPlayer, BGamedatas>,  private tooltipManager: TooltipManager) {
+    private zcardId(type: string): string {
+        return `bbl_${type}`;
+    }
+
+    constructor(private bga: Bga<BblPlayer, BGamedatas>,  private playerPanelManager: PlayerPanelManager, private tooltipManager: TooltipManager) {
         const zcards = this.bga.gameui.gamedatas.ziggurat_cards;
 
         const available = $(IDS.AVAILABLE_ZCARDS);
         for (let zcard of zcards) {
             const zcont = Html.div({});
             available.appendChild(zcont);
-            const zelem = this.createDiv(zcard.type, zcard.used, IDS.zcard(zcard.type));
+            const zelem = Html.div({ attrs: this.attr(zcard.type, zcard.used), id: this.zcardId(zcard.type) /* , title: _(zcard.tooltip) */});
 
             if (zcard.owning_player_id != 0) {
-                $(IDS.playerBoardZcards(zcard.owning_player_id)).appendChild(zelem);
+                this.playerPanelManager.addZCard(zcard.owning_player_id, zelem);
             } else {
                 zcont.appendChild(zelem);
             }
@@ -44,6 +49,10 @@ export class ZCardManager {
         );
     }
 
+    public getZCardElement(ztype: string): HTMLElement {
+        return $(this.zcardId(ztype));
+    }
+
     get(el: Element): ZType | undefined {
         return el.getAttribute(ZCardManager.ATTR) as ZType;
     }
@@ -52,11 +61,7 @@ export class ZCardManager {
         el.setAttribute(ZCardManager.USED_ATTR, String(used));
     }
 
-    createDiv(z: ZType, used: boolean = false, id?: string, text?: string): HTMLElement {
-        return Html.div({ attrs: this.attr(z, used), id: id, text: text });
-    }
-
-    attr(z: ZType, used: boolean = false): { bbl_ztype: ZType, bbl_zused?: string } {
+    private attr(z: ZType, used: boolean = false): { bbl_ztype: ZType, bbl_zused?: string } {
         if (used) {
             return {
                 bbl_ztype: z,

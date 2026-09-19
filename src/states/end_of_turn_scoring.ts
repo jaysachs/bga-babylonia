@@ -68,7 +68,7 @@ export class EndOfTurnScoringState extends BabyloniaState {
             }[];
         }
     ) {
-        const hex = $(IDS.hexDiv(args.rc));
+        const hex = this.boardManager.hexDiv(args.rc);
 
         let aa = this.animationManager.animationsActive();
         for (const details of args.details) {
@@ -99,7 +99,7 @@ export class EndOfTurnScoringState extends BabyloniaState {
         await this.indicateNeighbors(args.winner_hexes, args.other_hexes);
 
         let dest = (args.player_id != 0)
-            ? $(IDS.citycount(args.player_id))
+            ? this.playerPanelManager.citycountElement(args.player_id)
             : $(IDS.OFF_BOARD);
 
         await this.animationManager.slideOutAndDestroy(
