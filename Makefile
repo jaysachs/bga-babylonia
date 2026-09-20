@@ -12,7 +12,7 @@ PHPSTAN_LEVEL=10
 .PHONY: build test phpstan deploy clean pull-boilerplate sprites
 
 $(JS): src/**/*.ts src/*.ts tsconfig.json $(TS_STUBS)
-	npm run build:ts
+	NO_COLOR=true npm run build:ts
 
 $(STATS): $(GENSTATS) stats.jsonc Makefile
 	php $(GENSTATS) $(GAME)  > $(STATS)

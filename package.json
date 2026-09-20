@@ -2,7 +2,7 @@
   "name": "bga.babylonia",
   "version": "1.0.0",
   "description": "",
-  "main": "zooloretto.js",
+  "main": "babylonia.js",
   "scripts": {
     "build:ts": "rollup -c --failAfterWarnings",
     "watch:ts": "rollup -c -w --failAfterWarnings",
@@ -16,6 +16,6 @@
     "rollup": "^4.57.1",
     "sass": "^1.71.0",
     "tslib": "^2.8.1",
-    "typescript": "^5.3.3"
+    "typescript": "^6.0.0"
   }
 }

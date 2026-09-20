@@ -1,5 +1,6 @@
 {
     "compilerOptions": {
+        "pretty": false,
         "strictNullChecks": true,
         "noImplicitReturns": true,
         "exactOptionalPropertyTypes": true,
