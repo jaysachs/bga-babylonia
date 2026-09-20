@@ -10,19 +10,20 @@ export class HandManager {
 
     public constructor(private bga: Bga<BblPlayer, BGamedatas>, private animationManager: AnimationManager, private playerPanelManger: PlayerPanelManager, private player?: BblPlayer) {
         const hand = this.bga.gameui.gamedatas.hand;
-        const handDiv = $(IDS.HAND);
-        hand?.forEach((piece, i) => {
-            const hpd = handDiv.appendChild(Html.div({}));
-            if (Piece.isNonEmpty(piece)) {
-                const pieceDiv = Piece.createDiv(piece, this.player)
-                hpd.appendChild(pieceDiv);
+        if (true) {
+            hand?.forEach((piece, i) => {
+                const hpd = this.handPosDiv(i);
+                if (Piece.isNonEmpty(piece)) {
+                    hpd.appendChild(Piece.createDiv(piece, this.player));
+                }
+            });
+        } else {
+            // FIXME: this fails because it has async animations that
+            // don't finish by the time play_pieces state starts.
+            if (hand) {
+                this.refill(hand!);
             }
-        });
-        // FIXME: this fails because it has async animations that
-        //  don't finish by the time play_pieces state starts.
-        // if (hand) {
-        //     this.refill(hand);
-        // }
+        }
     }
 
     public handPosDiv(i: number): HTMLElement {
@@ -40,22 +41,15 @@ export class HandManager {
         }
         const anims: AnimationList = [];
         const pid = this.player.player_id;
-        const handDiv = $(IDS.HAND);
-        let handPosDiv = handDiv.firstElementChild;
-        for (let newPiece of hand) {
-            if (!handPosDiv) {
-                // dynamically expand hand if 7 size hand is chosen
-                handPosDiv = Html.div({});
-                handDiv.appendChild(handPosDiv);
-            }
-            let pieceDiv = handPosDiv!.firstElementChild as HTMLElement;
+        hand.forEach((newPiece, i) => {
+            const handPosDiv = this.handPosDiv(i);
+            let pieceDiv = handPosDiv.firstElementChild as HTMLElement;
             if (!pieceDiv) {
                 if (Piece.isNonEmpty(newPiece)) {
-                    let destDiv = handPosDiv! as HTMLElement;
                     anims.push(() => {
                         pieceDiv = Piece.createDiv(newPiece, this.player);
                         this.playerPanelManger.poolcountElement(pid).appendChild(pieceDiv);
-                        return this.animationManager.slideAndAttach(pieceDiv, destDiv, { fromPlaceholder: 'off' })
+                        return this.animationManager.slideAndAttach(pieceDiv, handPosDiv, { fromPlaceholder: 'off', toPlaceholder: 'off' })
                     });
                 }
             } else {
@@ -66,8 +60,7 @@ export class HandManager {
                     console.error("piece from args", newPiece, "not matches hand", pieceDiv);
                 }
             }
-            handPosDiv = handPosDiv!.nextElementSibling as (HTMLElement | null);
-        }
+        })
         return this.animationManager.playParallel(anims);
     }
 }
