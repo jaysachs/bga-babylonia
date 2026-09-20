@@ -282,6 +282,9 @@ class Model
     {
         $result = [ "" => [] ];
         $hand = $this->activePlayerInfo()->hand;
+        if ($hand->size() == 0) {
+            return [];
+        }
         $allPieces = PieceType::playerPieceTypes();
         foreach ($allPieces as $piece) {
             $result[$piece->value] = [];
