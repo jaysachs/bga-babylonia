@@ -4,6 +4,7 @@ import { BabyloniaState } from "./base";
 import { Piece } from "../piece";
 import { IDS } from "../ids";
 import { Css } from "../css";
+import { PieceInfo } from "../hand";
 
 interface PlayStateArgs {
     canEndTurn: boolean;
@@ -158,15 +159,12 @@ export class PlayPiecesState extends BabyloniaState {
         this.doEnterState(args.playState);
     }
 
-    private handController: AbortController = new AbortController();
     private attachHandHandler() {
-        this.handController.abort();
-        this.handController = new AbortController();
-        this.handManager.attachListenerToOccupiedSpaces('click', p => this.onHandClicked(p), { signal: this.handController.signal })
+        this.handManager.addSelectionHandler(this.handSelectionHandler);
     }
 
     private removeHandHandler() {
-        this.handController.abort();
+        this.handManager.removeSelectionHandler(this.handSelectionHandler);
     }
 
     private boardController: AbortController = new AbortController();
@@ -185,7 +183,6 @@ export class PlayPiecesState extends BabyloniaState {
         const piece = Piece.get(div)!.split('_')[0]!;
         return (this.playStateArgs.allowedMoves[""] ?? [])
             .concat(this.playStateArgs.allowedMoves[piece] ?? []);
-        ;
     }
 
     private unmarkHexesPlayable(hexes: number[]): void {
@@ -201,7 +198,7 @@ export class PlayPiecesState extends BabyloniaState {
     }
 
     private unselectAllHandPieces(): void {
-        this.handManager.unselectAllPieces(e => this.unmarkHexesPlayableForPiece(e));
+        this.handManager.unselectAllPieces();
     }
 
     private setPlayablePieces(): void {
@@ -254,31 +251,20 @@ export class PlayPiecesState extends BabyloniaState {
         this.bga.actions.performAction('actPlayPiece', { handpos: selectedPiece.logicalPos, rc: hex })
     }
 
-    private onHandClicked(ev: Event): boolean {
-        ev.preventDefault();
-        ev.stopPropagation();
-        const pieceDiv = ev.target as HTMLElement;
-        let p = Piece.get(pieceDiv)!;
-        if (!Piece.isNonEmpty(p)) { return false; }
-
-        let parentDiv = pieceDiv.parentElement!;
-        let cl = parentDiv.classList;
-        if (cl.contains(Css.UNPLAYABLE)) { return false; }
-
-        if (this.allowedMovesFor(pieceDiv).length == 0) {
-            return false;
+    private handSelectionHandler = (pieceInfo: PieceInfo, selected: boolean) => {
+        console.log("pieceSelected:", pieceInfo, selected);
+        if (this.allowedMovesFor(pieceInfo.pieceDiv).length == 0) {
+            console.log("no allowed moves");
+            return;
         }
-        if (!cl.contains(Css.SELECTED)) {
-            this.unselectAllHandPieces();
-            this.markHexesPlayableForPiece(pieceDiv);
+        if (selected) {
+            this.markHexesPlayableForPiece(pieceInfo.pieceDiv);
             this.chooseDestination();
         } else {
             this.removeBoardHandler();
-            this.unmarkHexesPlayableForPiece(pieceDiv);
+            this.unmarkHexesPlayableForPiece(pieceInfo.pieceDiv);
             this.setStatusBarForPlayState();
         }
-        cl.toggle(Css.SELECTED);
-        return false;
     }
 
     private chooseDestination(): void {

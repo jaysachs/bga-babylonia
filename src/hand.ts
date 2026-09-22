@@ -7,8 +7,36 @@ import { AnimationList } from "./more-animations";
 import { Piece } from "./piece";
 import { PlayerPanelManager } from "./player_panel";
 
+export type PieceInfo = {
+    pieceType: PieceType;
+    logicalPos: number;
+    pieceDiv: HTMLElement;
+}
+
+export type SelectionHandler = (p : PieceInfo, selected: boolean) => void;
+
 export class HandManager {
     private readonly collator = new Intl.Collator("en");
+    private selectionHandlers: SelectionHandler[] = [];
+
+    public addSelectionHandler(handler: SelectionHandler): void {
+        if (!this.selectionHandlers.find(h => h == handler)) {
+            console.log("adding selection handler", handler);
+            this.selectionHandlers.push(handler);
+        }
+    }
+
+    public removeSelectionHandler(handler: SelectionHandler): boolean {
+        const i = this.selectionHandlers.findIndex(h => h == handler);
+        if (i >= 0) {
+            this.selectionHandlers.splice(i, 1);
+            console.log("removed selection handler", handler);
+            return true;
+        }
+        console.log("unable to remove handler", handler);
+        return false;
+    }
+
     private orderedHand(hand: HandPiece[]): HandPiece[] {
         let result = hand.concat([]);
         result.sort((p1, p2) => {
@@ -71,7 +99,8 @@ export class HandManager {
     private spaceForPhysicalPos(i: number): HTMLElement {
         const hand = $(IDS.HAND);
         while (i >= hand.childElementCount) {
-            hand.appendChild(Html.div({ attrs: { bbl_logicalpos: String(i) }}));
+            hand.appendChild(Html.div({ attrs: { bbl_logicalpos: String(i) }}))
+                .addEventListener('click', this.onHandClicked.bind(this));
         }
         return $(IDS.HAND).childNodes.item(i)! as HTMLElement;
     }
@@ -174,12 +203,6 @@ export class HandManager {
         return this.animationManager.playParallel(anims);
     }
 
-    public attachListenerToOccupiedSpaces(eventType: string, handler: EventListenerOrEventListenerObject, opts?: AddEventListenerOptions): void {
-        Array.from($(IDS.HAND).children).forEach(e =>
-            e.firstChild?.addEventListener(eventType, handler, opts)
-        );
-    }
-
     public setPlayablePieces(isPlayable: (h: Element | null) => boolean): void {
         const hand = $(IDS.HAND);
         hand.childNodes.forEach((node) => {
@@ -195,7 +218,7 @@ export class HandManager {
         });
     }
 
-    public getSelectedPiece(): { pieceType: PieceType, logicalPos: number, pieceDiv: HTMLElement } | null {
+    public getSelectedPiece(): PieceInfo | null {
         const spaceDiv = document.querySelector(`#${IDS.HAND} > .${Css.SELECTED}`);
         if (!spaceDiv) { 
             return null; 
@@ -218,13 +241,12 @@ export class HandManager {
     }
 
     /** returns the already selected   */
-    public unselectAllPieces(unselect?: (h: Element) => void): void {
+    public unselectAllPieces(): void {
         const hand = $(IDS.HAND);
-        hand.childNodes.forEach(node => {
-            const posDiv = node as HTMLElement;
-            const cl = posDiv.classList;
+        Array.from(hand.children).forEach(spaceDiv => {
+            const cl = spaceDiv.classList;
             if (cl.contains(Css.SELECTED)) {
-                unselect && unselect(posDiv.firstElementChild!);
+                this.selectionHandlers.forEach(h => h({ pieceType: Piece.get(spaceDiv.firstChild as HTMLElement)!, pieceDiv: spaceDiv.firstElementChild as HTMLElement, logicalPos: 0 }, false))
             }
             cl.remove(Css.SELECTED);
             cl.remove(Css.PLAYABLE);
@@ -232,4 +254,32 @@ export class HandManager {
         });
     }
 
+    private onHandClicked(ev: Event): boolean {
+        ev.preventDefault();
+        ev.stopPropagation();
+        if (this.selectionHandlers.length == 0) { return false; }
+        const pieceDiv = ev.target as HTMLElement;
+        const spaceDiv = pieceDiv.parentElement!;
+
+        let p = Piece.get(pieceDiv)!;
+        if (!Piece.isNonEmpty(p)) { return false; }
+
+        let cl = spaceDiv.classList;
+        if (cl.contains(Css.UNPLAYABLE)) { return false; }
+
+        const currentSelected = this.getSelectedPiece();
+        if (currentSelected) {
+            currentSelected.pieceDiv.parentElement!.classList.toggle(Css.SELECTED);
+            this.selectionHandlers.forEach(h => h(currentSelected, false));
+        }
+
+        const selected = cl.toggle(Css.SELECTED);
+        const pi: PieceInfo = {
+            pieceDiv: pieceDiv,
+            pieceType: Piece.get(pieceDiv)!,
+            logicalPos: this.getLogicalPos(spaceDiv)
+        };
+        this.selectionHandlers.forEach(h => h(pi, selected));
+        return false;
+    }
 }
