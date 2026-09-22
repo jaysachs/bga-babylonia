@@ -151,6 +151,10 @@ export class BoardManager {
         hexes.forEach((hex) => this.markHexPlayable(hex));
     }
 
+    public unmarkHexesPlayable(hexes: number[]): void {
+        hexes.forEach((hex) => this.unmarkHexPlayable(hex));
+    }
+
     public markHexSelected(rc: number): void {
         this.hexDiv(rc).classList.add(Css.SELECTED);
     }

@@ -102,7 +102,7 @@ export class HandManager {
             hand.appendChild(Html.div({ attrs: { bbl_logicalpos: String(i) }}))
                 .addEventListener('click', this.onHandClicked.bind(this));
         }
-        return $(IDS.HAND).childNodes.item(i)! as HTMLElement;
+        return hand.children.item(i)! as HTMLElement;
     }
 
     private sortedHandsEnabled(): boolean {
@@ -203,12 +203,10 @@ export class HandManager {
         return this.animationManager.playParallel(anims);
     }
 
-    public setPlayablePieces(isPlayable: (h: Element | null) => boolean): void {
-        const hand = $(IDS.HAND);
-        hand.childNodes.forEach((node) => {
-            const child = node as HTMLElement;
-            const cl = child.classList;
-            if (isPlayable(child.firstElementChild)) {
+    public setPlayablePieces(isPlayable: (h: PieceType | null) => boolean): void {
+        Array.from($(IDS.HAND).children).forEach((spaceDiv) => {
+            const cl = spaceDiv.classList;
+            if (isPlayable(Piece.get(spaceDiv.firstElementChild))) {
                 cl.add(Css.PLAYABLE);
                 cl.remove(Css.UNPLAYABLE);
             } else {
@@ -242,8 +240,7 @@ export class HandManager {
 
     /** returns the already selected   */
     public unselectAllPieces(): void {
-        const hand = $(IDS.HAND);
-        Array.from(hand.children).forEach(spaceDiv => {
+        Array.from($(IDS.HAND).children).forEach(spaceDiv => {
             const cl = spaceDiv.classList;
             if (cl.contains(Css.SELECTED)) {
                 this.selectionHandlers.forEach(h => h({ pieceType: Piece.get(spaceDiv.firstChild as HTMLElement)!, pieceDiv: spaceDiv.firstElementChild as HTMLElement, logicalPos: 0 }, false))
@@ -257,6 +254,7 @@ export class HandManager {
     private onHandClicked(ev: Event): boolean {
         ev.preventDefault();
         ev.stopPropagation();
+        if (!this.bga.players.isCurrentPlayerActive()) { return false; }
         if (this.selectionHandlers.length == 0) { return false; }
         const pieceDiv = ev.target as HTMLElement;
         const spaceDiv = pieceDiv.parentElement!;

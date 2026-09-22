@@ -12,7 +12,8 @@ export class Piece {
             : p;
     }
 
-    static get(el: Element): PieceType | undefined {
+    static get(el: Element | null): PieceType | null {
+        if (!el) { return null; }
         return el.getAttribute(Piece.ATTR) as PieceType;
     }
 

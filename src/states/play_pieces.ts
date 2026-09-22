@@ -178,23 +178,19 @@ export class PlayPiecesState extends BabyloniaState {
         this.boardController.abort();
     }
 
-    private allowedMovesFor(div: Element | null): number[] {
-        if (!div) { return []; }
-        const piece = Piece.get(div)!.split('_')[0]!;
+    private allowedMovesFor(pieceType: PieceType | null): number[] {
+        if (!pieceType) { return []; }
+        const piece = pieceType.split('_')[0]!;
         return (this.playStateArgs.allowedMoves[""] ?? [])
             .concat(this.playStateArgs.allowedMoves[piece] ?? []);
     }
 
-    private unmarkHexesPlayable(hexes: number[]): void {
-        hexes.forEach(hex => this.boardManager.unmarkHexPlayable(hex));
+    private markHexesPlayableForPiece(pieceType: PieceType): void {
+        this.boardManager.markHexesPlayable(this.allowedMovesFor(pieceType));
     }
 
-    private markHexesPlayableForPiece(div: Element): void {
-        this.boardManager.markHexesPlayable(this.allowedMovesFor(div));
-    }
-
-    private unmarkHexesPlayableForPiece(div: Element): void {
-        this.unmarkHexesPlayable(this.allowedMovesFor(div));
+    private unmarkHexesPlayableForPiece(pieceType: PieceType): void {
+        this.boardManager.unmarkHexesPlayable(this.allowedMovesFor(pieceType));
     }
 
     private unselectAllHandPieces(): void {
@@ -253,16 +249,16 @@ export class PlayPiecesState extends BabyloniaState {
 
     private handSelectionHandler = (pieceInfo: PieceInfo, selected: boolean) => {
         console.log("pieceSelected:", pieceInfo, selected);
-        if (this.allowedMovesFor(pieceInfo.pieceDiv).length == 0) {
+        if (this.allowedMovesFor(pieceInfo.pieceType).length == 0) {
             console.log("no allowed moves");
             return;
         }
         if (selected) {
-            this.markHexesPlayableForPiece(pieceInfo.pieceDiv);
+            this.markHexesPlayableForPiece(pieceInfo.pieceType);
             this.chooseDestination();
         } else {
             this.removeBoardHandler();
-            this.unmarkHexesPlayableForPiece(pieceInfo.pieceDiv);
+            this.unmarkHexesPlayableForPiece(pieceInfo.pieceType);
             this.setStatusBarForPlayState();
         }
     }
