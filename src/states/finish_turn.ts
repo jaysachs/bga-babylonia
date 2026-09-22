@@ -1,4 +1,4 @@
-import { PieceType } from "../bdata";
+import { HandPiece, PieceType } from "../bdata";
 import { BabyloniaState } from "./base";
 
 export class FinishTurnState extends BabyloniaState {
@@ -13,7 +13,7 @@ export class FinishTurnState extends BabyloniaState {
         this.playerPanelManager.updatePoolCount(args);
     }
 
-    async notif_handRefilled(args: { hand: PieceType[] }) {
+    async notif_handRefilled(args: { hand: HandPiece[] }) {
         await this.handManager.refill(args.hand);
     }
 }

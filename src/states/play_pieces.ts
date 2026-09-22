@@ -51,6 +51,7 @@ export class PlayPiecesState extends BabyloniaState {
             player_id: number;
             points: number;
             piece: PieceType;
+            original_piece?: PieceType;
             handpos?: number;
             rc: number;
             hand_size: number;
@@ -63,8 +64,8 @@ export class PlayPiecesState extends BabyloniaState {
     ) {
         let anims: AnimationList = [];
         const hexDiv = this.boardManager.hexDiv(args.rc);
-        const handDiv = (args.handpos === undefined) ? undefined : this.handManager.handPosDiv(args.handpos);
-        let pieceDiv = handDiv?.firstElementChild as HTMLElement;
+        const logicalHandDiv = (args.handpos === undefined) ? undefined : this.handManager.handLogicalPosDiv(args.handpos);
+        let pieceDiv = logicalHandDiv?.firstElementChild as HTMLElement;
         // Either not active player, or another window of the active player (so piece still in hand)
         if (args.handpos === undefined || pieceDiv) {
             // Check for field capture
@@ -137,7 +138,9 @@ export class PlayPiecesState extends BabyloniaState {
         let pieceDiv = hexDiv.firstElementChild as HTMLElement;
         // Note that handpos is private data, only set for the active player
         //  so its existence is equivalent to "isCurrentPlayerActive()"
-        let destDiv = args.handpos !== undefined ? this.handManager.handPosDiv(args.handpos) : this.playerPanelManager.handcountElement(args.player_id);
+        let destDiv = args.handpos !== undefined 
+            ? this.handManager.handLogicalPosDiv(args.handpos) 
+            : this.playerPanelManager.handcountElement(args.player_id);
 
         if (args.original_piece) {
             // restore piece value, e.g. if it was originally hidden
@@ -278,7 +281,7 @@ export class PlayPiecesState extends BabyloniaState {
         this.removeBoardHandler();
 
         await this.animationManager.playParallel(anims);
-        this.bga.actions.performAction('actPlayPiece', { handpos: Html.indexInParent(handDiv), rc: hex })
+        this.bga.actions.performAction('actPlayPiece', { handpos: this.handManager.getLogicalPos(handDiv), rc: hex })
     }
 
     private onHandClicked(ev: Event): boolean {

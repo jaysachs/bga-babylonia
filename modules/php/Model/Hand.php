@@ -27,18 +27,39 @@ declare(strict_types=1);
 
 namespace Bga\Games\babylonia\Model;
 
+class HandPiece {
+    public function __construct(public readonly PieceType $pieceType, public int $position, public bool $played) {}
+
+    public function isEmpty(): bool { 
+        return $this->played || $this->pieceType->isEmpty(); 
+    }
+
+    public function __toString(): string {
+        return "{piece:{$this->pieceType->value},pos:{$this->position},played:{$this->played}}";
+    }
+}
+
 class Hand
 {
     public const DEFAULT_SIZE = 5;
 
-    /** @param PieceType[] $pieces */
+    /** @param HandPiece[] $pieces */
     public function __construct(private array $pieces) {}
+
+    /** @param PieceType[] $pts */
+    public static function fromPieceTypes(array $pts): Hand {
+        $hp = [];
+        foreach ($pts as $i => $pt) {
+            $hp[] = new HandPiece($pt, $i, false);
+        }
+        return new Hand($hp);
+    }
 
     public static function new(int $size = Hand::DEFAULT_SIZE): Hand
     {
         $pieces = [];
         for ($i = 0; $i < $size; $i++) {
-            $pieces[] = PieceType::EMPTY;
+            $pieces[] = new HandPiece(PieceType::EMPTY, $i, false);
         }
         return new Hand($pieces);
     }
@@ -52,12 +73,12 @@ class Hand
         $result = [];
         for ($i = count($this->pieces); $i < $newsize; $i++) {
             $result[] = $i;
-            $this->pieces[] = PieceType::EMPTY;
+            $this->pieces[] = new HandPiece(PieceType::EMPTY, $i, false);
         }
         return $result;
     }
 
-    /** @return PieceType[] */
+    /** @return HandPiece[] */
     public function pieces(): array
     {
         return $this->pieces;
@@ -81,16 +102,16 @@ class Hand
 
     public function contains(PieceType $piece): bool
     {
-        return in_array($piece, $this->pieces);
+        return array_find($this->pieces, fn($hp) => $hp->pieceType == $piece) !== null;
     }
 
-    public function play(int $pos): PieceType
+    public function play(int $pos): HandPiece
     {
         $p = $this->pieces[$pos];
         if ($p->isEmpty()) {
             throw new \InvalidArgumentException("Can't play hand piece at empty position $pos");
         }
-        $this->pieces[$pos] = PieceType::EMPTY;
+        $p->played = true;
         return $p;
     }
 
@@ -106,7 +127,7 @@ class Hand
         if (!$this->pieces[$pos]->isEmpty()) {
             throw new \InvalidArgumentException("Can't replace non-empty hand piece");
         }
-        $this->pieces[$pos] = $piece;
+        $this->pieces[$pos] = new HandPiece($piece, $pos, false);
     }
 
     /** Returns position */
@@ -117,10 +138,21 @@ class Hand
         }
         for ($i = 0; $i < count($this->pieces); $i++) {
             if ($this->pieces[$i]->isEmpty()) {
-                $this->pieces[$i] = $piece;
+                $this->pieces[$i] = new HandPiece($piece, $i, false);
                 return $i;
             }
         }
         throw new \LogicException("Can't replenish a full hand");
+    }
+
+    /** @return array<array<string,mixed>> */
+    public function serialize(): array {
+        return array_map(
+            fn ($p) => [
+                "piece_type" => $p->pieceType->value,
+                "position" => $p->position,
+                "played" => $p->played
+            ],
+            $this->pieces());
     }
 }

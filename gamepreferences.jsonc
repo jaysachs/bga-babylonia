@@ -15,6 +15,18 @@
     },
     "default": 0
   },
+  "130": {
+    "name": "Keep hand pieces sorted (may be bugs!)",
+    "needReload": true,
+    "values": {
+        "0": {
+            "name": "No"
+        },
+        "1": {
+            "name": "Yes"
+        }
+    }
+  },
   "150": {
     "name": "Drop shadows on pieces",
     "needReload": true,

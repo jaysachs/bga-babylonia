@@ -6,6 +6,7 @@ use PHPUnit\Framework\TestCase;
 
 use Bga\Games\babylonia\Model\{
     Hand,
+    HandPiece,
     PieceType,
 };
 
@@ -35,7 +36,7 @@ final class HandTest extends TestCase
         shuffle($xk);
         for ($i = 0; $i < count($x); $i++) {
             $k = $xk[$i];
-            $this->assertEquals($x[$k], $hand->play($k));
+            $this->assertEquals(new HandPiece($x[$k], $k, true), $hand->play($k));
             $this->assertEquals(count($x) - $i - 1, $hand->size());
         }
         $this->assertEquals(true, $hand->isEmpty());

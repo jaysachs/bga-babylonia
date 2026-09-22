@@ -99,13 +99,17 @@ class PlayPieces extends AbstractState
                 : clienttranslate('${player_name} plays ${piece} to ${hex}'))
             : clienttranslate('${player_name} plays ${piece} to ${hex} capturing ${captured_piece} scoring ${points}');
 
-        $privateArgs =  [ $active_player_id => [ "handpos" => $handpos ] ];
         $this->notify->all(
             "piecePlayed",
             $msg,
             $this->addStateArgs(
                 [
-                    "_private"=> $privateArgs,
+                    "_private"=> [
+                        $active_player_id => [ 
+                            "handpos" => $move->handpos,
+                            "original_piece" => $move->original_piece->value
+                        ]
+                    ],
                     "player_id" => $active_player_id,
                     "piece" => $piece,
                     "rc" => $rc,

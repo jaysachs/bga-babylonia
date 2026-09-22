@@ -9,7 +9,8 @@ use Bga\Games\babylonia\Model\ {
         Board,
         Components,
         Hand,
-        Hex,
+    HandPiece,
+    Hex,
         Model,
         Move,
         PersistentStore,
@@ -56,7 +57,7 @@ class TestStore extends PersistentStore {
      * @param list<PieceType> $poolPieces
      */
     public function setHandAndPool(int $player_id, array $handPieces, array $poolPieces): void {
-        $this->player_infos[$player_id] = new PlayerInfo($player_id, 0, new Hand($handPieces), new Pool($poolPieces), 0);
+        $this->player_infos[$player_id] = new PlayerInfo($player_id, 0, Hand::fromPieceTypes($handPieces), new Pool($poolPieces), 0);
     }
 
     public function __construct() {

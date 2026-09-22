@@ -29,9 +29,15 @@ export interface Zcard {
 
 export type PotentialCityScoring = Record<string, Record<string, number>>;
 
+export interface HandPiece {
+    piece_type: PieceType;
+    position: number;
+    played: boolean;
+}
+
 export interface BGamedatas extends Gamedatas<BblPlayer> {
     board: Hex[];
-    hand?: PieceType[];
+    hand?: HandPiece[];
     ziggurat_cards: Zcard[];
     translated_pieces: Record<PieceType, string>;
     potential_city_scoring: PotentialCityScoring;

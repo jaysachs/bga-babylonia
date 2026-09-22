@@ -65,12 +65,7 @@ class FinishTurn extends AbstractState
             '',
             [
                 "player_id" => $active_player_id,
-                'hand' => array_map(
-                    function ($p) {
-                        return $p->value;
-                    },
-                    $hand->pieces()
-                ),
+                'hand' => $hand->serialize()
             ]
         );
 

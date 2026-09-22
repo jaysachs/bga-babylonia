@@ -107,7 +107,7 @@ class PersistentStore
                 $sql_values[] = "('POOL', $i, '$x', $pinfo->player_id, NULL, NULL)";
             }
             foreach ($pinfo->hand->pieces() as $i => $p) {
-                $x = $p->value;
+                $x = $p->pieceType->value;
                 $sql_values[] = "('HAND', $i, '$x', $pinfo->player_id, NULL, NULL)";
             }
         }
@@ -185,7 +185,7 @@ class PersistentStore
 
         $pinfos = [];
         foreach ($player_ids as $pid => $_) {
-            $pinfos[$pid] = new PlayerInfo($pid, $captured[$pid], new Hand($hands[$pid]), new Pool($pools[$pid]), $this->playerScore->get($pid));
+            $pinfos[$pid] = new PlayerInfo($pid, $captured[$pid], Hand::fromPieceTypes($hands[$pid]), new Pool($pools[$pid]), $this->playerScore->get($pid));
         }
         $board = Board::fromHexes($hexes);
         return [

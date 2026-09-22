@@ -310,16 +310,16 @@ class Model
     private function doPlayPiece(int $player_id, int $handpos, int $rc): ElaboratedMove {
         $piece = $this->allPlayerInfo()[$player_id]->hand->play($handpos);
         $hex = $this->board()->hexAt($rc);
-        $result = $this->checkPlay($player_id, $piece, $hex);
+        $result = $this->checkPlay($player_id, $piece->pieceType, $hex);
         if (!$result->isAllowed()) {
-            throw new \InvalidArgumentException("Illegal to play $piece->value to $rc by player $this->player_id: $result->reason");
+            throw new \InvalidArgumentException("Illegal to play {$piece} to $rc by player $this->player_id: $result->reason");
         }
 
         $originalPiece = $piece;
         if ($hex->isWater()) {
-            $piece = PieceType::HIDDEN;
+            $piece = new HandPiece(PieceType::HIDDEN, $piece->position, true);
         }
-        $hexPiece = $hex->playPiece($piece, $player_id);
+        $hexPiece = $hex->playPiece($piece->pieceType, $player_id);
 
         $field_points = 0;
         $ziggurats = [];
@@ -346,8 +346,8 @@ class Model
         }
         return new ElaboratedMove(
             $this->player_id,
-            $piece,
-            $originalPiece,
+            $piece->pieceType,
+            $originalPiece->pieceType,
             $handpos,
             $rc,
             $hexPiece,

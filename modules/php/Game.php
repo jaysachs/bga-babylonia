@@ -176,18 +176,10 @@ class Game extends Table
         }
 
         $pis = $model->allPlayerInfo();
-        $hand = null;
         $cpid = intval($this->getCurrentPlayerId());
-        if (isset($pis[$cpid])) {
-            $hand = array_map(
-                function ($p) {
-                    return $p->value;
-                },
-                $pis[$cpid]->hand->pieces());
-        }
         return [
             "players" => $players,
-            'hand' => $hand,
+            'hand' => isset($pis[$cpid]) ? $pis[$cpid]->hand->serialize() : null,
             'board' => $board_data,
             'translated_pieces' => $translated,
             'potentialCityScoring' => $model->potentialCityScoring(),
