@@ -1,4 +1,4 @@
-import { BblPlayer, BGamedatas, HandPiece, PieceType } from "./bdata";
+import { BblPlayer, BGamedatas, HandPiece } from "./bdata";
 import { AnimationManager } from "./bga-animations";
 import { Html } from "./html";
 import { IDS } from "./ids";
@@ -31,7 +31,7 @@ export class HandManager {
                 ? this.orderedHand(bga.gameui.gamedatas.hand!)
                 : bga.gameui.gamedatas.hand!;
             hand.forEach((hp, i) => {
-                const hpd = this.handPosDiv(i);
+                const hpd = this.spaceForPhysicalPos(i);
                 this.setLogicalPos(hpd, hp.position);
                 if (!hp.played && Piece.isNonEmpty(hp.piece_type)) {
                     hpd.appendChild(Piece.createDiv(hp.piece_type, this.player));
@@ -46,17 +46,20 @@ export class HandManager {
         }
     }
 
+    static readonly LOGICAL_POS_ATTR = 'bbl_logicalpos';
+
     private setLogicalPos(div: Element, lpos: number): void {
-        div.setAttribute('bbl_hpos', String(lpos));
+        div.setAttribute(HandManager.LOGICAL_POS_ATTR, String(lpos));
+        // for debugging
         // div.setAttribute('title', String(lpos));
     }
 
     public getLogicalPos(div: Element): number {
-        let p = div.getAttribute('bbl_hpos');
+        let p = div.getAttribute(HandManager.LOGICAL_POS_ATTR);
         return p ? Number(p) : -1;
     }
 
-    public handLogicalPosDiv(li: number): HTMLElement {
+    public spaceForLogicalPos(li: number): HTMLElement {
         let hpd = $(IDS.HAND).firstElementChild;
         while (hpd && this.getLogicalPos(hpd) != li) {
             hpd = hpd.nextElementSibling;
@@ -64,10 +67,10 @@ export class HandManager {
         return hpd as HTMLElement;
     }
 
-    private handPosDiv(i: number): HTMLElement {
+    private spaceForPhysicalPos(i: number): HTMLElement {
         const hand = $(IDS.HAND);
         while (i >= hand.childElementCount) {
-            hand.appendChild(Html.div({}));
+            hand.appendChild(Html.div({ attrs: { bbl_logicalpos: String(i) }}));
         }
         return $(IDS.HAND).childNodes.item(i)! as HTMLElement;
     }
@@ -96,7 +99,7 @@ export class HandManager {
         hand = this.orderedHand(hand);
         console.log("Sorted hand", hand);
         // first add spaces for expanded hand
-        const handSpaceDivs = hand.map((hp, i) => this.handPosDiv(i));
+        const handSpaceDivs = hand.map((hp, i) => this.spaceForPhysicalPos(i));
 
         // hand has the desired ordering.
         // 
@@ -111,7 +114,7 @@ export class HandManager {
                 // either wrong logical pos, or no piece there.
                 if (lp != newPos || !hsd.firstElementChild) {
                     // Ok we need to move this one from somewhere.
-                    let srcSpace = this.handLogicalPosDiv(newPos);
+                    let srcSpace = this.spaceForLogicalPos(newPos);
                     if (srcSpace.firstElementChild) {
                         console.log("will move from ", i, srcSpace)
                         anims.push(() => {
@@ -148,14 +151,14 @@ export class HandManager {
     private refillStandard(hand: HandPiece[]): Promise<any> {
         const anims: AnimationList = [];
         hand.forEach((hp, i) => {
-            const handPosDiv = this.handPosDiv(i);
-            let pieceDiv = handPosDiv.firstElementChild as HTMLElement;
+            const handSpaceDiv = this.spaceForPhysicalPos(i);
+            let pieceDiv = handSpaceDiv.firstElementChild as HTMLElement;
             if (!pieceDiv) {
                 if (!hp.played && Piece.isNonEmpty(hp.piece_type)) {
                     anims.push(() => {
                         pieceDiv = Piece.createDiv(hp.piece_type, this.player);
                         this.playerPanelManger.poolcountElement(this.bga.players.getCurrentPlayerId()).appendChild(pieceDiv);
-                        return this.animationManager.slideAndAttach(pieceDiv, handPosDiv, { fromPlaceholder: 'off', toPlaceholder: 'off' })
+                        return this.animationManager.slideAndAttach(pieceDiv, handSpaceDiv, { fromPlaceholder: 'off', toPlaceholder: 'off' })
                     });
                 }
             } else {

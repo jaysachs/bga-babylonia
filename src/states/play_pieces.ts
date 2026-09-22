@@ -64,7 +64,7 @@ export class PlayPiecesState extends BabyloniaState {
     ) {
         let anims: AnimationList = [];
         const hexDiv = this.boardManager.hexDiv(args.rc);
-        const logicalHandDiv = (args.handpos === undefined) ? undefined : this.handManager.handLogicalPosDiv(args.handpos);
+        const logicalHandDiv = (args.handpos === undefined) ? undefined : this.handManager.spaceForLogicalPos(args.handpos);
         let pieceDiv = logicalHandDiv?.firstElementChild as HTMLElement;
         // Either not active player, or another window of the active player (so piece still in hand)
         if (args.handpos === undefined || pieceDiv) {
@@ -139,7 +139,7 @@ export class PlayPiecesState extends BabyloniaState {
         // Note that handpos is private data, only set for the active player
         //  so its existence is equivalent to "isCurrentPlayerActive()"
         let destDiv = args.handpos !== undefined 
-            ? this.handManager.handLogicalPosDiv(args.handpos) 
+            ? this.handManager.spaceForLogicalPos(args.handpos) 
             : this.playerPanelManager.handcountElement(args.player_id);
 
         if (args.original_piece) {
