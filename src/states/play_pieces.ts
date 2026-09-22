@@ -178,8 +178,8 @@ export class PlayPiecesState extends BabyloniaState {
         this.boardManager.unmarkHexesPlayable(this.allowedMovesFor(pieceType));
     }
 
-    private unselectAllHandPieces(): void {
-        this.handManager.unselectAllPieces();
+    private async unselectAllHandPieces() {
+        await this.handManager.unselectAllPieces();
     }
 
     private setPlayablePieces(): void {
@@ -187,12 +187,13 @@ export class PlayPiecesState extends BabyloniaState {
     }
 
     private boardSelectionHandler = async (hex: number, hexDiv: HTMLElement, capturedPieceDiv: HTMLElement | null | undefined, terrain: string) => {
-        const selectedPiece = this.handManager.getSelectedPiece();
+        const selectedPiece = this.handManager.getSelectedPiece(true);
         if (!selectedPiece) {
             console.error('no piece selected!');
             return;
         }
         this.handManager.disableUserInteraction();
+        await this.handManager.unselectAllPieces();
         let anims: AnimationList = [];
 
         // Check for field capture
@@ -214,7 +215,6 @@ export class PlayPiecesState extends BabyloniaState {
 
         await this.animationManager.playParallel(anims);
         await this.bga.actions.performAction('actPlayPiece', { handpos: selectedPiece.logicalPos, rc: hex })
-        this.handManager.unselectAllPieces();
     };
 
 

@@ -211,7 +211,22 @@ export class HandManager {
         });
     }
 
-    public getSelectedPiece(): PieceInfo | null {
+    private async setSpaceSelected(spaceDiv: Element, selected: boolean) {
+        const cl = spaceDiv.classList;
+        if (selected == cl.contains(Css.SELECTED)) {
+            return;
+        }
+        const pieceDiv = spaceDiv.firstElementChild as HTMLElement;
+        const pi: PieceInfo = {
+            pieceDiv: pieceDiv,
+            pieceType: Piece.get(pieceDiv)!,
+            logicalPos: this.getLogicalPos(spaceDiv)
+        };
+        cl.toggle(Css.SELECTED);
+        await Promise.all(this.selectionHandlers.map(async h => h(pi, selected)));
+    }
+
+    public getSelectedPiece(deselect: boolean = false): PieceInfo | null {
         const spaceDiv = document.querySelector(`#${IDS.HAND} > .${Css.SELECTED}`);
         if (!spaceDiv) { 
             return null; 
@@ -226,6 +241,7 @@ export class HandManager {
             console.error("no piece in selected space", spaceDiv, pieceDiv);
             return null;
         }
+        if (deselect) { this.setSpaceSelected(spaceDiv, false); }
         return {
             pieceType: pieceType,
             logicalPos: this.getLogicalPos(spaceDiv),
@@ -234,16 +250,13 @@ export class HandManager {
     }
 
     /** returns the already selected   */
-    public unselectAllPieces(): void {
-        Array.from($(IDS.HAND).children).forEach(spaceDiv => {
-            const cl = spaceDiv.classList;
-            if (cl.contains(Css.SELECTED)) {
-                this.selectionHandlers.forEach(h => h({ pieceType: Piece.get(spaceDiv.firstChild as HTMLElement)!, pieceDiv: spaceDiv.firstElementChild as HTMLElement, logicalPos: 0 }, false))
-            }
-            cl.remove(Css.SELECTED);
-            cl.remove(Css.PLAYABLE);
-            cl.remove(Css.UNPLAYABLE);
-        });
+    public async unselectAllPieces() {
+        for(let spaceDiv of Array.from($(IDS.HAND).children)) {
+            await this.setSpaceSelected(spaceDiv, false);
+            console.log('continuing');
+            spaceDiv.classList.remove(Css.PLAYABLE);
+            spaceDiv.classList.remove(Css.UNPLAYABLE);
+        };
     }
 
     private userInteractionEnabled = false;
@@ -272,21 +285,14 @@ export class HandManager {
 
         const currentSelected = this.getSelectedPiece();
         if (currentSelected) {
-            currentSelected.pieceDiv.parentElement!.classList.toggle(Css.SELECTED);
-            this.selectionHandlers.forEach(h => h(currentSelected, false));
+            await this.setSpaceSelected(currentSelected.pieceDiv.parentElement!, false);
             if (currentSelected.pieceDiv == pieceDiv) {
                 return false;
             }
         }
 
-        const selected = cl.toggle(Css.SELECTED);
-        const pi: PieceInfo = {
-            pieceDiv: pieceDiv,
-            pieceType: Piece.get(pieceDiv)!,
-            logicalPos: this.getLogicalPos(spaceDiv)
-        };
         this.disableUserInteraction();
-        await Promise.all(this.selectionHandlers.map(async h => await h(pi, selected)))
+        await this.setSpaceSelected(spaceDiv, true)
             .then(() => this.enableUserInteraction());
         return false;
     }
