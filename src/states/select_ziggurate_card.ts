@@ -1,5 +1,4 @@
 import { Css } from "../css";
-import { IDS } from "../ids";
 import { BabyloniaState } from "./base";
 
 type StateArgs = {
@@ -8,63 +7,47 @@ type StateArgs = {
 }
 
 export class SelectZigguratCardState extends BabyloniaState {
-    private controller = new AbortController();
 
     override onEnteringState(args: StateArgs, isCurrentPlayerActive: boolean) {
         this.boardManager.markHexSelected(args.hex);
         if (isCurrentPlayerActive) {
-            const div = $(IDS.AVAILABLE_ZCARDS) as HTMLElement;
-            div.classList.add(Css.SELECTING);
-            this.attachHandler();
+            this.zcardManager.startSelecting();
+            this.zcardManager.addHandler(this.handler);
         }
     }
 
     override onLeavingState(args: StateArgs, isCurrentPlayerActive: boolean) {
         this.boardManager.unmarkHexSelected(args.hex);
-        if (isCurrentPlayerActive) {
-            const div = $(IDS.AVAILABLE_ZCARDS) as HTMLElement;
-            div.classList.remove(Css.SELECTING);
-            this.controller.abort();
+        this.zcardManager.removeHandler(this.handler);
+        this.zcardManager.stopSelecting();
+    }
+
+    private xhandler = async (zcardType?: string) => { 
+        if (!zcardType) {
+            this.zcardManager.unselectAll();
+            this.bga.states.restoreServerGameState();
+            return;
         }
-    }
-
-    private attachHandler() {
-        this.controller.abort();
-        this.controller = new AbortController();
-        $(IDS.AVAILABLE_ZCARDS).addEventListener('click', e => this.onZcardClicked(e), { signal: this.controller.signal });
-    }
-
-    private confirmSelection(e: Element) {
-        e.classList.toggle(Css.SELECTED);
-        this.controller.abort();
-        const zt = this.zcardManager.get(e)!;
         this.bga.statusBar.removeActionButtons();
         // TODO: add tooltip
-        this.bga.statusBar.setTitle(_('Select ziggurat card ${zcard}?'), { zcard: zt });
+        this.bga.statusBar.setTitle(_('Select ziggurat card ${zcard}?'), { zcard: zcardType });
 
         this.bga.statusBar.addActionButton(_('Confirm'),
-            () => this.bga.actions.performAction('actSelectZigguratCard', { zctype: zt }),
+            () => this.bga.actions.performAction('actSelectZigguratCard', { zctype: zcardType }),
             { autoclick: this.autoConfirmEnabled() }
         );
 
         this.bga.statusBar.addActionButton(
             _('Cancel'),
             () => {
-                e.classList.toggle(Css.SELECTED);
+                // e.classList.toggle(Css.SELECTED);
+                this.zcardManager.unselectAll();
                 this.bga.states.restoreServerGameState();
             },
             { color: "secondary" });
-    }
+    };
 
-    private onZcardClicked(event: Event) {
-        event.preventDefault();
-        event.stopPropagation();
-        let e = event.target as HTMLElement;
-        let z = this.zcardManager.get(e);
-        if (!z) { return false; }
-        this.confirmSelection(e);
-        return false;
-    }
+    private handler = this.xhandler.bind(this);
 
     async notif_zigguratCardSelection(
         args: {
