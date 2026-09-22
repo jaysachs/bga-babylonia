@@ -21,7 +21,6 @@ export class HandManager {
 
     public addSelectionHandler(handler: SelectionHandler): void {
         if (this.selectionHandlers.indexOf(handler) < 0) {
-            console.log("adding selection handler", handler);
             this.selectionHandlers.push(handler);
         }
     }
@@ -247,11 +246,21 @@ export class HandManager {
         });
     }
 
-    private onHandClicked(ev: Event): boolean {
+    private userInteractionEnabled = false;
+    public enableUserInteraction() {
+        this.userInteractionEnabled = true;
+    }
+
+    public disableUserInteraction() {
+        this.userInteractionEnabled = false;
+    }
+
+    private async onHandClicked(ev: Event): Promise<boolean> {
         ev.preventDefault();
         ev.stopPropagation();
+        if (!this.userInteractionEnabled) { return false; }
         if (!this.bga.players.isCurrentPlayerActive()) { return false; }
-        if (this.selectionHandlers.length == 0) { return false; }
+
         const pieceDiv = ev.target as HTMLElement;
         const spaceDiv = pieceDiv.parentElement!;
 
@@ -276,7 +285,9 @@ export class HandManager {
             pieceType: Piece.get(pieceDiv)!,
             logicalPos: this.getLogicalPos(spaceDiv)
         };
-        this.selectionHandlers.forEach(h => h(pi, selected));
+        this.disableUserInteraction();
+        await Promise.all(this.selectionHandlers.map(async h => await h(pi, selected)))
+            .then(() => this.enableUserInteraction());
         return false;
     }
 }

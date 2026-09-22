@@ -28,6 +28,7 @@ export class PlayPiecesState extends BabyloniaState {
     override onEnteringState(args: { playState: PlayStateArgs; must_end_game: number[]; may_end_game: number[]; }, isCurrentPlayerActive: boolean) {
         console.log(args);
         if (isCurrentPlayerActive) {
+            this.handManager.addSelectionHandler(this.handSelectionHandler);
             if (args.must_end_game.length > 0) {
                 this.bga.gameArea.addLastTurnBanner(_("This is your last turn"));
             } else if (args.may_end_game.length > 0) {
@@ -35,6 +36,10 @@ export class PlayPiecesState extends BabyloniaState {
             }
         }
         this.doEnterState(args.playState);
+    }
+
+    override onLeavingState(args: any, isCurrentPlayerActive: boolean): void {
+        this.handManager.removeSelectionHandler(this.handSelectionHandler);
     }
 
     async notif_piecePlayed(
@@ -150,14 +155,6 @@ export class PlayPiecesState extends BabyloniaState {
         this.doEnterState(args.playState);
     }
 
-    private attachHandHandler() {
-        this.handManager.addSelectionHandler(this.handSelectionHandler);
-    }
-
-    private removeHandHandler() {
-        this.handManager.removeSelectionHandler(this.handSelectionHandler);
-    }
-
     private attachBoardHandler() {
         this.boardManager.addHandler(this.boardSelectionHandler);
     }
@@ -195,6 +192,7 @@ export class PlayPiecesState extends BabyloniaState {
             console.error('no piece selected!');
             return;
         }
+        this.handManager.disableUserInteraction();
         let anims: AnimationList = [];
 
         // Check for field capture
@@ -214,7 +212,6 @@ export class PlayPiecesState extends BabyloniaState {
                 })
         );
 
-        this.handManager.unselectAllPieces();
         await this.animationManager.playParallel(anims);
         await this.bga.actions.performAction('actPlayPiece', { handpos: selectedPiece.logicalPos, rc: hex })
         this.handManager.unselectAllPieces();
@@ -222,7 +219,6 @@ export class PlayPiecesState extends BabyloniaState {
 
 
     private handSelectionHandler = (pieceInfo: PieceInfo, selected: boolean) => {
-        console.log("pieceSelected:", pieceInfo, selected);
         if (this.allowedMovesFor(pieceInfo.pieceType).length == 0) {
             console.log("no allowed moves");
             return;
@@ -261,27 +257,26 @@ export class PlayPiecesState extends BabyloniaState {
                 this.setPlayablePieces();
             } else {
                 this.bga.statusBar.setTitle(_('${you} may select a piece to play or end your turn'))
-                this.attachHandHandler();
+                this.handManager.enableUserInteraction();
                 this.setPlayablePieces();
             }
             this.bga.statusBar.addActionButton(
                 _('End turn'),
                 () => {
-                    this.removeHandHandler();
-                    this.unselectAllHandPieces();
+                    this.handManager.disableUserInteraction();
                     this.bga.actions.performAction('actDonePlayPieces').then(() => this.unselectAllHandPieces());
                 }, {
                 autoclick: mustEnd && this.autoConfirmEnabled(),
             });
         } else {
             this.bga.statusBar.setTitle(_('${you} must select a piece to play'));
-            this.attachHandHandler();
+            this.handManager.enableUserInteraction();
             this.setPlayablePieces();
         }
         if (this.playStateArgs.canUndo) {
             this.bga.statusBar.addActionButton(
                 _('Undo'),
-                () => this.bga.actions.performAction('actUndoPlay').then(() => this.unselectAllHandPieces()),
+                () => this.bga.actions.performAction('actUndoPlay').then(() => this.unselectAllHandPieces() ),
                 { color: "alert" }
             );
         }
