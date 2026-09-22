@@ -15,7 +15,7 @@ export abstract class BaseGame<P extends Player, T extends Gamedatas<P>> {
         this.bga = bga;
         this.animationManager = new BgaAnimations.Manager({
             animationsActive: () => this.bgaAnimationsActive(),
-            duration: 750, // default is 500
+            // duration: 750, // default is 500
         });
         this.moreAnimations = new MoreAnimations(this.animationManager);
     }

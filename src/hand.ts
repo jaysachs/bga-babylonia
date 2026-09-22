@@ -39,7 +39,7 @@ export class HandManager {
                 return p2.piece_type == 'empty' ? 0 : 1;
             } 
             else if (p2.piece_type == 'empty') {
-                return 1;
+                return -1;
             }
             let i = this.collator.compare(p1.piece_type, p2.piece_type);
             return i == 0 ? p1.position - p2.position : i;
