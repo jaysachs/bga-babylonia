@@ -32,7 +32,7 @@
     "needReload": true,
     "values": {
       "0": {
-        "name": "No",
+        "name": "No"
       },
       "1": {
         "name": "Yes",
@@ -40,5 +40,5 @@
       }
     },
     "default": 1
-  },
+  }
 }
