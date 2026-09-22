@@ -5,6 +5,8 @@ import { IDS } from "./ids";
 import { Piece } from "./piece";
 import { TooltipManager } from "./tooltips";
 
+export type HexSelectionHandler = (hex: number, hexDiv: HTMLElement, capturedPieceDiv: HTMLElement | undefined | null, terrain: string) => void;
+
 export class BoardManager {
 
     public constructor(private bga: Bga<BblPlayer, BGamedatas>, private readonly tooltipManager: TooltipManager) {
@@ -33,6 +35,7 @@ export class BoardManager {
                 // mark "out of play"
             }
         }
+        boardDiv.addEventListener('click', async e => this.onBoardClicked(e));
     }
 
     static readonly hstart = 56.0; // this the (negative) offset on left of board
@@ -56,6 +59,50 @@ export class BoardManager {
         const id = hexDiv.id.split('_');
         return Number(id[2]);
     }
+
+    private hexForRc(rc: number): Hex | undefined {
+        for (let hex of this.bga.gameui.gamedatas.board) {
+            if (hex.rc == rc) {
+                return hex;
+            }
+        };
+        return undefined;
+    }
+
+    public addHandler(handler: HexSelectionHandler): void {
+        if (!this.boardHandlers.find(h => h == handler)) {
+            this.boardHandlers.push(handler);
+        }
+    }
+
+    public removeHandler(handler: HexSelectionHandler): void {
+        const i = this.boardHandlers.indexOf(handler);
+        if (i) {
+            this.boardHandlers.splice(i, 1);
+        }
+    }
+    private boardHandlers: HexSelectionHandler[] = [];
+
+    private async onBoardClicked(event: Event): Promise<boolean> {
+        event.preventDefault();
+        event.stopPropagation();
+
+        if (!this.bga.players.isCurrentPlayerActive()) {
+            return false;
+        }
+    
+        const hex = this.selectedHexIfPlayable(event.target!);
+        if (hex == null) {
+            return false;
+        }
+    
+        const hexDiv = this.hexDiv(hex);
+        const res : Promise<any>[] = this.boardHandlers.map(
+            async h => h(hex, hexDiv, hexDiv.firstElementChild as HTMLElement, this.hexForRc(hex)!.terrain));
+        await Promise.all(res);
+        return false;
+    }
+    
 
     private hexDivId(rc: number): string {
         return `bbl_hex_${rc}`;

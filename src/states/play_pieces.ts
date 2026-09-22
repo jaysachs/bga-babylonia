@@ -16,15 +16,6 @@ interface PlayStateArgs {
 export class PlayPiecesState extends BabyloniaState {
     private playStateArgs: PlayStateArgs = { canEndTurn: false, allowedMoves: {}, canUndo: false, potentialCityScoring: {} };
 
-    private hexForRc(rc: number): Hex | undefined {
-        for (let hex of this.bga.gameui.gamedatas.board) {
-            if (hex.rc == rc) {
-                return hex;
-            }
-        };
-        return undefined;
-    }
-
     private doEnterState(playStateArgs: PlayStateArgs) {
         this.playStateArgs = playStateArgs;
         this.bga.gameui.gamedatas.potential_city_scoring = playStateArgs.potentialCityScoring;
@@ -167,15 +158,12 @@ export class PlayPiecesState extends BabyloniaState {
         this.handManager.removeSelectionHandler(this.handSelectionHandler);
     }
 
-    private boardController: AbortController = new AbortController();
     private attachBoardHandler() {
-        this.boardController.abort();
-        this.boardController = new AbortController();
-        $(IDS.BOARD).addEventListener('click', e => this.onBoardClicked(e), { signal: this.boardController.signal });
+        this.boardManager.addHandler(this.boardSelectionHandler);
     }
 
     private removeBoardHandler() {
-        this.boardController.abort();
+        this.boardManager.removeHandler(this.boardSelectionHandler);
     }
 
     private allowedMovesFor(pieceType: PieceType | null): number[] {
@@ -201,51 +189,37 @@ export class PlayPiecesState extends BabyloniaState {
         this.handManager.setPlayablePieces(e => this.allowedMovesFor(e).length > 0);
     }
 
-    private async onBoardClicked(event: Event) {
-        event.preventDefault();
-        event.stopPropagation();
+    private boardSelectionHandler = async (hex: number, hexDiv: HTMLElement, capturedPieceDiv: HTMLElement | null | undefined, terrain: string) => {
         const selectedPiece = this.handManager.getSelectedPiece();
         if (!selectedPiece) {
             console.error('no piece selected!');
             return;
         }
-
-        const hex = this.boardManager.selectedHexIfPlayable(event.target!);
-        if (hex == null) {
-            return;
-        }
-
         let anims: AnimationList = [];
 
-        const hexDiv = this.boardManager.hexDiv(hex);
-
         // Check for field capture
-        if (hexDiv.firstElementChild) /* and is field */ {
-            let field = hexDiv.firstElementChild as HTMLElement;
-            // slide the captured field to the player board
-            anims.push(() => this.animationManager.slideOutAndDestroy(field, this.playerPanelManager.handcountElement(this.bga.players.getCurrentPlayerId()), {}));
+        if (capturedPieceDiv) /* and is field */ {
+            anims.push(() => this.animationManager.slideOutAndDestroy(capturedPieceDiv, this.playerPanelManager.handcountElement(this.bga.players.getCurrentPlayerId()), {}));
         }
 
-        const pieceDiv = selectedPiece.pieceDiv;
         anims.push(() =>
             // slide piece from hand to hex
-            this.animationManager.slideAndAttach(pieceDiv, hexDiv)
+            this.animationManager.slideAndAttach(selectedPiece.pieceDiv, hexDiv)
                 // FIXME: need to know this is happening? or just let it flip in the notif??
                 // play into river, piece is hidden
                 .then(() => {
-                    if (this.hexForRc(hex)?.terrain == 'RIVER') {
-                        Piece.set(pieceDiv, 'hidden', this.bga.players.getCurrentPlayer())
+                    if (terrain == 'RIVER') {
+                        Piece.set(selectedPiece.pieceDiv, 'hidden', this.bga.players.getCurrentPlayer())
                     }
                 })
         );
 
-        this.unselectAllHandPieces();
-        this.removeHandHandler();
-        this.removeBoardHandler();
-
+        this.handManager.unselectAllPieces();
         await this.animationManager.playParallel(anims);
-        this.bga.actions.performAction('actPlayPiece', { handpos: selectedPiece.logicalPos, rc: hex })
-    }
+        await this.bga.actions.performAction('actPlayPiece', { handpos: selectedPiece.logicalPos, rc: hex })
+        this.handManager.unselectAllPieces();
+    };
+
 
     private handSelectionHandler = (pieceInfo: PieceInfo, selected: boolean) => {
         console.log("pieceSelected:", pieceInfo, selected);
@@ -295,7 +269,7 @@ export class PlayPiecesState extends BabyloniaState {
                 () => {
                     this.removeHandHandler();
                     this.unselectAllHandPieces();
-                    this.bga.actions.performAction('actDonePlayPieces');
+                    this.bga.actions.performAction('actDonePlayPieces').then(() => this.unselectAllHandPieces());
                 }, {
                 autoclick: mustEnd && this.autoConfirmEnabled(),
             });
@@ -307,7 +281,7 @@ export class PlayPiecesState extends BabyloniaState {
         if (this.playStateArgs.canUndo) {
             this.bga.statusBar.addActionButton(
                 _('Undo'),
-                () => this.bga.actions.performAction('actUndoPlay'),
+                () => this.bga.actions.performAction('actUndoPlay').then(() => this.unselectAllHandPieces()),
                 { color: "alert" }
             );
         }

@@ -20,21 +20,17 @@ export class HandManager {
     private selectionHandlers: SelectionHandler[] = [];
 
     public addSelectionHandler(handler: SelectionHandler): void {
-        if (!this.selectionHandlers.find(h => h == handler)) {
+        if (this.selectionHandlers.indexOf(handler) < 0) {
             console.log("adding selection handler", handler);
             this.selectionHandlers.push(handler);
         }
     }
 
-    public removeSelectionHandler(handler: SelectionHandler): boolean {
-        const i = this.selectionHandlers.findIndex(h => h == handler);
+    public removeSelectionHandler(handler: SelectionHandler): void {
+        const i = this.selectionHandlers.indexOf(handler);
         if (i >= 0) {
             this.selectionHandlers.splice(i, 1);
-            console.log("removed selection handler", handler);
-            return true;
         }
-        console.log("unable to remove handler", handler);
-        return false;
     }
 
     private orderedHand(hand: HandPiece[]): HandPiece[] {
@@ -269,6 +265,9 @@ export class HandManager {
         if (currentSelected) {
             currentSelected.pieceDiv.parentElement!.classList.toggle(Css.SELECTED);
             this.selectionHandlers.forEach(h => h(currentSelected, false));
+            if (currentSelected.pieceDiv == pieceDiv) {
+                return false;
+            }
         }
 
         const selected = cl.toggle(Css.SELECTED);
