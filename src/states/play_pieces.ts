@@ -1,7 +1,6 @@
 import { Hex, PieceType } from "../bdata";
 import { AnimationList } from "../more-animations";
 import { BabyloniaState } from "./base";
-import { Html } from "../html";
 import { Piece } from "../piece";
 import { IDS } from "../ids";
 import { Css } from "../css";
@@ -163,9 +162,7 @@ export class PlayPiecesState extends BabyloniaState {
     private attachHandHandler() {
         this.handController.abort();
         this.handController = new AbortController();
-        $(IDS.HAND).childNodes.forEach(e =>
-            e.firstChild?.addEventListener('click', p => this.onHandClicked(p), { signal: this.handController.signal })
-        );
+        this.handManager.attachListenerToOccupiedSpaces('click', p => this.onHandClicked(p), { signal: this.handController.signal })
     }
 
     private removeHandHandler() {
@@ -204,44 +201,18 @@ export class PlayPiecesState extends BabyloniaState {
     }
 
     private unselectAllHandPieces(): void {
-        const hand = $(IDS.HAND);
-        hand.childNodes.forEach(node => {
-            const posDiv = node as HTMLElement;
-            const cl = posDiv.classList;
-            if (cl.contains(Css.SELECTED)) {
-                this.unmarkHexesPlayableForPiece(posDiv.firstElementChild!);
-            }
-            cl.remove(Css.SELECTED);
-            cl.remove(Css.PLAYABLE);
-            cl.remove(Css.UNPLAYABLE);
-        });
+        this.handManager.unselectAllPieces(e => this.unmarkHexesPlayableForPiece(e));
     }
 
     private setPlayablePieces(): void {
-        const hand = $(IDS.HAND);
-
-        hand.childNodes.forEach((node) => {
-            const child = node as HTMLElement;
-            const cl = child.classList;
-            if (this.allowedMovesFor(child.firstElementChild).length > 0) {
-                cl.add(Css.PLAYABLE);
-                cl.remove(Css.UNPLAYABLE);
-            } else {
-                cl.remove(Css.PLAYABLE);
-                cl.add(Css.UNPLAYABLE);
-            }
-        });
-    }
-
-    private selectedHandDiv(): Element | null {
-        return document.querySelector(`#${IDS.HAND} > .${Css.SELECTED}`);
+        this.handManager.setPlayablePieces(e => this.allowedMovesFor(e).length > 0);
     }
 
     private async onBoardClicked(event: Event) {
         event.preventDefault();
         event.stopPropagation();
-        const handDiv = this.selectedHandDiv();
-        if (!handDiv) {
+        const selectedPiece = this.handManager.getSelectedPiece();
+        if (!selectedPiece) {
             console.error('no piece selected!');
             return;
         }
@@ -250,7 +221,6 @@ export class PlayPiecesState extends BabyloniaState {
         if (hex == null) {
             return;
         }
-
 
         let anims: AnimationList = [];
 
@@ -263,7 +233,7 @@ export class PlayPiecesState extends BabyloniaState {
             anims.push(() => this.animationManager.slideOutAndDestroy(field, this.playerPanelManager.handcountElement(this.bga.players.getCurrentPlayerId()), {}));
         }
 
-        const pieceDiv = handDiv.firstElementChild as HTMLElement;
+        const pieceDiv = selectedPiece.pieceDiv;
         anims.push(() =>
             // slide piece from hand to hex
             this.animationManager.slideAndAttach(pieceDiv, hexDiv)
@@ -281,7 +251,7 @@ export class PlayPiecesState extends BabyloniaState {
         this.removeBoardHandler();
 
         await this.animationManager.playParallel(anims);
-        this.bga.actions.performAction('actPlayPiece', { handpos: this.handManager.getLogicalPos(handDiv), rc: hex })
+        this.bga.actions.performAction('actPlayPiece', { handpos: selectedPiece.logicalPos, rc: hex })
     }
 
     private onHandClicked(ev: Event): boolean {

@@ -1,5 +1,6 @@
-import { BblPlayer, BGamedatas, HandPiece } from "./bdata";
+import { BblPlayer, BGamedatas, HandPiece, PieceType } from "./bdata";
 import { AnimationManager } from "./bga-animations";
+import { Css } from "./css";
 import { Html } from "./html";
 import { IDS } from "./ids";
 import { AnimationList } from "./more-animations";
@@ -172,4 +173,63 @@ export class HandManager {
         })
         return this.animationManager.playParallel(anims);
     }
+
+    public attachListenerToOccupiedSpaces(eventType: string, handler: EventListenerOrEventListenerObject, opts?: AddEventListenerOptions): void {
+        Array.from($(IDS.HAND).children).forEach(e =>
+            e.firstChild?.addEventListener(eventType, handler, opts)
+        );
+    }
+
+    public setPlayablePieces(isPlayable: (h: Element | null) => boolean): void {
+        const hand = $(IDS.HAND);
+        hand.childNodes.forEach((node) => {
+            const child = node as HTMLElement;
+            const cl = child.classList;
+            if (isPlayable(child.firstElementChild)) {
+                cl.add(Css.PLAYABLE);
+                cl.remove(Css.UNPLAYABLE);
+            } else {
+                cl.remove(Css.PLAYABLE);
+                cl.add(Css.UNPLAYABLE);
+            }
+        });
+    }
+
+    public getSelectedPiece(): { pieceType: PieceType, logicalPos: number, pieceDiv: HTMLElement } | null {
+        const spaceDiv = document.querySelector(`#${IDS.HAND} > .${Css.SELECTED}`);
+        if (!spaceDiv) { 
+            return null; 
+        }
+        const pieceDiv = spaceDiv.firstElementChild as HTMLElement;
+        if (!pieceDiv) {
+            console.error("no piece div in selected space", spaceDiv);
+            return null;
+        }
+        const pieceType = Piece.get(pieceDiv);
+        if (!pieceType) {
+            console.error("no piece in selected space", spaceDiv, pieceDiv);
+            return null;
+        }
+        return {
+            pieceType: pieceType,
+            logicalPos: this.getLogicalPos(spaceDiv),
+            pieceDiv: pieceDiv
+        }
+    }
+
+    /** returns the already selected   */
+    public unselectAllPieces(unselect?: (h: Element) => void): void {
+        const hand = $(IDS.HAND);
+        hand.childNodes.forEach(node => {
+            const posDiv = node as HTMLElement;
+            const cl = posDiv.classList;
+            if (cl.contains(Css.SELECTED)) {
+                unselect && unselect(posDiv.firstElementChild!);
+            }
+            cl.remove(Css.SELECTED);
+            cl.remove(Css.PLAYABLE);
+            cl.remove(Css.UNPLAYABLE);
+        });
+    }
+
 }
