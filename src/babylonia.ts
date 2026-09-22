@@ -2,7 +2,7 @@ import { BaseGame } from './basegame';
 import { BblPlayer, BGamedatas, PieceType } from './bdata';
 import { SelectExtraTurnState } from './states/select_extra_turn';
 import { EndOfTurnScoringState } from './states/end_of_turn_scoring';
-import { SelectZigguratCardState } from './states/select_ziggurate_card';
+import { SelectZigguratCardState } from './states/select_ziggurat_card';
 import { PlayPiecesState } from './states/play_pieces';
 import { SelectScoringHexState } from './states/select_scoring_hex';
 import { FinishTurnState } from './states/finish_turn';
