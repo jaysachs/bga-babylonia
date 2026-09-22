@@ -26,19 +26,5 @@
             "name": "Yes"
         }
     }
-  },
-  "150": {
-    "name": "Drop shadows on pieces",
-    "needReload": true,
-    "values": {
-      "0": {
-        "name": "No"
-      },
-      "1": {
-        "name": "Yes",
-        "cssPref": "bbl_piece_shadows"
-      }
-    },
-    "default": 1
   }
 }

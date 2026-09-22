@@ -265,19 +265,19 @@ body {
     top: 0;
 }
 
-html.bbl_piece_shadows [bbl_piece$="_1"] {
+[bbl_piece$="_1"] {
     filter: drop-shadow(#59412b var(--bbl-piece-shadow) var(--bbl-piece-shadow));
 }
 
-html.bbl_piece_shadows [bbl_piece$="_2"] {
+[bbl_piece$="_2"] {
     filter: drop-shadow(#877810  var(--bbl-piece-shadow) var(--bbl-piece-shadow));
 }
 
-html.bbl_piece_shadows [bbl_piece$="_3"] {
+[bbl_piece$="_3"] {
     filter: drop-shadow(#772f0c var(--bbl-piece-shadow) var(--bbl-piece-shadow));
 }
 
-html.bbl_piece_shadows [bbl_piece$="_4"] {
+[bbl_piece$="_4"] {
     filter: drop-shadow(#777777 var(--bbl-piece-shadow) var(--bbl-piece-shadow));
 }
 
