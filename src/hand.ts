@@ -81,7 +81,7 @@ export class HandManager {
 
     public refill(hand: HandPiece[]): Promise<any> {
         if (!this.player) {
-            console.log("Spectator should not refill hand");
+            console.error("Spectator should not refill hand");
             return Promise.resolve();
         }
         if (this.sortedHandsEnabled()) {
@@ -93,11 +93,11 @@ export class HandManager {
 
     private refillSorted(hand: HandPiece[]): Promise<any> {
         const anims: AnimationList = [];
-        console.log("Refilling hand", hand);
-        console.log("Current state: ", Array.from($('bbl_hand').children).map(d => "" + this.getLogicalPos(d) + " " + d.firstElementChild?.getAttribute('bbl_piece')));
+        console.debug("Refilling hand", hand);
+        console.debug("Current state: ", Array.from($('bbl_hand').children).map(d => "" + this.getLogicalPos(d) + " " + d.firstElementChild?.getAttribute('bbl_piece')));
         this.bga.gameui.gamedatas.hand = hand;
         hand = this.orderedHand(hand);
-        console.log("Sorted hand", hand);
+        console.debug("Sorted hand", hand);
         // first add spaces for expanded hand
         const handSpaceDivs = hand.map((hp, i) => this.spaceForPhysicalPos(i));
 
@@ -109,23 +109,23 @@ export class HandManager {
         handSpaceDivs.forEach((hsd, i) => {
             let lp = this.getLogicalPos(hsd);
             if (hand[i]!.piece_type != 'empty') {
-                console.log("physical pos", i, "logical pos", lp, "hand position", hand[i]?.position);
+                console.debug("physical pos", i, "logical pos", lp, "hand position", hand[i]?.position);
                 const newPos = hand[i]!.position;
                 // either wrong logical pos, or no piece there.
                 if (lp != newPos || !hsd.firstElementChild) {
                     // Ok we need to move this one from somewhere.
                     let srcSpace = this.spaceForLogicalPos(newPos);
                     if (srcSpace.firstElementChild) {
-                        console.log("will move from ", i, srcSpace)
+                        console.debug("will move from ", i, srcSpace)
                         anims.push(() => {
                             this.setLogicalPos(hsd, newPos);
                             return this.animationManager.slideAndAttach(
                                 srcSpace.firstElementChild as HTMLElement, 
                                 hsd, 
-                                { duration: 1200, fromPlaceholder: 'off', toPlaceholder: 'off' })
+                                { fromPlaceholder: 'off', toPlaceholder: 'off' })
                         });
                     } else {
-                        console.log("will move new from pool", i, hand[i])
+                        console.debug("will move new from pool", i, hand[i])
                         anims.push(() => {
                             const pieceDiv = Piece.createDiv(hand[i]!.piece_type, this.player);
                             this.playerPanelManger.poolcountElement(this.bga.players.getCurrentPlayerId()).appendChild(pieceDiv);
@@ -133,17 +133,17 @@ export class HandManager {
                             return this.animationManager.slideAndAttach(
                                 pieceDiv, 
                                 hsd, 
-                                { duration: 1200, fromPlaceholder: 'off', toPlaceholder: 'off' })
+                                { fromPlaceholder: 'off', toPlaceholder: 'off' })
                         });
                     }
                 }
                 else {
-                    console.log("already there")
+                    console.debug("already there")
                 }
             }
         });
         return this.animationManager.playParallel(anims).then(() => { 
-            console.log("Final state: ", 
+            console.debug("Final state: ", 
                 Array.from($('bbl_hand').children).map(d => "" + this.getLogicalPos(d) + " " + d.firstElementChild?.getAttribute('bbl_piece')));
              return Promise.resolve(); } );
     }
