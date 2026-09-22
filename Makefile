@@ -38,6 +38,9 @@ phpstan: build
 deploy: test
 	lftp -e 'cd $(GAME); mirror -e -R --exclude .vscode/ --exclude .git/ --exclude work/ --exclude local/ --exclude bga-framework.d.ts --exclude .phpunit* --exclude node_modules*/ --exclude _ide_helper.php; exit' $(SFTP)
 
+quick-deploy: test
+	lftp -e 'cd $(GAME); put -O modules/js modules/js/Game.js; put babylonia.css; exit' $(SFTP)
+
 pull-boilerplate:
 	lftp -e 'cd $(GAME); set xfer:clobber true; get _ide_helper.php; get bga-framework.d.ts; exit' $(SFTP)
 
