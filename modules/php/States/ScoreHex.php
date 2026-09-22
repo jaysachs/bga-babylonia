@@ -112,9 +112,17 @@ class ScoreHex extends AbstractState
             }
         } else {
             $scored_city = $model->scoreCity($rc);
-
-            $this->sendNotify($scored_city->hex_winner, [ "details" => $this->computeCityScoringDetails($model, $scored_city) ]);
-
+            $details = $this->computeCityScoringDetails($model, $scored_city);
+            $this->sendNotify($scored_city->hex_winner, [ "details" => $details ]);
+            foreach ($details as $stuff) {
+                $this->notify->all("logInfo",
+                clienttranslate('${player_name} scored ${network_points} network points and ${capture_points} capture points'),
+                [
+                    'player_id' => $stuff['player_id'],
+                    'network_points' => $stuff['network_points'],
+                    'capture_points' => $stuff['capture_points']
+                ]);
+            }
             return EndOfTurnScoring::class;
         }
     }
