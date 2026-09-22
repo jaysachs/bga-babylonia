@@ -5,7 +5,7 @@ import { IDS } from "./ids";
 import { Piece } from "./piece";
 import { TooltipManager } from "./tooltips";
 
-export type HexSelectionHandler = (hex: number, hexDiv: HTMLElement, capturedPieceDiv: HTMLElement | undefined | null, terrain: string) => void;
+export type HexSelectionHandler = (hex: number, hexDiv: HTMLElement, piece: PieceType | null, capturedPieceDiv: HTMLElement | undefined | null, terrain: string) => void;
 
 export class BoardManager {
 
@@ -44,7 +44,7 @@ export class BoardManager {
     static readonly vdelta = 216; // 1.0 * this.height + 2.0;
 
     // Returns the hex (row,col) clicked on, or null if not a playable hex
-    public selectedHexIfPlayable(target: EventTarget): number | null {
+    private selectedHexIfPlayableOrSelectable(target: EventTarget): number | null {
         let hexDiv = target as Element;
         while (hexDiv.parentElement != null && hexDiv.parentElement.id != IDS.BOARD) {
             hexDiv = hexDiv.parentElement;
@@ -91,14 +91,16 @@ export class BoardManager {
             return false;
         }
     
-        const hex = this.selectedHexIfPlayable(event.target!);
+        const hex = this.selectedHexIfPlayableOrSelectable(event.target!);
         if (hex == null) {
             return false;
         }
     
         const hexDiv = this.hexDiv(hex);
+        const pieceDiv = hexDiv.firstElementChild as HTMLElement | null;
+        const piece = Piece.get(pieceDiv);
         const res : Promise<any>[] = this.boardHandlers.map(
-            async h => h(hex, hexDiv, hexDiv.firstElementChild as HTMLElement, this.hexForRc(hex)!.terrain));
+            async h => h(hex, hexDiv, piece, pieceDiv, this.hexForRc(hex)!.terrain));
         await Promise.all(res);
         return false;
     }

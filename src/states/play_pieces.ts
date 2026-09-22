@@ -186,7 +186,7 @@ export class PlayPiecesState extends BabyloniaState {
         this.handManager.setPlayablePieces(e => this.allowedMovesFor(e).length > 0);
     }
 
-    private boardSelectionHandler = async (hex: number, hexDiv: HTMLElement, capturedPieceDiv: HTMLElement | null | undefined, terrain: string) => {
+    private boardSelectionHandler = async (hex: number, hexDiv: HTMLElement, piece: PieceType | null, capturedPieceDiv: HTMLElement | null | undefined, terrain: string) => {
         const selectedPiece = this.handManager.getSelectedPiece(true);
         if (!selectedPiece) {
             console.error('no piece selected!');

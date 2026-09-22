@@ -1,34 +1,24 @@
-import { IDS } from "../ids";
-import { Piece } from "../piece";
+import { PieceType } from "../bdata";
 import { BabyloniaState } from "./base";
 
 export class SelectScoringHexState extends BabyloniaState {
-    private handler = (e: Event) => this.onBoardClicked(e)
     private hexes: string[] = [];
 
     override onEnteringState(args: { hexes: string[] }, isCurrentPlayerActive: boolean) {
         this.hexes = args.hexes;
         if (isCurrentPlayerActive) {
             const rcs = Object.keys(args.hexes).map(Number);
+            this.boardManager.addHandler(this.boardClicked);
             this.boardManager.markHexesSelectable(rcs);
-            $(IDS.BOARD).addEventListener('click', this.handler);
         }
     }
     override onLeavingState(args: any, isCurrentPlayerActive: boolean) {
         if (isCurrentPlayerActive) {
-            $(IDS.BOARD).removeEventListener('click', this.handler);
+            this.boardManager.removeHandler(this.boardClicked);
         }
     }
 
-    private onBoardClicked(event: Event) {
-        event.preventDefault();
-        event.stopPropagation();
-
-        const hex = this.boardManager.selectedHexIfPlayable(event.target!);
-        if (hex === null) {
-            return;
-        }
-        let piece = Piece.get(this.boardManager.hexDiv(hex).firstElementChild!);
+    private boardClicked = async (hex: number, hexDiv: HTMLElement, piece: PieceType | null, capturedPieceDiv: HTMLElement | undefined | null, terrain: string) => {
         this.boardManager.unmarkHexSelectable(hex);
         this.boardManager.markHexSelected(hex);
         // TODO: add tooltip
@@ -45,7 +35,7 @@ export class SelectScoringHexState extends BabyloniaState {
                 this.bga.states.restoreServerGameState();
             },
             { color: "secondary" });
-    }
+    };
 
     async notif_scoringSelection(
         args: {
