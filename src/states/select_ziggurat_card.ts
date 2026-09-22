@@ -22,7 +22,7 @@ export class SelectZigguratCardState extends BabyloniaState {
         this.zcardManager.stopSelecting();
     }
 
-    private xhandler = async (zcardType?: string) => { 
+    private async handleSelection(zcardType?: string) { 
         if (!zcardType) {
             this.zcardManager.unselectAll();
             this.bga.states.restoreServerGameState();
@@ -47,7 +47,7 @@ export class SelectZigguratCardState extends BabyloniaState {
             { color: "secondary" });
     };
 
-    private handler = this.xhandler.bind(this);
+    private handler = this.handleSelection.bind(this);
 
     async notif_zigguratCardSelection(
         args: {

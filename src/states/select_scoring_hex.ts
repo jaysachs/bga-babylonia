@@ -8,17 +8,17 @@ export class SelectScoringHexState extends BabyloniaState {
         this.hexes = args.hexes;
         if (isCurrentPlayerActive) {
             const rcs = Object.keys(args.hexes).map(Number);
-            this.boardManager.addHandler(this.boardClicked);
+            this.boardManager.addHandler(this.boardHandler);
             this.boardManager.markHexesSelectable(rcs);
         }
     }
     override onLeavingState(args: any, isCurrentPlayerActive: boolean) {
         if (isCurrentPlayerActive) {
-            this.boardManager.removeHandler(this.boardClicked);
+            this.boardManager.removeHandler(this.boardHandler);
         }
     }
 
-    private boardClicked = async (hex: number, hexDiv: HTMLElement, piece: PieceType | null, capturedPieceDiv: HTMLElement | undefined | null, terrain: string) => {
+    private async handleBoardSelection(hex: number, hexDiv: HTMLElement, piece: PieceType | null, capturedPieceDiv: HTMLElement | undefined | null, terrain: string) {
         this.boardManager.unmarkHexSelectable(hex);
         this.boardManager.markHexSelected(hex);
         // TODO: add tooltip
@@ -36,6 +36,8 @@ export class SelectScoringHexState extends BabyloniaState {
             },
             { color: "secondary" });
     };
+
+    private boardHandler = this.handleBoardSelection.bind(this);
 
     async notif_scoringSelection(
         args: {

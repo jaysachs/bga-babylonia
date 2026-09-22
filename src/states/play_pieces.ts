@@ -186,7 +186,7 @@ export class PlayPiecesState extends BabyloniaState {
         this.handManager.setPlayablePieces(e => this.allowedMovesFor(e).length > 0);
     }
 
-    private boardSelectionHandler = async (hex: number, hexDiv: HTMLElement, piece: PieceType | null, capturedPieceDiv: HTMLElement | null | undefined, terrain: string) => {
+    private async handleBoardSelections(hex: number, hexDiv: HTMLElement, piece: PieceType | null, capturedPieceDiv: HTMLElement | null | undefined, terrain: string) {
         const selectedPiece = this.handManager.getSelectedPiece(true);
         if (!selectedPiece) {
             console.error('no piece selected!');
@@ -217,8 +217,9 @@ export class PlayPiecesState extends BabyloniaState {
         await this.bga.actions.performAction('actPlayPiece', { handpos: selectedPiece.logicalPos, rc: hex })
     };
 
+    private boardSelectionHandler = this.handleBoardSelections.bind(this);
 
-    private handSelectionHandler = (pieceInfo: PieceInfo, selected: boolean) => {
+    private async handlePieceSelection(pieceInfo: PieceInfo, selected: boolean) {
         if (this.allowedMovesFor(pieceInfo.pieceType).length == 0) {
             console.log("no allowed moves");
             return;
@@ -232,9 +233,9 @@ export class PlayPiecesState extends BabyloniaState {
             this.setStatusBarForPlayState();
         }
     }
+    private handSelectionHandler = this.handlePieceSelection.bind(this);
 
     private chooseDestination(): void {
-        // this.removeHandHandler();
         this.attachBoardHandler();
         this.bga.statusBar.setTitle(_('${you} must select a hex to play to'));
         this.bga.statusBar.removeActionButtons();
