@@ -93,8 +93,6 @@ class ScoreHex extends AbstractState
     function onEnteringState(int $active_player_id): mixed {
         $model = $this->createModel($active_player_id);
         $rc = $this->scoringHex();
-        // TODO: verify it is scoreable in the Model
-
         if ($model->board()->hexAt($rc)->piece->isZiggurat()) {
             $scored_zig = $model->scoreZiggurat($rc);
 
