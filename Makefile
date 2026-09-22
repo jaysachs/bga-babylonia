@@ -9,7 +9,7 @@ TS_STUBS=src/bga-framework.d.ts
 JS=modules/js/Game.js
 PHPSTAN_LEVEL=10
 
-.PHONY: build test phpstan deploy clean pull-boilerplate sprites
+.PHONY: build test phpstan deploy clean pull-boilerplate sprites quick-deploy
 
 $(JS): src/**/*.ts src/*.ts tsconfig.json $(TS_STUBS)
 	NO_COLOR=true npm run build:ts
