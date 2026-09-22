@@ -102,7 +102,7 @@ class Hand
 
     public function contains(PieceType $piece): bool
     {
-        return array_find($this->pieces, fn($hp) => $hp->pieceType == $piece) !== null;
+        return array_find($this->pieces, fn($hp) => $hp->pieceType == $piece && !$hp->played) !== null;
     }
 
     public function play(int $pos): HandPiece
