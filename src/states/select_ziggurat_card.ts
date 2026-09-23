@@ -1,4 +1,5 @@
 import { Css } from "../css";
+import { ZType } from "../bdata";
 import { BabyloniaState } from "./base";
 
 type StateArgs = {
@@ -51,7 +52,7 @@ export class SelectZigguratCardState extends BabyloniaState {
 
     async notif_zigguratCardSelection(
         args: {
-            zcard: string;
+            zcard: ZType;
             player_id: number;
             cardused: boolean;
             points: number;
@@ -64,7 +65,7 @@ export class SelectZigguratCardState extends BabyloniaState {
         await this.animationManager.slideAndAttach(zelem, dest, { toPlaceholder: 'off' })
         this.bga.playerPanels.getScoreCounter(args.player_id).incValue(args.points);
         if (args.cardused) {
-            this.zcardManager.setUsed(zelem, true);
+            this.zcardManager.setUsed(args.zcard, true);
         }
     }
 }

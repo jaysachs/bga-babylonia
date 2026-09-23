@@ -20,8 +20,10 @@ export interface Hex {
     terrain: 'NORTH' | 'SOUTH' | 'CENTRAL' | 'RIVER' | 'UNUSED';
 }
 
+export type ZType = 'zc_10pts' | 'zc_xturn' | 'zc_hand7' | 'zc_3nobles' | 'zc_farmers' | 'zc_fields' | 'zc_citypts' | 'zc_land' | 'zc_river' ;
+
 export interface Zcard {
-    type: string;
+    type: ZType;
     used: boolean;
     tooltip: string;
     owning_player_id: number;

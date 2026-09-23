@@ -1,3 +1,4 @@
+import { ZType } from "../bdata";
 import { BabyloniaState } from "./base";
 
 export class SelectExtraTurnState extends BabyloniaState {
@@ -14,13 +15,8 @@ export class SelectExtraTurnState extends BabyloniaState {
         }
     }
 
-    async notif_extraTurnUsed(args: { card: string; used: boolean; }) {
-        const carddiv = this.zcardManager.getZCardElement(args.card);
-        if (carddiv == undefined) {
-            console.error(`Could not find div for owned ${args.card} card`, args.card);
-        } else {
-            this.zcardManager.setUsed(carddiv, true);
-        }
+    async notif_extraTurnUsed(args: { card: ZType; used: boolean; }) {
+        this.zcardManager.setUsed(args.card, true);
     }
 
 }

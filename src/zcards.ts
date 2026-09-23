@@ -1,11 +1,9 @@
 import { BaseComponent } from "./basecomponent";
-import { BblPlayer, BGamedatas, Zcard } from "./bdata";
+import { BblPlayer, BGamedatas, Zcard, ZType } from "./bdata";
 import { Css } from "./css";
 import { Html } from "./html";
 import { PlayerPanelManager } from "./player_panel";
 import { TooltipManager } from "./tooltips";
-
-export type ZType = string;
 
 export class ZCardManager extends BaseComponent<ZType | undefined> {
 
@@ -69,7 +67,7 @@ export class ZCardManager extends BaseComponent<ZType | undefined> {
         return false;
     }
 
-    public createSpan(zcard: string): HTMLElement {
+    public createSpan(zcard: ZType): HTMLElement {
         return Html.span({
             title: this.zcardTooltips.get(zcard) ?? '',
             attrs: this.attr(zcard)
@@ -83,7 +81,7 @@ export class ZCardManager extends BaseComponent<ZType | undefined> {
         );
     }
 
-    public getZCardElement(ztype: string): HTMLElement {
+    public getZCardElement(ztype: ZType): HTMLElement {
         return $(this.zcardId(ztype));
     }
 
@@ -95,8 +93,8 @@ export class ZCardManager extends BaseComponent<ZType | undefined> {
         Array.from(this.mainDiv!.children).forEach(e => e.firstElementChild?.classList.remove(Css.SELECTED));
     }
 
-    public setUsed(el: Element, used: boolean) {
-        el.setAttribute(ZCardManager.USED_ATTR, String(used));
+    public setUsed(zcard: ZType, used: boolean) {
+        this.getZCardElement(zcard).setAttribute(ZCardManager.USED_ATTR, String(used));
     }
 
     private attr(z: ZType, used: boolean = false): { bbl_ztype: ZType, bbl_zused?: string } {
