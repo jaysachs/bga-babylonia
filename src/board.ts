@@ -125,10 +125,9 @@ export class BoardManager {
 
     private playersInPlayerNoOrder(): BblPlayer[] {
         return this.bga.gameui.gamedatas.playerorder.map(
-            pid => this.bga.players.getPlayerById(Number(pid))!
+            pid => this.bga.players.getPlayerById(pid)!
         );
     }
-
 
     private cityScoringHover(rc: number): HTMLElement {
         const scores = this.bga.gameui.gamedatas.potential_city_scoring[String(rc)]!;
