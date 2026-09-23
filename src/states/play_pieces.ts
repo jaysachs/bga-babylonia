@@ -218,16 +218,16 @@ export class PlayPiecesState extends BabyloniaState {
 
     private boardSelectionHandler = this.handleBoardSelections.bind(this);
 
-    private async handlePieceSelection(ps: {pieceInfo: PieceInfo, selected: boolean}) {
-        if (this.allowedMovesFor(ps.pieceInfo.pieceType).length == 0) {
+    private async handlePieceSelection(pieceInfo: PieceInfo) {
+        if (this.allowedMovesFor(pieceInfo.pieceType).length == 0) {
             return;
         }
-        if (ps.selected) {
-            this.markHexesPlayableForPiece(ps.pieceInfo.pieceType);
+        if (pieceInfo.selected) {
+            this.markHexesPlayableForPiece(pieceInfo.pieceType);
             this.chooseDestination();
         } else {
             this.removeBoardHandler();
-            this.unmarkHexesPlayableForPiece(ps.pieceInfo.pieceType);
+            this.unmarkHexesPlayableForPiece(pieceInfo.pieceType);
             this.setStatusBarForPlayState();
         }
     }

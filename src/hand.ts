@@ -11,9 +11,10 @@ export type PieceInfo = {
     pieceType: PieceType;
     logicalPos: number;
     pieceDiv: HTMLElement;
+    selected: boolean;
 }
 
-export class HandManager extends BaseComponent<{pieceInfo: PieceInfo, selected: boolean}> {
+export class HandManager extends BaseComponent<PieceInfo> {
     private readonly collator = new Intl.Collator("en");
     private player: BblPlayer | undefined;
     private mainDiv: HTMLElement;
@@ -215,10 +216,11 @@ export class HandManager extends BaseComponent<{pieceInfo: PieceInfo, selected: 
         const pi: PieceInfo = {
             pieceDiv: pieceDiv,
             pieceType: Piece.get(pieceDiv)!,
-            logicalPos: this.getLogicalPos(spaceDiv)
+            logicalPos: this.getLogicalPos(spaceDiv),
+            selected: selected
         };
         cl.toggle(Css.SELECTED);
-        await super.dispatch({pieceInfo: pi, selected: selected});
+        await super.dispatch(pi);
     }
 
     public getSelectedPiece(deselect: boolean = false): PieceInfo | null {
@@ -240,7 +242,8 @@ export class HandManager extends BaseComponent<{pieceInfo: PieceInfo, selected: 
         return {
             pieceType: pieceType,
             logicalPos: this.getLogicalPos(spaceDiv),
-            pieceDiv: pieceDiv
+            pieceDiv: pieceDiv,
+            selected: true
         }
     }
 
