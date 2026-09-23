@@ -65,7 +65,8 @@ class FinishTurn extends AbstractState
             '',
             [
                 "player_id" => $active_player_id,
-                'hand' => $hand->serialize()
+                'hand' => $hand->serialize(),
+                'pool' => $model->getPoolContents()
             ]
         );
 

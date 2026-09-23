@@ -37,9 +37,15 @@ export interface HandPiece {
     played: boolean;
 }
 
+export interface PieceCount {
+    pieceType: PieceType;
+    count: number;
+}
+
 export interface BGamedatas extends Gamedatas<BblPlayer> {
     board: Hex[];
     hand?: HandPiece[];
+    pool?: Record<PieceType, number>;
     ziggurat_cards: Zcard[];
     translated_pieces: Record<PieceType, string>;
     potential_city_scoring: PotentialCityScoring;

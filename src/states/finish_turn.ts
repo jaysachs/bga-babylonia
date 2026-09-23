@@ -1,4 +1,4 @@
-import { HandPiece } from "../bdata";
+import { HandPiece, PieceCount, PieceType } from "../bdata";
 import { BabyloniaState } from "./base";
 
 export class FinishTurnState extends BabyloniaState {
@@ -13,7 +13,8 @@ export class FinishTurnState extends BabyloniaState {
         this.playerPanelManager.updatePoolCount(args);
     }
 
-    async notif_handRefilled(args: { hand: HandPiece[] }) {
+    async notif_handRefilled(args: { hand: HandPiece[], pool: Record<PieceType,number> }) {
+        this.bga.gameui.gamedatas.pool = args.pool;
         await this.handManager.refill(args.hand);
     }
 }

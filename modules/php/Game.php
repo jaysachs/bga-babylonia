@@ -179,6 +179,7 @@ class Game extends Table
         $cpid = intval($this->getCurrentPlayerId());
         return [
             "players" => $players,
+            'pool' => isset($pis[$cpid]) ? $model->getPoolContents() : null,
             'hand' => isset($pis[$cpid]) ? $pis[$cpid]->hand->serialize() : null,
             'board' => $board_data,
             'translated_pieces' => $translated,

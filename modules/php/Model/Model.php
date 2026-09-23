@@ -272,6 +272,19 @@ class Model
         return PlayAllowedResult::failure("cannot place extra nobles");
     }
 
+    public function getPoolContents(): array {
+        $result = [
+            PieceType::FARMER->value => 0,
+            PieceType::MERCHANT->value => 0,
+            PieceType::PRIEST->value => 0,
+            PieceType::SERVANT->value => 0,
+        ];
+        foreach ($this->activePlayerInfo()->pool->pieces() as $piece) {
+            $result[$piece->value]++;
+        }
+        return $result;
+    }
+
     /**
      * Returns an array ["piece" => [rc1, rc2,...], ...]
      * for piece types that are in hand

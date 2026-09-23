@@ -29,11 +29,11 @@ export class Game extends BaseGame<BblPlayer, BGamedatas> {
     constructor(bga: Bga<BblPlayer, BGamedatas>) {
         super(bga);
 
-        this.tooltipManager = new TooltipManager(this.bga);
-        this.playerPanelManager = new PlayerPanelManager(this.bga);
-        this.boardManager = new BoardManager(this.bga, this.tooltipManager);
-        this.handManager = new HandManager(this.bga, this.animationManager, this.playerPanelManager)
-        this.zcardManager = new ZCardManager(this.bga, this.playerPanelManager, this.tooltipManager);
+        this.tooltipManager = new TooltipManager(bga);
+        this.playerPanelManager = new PlayerPanelManager(bga, this.tooltipManager);
+        this.boardManager = new BoardManager(bga, this.tooltipManager);
+        this.handManager = new HandManager(bga, this.animationManager, this.playerPanelManager)
+        this.zcardManager = new ZCardManager(bga, this.playerPanelManager, this.tooltipManager);
     }
 
     async setup(gamedatas: BGamedatas) {
