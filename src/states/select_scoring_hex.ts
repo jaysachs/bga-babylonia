@@ -16,22 +16,22 @@ export class SelectScoringHexState extends BabyloniaState {
         if (isCurrentPlayerActive) {
             this.boardManager.removeHandler(this.boardHandler);
         }
+        this.boardManager.unmarkHexesSelectable(Object.keys(args.hexes).map(Number));
     }
 
     private async handleBoardSelection(hex: number, hexDiv: HTMLElement, piece: PieceType | null, capturedPieceDiv: HTMLElement | undefined | null, terrain: string) {
-        this.boardManager.unmarkHexSelectable(hex);
         this.boardManager.markHexSelected(hex);
         // TODO: add tooltip
         this.bga.statusBar.setTitle(_('Score ${city} at ${hex}?'), {
             hex: this.hexes[hex], city: piece,
         });
+        this.bga.statusBar.removeActionButtons();
         this.bga.statusBar.addActionButton(_('Confirm'),
             () => this.bga.actions.performAction('actSelectHexToScore', { rc: hex }).then(() => this.boardManager.unmarkHexPlayable(hex)),
             { autoclick: this.autoConfirmEnabled() });
         this.bga.statusBar.addActionButton(_('Cancel'),
             () => {
                 this.boardManager.unmarkHexSelected(hex);
-                this.boardManager.markHexSelectable(hex);
                 this.bga.states.restoreServerGameState();
             },
             { color: "secondary" });
@@ -46,7 +46,6 @@ export class SelectScoringHexState extends BabyloniaState {
             rc: number;
             city: string;
         }) {
-        this.boardManager.unmarkHexSelectable(args.rc);
         this.boardManager.markHexSelected(args.rc);
     }
 

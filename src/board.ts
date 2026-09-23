@@ -166,7 +166,7 @@ export class BoardManager {
         this.hexDiv(rc).firstElementChild?.classList.add(Css.SCORED);
     }
 
-    public markHexPlayable(rc: number): void {
+    private markHexPlayable(rc: number): void {
         this.hexDiv(rc).classList.add(Css.PLAYABLE);
     }
 
@@ -179,21 +179,12 @@ export class BoardManager {
             .forEach(div => div.classList.remove(Css.PLAYABLE));
     }
 
-    public markHexSelectable(rc: number): void {
-        this.hexDiv(rc).classList.add(Css.SELECTABLE);
-    }
-
     public markHexesSelectable(hexes: number[]): void {
-        hexes.forEach((hex) => this.markHexSelectable(hex));
+        hexes.forEach((hex) => this.hexDiv(hex).classList.add(Css.SELECTABLE));
     }
 
-    public unmarkHexSelectable(rc: number): void {
-        this.hexDiv(rc).classList.remove(Css.SELECTABLE);
-    }
-
-    public markAllHexesUnselectable(): void {
-        $(IDS.BOARD).querySelectorAll('.' + Css.SELECTABLE)
-            .forEach(div => div.classList.remove(Css.SELECTABLE));
+    public unmarkHexesSelectable(hexes: number[]): void {
+        hexes.forEach((hex) => this.hexDiv(hex).classList.remove(Css.SELECTABLE));
     }
 
     public markHexesPlayable(hexes: number[]): void {
@@ -205,6 +196,7 @@ export class BoardManager {
     }
 
     public markHexSelected(rc: number): void {
+        Array.from($(IDS.BOARD).children).forEach(div => div.classList.remove(Css.SELECTED));
         this.hexDiv(rc).classList.add(Css.SELECTED);
     }
 

@@ -10,15 +10,15 @@ interface PlayStateArgs {
     canEndTurn: boolean;
     allowedMoves: Record<string, number[]>;
     canUndo: boolean;
-    potentialCityScoring: Record<string, Record<string, number>>;
+    potential_city_scoring: Record<string, Record<string, number>>;
 }
 
 export class PlayPiecesState extends BabyloniaState {
-    private playStateArgs: PlayStateArgs = { canEndTurn: false, allowedMoves: {}, canUndo: false, potentialCityScoring: {} };
+    private playStateArgs: PlayStateArgs = { canEndTurn: false, allowedMoves: {}, canUndo: false, potential_city_scoring: {} };
 
     private doEnterState(playStateArgs: PlayStateArgs) {
         this.playStateArgs = playStateArgs;
-        this.bga.gameui.gamedatas.potential_city_scoring = playStateArgs.potentialCityScoring;
+        this.bga.gameui.gamedatas.potential_city_scoring = playStateArgs.potential_city_scoring;
         this.boardManager.markAllHexesUnplayable();
         if (this.bga.players.isCurrentPlayerActive()) {
             this.setStatusBarForPlayState();
