@@ -1,14 +1,16 @@
+import { BaseComponent } from "./basecomponent";
 import { BblPlayer, BGamedatas, Hex, PieceType } from "./bdata";
 import { Css } from "./css";
 import { Html } from "./html";
 import { Piece } from "./piece";
 import { TooltipManager } from "./tooltips";
 
-export type HexSelectionHandler = (hex: number, hexDiv: HTMLElement, piece: PieceType | null, capturedPieceDiv: HTMLElement | undefined | null, terrain: string) => void;
+export type HexSelectionData = { hex: number, hexDiv: HTMLElement, piece: PieceType | null, capturedPieceDiv: HTMLElement | undefined | null, terrain: string };
 
-export class BoardManager {
+export class BoardManager extends BaseComponent<HexSelectionData> {
 
     public constructor(private bga: Bga<BblPlayer, BGamedatas>, private readonly tooltipManager: TooltipManager) {
+        super();
     }
 
     private boardDiv?: HTMLElement;
@@ -74,20 +76,6 @@ export class BoardManager {
         return undefined;
     }
 
-    public addHandler(handler: HexSelectionHandler): void {
-        if (!this.boardHandlers.find(h => h == handler)) {
-            this.boardHandlers.push(handler);
-        }
-    }
-
-    public removeHandler(handler: HexSelectionHandler): void {
-        const i = this.boardHandlers.indexOf(handler);
-        if (i) {
-            this.boardHandlers.splice(i, 1);
-        }
-    }
-    private boardHandlers: HexSelectionHandler[] = [];
-
     private async onBoardClicked(event: Event): Promise<boolean> {
         event.preventDefault();
         event.stopPropagation();
@@ -104,9 +92,7 @@ export class BoardManager {
         const hexDiv = this.hexDiv(hex);
         const pieceDiv = hexDiv.firstElementChild as HTMLElement | null;
         const piece = Piece.get(pieceDiv);
-        const res : Promise<any>[] = this.boardHandlers.map(
-            async h => h(hex, hexDiv, piece, pieceDiv, this.hexForRc(hex)!.terrain));
-        await Promise.all(res);
+        await super.dispatch({ hex, hexDiv, piece, capturedPieceDiv: pieceDiv, terrain: this.hexForRc(hex)!.terrain})
         return false;
     }
     

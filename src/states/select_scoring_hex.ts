@@ -1,4 +1,5 @@
 import { PieceType } from "../bdata";
+import { HexSelectionData } from "../board";
 import { BabyloniaState } from "./base";
 
 export class SelectScoringHexState extends BabyloniaState {
@@ -19,19 +20,20 @@ export class SelectScoringHexState extends BabyloniaState {
         this.boardManager.unmarkHexesSelectable(Object.keys(args.hexes).map(Number));
     }
 
-    private async handleBoardSelection(hex: number, hexDiv: HTMLElement, piece: PieceType | null, capturedPieceDiv: HTMLElement | undefined | null, terrain: string) {
-        this.boardManager.markHexSelected(hex);
+    private async handleBoardSelection(data: HexSelectionData) {
+        this.boardManager.markHexSelected(data.hex);
         // TODO: add tooltip
         this.bga.statusBar.setTitle(_('Score ${city} at ${hex}?'), {
-            hex: this.hexes[hex], city: piece,
+            hex: this.hexes[data.hex], city: data.piece,
         });
         this.bga.statusBar.removeActionButtons();
         this.bga.statusBar.addActionButton(_('Confirm'),
-            () => this.bga.actions.performAction('actSelectHexToScore', { rc: hex }).then(() => this.boardManager.unmarkHexPlayable(hex)),
+            () => this.bga.actions.performAction('actSelectHexToScore', { rc: data.hex })
+                .then(() => this.boardManager.unmarkHexPlayable(data.hex)),
             { autoclick: this.autoConfirmEnabled() });
         this.bga.statusBar.addActionButton(_('Cancel'),
             () => {
-                this.boardManager.unmarkHexSelected(hex);
+                this.boardManager.unmarkHexSelected(data.hex);
                 this.bga.states.restoreServerGameState();
             },
             { color: "secondary" });

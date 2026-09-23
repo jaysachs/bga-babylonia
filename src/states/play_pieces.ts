@@ -4,6 +4,7 @@ import { BabyloniaState } from "./base";
 import { Piece } from "../piece";
 import { Css } from "../css";
 import { PieceInfo } from "../hand";
+import { HexSelectionData } from "../board";
 
 interface PlayStateArgs {
     canEndTurn: boolean;
@@ -26,7 +27,7 @@ export class PlayPiecesState extends BabyloniaState {
 
     override onEnteringState(args: { playState: PlayStateArgs; must_end_game: number[]; may_end_game: number[]; }, isCurrentPlayerActive: boolean) {
         if (isCurrentPlayerActive) {
-            this.handManager.addSelectionHandler(this.handSelectionHandler);
+            this.handManager.addHandler(this.handSelectionHandler);
             if (args.must_end_game.length > 0) {
                 this.bga.gameArea.addLastTurnBanner(_("This is your last turn"));
             } else if (args.may_end_game.length > 0) {
@@ -37,7 +38,7 @@ export class PlayPiecesState extends BabyloniaState {
     }
 
     override onLeavingState(args: any, isCurrentPlayerActive: boolean): void {
-        this.handManager.removeSelectionHandler(this.handSelectionHandler);
+        this.handManager.removeHandler(this.handSelectionHandler);
     }
 
     async notif_piecePlayed(
@@ -184,7 +185,7 @@ export class PlayPiecesState extends BabyloniaState {
         this.handManager.setPlayablePieces(e => this.allowedMovesFor(e).length > 0);
     }
 
-    private async handleBoardSelections(hex: number, hexDiv: HTMLElement, piece: PieceType | null, capturedPieceDiv: HTMLElement | null | undefined, terrain: string) {
+    private async handleBoardSelections(data: HexSelectionData) {
         const selectedPiece = this.handManager.getSelectedPiece(true);
         if (!selectedPiece) {
             console.error('no piece selected!');
@@ -195,38 +196,38 @@ export class PlayPiecesState extends BabyloniaState {
         let anims: AnimationList = [];
 
         // Check for field capture
-        if (capturedPieceDiv) /* and is field */ {
-            anims.push(() => this.animationManager.slideOutAndDestroy(capturedPieceDiv, this.playerPanelManager.handcountElement(this.bga.players.getCurrentPlayerId()), {}));
+        if (data.capturedPieceDiv) /* and is field */ {
+            anims.push(() => this.animationManager.slideOutAndDestroy(data.capturedPieceDiv!, this.playerPanelManager.handcountElement(this.bga.players.getCurrentPlayerId()), {}));
         }
 
         anims.push(() =>
             // slide piece from hand to hex
-            this.animationManager.slideAndAttach(selectedPiece.pieceDiv, hexDiv)
+            this.animationManager.slideAndAttach(selectedPiece.pieceDiv, data.hexDiv)
                 // FIXME: need to know this is happening? or just let it flip in the notif??
                 // play into river, piece is hidden
                 .then(() => {
-                    if (terrain == 'RIVER') {
+                    if (data.terrain == 'RIVER') {
                         Piece.set(selectedPiece.pieceDiv, 'hidden', this.bga.players.getCurrentPlayer())
                     }
                 })
         );
 
         await this.animationManager.playParallel(anims);
-        await this.bga.actions.performAction('actPlayPiece', { handpos: selectedPiece.logicalPos, rc: hex })
+        await this.bga.actions.performAction('actPlayPiece', { handpos: selectedPiece.logicalPos, rc: data.hex })
     };
 
     private boardSelectionHandler = this.handleBoardSelections.bind(this);
 
-    private async handlePieceSelection(pieceInfo: PieceInfo, selected: boolean) {
-        if (this.allowedMovesFor(pieceInfo.pieceType).length == 0) {
+    private async handlePieceSelection(ps: {pieceInfo: PieceInfo, selected: boolean}) {
+        if (this.allowedMovesFor(ps.pieceInfo.pieceType).length == 0) {
             return;
         }
-        if (selected) {
-            this.markHexesPlayableForPiece(pieceInfo.pieceType);
+        if (ps.selected) {
+            this.markHexesPlayableForPiece(ps.pieceInfo.pieceType);
             this.chooseDestination();
         } else {
             this.removeBoardHandler();
-            this.unmarkHexesPlayableForPiece(pieceInfo.pieceType);
+            this.unmarkHexesPlayableForPiece(ps.pieceInfo.pieceType);
             this.setStatusBarForPlayState();
         }
     }
@@ -252,11 +253,9 @@ export class PlayPiecesState extends BabyloniaState {
             if (Object.keys(this.playStateArgs.allowedMoves).length == 0) {
                 this.bga.statusBar.setTitle(_('${you} must end your turn'));
                 mustEnd = true;
-                this.setPlayablePieces();
             } else {
                 this.bga.statusBar.setTitle(_('${you} may select a piece to play or end your turn'))
                 this.handManager.enableUserInteraction();
-                this.setPlayablePieces();
             }
             this.bga.statusBar.addActionButton(
                 _('End turn'),
@@ -269,8 +268,8 @@ export class PlayPiecesState extends BabyloniaState {
         } else {
             this.bga.statusBar.setTitle(_('${you} must select a piece to play'));
             this.handManager.enableUserInteraction();
-            this.setPlayablePieces();
         }
+        this.setPlayablePieces();
         if (this.playStateArgs.canUndo) {
             this.bga.statusBar.addActionButton(
                 _('Undo'),

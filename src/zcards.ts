@@ -1,3 +1,4 @@
+import { BaseComponent } from "./basecomponent";
 import { BblPlayer, BGamedatas, Zcard } from "./bdata";
 import { Css } from "./css";
 import { Html } from "./html";
@@ -8,7 +9,7 @@ export type ZType = string;
 
 export type ZCardHandler = (zcard?: ZType) => void;
 
-export class ZCardManager {
+export class ZCardManager extends BaseComponent<ZType | undefined> {
 
     private zcardTooltips = new Map<string, string>();
     private mainDiv?: HTMLElement;
@@ -17,7 +18,9 @@ export class ZCardManager {
         return `bbl_${type}`;
     }
 
-    public constructor(private bga: Bga<BblPlayer, BGamedatas>,  private playerPanelManager: PlayerPanelManager, private tooltipManager: TooltipManager) {}
+    public constructor(private bga: Bga<BblPlayer, BGamedatas>,  private playerPanelManager: PlayerPanelManager, private tooltipManager: TooltipManager) {
+        super();
+    }
 
     public setup(): HTMLElement {
         const zcards = this.bga.gameui.gamedatas.ziggurat_cards;
@@ -64,23 +67,8 @@ export class ZCardManager {
         if (!e.classList.toggle(Css.SELECTED)) {
             z = undefined;
         }
-        await Promise.all(this.handlers.map(async h => h(z)));
+        await super.dispatch(z);
         return false;
-    }
-
-    private handlers: ZCardHandler[] = [];
-
-    public addHandler(h: ZCardHandler): void {
-        if (this.handlers.indexOf(h) < 0) {
-            this.handlers.push(h);
-        }
-    }
-
-    public removeHandler(h: ZCardHandler): void {
-        const i = this.handlers.indexOf(h);
-        if (i > 0) {
-            this.handlers.splice(i, 1);
-        }
     }
 
     public createSpan(zcard: string): HTMLElement {

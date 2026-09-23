@@ -1,3 +1,4 @@
+import { BaseComponent } from "./basecomponent";
 import { BblPlayer, BGamedatas, HandPiece, PieceType } from "./bdata";
 import { AnimationManager } from "./bga-animations";
 import { Css } from "./css";
@@ -14,12 +15,12 @@ export type PieceInfo = {
 
 export type SelectionHandler = (p : PieceInfo, selected: boolean) => void;
 
-export class HandManager {
+export class HandManager extends BaseComponent<{pieceInfo: PieceInfo, selected: boolean}> {
     private readonly collator = new Intl.Collator("en");
-    private selectionHandlers: SelectionHandler[] = [];
     private player: BblPlayer | undefined;
     private mainDiv: HTMLElement;
     public constructor(private bga: Bga<BblPlayer, BGamedatas>, private animationManager: AnimationManager, private playerPanelManger: PlayerPanelManager) {
+        super();
         this.mainDiv = Html.div({});
     }
 
@@ -53,19 +54,6 @@ export class HandManager {
     }
 
     static readonly LOGICAL_POS_ATTR = 'bbl_logicalpos';
-
-    public addSelectionHandler(handler: SelectionHandler): void {
-        if (this.selectionHandlers.indexOf(handler) < 0) {
-            this.selectionHandlers.push(handler);
-        }
-    }
-
-    public removeSelectionHandler(handler: SelectionHandler): void {
-        const i = this.selectionHandlers.indexOf(handler);
-        if (i >= 0) {
-            this.selectionHandlers.splice(i, 1);
-        }
-    }
 
     private orderedHand(hand: HandPiece[]): HandPiece[] {
         let result = hand.concat([]);
@@ -232,7 +220,7 @@ export class HandManager {
             logicalPos: this.getLogicalPos(spaceDiv)
         };
         cl.toggle(Css.SELECTED);
-        await Promise.all(this.selectionHandlers.map(async h => h(pi, selected)));
+        await super.dispatch({pieceInfo: pi, selected: selected});
     }
 
     public getSelectedPiece(deselect: boolean = false): PieceInfo | null {
