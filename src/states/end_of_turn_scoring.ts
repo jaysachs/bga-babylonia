@@ -1,5 +1,4 @@
 import { Css } from "../css";
-import { IDS } from "../ids";
 import { BabyloniaState } from "./base";
 
 export class EndOfTurnScoringState extends BabyloniaState {
@@ -96,7 +95,7 @@ export class EndOfTurnScoringState extends BabyloniaState {
 
         let dest = (args.player_id != 0)
             ? this.playerPanelManager.citycountElement(args.player_id)
-            : $(IDS.OFF_BOARD);
+            : undefined;
 
         await this.animationManager.slideOutAndDestroy(
             hex.firstElementChild as HTMLElement, dest, {})

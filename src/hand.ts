@@ -2,7 +2,6 @@ import { BblPlayer, BGamedatas, HandPiece, PieceType } from "./bdata";
 import { AnimationManager } from "./bga-animations";
 import { Css } from "./css";
 import { Html } from "./html";
-import { IDS } from "./ids";
 import { AnimationList } from "./more-animations";
 import { Piece } from "./piece";
 import { PlayerPanelManager } from "./player_panel";

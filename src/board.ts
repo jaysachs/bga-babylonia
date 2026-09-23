@@ -1,7 +1,6 @@
 import { BblPlayer, BGamedatas, Hex, PieceType } from "./bdata";
 import { Css } from "./css";
 import { Html } from "./html";
-import { IDS } from "./ids";
 import { Piece } from "./piece";
 import { TooltipManager } from "./tooltips";
 

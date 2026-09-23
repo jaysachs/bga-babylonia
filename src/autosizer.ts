@@ -1,6 +1,4 @@
 import { Css } from "./css";
-import { Html } from "./html";
-import { IDS } from "./ids";
 
 export class Autosizer {
 

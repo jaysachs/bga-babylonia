@@ -14,9 +14,7 @@ import { Piece } from './piece';
 import { Html } from './html';
 import { BoardManager } from './board';
 import { PlayerPanelManager } from './player_panel';
-import { IDS } from './ids';
 import { range } from './utils';
-import { Css } from './css';
 import { Autosizer } from './autosizer';
 
 /** Game class */
@@ -37,17 +35,16 @@ export class Game extends BaseGame<BblPlayer, BGamedatas> {
         this.handManager = new HandManager(this.bga, this.animationManager, this.playerPanelManager)
         this.zcardManager = new ZCardManager(this.bga, this.playerPanelManager, this.tooltipManager);
     }
-    private readonly MAIN_ID = 'bbl_main';
 
     async setup(gamedatas: BGamedatas) {
         this.tooltipManager.setup();
         this.playerPanelManager.setup();
 
-        this.bga.gameArea.getElement().appendChild(
-            this.makeHtml(
+        const mainElem = this.makeHtml(
                 this.boardManager.setup(),
                 this.handManager.setup(),
-                this.zcardManager.setup()));
+                this.zcardManager.setup());
+        this.bga.gameArea.getElement().appendChild(mainElem);
         
         this.registerLogArgs();
 
@@ -71,7 +68,7 @@ export class Game extends BaseGame<BblPlayer, BGamedatas> {
             handlers: [this, ...this.bga.states.getStateClasses()],
         });
 
-        new Autosizer(this.bga).setup($(this.MAIN_ID)).then(() => console.debug('Game setup done'));
+        new Autosizer(this.bga).setup(mainElem).then(() => console.debug('Game setup done'));
     }
 
     private registerLogArgs(): void {
@@ -89,21 +86,18 @@ export class Game extends BaseGame<BblPlayer, BGamedatas> {
     }
 
     private makeHtml(boardElem: HTMLElement, handElem: HTMLElement | undefined, zcardsElem: HTMLElement): HTMLElement {
-        return Html.div({},
-            Html.div({ id: this.MAIN_ID, classes: this.bga.players.isCurrentPlayerSpectator() ? ['bbl_is_spectator'] : []},
-                Html.div({ id: "bbl_hand_container" }, handElem),
-                Html.div({ id: 'bbl_board_container' },
-                    Html.div({ id: "bbl_available_zcards_container" }, zcardsElem),
-                    Html.div({ id: 'bbl_column_headers' },
-                        ...range('A'.charCodeAt(0), 'Q'.charCodeAt(0)).map(c => Html.span({ text: String.fromCharCode(c) })),
-                    ),
-                    Html.div({ id: 'bbl_row_headers' },
-                        ...range(1, 23).map(c => Html.span({ text: String(c) })),
-                    ),
-                    boardElem
-                )
-            ),
-            Html.div({ id: IDS.OFF_BOARD })
+        return Html.div({ id: 'bbl_main', classes: this.bga.players.isCurrentPlayerSpectator() ? ['bbl_is_spectator'] : []},
+            Html.div({ id: 'bbl_hand_container' }, handElem),
+            Html.div({ id: 'bbl_board_container' },
+                Html.div({ id: 'bbl_available_zcards_container' }, zcardsElem),
+                Html.div({ id: 'bbl_column_headers' },
+                    ...range('A'.charCodeAt(0), 'Q'.charCodeAt(0)).map(c => Html.span({ text: String.fromCharCode(c) })),
+                ),
+                Html.div({ id: 'bbl_row_headers' },
+                    ...range(1, 23).map(c => Html.span({ text: String(c) })),
+                ),
+                boardElem
+            )
         );
     }
 }

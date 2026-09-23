@@ -1,11 +1,8 @@
 import { BblPlayer, BGamedatas } from "../bdata";
 import { AnimationManager } from "../bga-animations";
 import { BoardManager } from "../board";
-import { Css } from "../css";
 import { HandManager } from "../hand";
-import { IDS } from "../ids";
 import { PlayerPanelManager } from "../player_panel";
-import { TooltipManager } from "../tooltips";
 import { ZCardManager } from "../zcards";
 
 export abstract class BabyloniaState {

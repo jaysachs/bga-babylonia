@@ -1,6 +1,5 @@
 import { BblPlayer, BGamedatas } from "./bdata";
 import { Html } from "./html";
-import { IDS } from "./ids";
 
 export class PlayerPanelManager {
     private handCounters: Counter[] = [];

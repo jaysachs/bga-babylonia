@@ -1,8 +1,7 @@
-import { Hex, PieceType } from "../bdata";
+import { PieceType } from "../bdata";
 import { AnimationList } from "../more-animations";
 import { BabyloniaState } from "./base";
 import { Piece } from "../piece";
-import { IDS } from "../ids";
 import { Css } from "../css";
 import { PieceInfo } from "../hand";
 

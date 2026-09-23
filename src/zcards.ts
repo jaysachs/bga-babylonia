@@ -1,7 +1,6 @@
 import { BblPlayer, BGamedatas, Zcard } from "./bdata";
 import { Css } from "./css";
 import { Html } from "./html";
-import { IDS } from "./ids";
 import { PlayerPanelManager } from "./player_panel";
 import { TooltipManager } from "./tooltips";
 

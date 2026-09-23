@@ -1,4 +1,4 @@
-import { HandPiece, PieceType } from "../bdata";
+import { HandPiece } from "../bdata";
 import { BabyloniaState } from "./base";
 
 export class FinishTurnState extends BabyloniaState {
