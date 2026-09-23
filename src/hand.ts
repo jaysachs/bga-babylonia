@@ -13,8 +13,6 @@ export type PieceInfo = {
     pieceDiv: HTMLElement;
 }
 
-export type SelectionHandler = (p : PieceInfo, selected: boolean) => void;
-
 export class HandManager extends BaseComponent<{pieceInfo: PieceInfo, selected: boolean}> {
     private readonly collator = new Intl.Collator("en");
     private player: BblPlayer | undefined;

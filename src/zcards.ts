@@ -7,8 +7,6 @@ import { TooltipManager } from "./tooltips";
 
 export type ZType = string;
 
-export type ZCardHandler = (zcard?: ZType) => void;
-
 export class ZCardManager extends BaseComponent<ZType | undefined> {
 
     private zcardTooltips = new Map<string, string>();
