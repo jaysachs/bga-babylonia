@@ -19,13 +19,19 @@ export class HandManager {
     private readonly collator = new Intl.Collator("en");
     private selectionHandlers: SelectionHandler[] = [];
     private player: BblPlayer | undefined;
+    private mainDiv: HTMLElement;
+    public constructor(private bga: Bga<BblPlayer, BGamedatas>, private animationManager: AnimationManager, private playerPanelManger: PlayerPanelManager) {
+        this.mainDiv = Html.div({});
+    }
 
-    public constructor(private bga: Bga<BblPlayer, BGamedatas>, private animationManager: AnimationManager, private playerPanelManger: PlayerPanelManager) {}
-
-    public setup(): void {
-        this.player = this.bga.players.getPlayerById(gameui.player_id);
+    public setup(): HTMLElement {
         const hand = this.bga.gameui.gamedatas.hand;
-        if (!hand) { return; }
+        if (!hand) { return this.mainDiv; }
+
+        this.mainDiv = Html.div({id: 'bbl_hand'});
+
+        this.player = this.bga.players.getPlayerById(gameui.player_id);
+        
         if (true) {
             let hand = this.sortedHandsEnabled() 
                 ? this.orderedHand(this.bga.gameui.gamedatas.hand!)
@@ -44,6 +50,7 @@ export class HandManager {
             //     this.refill(hand!);
             // }
         }
+        return this.mainDiv;
     }
 
     static readonly LOGICAL_POS_ATTR = 'bbl_logicalpos';
@@ -88,7 +95,7 @@ export class HandManager {
     }
 
     public spaceForLogicalPos(li: number): HTMLElement {
-        let hpd = $(IDS.HAND).firstElementChild;
+        let hpd = this.mainDiv.firstElementChild;
         while (hpd && this.getLogicalPos(hpd) != li) {
             hpd = hpd.nextElementSibling;
         }
@@ -96,12 +103,11 @@ export class HandManager {
     }
 
     private spaceForPhysicalPos(i: number): HTMLElement {
-        const hand = $(IDS.HAND);
-        while (i >= hand.childElementCount) {
-            hand.appendChild(Html.div({ attrs: { bbl_logicalpos: String(i) }}))
+        while (i >= this.mainDiv.childElementCount) {
+            this.mainDiv.appendChild(Html.div({ attrs: { bbl_logicalpos: String(i) }}))
                 .addEventListener('click', this.onHandClicked.bind(this));
         }
-        return hand.children.item(i)! as HTMLElement;
+        return this.mainDiv.children.item(i)! as HTMLElement;
     }
 
     private sortedHandsEnabled(): boolean {
@@ -203,7 +209,7 @@ export class HandManager {
     }
 
     public setPlayablePieces(isPlayable: (h: PieceType | null) => boolean): void {
-        Array.from($(IDS.HAND).children).forEach((spaceDiv) => {
+        Array.from(this.mainDiv.children).forEach((spaceDiv) => {
             const cl = spaceDiv.classList;
             if (isPlayable(Piece.get(spaceDiv.firstElementChild))) {
                 cl.add(Css.PLAYABLE);
@@ -231,7 +237,7 @@ export class HandManager {
     }
 
     public getSelectedPiece(deselect: boolean = false): PieceInfo | null {
-        const spaceDiv = document.querySelector(`#${IDS.HAND} > .${Css.SELECTED}`);
+        const spaceDiv = document.querySelector(`#${this.mainDiv.id} > .${Css.SELECTED}`);
         if (!spaceDiv) { 
             return null; 
         }
@@ -255,7 +261,7 @@ export class HandManager {
 
     /** returns the already selected   */
     public async unselectAllPieces() {
-        for(let spaceDiv of Array.from($(IDS.HAND).children)) {
+        for(let spaceDiv of Array.from(this.mainDiv.children)) {
             await this.setSpaceSelected(spaceDiv, false);
             console.log('continuing');
             spaceDiv.classList.remove(Css.PLAYABLE);

@@ -1,11 +1,14 @@
 import { Css } from "./css";
+import { Html } from "./html";
 import { IDS } from "./ids";
 
 export class Autosizer {
 
-    constructor(private bga: Bga) {}
+    constructor(private bga: Bga) {  }
+    private mainDiv?: HTMLElement;
 
-    public async setup() {
+    public async setup(mainDiv: HTMLElement) {
+        this.mainDiv = mainDiv;
         this.bga.gameui.onScreenWidthChange = () => this.handleResize();
 
         // FIXME: shouldn't need this but we do.
@@ -43,7 +46,7 @@ export class Autosizer {
             w2 = availWidth;
         }
 
-        const mainElCl = document.getElementById(IDS.MAIN)!.classList;
+        const mainElCl = this.mainDiv!.classList;
         w1 = w1 * (1082 - 112) / 1082;
         w2 = w2 * (1082 - 112) / 1082;
         var width = w1;

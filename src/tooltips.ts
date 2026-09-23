@@ -5,8 +5,9 @@ export class TooltipManager {
 
     public setup(): void { }
 
-    public add(id: string, content: HTMLElement | (() => (HTMLElement))) {
+    public add(elem: HTMLElement, content: HTMLElement | (() => (HTMLElement))) {
         var tooltip: any;
+        let id = elem.id;
         if (content instanceof HTMLElement) {
             this.bga.gameui.addTooltipHtml(id, content.outerHTML);
             tooltip = (this.bga.gameui as any).tooltips[id];
@@ -18,10 +19,10 @@ export class TooltipManager {
         tooltip.removeTarget(id);
 
         let timeoutId: null | number = null;
-        $(id).addEventListener('pointerenter', (e) => {
+        elem.addEventListener('pointerenter', (e) => {
             timeoutId = setTimeout(() => { timeoutId = null; tooltip.open(id) }, 300);
         });
-        $(id).addEventListener('pointerleave', (e) => {
+        elem.addEventListener('pointerleave', (e) => {
             if (timeoutId == null) {
                 tooltip.close();
             } else {

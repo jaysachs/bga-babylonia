@@ -20,10 +20,10 @@ export class ZCardManager {
 
     public constructor(private bga: Bga<BblPlayer, BGamedatas>,  private playerPanelManager: PlayerPanelManager, private tooltipManager: TooltipManager) {}
 
-    public setup(): void {
+    public setup(): HTMLElement {
         const zcards = this.bga.gameui.gamedatas.ziggurat_cards;
 
-        this.mainDiv = $(IDS.AVAILABLE_ZCARDS);
+        this.mainDiv = Html.div({id: 'bbl_available_zcards'});
         for (let zcard of zcards) {
             const zcont =this.mainDiv.appendChild(Html.div({}));
             const zelem = Html.div({ attrs: this.attr(zcard.type, zcard.used), id: this.zcardId(zcard.type) /* , title: _(zcard.tooltip) */});
@@ -35,8 +35,9 @@ export class ZCardManager {
             }
 
             this.zcardTooltips.set(zcard.type, _(zcard.tooltip));
-            this.tooltipManager.add(zelem.id, this.zcardTooltip(zcard));
+            this.tooltipManager.add(zelem, this.zcardTooltip(zcard));
         }
+        return this.mainDiv!;
     }
 
     private controller = new AbortController();

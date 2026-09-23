@@ -15,7 +15,7 @@ export class BoardManager {
     private boardDiv?: HTMLElement;
 
     public setup(): HTMLElement {
-        this.boardDiv = $(IDS.BOARD);
+        this.boardDiv = Html.div({id: 'bbl_board'});
         for (const hex of this.bga.gameui.gamedatas.board) {
             const hexDiv = this.makeHexDiv(hex);
             this.boardDiv.appendChild(hexDiv);
@@ -29,10 +29,10 @@ export class BoardManager {
                     hexDiv.appendChild(pieceDiv);
                     if (Piece.isCity(piece)) {
                         pieceDiv.id = `bbl_city_${hex.rc}`;
-                        this.tooltipManager.add(pieceDiv.id, () => this.cityScoringHover(hex.rc));
+                        this.tooltipManager.add(pieceDiv, () => this.cityScoringHover(hex.rc));
                     } else if (Piece.isField(hex.piece)) {
                         pieceDiv.id = `bbl_field_${hex.rc}`;
-                        this.tooltipManager.add(pieceDiv.id, () => this.fieldScoringHover(hex.rc, piece));
+                        this.tooltipManager.add(pieceDiv, () => this.fieldScoringHover(hex.rc, piece));
                     }
                 }
             } else {
