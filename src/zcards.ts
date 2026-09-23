@@ -9,6 +9,7 @@ export class ZCardManager extends BaseComponent<ZType | undefined> {
 
     private zcardTooltips = new Map<string, string>();
     private mainDiv?: HTMLElement;
+    private static readonly SELECTING = 'bbl_selecting';
 
     private zcardId(type: string): string {
         return `bbl_${type}`;
@@ -41,13 +42,13 @@ export class ZCardManager extends BaseComponent<ZType | undefined> {
     private controller = new AbortController();
 
     public startSelecting(): void {
-        this.mainDiv!.classList.add(Css.SELECTING); 
+        this.mainDiv!.classList.add(ZCardManager.SELECTING); 
         this.controller = new AbortController();       
         this.mainDiv!.addEventListener('click', this.onZCardClicked.bind(this), { signal: this.controller.signal });
     }
 
     public stopSelecting(): void {
-        this.mainDiv!.classList.remove(Css.SELECTING);
+        this.mainDiv!.classList.remove(ZCardManager.SELECTING);
         this.controller.abort();
     }
 

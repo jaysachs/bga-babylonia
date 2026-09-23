@@ -14,6 +14,8 @@ export class BoardManager extends BaseComponent<HexSelectionData> {
     }
 
     private boardDiv?: HTMLElement;
+    private static readonly SCORED = 'bbl_scored';
+    private  static readonly SELECTABLE = 'bbl_selectable';
 
     public setup(): HTMLElement {
         this.boardDiv = Html.div({id: 'bbl_board'});
@@ -25,7 +27,7 @@ export class BoardManager extends BaseComponent<HexSelectionData> {
                 if (Piece.isNonEmpty(piece)) {
                     let pieceDiv = Piece.createDiv(piece, this.bga.players.getPlayerById(hex.board_player));
                     if (hex.scored) {
-                        pieceDiv.classList.add(Css.SCORED);
+                        pieceDiv.classList.add(BoardManager.SCORED);
                     }
                     hexDiv.appendChild(pieceDiv);
                     if (Piece.isCity(piece)) {
@@ -37,7 +39,7 @@ export class BoardManager extends BaseComponent<HexSelectionData> {
                     }
                 }
             } else {
-                hexDiv.classList.add(Css.OUT_OF_PLAY);
+                hexDiv.classList.add('bbl_outofplay');
                 // mark "out of play"
             }
         }
@@ -60,7 +62,7 @@ export class BoardManager extends BaseComponent<HexSelectionData> {
             return null;
         }
         // now check if it's allowed
-        if (!hexDiv.classList.contains(Css.PLAYABLE) && !hexDiv.classList.contains(Css.SELECTABLE)) {
+        if (!hexDiv.classList.contains(Css.PLAYABLE) && !hexDiv.classList.contains(BoardManager.SELECTABLE)) {
             return null;
         }
         const id = hexDiv.id.split('_');
@@ -153,7 +155,7 @@ export class BoardManager extends BaseComponent<HexSelectionData> {
     }
 
     public markHexScored(rc: number): void {
-        this.hexDiv(rc).firstElementChild?.classList.add(Css.SCORED);
+        this.hexDiv(rc).firstElementChild?.classList.add(BoardManager.SCORED);
     }
 
     private markHexPlayable(rc: number): void {
@@ -170,11 +172,11 @@ export class BoardManager extends BaseComponent<HexSelectionData> {
     }
 
     public markHexesSelectable(hexes: number[]): void {
-        hexes.forEach((hex) => this.hexDiv(hex).classList.add(Css.SELECTABLE));
+        hexes.forEach((hex) => this.hexDiv(hex).classList.add(BoardManager.SELECTABLE));
     }
 
     public unmarkHexesSelectable(hexes: number[]): void {
-        hexes.forEach((hex) => this.hexDiv(hex).classList.remove(Css.SELECTABLE));
+        hexes.forEach((hex) => this.hexDiv(hex).classList.remove(BoardManager.SELECTABLE));
     }
 
     public markHexesPlayable(hexes: number[]): void {

@@ -1,4 +1,3 @@
-import { Css } from "../css";
 import { BabyloniaState } from "./base";
 
 export class EndOfTurnScoringState extends BabyloniaState {
@@ -8,26 +7,29 @@ export class EndOfTurnScoringState extends BabyloniaState {
         }
     }
 
+    private static readonly IN_NETWORK = 'bbl_in_network';
+    private static readonly UNIMPORTANT = 'bbl_unimportant';
+
     private async indicateNeighbors(winnerHexes: number[], otherHexes: number[]) {
         const otherCls = otherHexes.map(rc => this.boardManager.hexDiv(rc).classList);
         const winnerCls = winnerHexes.map(rc => this.boardManager.hexDiv(rc).classList);
 
         if (this.animationManager.animationsActive()) {
             for (const cl of otherCls) {
-                cl.add(Css.IN_NETWORK, Css.UNIMPORTANT);
+                cl.add(EndOfTurnScoringState.IN_NETWORK, EndOfTurnScoringState.UNIMPORTANT);
             }
             for (let i = 0; i < 3; i++) {
                 for (const cl of winnerCls) {
-                    cl.add(Css.IN_NETWORK);
+                    cl.add(EndOfTurnScoringState.IN_NETWORK);
                 }
                 await this.bga.gameui.wait(250);
                 for (const cl of winnerCls) {
-                    cl.remove(Css.IN_NETWORK);
+                    cl.remove(EndOfTurnScoringState.IN_NETWORK);
                 }
                 await this.bga.gameui.wait(250);
             }
             for (const cl of otherCls) {
-                cl.remove(Css.IN_NETWORK, Css.UNIMPORTANT);
+                cl.remove(EndOfTurnScoringState.IN_NETWORK, EndOfTurnScoringState.UNIMPORTANT);
             }
         }
     }
@@ -76,9 +78,9 @@ export class EndOfTurnScoringState extends BabyloniaState {
                 for (const nh of details.network_locations) {
                     let cl = this.boardManager.hexDiv(nh).classList;
                     nlCls.push(cl);
-                    cl.add(Css.IN_NETWORK);
+                    cl.add(EndOfTurnScoringState.IN_NETWORK);
                     if (!details.scored_locations.some(sh => (nh == sh))) {
-                        cl.add(Css.UNIMPORTANT);
+                        cl.add(EndOfTurnScoringState.UNIMPORTANT);
                     }
                 }
                 await this.animationManager.displayScoring(
@@ -86,7 +88,7 @@ export class EndOfTurnScoringState extends BabyloniaState {
                     details.network_points,
                     this.bga.gameui.gamedatas.players[details.player_id]!.color,
                     { extraClass: 'bbl_city_scoring' });
-                nlCls.forEach(cl => cl.remove(Css.IN_NETWORK, Css.UNIMPORTANT));
+                nlCls.forEach(cl => cl.remove(EndOfTurnScoringState.IN_NETWORK, EndOfTurnScoringState.UNIMPORTANT));
             }
             this.bga.playerPanels.getScoreCounter(details.player_id).incValue(details.network_points);
         }

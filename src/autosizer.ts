@@ -1,5 +1,3 @@
-import { Css } from "./css";
-
 export class Autosizer {
 
     constructor(private bga: Bga) {  }
@@ -18,6 +16,7 @@ export class Autosizer {
 
     // This includes spots for cards
     static readonly map_aspect_ratio = 808 / 1082; // 2709 / 3385;
+    static readonly LAYOUT_UNDER_BOARD = 'bbl_altflow';
 
     private handleResize() {
         const pageRect = this.bga.gameui.getBoundingClientRectIgnoreZoom('page-content');
@@ -50,10 +49,10 @@ export class Autosizer {
         var width = w1;
         if (w1 >= w2) {
             width = w1;
-            mainElCl.remove(Css.LAYOUT_UNDER_BOARD);
+            mainElCl.remove(Autosizer.LAYOUT_UNDER_BOARD);
         } else {
             width = w2;
-            mainElCl.add(Css.LAYOUT_UNDER_BOARD);
+            mainElCl.add(Autosizer.LAYOUT_UNDER_BOARD);
         }
         document.body.style.setProperty('--bbl-board-width', `${width}px`);
     }

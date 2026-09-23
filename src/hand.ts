@@ -16,6 +16,7 @@ export type PieceInfo = {
 
 export class HandManager extends BaseComponent<PieceInfo> {
     private readonly collator = new Intl.Collator("en");
+    private static readonly UNPLAYABLE = 'bbl_unplayable';
     private player: BblPlayer | undefined;
     private mainDiv: HTMLElement;
     public constructor(private bga: Bga<BblPlayer, BGamedatas>, private animationManager: AnimationManager, private playerPanelManger: PlayerPanelManager) {
@@ -199,10 +200,10 @@ export class HandManager extends BaseComponent<PieceInfo> {
             const cl = spaceDiv.classList;
             if (isPlayable(Piece.get(spaceDiv.firstElementChild))) {
                 cl.add(Css.PLAYABLE);
-                cl.remove(Css.UNPLAYABLE);
+                cl.remove(HandManager.UNPLAYABLE);
             } else {
                 cl.remove(Css.PLAYABLE);
-                cl.add(Css.UNPLAYABLE);
+                cl.add(HandManager.UNPLAYABLE);
             }
         });
     }
@@ -252,7 +253,7 @@ export class HandManager extends BaseComponent<PieceInfo> {
         for(let spaceDiv of Array.from(this.mainDiv.children)) {
             await this.setSpaceSelected(spaceDiv, false);
             spaceDiv.classList.remove(Css.PLAYABLE);
-            spaceDiv.classList.remove(Css.UNPLAYABLE);
+            spaceDiv.classList.remove(HandManager.UNPLAYABLE);
         };
     }
 
@@ -278,7 +279,7 @@ export class HandManager extends BaseComponent<PieceInfo> {
         if (!Piece.isNonEmpty(p)) { return false; }
 
         let cl = spaceDiv.classList;
-        if (cl.contains(Css.UNPLAYABLE)) { return false; }
+        if (cl.contains(HandManager.UNPLAYABLE)) { return false; }
 
         const currentSelected = this.getSelectedPiece();
         if (currentSelected) {
