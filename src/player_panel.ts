@@ -7,8 +7,7 @@ export class PlayerPanelManager {
     private poolCounters: Counter[] = [];
     private cityCounters: Counter[] = [];
 
-    public constructor(private bga: Bga<BblPlayer, BGamedatas>) {
-    }
+    public constructor(private bga: Bga<BblPlayer, BGamedatas>) {}
 
     public setup(): void {
         const players = this.bga.gameui.gamedatas.players;

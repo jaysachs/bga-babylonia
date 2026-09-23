@@ -18,13 +18,14 @@ export type SelectionHandler = (p : PieceInfo, selected: boolean) => void;
 export class HandManager {
     private readonly collator = new Intl.Collator("en");
     private selectionHandlers: SelectionHandler[] = [];
+    private player: BblPlayer | undefined;
 
-    public constructor(private bga: Bga<BblPlayer, BGamedatas>, private animationManager: AnimationManager, private playerPanelManger: PlayerPanelManager, private player?: BblPlayer) {
-        const hand = this.bga.gameui.gamedatas.hand;
-        if (!hand) { return; }
-    }
+    public constructor(private bga: Bga<BblPlayer, BGamedatas>, private animationManager: AnimationManager, private playerPanelManger: PlayerPanelManager) {}
 
     public setup(): void {
+        this.player = this.bga.players.getPlayerById(gameui.player_id);
+        const hand = this.bga.gameui.gamedatas.hand;
+        if (!hand) { return; }
         if (true) {
             let hand = this.sortedHandsEnabled() 
                 ? this.orderedHand(this.bga.gameui.gamedatas.hand!)

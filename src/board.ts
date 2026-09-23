@@ -10,11 +10,9 @@ export type HexSelectionHandler = (hex: number, hexDiv: HTMLElement, piece: Piec
 export class BoardManager {
 
     public constructor(private bga: Bga<BblPlayer, BGamedatas>, private readonly tooltipManager: TooltipManager) {
-        // this.boardDiv = Html.div({id: IDS.BOARD});
-        this.boardDiv = Html.div({id: 'xyz'});
     }
 
-    private boardDiv: HTMLElement;
+    private boardDiv?: HTMLElement;
 
     public setup(): HTMLElement {
         this.boardDiv = $(IDS.BOARD);
@@ -54,7 +52,7 @@ export class BoardManager {
     // Returns the hex (row,col) clicked on, or null if not a playable hex
     private selectedHexIfPlayableOrSelectable(target: EventTarget): number | null {
         let hexDiv = target as Element;
-        while (hexDiv.parentElement != null && hexDiv.parentElement.id != this.boardDiv.id) {
+        while (hexDiv.parentElement != null && hexDiv.parentElement.id != this.boardDiv!.id) {
             hexDiv = hexDiv.parentElement;
         }
         if (hexDiv.parentElement == null) {
@@ -183,7 +181,7 @@ export class BoardManager {
     }
 
     public markAllHexesUnplayable(): void {
-        this.boardDiv.querySelectorAll('.' + Css.PLAYABLE)
+        this.boardDiv!.querySelectorAll('.' + Css.PLAYABLE)
             .forEach(div => div.classList.remove(Css.PLAYABLE));
     }
 
@@ -204,7 +202,7 @@ export class BoardManager {
     }
 
     public markHexSelected(rc: number): void {
-        Array.from(this.boardDiv.children).forEach(div => div.classList.remove(Css.SELECTED));
+        Array.from(this.boardDiv!.children).forEach(div => div.classList.remove(Css.SELECTED));
         this.hexDiv(rc).classList.add(Css.SELECTED);
     }
 
