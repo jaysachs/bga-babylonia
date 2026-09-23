@@ -3,6 +3,8 @@ import { BblPlayer, BGamedatas } from "./bdata";
 export class TooltipManager {
     constructor(private bga: Bga<BblPlayer, BGamedatas>) { }
 
+    public setup(): void { }
+
     public add(id: string, content: HTMLElement | (() => (HTMLElement))) {
         var tooltip: any;
         if (content instanceof HTMLElement) {

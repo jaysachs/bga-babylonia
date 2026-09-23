@@ -18,7 +18,11 @@ export class ZCardManager {
         return `bbl_${type}`;
     }
 
-    constructor(private bga: Bga<BblPlayer, BGamedatas>,  private playerPanelManager: PlayerPanelManager, private tooltipManager: TooltipManager) {
+    public constructor(private bga: Bga<BblPlayer, BGamedatas>,  private playerPanelManager: PlayerPanelManager, private tooltipManager: TooltipManager) {
+        this.mainDiv = Html.div({});
+    }
+
+    public setup(): void {
         const zcards = this.bga.gameui.gamedatas.ziggurat_cards;
 
         this.mainDiv = $(IDS.AVAILABLE_ZCARDS);

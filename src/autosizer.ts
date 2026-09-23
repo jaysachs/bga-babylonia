@@ -5,7 +5,7 @@ export class Autosizer {
 
     constructor(private bga: Bga) {}
 
-    public async initialize() {
+    public async setup() {
         this.bga.gameui.onScreenWidthChange = () => this.handleResize();
 
         // FIXME: shouldn't need this but we do.

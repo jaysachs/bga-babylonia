@@ -31,12 +31,17 @@ export class Game extends BaseGame<BblPlayer, BGamedatas> {
         if (this.bga.players.isCurrentPlayerSpectator()) {
             $(IDS.MAIN).classList.add(Css.IS_SPECTATOR);
         }
-
+        
         const tooltipManager = new TooltipManager(this.bga);
+        tooltipManager.setup();
         const playerPanelManager = new PlayerPanelManager(this.bga);
+        playerPanelManager.setup();
         const boardManager = new BoardManager(this.bga, tooltipManager);
+        boardManager.setup();
         const handManager = new HandManager(this.bga, this.animationManager, playerPanelManager, this.bga.players.getPlayerById(gameui.player_id))
+        handManager.setup();
         const zcardManager = new ZCardManager(this.bga, playerPanelManager, tooltipManager);
+        zcardManager.setup();
 
         this.registerLogArgs(zcardManager);
 
@@ -53,7 +58,7 @@ export class Game extends BaseGame<BblPlayer, BGamedatas> {
             handlers: [this, ...this.bga.states.getStateClasses()],
         });
 
-        new Autosizer(this.bga).initialize().then(() => console.debug('Game setup done'));
+        new Autosizer(this.bga).setup().then(() => console.debug('Game setup done'));
     }
 
     private registerLogArgs(zcardManager: ZCardManager): void {

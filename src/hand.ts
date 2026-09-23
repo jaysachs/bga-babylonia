@@ -19,6 +19,34 @@ export class HandManager {
     private readonly collator = new Intl.Collator("en");
     private selectionHandlers: SelectionHandler[] = [];
 
+    public constructor(private bga: Bga<BblPlayer, BGamedatas>, private animationManager: AnimationManager, private playerPanelManger: PlayerPanelManager, private player?: BblPlayer) {
+        const hand = this.bga.gameui.gamedatas.hand;
+        if (!hand) { return; }
+    }
+
+    public setup(): void {
+        if (true) {
+            let hand = this.sortedHandsEnabled() 
+                ? this.orderedHand(this.bga.gameui.gamedatas.hand!)
+                : this.bga.gameui.gamedatas.hand!;
+            hand.forEach((hp, i) => {
+                const hpd = this.spaceForPhysicalPos(i);
+                this.setLogicalPos(hpd, hp.position);
+                if (!hp.played && Piece.isNonEmpty(hp.piece_type)) {
+                    hpd.appendChild(Piece.createDiv(hp.piece_type, this.player));
+                }
+            });
+        } else {
+            // FIXME: this fails because it has async animations that
+            // don't finish by the time play_pieces state starts.
+            // if (hand) {
+            //     this.refill(hand!);
+            // }
+        }
+    }
+
+    static readonly LOGICAL_POS_ATTR = 'bbl_logicalpos';
+
     public addSelectionHandler(handler: SelectionHandler): void {
         if (this.selectionHandlers.indexOf(handler) < 0) {
             this.selectionHandlers.push(handler);
@@ -47,32 +75,7 @@ export class HandManager {
         return result;
     }
 
-    public constructor(private bga: Bga<BblPlayer, BGamedatas>, private animationManager: AnimationManager, private playerPanelManger: PlayerPanelManager, private player?: BblPlayer) {
-        const hand = this.bga.gameui.gamedatas.hand;
-        if (!hand) { return; }
-        if (true) {
-            let hand = this.sortedHandsEnabled() 
-                ? this.orderedHand(bga.gameui.gamedatas.hand!)
-                : bga.gameui.gamedatas.hand!;
-            hand.forEach((hp, i) => {
-                const hpd = this.spaceForPhysicalPos(i);
-                this.setLogicalPos(hpd, hp.position);
-                if (!hp.played && Piece.isNonEmpty(hp.piece_type)) {
-                    hpd.appendChild(Piece.createDiv(hp.piece_type, this.player));
-                }
-            });
-        } else {
-            // FIXME: this fails because it has async animations that
-            // don't finish by the time play_pieces state starts.
-            if (hand) {
-                this.refill(hand!);
-            }
-        }
-    }
-
-    static readonly LOGICAL_POS_ATTR = 'bbl_logicalpos';
-
-    private setLogicalPos(div: Element, lpos: number): void {
+   private setLogicalPos(div: Element, lpos: number): void {
         div.setAttribute(HandManager.LOGICAL_POS_ATTR, String(lpos));
         // for debugging
         // div.setAttribute('title', String(lpos));
