@@ -113,7 +113,7 @@ class PlayPieces extends AbstractState
                     "player_id" => $active_player_id,
                     "piece" => $piece,
                     "rc" => $rc,
-                    "hex" => RowCol::toUser($rc),
+                    "hex" => $rc,
                     "captured_piece" => $move->captured_piece->value,
                     "points" => $points,
                     "ziggurat_points" => $move->ziggurat_points,
@@ -152,7 +152,7 @@ class PlayPieces extends AbstractState
                 [
                     "player_id" => $active_player_id,
                     "rc" => $move->rc,
-                    "hex" => RowCol::toUser($move->rc),
+                    "hex" => $move->rc,
                     "piece" => $move->piece->value,
                     "captured_piece" => $move->captured_piece->value,
                     "hand_size" => $model->activePlayerInfo()->hand->size(),

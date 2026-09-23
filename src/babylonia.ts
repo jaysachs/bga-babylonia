@@ -16,6 +16,7 @@ import { BoardManager } from './board';
 import { PlayerPanelManager } from './player_panel';
 import { range } from './utils';
 import { Autosizer } from './autosizer';
+import { Hex } from './hex';
 
 /** Game class */
 export class Game extends BaseGame<BblPlayer, BGamedatas> {
@@ -66,9 +67,11 @@ export class Game extends BaseGame<BblPlayer, BGamedatas> {
         this.bga.notifications.setupPromiseNotifications({
             // logger: console.log,
             handlers: [this, ...this.bga.states.getStateClasses()],
+            onEnd: this.addHexHovers.bind(this)
         });
-
-        new Autosizer(this.bga).setup(mainElem).then(() => console.debug('Game setup done'));
+        new Autosizer(this.bga).setup(mainElem)
+            .then(() => this.addHexHovers())
+            .then(() => console.debug('Game setup done'));
     }
 
     private registerLogArgs(): void {
@@ -77,6 +80,26 @@ export class Game extends BaseGame<BblPlayer, BGamedatas> {
         this.registerLogArg('zcard', (args) => this.zcardManager.createSpan(args.zcard));
         this.registerLogArg('original_piece', (args) => this.renderPieceForLog(args.original_piece, args.player_id));
         this.registerLogArg('captured_piece', (args) => this.renderPieceForLog(args.captured_piece));
+        this.registerLogArg('hex', (args) => this.renderHexForLog(args.hex));
+    }
+
+    private addHexHovers(): void {
+        const item_elements = document.querySelectorAll('#logs [bbl_hex]:not(.bbl_processed)');
+        Array.from(item_elements).forEach(ele => {
+            ele.classList.add('bbl_processed');  // prevents tooltips being re-added to previous log entries
+            ele.addEventListener('mouseover', (e) => {
+                this.boardManager.highlightHex(Number(ele.getAttribute('bbl_hex')));
+            })
+            ele.addEventListener('mouseleave', (e) => {
+                this.boardManager.unhighlightHex(Number(ele.getAttribute('bbl_hex')));
+            })
+        });
+    }
+
+    private renderHexForLog(hex: number): HTMLElement {
+        const span = Html.span({ text: Hex.format(hex), classes: 'bbl_formattedhex' });
+        span.setAttribute('bbl_hex', String(hex));
+        return span;
     }
 
     private renderPieceForLog(piece: PieceType, player_id: number = 0): HTMLElement {

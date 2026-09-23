@@ -72,10 +72,4 @@ class RowCol
     public static function fromRowCol(int $row, int $col): int {
         return $row * 100 + $col;
     }
-
-    public static function toUser(int $rc): string {
-        $col = self::col($rc);
-        if ($col < 0 || $col > 50) return "??";
-        return chr($col + 65) . strval(self::row($rc) + 1);
-    }
 }

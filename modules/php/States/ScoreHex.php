@@ -60,7 +60,7 @@ class ScoreHex extends AbstractState
         $model = $this->createModel(0);
         return [
             "current_scoring_hex" => $rc,
-            "hex" => RowCol::toUser($rc),
+            "hex" => $rc,
             "city" => $model->board()->hexAt($rc)->piece->value,
         ];
     }
@@ -72,7 +72,7 @@ class ScoreHex extends AbstractState
         $piece = $hexWinner->hex->piece;
         $data = array_merge($data, [
             "rc" =>  $rc,
-            "hex" => RowCol::toUSer($rc),
+            "hex" => $rc,
             "winner_hexes" => $hexWinner->winnerRowCols(),
             "other_hexes" => $hexWinner->othersRowCols(),
             "player_id" => $player_id,

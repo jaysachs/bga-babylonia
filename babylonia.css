@@ -876,3 +876,17 @@ div.bbl_pb_zcards>div {
     background-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='173' ><polygon points='8,86 48,8 148,8 190,86 148,164 48,164' fill='black' fill-opacity='0.3' stroke='none'/></svg>");
     background-size: contain;
 }
+
+#bbl_board>div.bbl_highlighted::after {
+    content: '';
+    display: inline;
+    position: absolute;
+    pointer-events: none;
+    left: 0;
+    top: 0;
+    height: var(--bbl-hex-height);
+    aspect-ratio: var(--bbl-hex-ratio);
+    background-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='173' ><polygon points='8,86 48,8 148,8 190,86 148,164 48,164' fill='yellow' fill-opacity='0.1' stroke='rgb(68,238,68)' stroke-width='14' /></svg>") !important;
+    filter:saturate(150%);
+    background-size: contain;
+}

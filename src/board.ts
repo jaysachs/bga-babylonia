@@ -15,7 +15,8 @@ export class BoardManager extends BaseComponent<HexSelectionData> {
 
     private boardDiv?: HTMLElement;
     private static readonly SCORED = 'bbl_scored';
-    private  static readonly SELECTABLE = 'bbl_selectable';
+    private static readonly SELECTABLE = 'bbl_selectable';
+    private static readonly HIGHLIGHTED = 'bbl_highlighted';
 
     public setup(): HTMLElement {
         this.boardDiv = Html.div({id: 'bbl_board'});
@@ -126,6 +127,14 @@ export class BoardManager extends BaseComponent<HexSelectionData> {
                     p => Piece.createDiv("hidden", p, undefined, String(scores[String(p.player_id)] ?? 0)))
             )
         )
+    }
+
+    public highlightHex(rc: number): void {
+        this.hexDiv(rc).classList.add(BoardManager.HIGHLIGHTED);
+    }
+
+    public unhighlightHex(rc: number): void {
+        this.hexDiv(rc).classList.remove(BoardManager.HIGHLIGHTED);
     }
 
     private fieldScoringHover(rc: number, piece: PieceType): HTMLElement {
