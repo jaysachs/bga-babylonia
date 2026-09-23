@@ -25,7 +25,6 @@ export class PlayPiecesState extends BabyloniaState {
     }
 
     override onEnteringState(args: { playState: PlayStateArgs; must_end_game: number[]; may_end_game: number[]; }, isCurrentPlayerActive: boolean) {
-        console.log(args);
         if (isCurrentPlayerActive) {
             this.handManager.addSelectionHandler(this.handSelectionHandler);
             if (args.must_end_game.length > 0) {
@@ -220,7 +219,6 @@ export class PlayPiecesState extends BabyloniaState {
 
     private async handlePieceSelection(pieceInfo: PieceInfo, selected: boolean) {
         if (this.allowedMovesFor(pieceInfo.pieceType).length == 0) {
-            console.log("no allowed moves");
             return;
         }
         if (selected) {

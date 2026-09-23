@@ -262,7 +262,6 @@ export class HandManager {
     public async unselectAllPieces() {
         for(let spaceDiv of Array.from(this.mainDiv.children)) {
             await this.setSpaceSelected(spaceDiv, false);
-            console.log('continuing');
             spaceDiv.classList.remove(Css.PLAYABLE);
             spaceDiv.classList.remove(Css.UNPLAYABLE);
         };
