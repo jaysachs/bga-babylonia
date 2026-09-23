@@ -9,27 +9,26 @@ export class EndOfTurnScoringState extends BabyloniaState {
         }
     }
 
-    private async indicateNeighbors(
-        winnerHexes: number[],
-        otherHexes: number[]) {
+    private async indicateNeighbors(winnerHexes: number[], otherHexes: number[]) {
+        const otherCls = otherHexes.map(rc => this.boardManager.hexDiv(rc).classList);
+        const winnerCls = winnerHexes.map(rc => this.boardManager.hexDiv(rc).classList);
+
         if (this.animationManager.animationsActive()) {
-            for (const rc of otherHexes) {
-                this.boardManager.hexDiv(rc).classList.add(Css.IN_NETWORK);
-                this.boardManager.hexDiv(rc).classList.add(Css.UNIMPORTANT);
+            for (const cl of otherCls) {
+                cl.add(Css.IN_NETWORK, Css.UNIMPORTANT);
             }
             for (let i = 0; i < 3; i++) {
-                for (const rc of winnerHexes) {
-                    this.boardManager.hexDiv(rc).classList.add(Css.IN_NETWORK);
+                for (const cl of winnerCls) {
+                    cl.add(Css.IN_NETWORK);
                 }
                 await this.bga.gameui.wait(250);
-                for (const rc of winnerHexes) {
-                    this.boardManager.hexDiv(rc).classList.remove(Css.IN_NETWORK);
+                for (const cl of winnerCls) {
+                    cl.remove(Css.IN_NETWORK);
                 }
                 await this.bga.gameui.wait(250);
             }
-            for (const rc of otherHexes) {
-                this.boardManager.hexDiv(rc).classList.remove(Css.IN_NETWORK);
-                this.boardManager.hexDiv(rc).classList.remove(Css.UNIMPORTANT);
+            for (const cl of otherCls) {
+                cl.remove(Css.IN_NETWORK, Css.UNIMPORTANT);
             }
         }
     }
@@ -74,8 +73,10 @@ export class EndOfTurnScoringState extends BabyloniaState {
         for (const details of args.details) {
             // const details = args.details[playerId]!;
             if (aa) {
+                const nlCls = [];
                 for (const nh of details.network_locations) {
                     let cl = this.boardManager.hexDiv(nh).classList;
+                    nlCls.push(cl);
                     cl.add(Css.IN_NETWORK);
                     if (!details.scored_locations.some(sh => (nh == sh))) {
                         cl.add(Css.UNIMPORTANT);
@@ -86,12 +87,7 @@ export class EndOfTurnScoringState extends BabyloniaState {
                     details.network_points,
                     this.bga.gameui.gamedatas.players[details.player_id]!.color,
                     { extraClass: 'bbl_city_scoring' });
-                details.network_locations.forEach(
-                    (rc: number) => {
-                        let cl = this.boardManager.hexDiv(rc).classList;
-                        cl.remove(Css.IN_NETWORK);
-                        cl.remove(Css.UNIMPORTANT);
-                    });
+                nlCls.forEach(cl => cl.remove(Css.IN_NETWORK, Css.UNIMPORTANT));
             }
             this.bga.playerPanels.getScoreCounter(details.player_id).incValue(details.network_points);
         }
