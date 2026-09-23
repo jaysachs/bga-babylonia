@@ -56,7 +56,7 @@ class PlayPieces extends AbstractState
      */
     private function addStateArgs(array $args, Model $model, int $active_player_id): array {
         $args["playState"] = [
-            "potentialCityScoring" => $model->potentialCityScoring()
+            "potential_city_scoring" => $model->potentialCityScoring()
         ];
 
         $priv = &$args["_private"];
@@ -68,7 +68,7 @@ class PlayPieces extends AbstractState
             "canEndTurn" => $model->canEndTurn(),
             "canUndo" => $model->canUndo(),
             // FIXME:need to do this because private subargs don't merge, they replace :-(
-            "potentialCityScoring" => $args["playState"]["potentialCityScoring"],
+            "potential_city_scoring" => $args["playState"]["potentialCityScoring"],
         ];
 
         return $args;

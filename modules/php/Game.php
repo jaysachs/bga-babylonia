@@ -182,7 +182,7 @@ class Game extends Table
             'hand' => isset($pis[$cpid]) ? $pis[$cpid]->hand->serialize() : null,
             'board' => $board_data,
             'translated_pieces' => $translated,
-            'potentialCityScoring' => $model->potentialCityScoring(),
+            'potential_city_scoring' => $model->potentialCityScoring(),
             'captured_city_count' => $total_captured_city_count,
             'ziggurat_cards' =>
                 array_map(
