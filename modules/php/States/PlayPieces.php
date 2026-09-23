@@ -68,7 +68,7 @@ class PlayPieces extends AbstractState
             "canEndTurn" => $model->canEndTurn(),
             "canUndo" => $model->canUndo(),
             // FIXME:need to do this because private subargs don't merge, they replace :-(
-            "potential_city_scoring" => $args["playState"]["potentialCityScoring"],
+            "potential_city_scoring" => $args["playState"]["potential_city_scoring"],
         ];
 
         return $args;
