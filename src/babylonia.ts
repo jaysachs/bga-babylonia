@@ -80,7 +80,7 @@ export class Game extends BaseGame<BblPlayer, BGamedatas> {
         this.registerLogArg('zcard', (args) => this.zcardManager.createSpan(args.zcard));
         this.registerLogArg('original_piece', (args) => this.renderPieceForLog(args.original_piece, args.player_id));
         this.registerLogArg('captured_piece', (args) => this.renderPieceForLog(args.captured_piece));
-        this.registerLogArg('hex', (args) => this.renderHexForLog(args.hex, args));
+        this.registerLogArg('hex', (args) => this.renderHexForLog(args.hex));
     }
 
     private addHexHovers(): void {
@@ -96,9 +96,10 @@ export class Game extends BaseGame<BblPlayer, BGamedatas> {
         });
     }
 
-    private renderHexForLog(hex: any, args: any): HTMLElement {
-        console.debug(hex, args.rc, args.captured_city_count);
-        if (typeof hex != 'number') { hex = args.rc ?? args.captured_city_count; }
+    private renderHexForLog(hex: number | string): HTMLElement {
+        if (typeof hex == 'string') {
+            hex = Hex.unformat(hex);
+        }
         const span = Html.span({ text: Hex.format(hex), classes: 'bbl_formattedhex' });
         span.setAttribute('bbl_hex', String(hex));
         return span;
