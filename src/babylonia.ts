@@ -46,22 +46,22 @@ export class Game extends BaseGame<BblPlayer, BGamedatas> {
                 this.handManager.setup(),
                 this.zcardManager.setup());
         this.bga.gameArea.getElement().appendChild(mainElem);
-        
+
         this.registerLogArgs();
 
-        this.bga.states.register('SelectExtraTurn', 
+        this.bga.states.register('SelectExtraTurn',
             new SelectExtraTurnState(this.bga, this.animationManager, this.boardManager, this.handManager, this.zcardManager, this.playerPanelManager));
-        this.bga.states.register('FinishTurn', 
+        this.bga.states.register('FinishTurn',
             new FinishTurnState(this.bga, this.animationManager, this.boardManager, this.handManager, this.zcardManager, this.playerPanelManager));
-        this.bga.states.register('EndOfTurnScoring', 
+        this.bga.states.register('EndOfTurnScoring',
             new EndOfTurnScoringState(this.bga, this.animationManager, this.boardManager, this.handManager, this.zcardManager, this.playerPanelManager));
-        this.bga.states.register('SelectZigguratCard', 
+        this.bga.states.register('SelectZigguratCard',
             new SelectZigguratCardState(this.bga, this.animationManager, this.boardManager, this.handManager, this.zcardManager, this.playerPanelManager));
-        this.bga.states.register('PlayPieces', 
+        this.bga.states.register('PlayPieces',
             new PlayPiecesState(this.bga, this.animationManager, this.boardManager, this.handManager, this.zcardManager, this.playerPanelManager));
-        this.bga.states.register('SelectScoringHex', 
+        this.bga.states.register('SelectScoringHex',
             new SelectScoringHexState(this.bga, this.animationManager, this.boardManager, this.handManager, this.zcardManager, this.playerPanelManager));
-        this.bga.states.register('ScoreHex', 
+        this.bga.states.register('ScoreHex',
             new ScoreHexState(this.bga, this.animationManager, this.boardManager, this.handManager, this.zcardManager, this.playerPanelManager));
 
         this.bga.notifications.setupPromiseNotifications({
@@ -80,7 +80,7 @@ export class Game extends BaseGame<BblPlayer, BGamedatas> {
         this.registerLogArg('zcard', (args) => this.zcardManager.createSpan(args.zcard));
         this.registerLogArg('original_piece', (args) => this.renderPieceForLog(args.original_piece, args.player_id));
         this.registerLogArg('captured_piece', (args) => this.renderPieceForLog(args.captured_piece));
-        this.registerLogArg('hex', (args) => this.renderHexForLog(args.hex));
+        this.registerLogArg('hex', (args) => this.renderHexForLog(args.hex, args));
     }
 
     private addHexHovers(): void {
@@ -96,7 +96,8 @@ export class Game extends BaseGame<BblPlayer, BGamedatas> {
         });
     }
 
-    private renderHexForLog(hex: number): HTMLElement {
+    private renderHexForLog(hex: number, args: any): HTMLElement {
+        if (typeof hex != 'number') { hex = args.rc ?? args.captured_city_count; }
         const span = Html.span({ text: Hex.format(hex), classes: 'bbl_formattedhex' });
         span.setAttribute('bbl_hex', String(hex));
         return span;
