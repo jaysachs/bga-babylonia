@@ -272,7 +272,11 @@ class Model
         return PlayAllowedResult::failure("cannot place extra nobles");
     }
 
+    /**
+     * @return array<string,int>
+     */
     public function getPoolContents(): array {
+        /** @var array<string,int> */
         $result = [
             PieceType::FARMER->value => 0,
             PieceType::MERCHANT->value => 0,

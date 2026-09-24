@@ -49,13 +49,13 @@ class SelectScoringHex extends AbstractScoringSelection
         $this->giveExtraTime($active_player_id);
     }
 
-    /** @return array{hexes:array<int,string>} */
+    /** @return array{hexes:array<int,int>} */
     public function getArgs(int $active_player_id): array
     {
         $model = $this->createModel($active_player_id);
         $hexes = [];
         foreach($model->locationsRequiringScoring() as $rc) {
-            $hexes[$rc] = RowCol::toUser($rc);
+            $hexes[$rc] = $rc;
         }
         return ["hexes" => $hexes];
     }

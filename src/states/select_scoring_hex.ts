@@ -3,9 +3,9 @@ import { HexSelectionData } from "../board";
 import { BabyloniaState } from "./base";
 
 export class SelectScoringHexState extends BabyloniaState {
-    private hexes: string[] = [];
+    private hexes: number[] = [];
 
-    override onEnteringState(args: { hexes: string[] }, isCurrentPlayerActive: boolean) {
+    override onEnteringState(args: { hexes: number[] }, isCurrentPlayerActive: boolean) {
         this.hexes = args.hexes;
         if (isCurrentPlayerActive) {
             const rcs = Object.keys(args.hexes).map(Number);
@@ -24,7 +24,7 @@ export class SelectScoringHexState extends BabyloniaState {
         this.boardManager.markHexSelected(data.hex);
         // TODO: add tooltip
         this.bga.statusBar.setTitle(_('Score ${city} at ${hex}?'), {
-            hex: this.hexes[data.hex], city: data.piece,
+            hex: data.hex, city: data.piece,
         });
         this.bga.statusBar.removeActionButtons();
         this.bga.statusBar.addActionButton(_('Confirm'),
