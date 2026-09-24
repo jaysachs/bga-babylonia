@@ -877,6 +877,29 @@ div.bbl_pb_zcards>div {
     background-size: contain;
 }
 
+@keyframes highlighted {
+    from {
+        opacity: 20%;
+    }
+    10% {
+        opacity: 100%;
+    }
+    20% {
+        opacity: 20%;
+    }
+    30% {
+        opacity: 100%;
+    }
+    40% {
+        opacity: 20%;
+    }
+    50% {
+        opacity: 100%;
+    }
+    to {
+        opacity: 100%;
+    }
+}
 #bbl_board>div.bbl_highlighted::after {
     content: '';
     display: inline;
@@ -886,7 +909,9 @@ div.bbl_pb_zcards>div {
     top: 0;
     height: var(--bbl-hex-height);
     aspect-ratio: var(--bbl-hex-ratio);
-    background-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='173' ><polygon points='8,86 48,8 148,8 190,86 148,164 48,164' fill='yellow' fill-opacity='0.1' stroke='rgb(238,238,68)' stroke-dasharray='12' stroke-width='18' /></svg>") !important;
+    background-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='173' ><polygon points='8,86 48,8 148,8 190,86 148,164 48,164' fill='yellow' fill-opacity='0.1' stroke='rgb(68,238,68)' stroke-dasharray='24' stroke-width='18' /></svg>") !important;
     filter:saturate(150%);
     background-size: contain;
+    animation: 3s highlighted;
+    animation-timing-function: linear;
 }
