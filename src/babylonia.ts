@@ -96,7 +96,8 @@ export class Game extends BaseGame<BblPlayer, BGamedatas> {
         });
     }
 
-    private renderHexForLog(hex: number, args: any): HTMLElement {
+    private renderHexForLog(hex: any, args: any): HTMLElement {
+        console.log(hex, args.rc, args.captured_city_count);
         if (typeof hex != 'number') { hex = args.rc ?? args.captured_city_count; }
         const span = Html.span({ text: Hex.format(hex), classes: 'bbl_formattedhex' });
         span.setAttribute('bbl_hex', String(hex));

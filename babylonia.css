@@ -828,8 +828,8 @@ div.bbl_pb_zcards>div {
     height: var(--bbl-hex-height);
 }
 
-.bbl_city_scoring_hover_details > div[bbl_piece="hidden_2"],
-.bbl_city_scoring_hover_details > div[bbl_piece="hidden_4"] {
+.bbl_city_scoring_hover_details > div[bbl_piece$="_2"],
+.bbl_city_scoring_hover_details > div[bbl_piece$="_4"] {
     color: black;
 }
 
