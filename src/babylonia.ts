@@ -97,9 +97,7 @@ export class Game extends BaseGame<BblPlayer, BGamedatas> {
     }
 
     private renderHexForLog(hex: number): HTMLElement {
-        const span = Html.span({ text: Hex.format(hex), classes: 'bbl_formattedhex' });
-        span.setAttribute('bbl_hex', String(hex));
-        return span;
+        return Html.span({ text: Hex.format(hex), attrs: { bbl_hex: String(hex) } });
     }
 
     private renderPieceForLog(piece: PieceType, player_id: number = 0): HTMLElement {

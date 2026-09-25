@@ -913,7 +913,7 @@ div.bbl_pb_zcards>div {
     animation-timing-function: linear;
 }
 
-.bbl_formattedhex {
+[bbl_hex] {
     font-family: 'Courier New', monospace;
     font-weight: bold;
     /*
