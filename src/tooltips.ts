@@ -1,7 +1,5 @@
-import { BblPlayer, BGamedatas } from "./bdata";
-
 export class TooltipManager {
-    constructor(private bga: Bga<BblPlayer, BGamedatas>) { }
+    constructor(private bga: Bga) { }
 
     public setup(): void { }
 
