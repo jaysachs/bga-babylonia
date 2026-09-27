@@ -24,15 +24,16 @@ export class PlayerPanelManager {
 
     private poolTooltip(): HTMLElement {
         const pool = this.bga.gameui.gamedatas.pool!;
-        return Html.div({ classes: 'bbl_city_scoring_hover' },
+        return Html.div({ classes: ['bbl_pool_contents_hover', 'bbl_piece_hover'] },
             Html.span({ text: _("Current pool contents") }),
-            Html.div({ classes: 'bbl_city_scoring_hover_details' },
-                ... Object.entries(pool).map(
-                    (p) => Piece.createDiv(
-                        String(p[0]) as PieceType,
-                        this.bga.players.getCurrentPlayer(), 
-                        undefined, 
-                        String(p[1])))
+            Html.div({ classes: 'bbl_piece_hover_details' },
+                ... Object.entries(pool).flatMap(
+                    (p) => [
+                            Piece.createDiv(
+                                String(p[0]) as PieceType,
+                                this.bga.players.getCurrentPlayer()),
+                            Html.div({ text: String(p[1]) })
+                    ])
             )
         )
     }
@@ -84,7 +85,7 @@ export class PlayerPanelManager {
 
     public citycountElement(player_id: number): HTMLElement {
         return $(this.citycountId(player_id));
-        
+
     }
 
     private updateCounter(counter: Counter, value: number, animate: boolean) {
@@ -114,7 +115,7 @@ export class PlayerPanelManager {
     }
 
     public addZCard(player_id: number, zelem: HTMLElement): void {
-        $(this.zcardsId(player_id)).appendChild(zelem);        
+        $(this.zcardsId(player_id)).appendChild(zelem);
     }
 
     private player_board_ext(player_id: number): HTMLElement[] {

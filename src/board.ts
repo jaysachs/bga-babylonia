@@ -86,19 +86,19 @@ export class BoardManager extends BaseComponent<HexSelectionData> {
         if (!this.bga.players.isCurrentPlayerActive()) {
             return false;
         }
-    
+
         const hex = this.selectedHexIfPlayableOrSelectable(event.target!);
         if (hex == null) {
             return false;
         }
-    
+
         const hexDiv = this.hexDiv(hex);
         const pieceDiv = hexDiv.firstElementChild as HTMLElement | null;
         const piece = Piece.get(pieceDiv);
         await super.dispatch({ hex, hexDiv, piece, capturedPieceDiv: pieceDiv, terrain: this.hexForRc(hex)!.terrain})
         return false;
     }
-    
+
 
     private hexDivId(rc: number): string {
         return `bbl_hex_${rc}`;
@@ -120,9 +120,9 @@ export class BoardManager extends BaseComponent<HexSelectionData> {
 
     private cityScoringHover(rc: number): HTMLElement {
         const scores = this.bga.gameui.gamedatas.potential_city_scoring[String(rc)]!;
-        return Html.div({ classes: 'bbl_city_scoring_hover' },
+        return Html.div({ classes: ['bbl_piece_hover', 'bbl_city_scoring_hover'] },
             Html.span({ text: _("Current points") }),
-            Html.div({ classes: 'bbl_city_scoring_hover_details' },
+            Html.div({ classes: 'bbl_piece_hover_details' },
                 ... this.playersInPlayerNoOrder().map(
                     p => Piece.createDiv("hidden", p, undefined, String(scores[String(p.player_id)] ?? 0)))
             )
@@ -138,11 +138,11 @@ export class BoardManager extends BaseComponent<HexSelectionData> {
     }
 
     private fieldScoringHover(rc: number, piece: PieceType): HTMLElement {
-        return Html.div({ classes: 'bbl_field_scoring_hover' },
+        return Html.div({ classes: ['bbl_field_scoring_hover','bbl_piece_hover'] },
             Html.span({ text: _("Field points") }),
-            Html.div({ classes: 'bbl_field_scoring_hover_details' },
-                Piece.createDiv(piece, undefined, "bbl_field_scoring_hover_piece"),
-                Html.div({ id: "bbl_field_scoring_hover_points", text: `${this.fieldPoints(piece)}` })
+            Html.div({ classes: 'bbl_piece_hover_details' },
+                Piece.createDiv(piece),
+                Html.div({ text: `${this.fieldPoints(piece)}` })
             )
         )
     }

@@ -765,70 +765,59 @@ div.bbl_pb_zcards>div {
     padding-top: 0.5em;
 }
 
-.bbl_city_scoring_hover {
+.bbl_piece_hover {
     font-size: calc(var(--bbl-hex-height)/3);
     background-color: beige;
     padding: 5px;
+    color: black;
     border: 1px solid black;
 }
 
-.bbl_city_scoring_hover > span {
+.bbl_piece_hover > span {
     display: grid;
     font-style: italic;
     text-align: center;
     width: 100%;
 }
 
-.bbl_city_scoring_hover_details {
+.bbl_piece_hover_details {
     border-top: 1px solid darkgrey;
     border-bottom: 1px solid darkgrey;
     padding-top: 3px;
     padding-bottom: 3px;
     display: flex;
-    color: white;
+    flex-wrap: nowrap;
+    grid-template-columns: auto;
     font-size: calc(var(--bbl-hex-height)/2);
+
+/*    font-size: calc(var(--bbl-hex-height)/1.5); */
+    justify-content: space-around;
+    align-items: center;
+    flex-direction: row;
 }
 
-.bbl_city_scoring_hover_details > div {
+.bbl_piece_hover_details > div {
     display: flex;
     justify-content: center;
     align-items: center;
     flex-direction: column;
+}
+
+.bbl_piece_hover_details > div:nth-of-type(even) {
+    margin-right: 0.25em;
+}
+
+.bbl_piece_hover_details > div:nth-of-type(1) {
+    margin-left: 0.25em;
+}
+
+.bbl_piece_hover_details [bbl_piece] {
     width: var(--bbl-hex-width);
     height: var(--bbl-hex-height);
 }
-
-.bbl_city_scoring_hover_details > div[bbl_piece$="_2"],
-.bbl_city_scoring_hover_details > div[bbl_piece$="_4"] {
-    color: black;
-}
-
-/* field scoring hover */
-
-.bbl_field_scoring_hover {
-    font-size: calc(var(--bbl-hex-height)/3);
-    background-color: beige;
-    padding: 5px;
-    border: 1px solid black;
-}
-
-.bbl_field_scoring_hover > span {
-    display: grid;
-    font-style: italic;
-    text-align: center;
-    width: 100%;
-}
-
-.bbl_field_scoring_hover_details {
-    border-top: 1px solid darkgrey;
-    border-bottom: 1px solid darkgrey;
-    padding-top: 3px;
-    padding-bottom: 3px;
-    display: flex;
-    font-size: calc(var(--bbl-hex-height)/1.5);
-    justify-content: space-around;
-    align-items: center;
-    flex-direction: row;
+.bbl_piece_hover_details div[bbl_piece$="_1"],
+.bbl_piece_hover_details div[bbl_piece$="_3"] {
+    color: white;
 }
 
 .bbl_outofplay {
@@ -856,6 +845,7 @@ div.bbl_pb_zcards>div {
         transform: scale(1.0);
     }
 }
+
 #bbl_board>div.bbl_highlighted::after {
     content: '';
     display: inline;
