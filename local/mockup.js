@@ -1,7 +1,3 @@
-function toggleShadows() {
-    document.documentElement.classList.toggle('bbl_piece_shadows');
-}
-
 function handchange(n) {
     document.querySelectorAll('#bbl_hand > div > div')
         .forEach(d => {
@@ -11,14 +7,6 @@ function handchange(n) {
                 d.setAttribute('bbl_piece', p[0] + '_' + n);
             }
         });
-}
-
-function bgchange(event) {
-    const c = document.body.classList;
-    c.remove('bblbg1');
-    c.remove('bblbg2');
-    c.remove('bblbg3');
-    c.add(event.target.value);
 }
 
 const hstart = 38.0; // this is related to board width but not sure how

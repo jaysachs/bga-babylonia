@@ -13,19 +13,6 @@
  *
  */
 
-body.bblbg1 {
-    background-image: url(img/background-dark.jpg);
-}
-
-body.bblbg2 {
-    background: linear-gradient(60deg, #a7855d, #b2afa4);
-}
-
-body.bblbg3 {
-    background: conic-gradient(#666, #a7855d, #666, #b2afa4, #666);
-}
-
-/* inspired from https://css-tricks.com/hexagons-and-beyond-flexible-responsive-grid-patterns-sans-media-queries/ */
 body {
     background:
        linear-gradient(60deg, #6af3, #6af5, #6af7, #6af5, #6af3)
@@ -753,12 +740,6 @@ div.bbl_pb_zcards>div {
     width: 100%;
 }
 
-/* FIXME: only needed for mockup
-@font-face {
-    font-family: 'ParchmentMf Vqge';
-    src: url(fonts/ParchmentMf-Vqge.ttf);
-} */
-
 .bbl_zcard_hover {
     width: calc(min(50vw,265px));
     font-size: calc(min(12pt, var(--bbl-hex-height)/2));
@@ -789,17 +770,6 @@ div.bbl_pb_zcards>div {
     background-color: beige;
     padding: 5px;
     border: 1px solid black;
-}
-
-#bbl_board_container.bbl_mockup:has( div[bbl_piece^="city_"]:hover) .bbl_city_scoring_hover {
-    opacity: 100%;
-    transition: all 100ms 500ms allow-discrete;
-}
-
-#bbl_board_container.bbl_mockup:not(:has( div[bbl_piece^="city_"]:hover)) .bbl_city_scoring_hover {
-    opacity: 0%;
-    pointer-events: none;
-    transition: all 100ms 350ms allow-discrete;
 }
 
 .bbl_city_scoring_hover > span {
@@ -840,17 +810,6 @@ div.bbl_pb_zcards>div {
     background-color: beige;
     padding: 5px;
     border: 1px solid black;
-}
-
-#bbl_board_container.bbl_mockup:has( div[bbl_piece^="field_"]:hover) .bbl_field_scoring_hover {
-    opacity: 100%;
-    transition: all 100ms 500ms allow-discrete;
-}
-
-#bbl_board_container.bbl_mockup:not(:has( div[bbl_piece^="field_"]:hover)) .bbl_field_scoring_hover {
-    opacity: 0%;
-    pointer-events: none;
-    transition: all 100ms 350ms allow-discrete;
 }
 
 .bbl_field_scoring_hover > span {

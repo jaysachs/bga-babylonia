@@ -1,0 +1,33 @@
+/* mockup-related hover triggers */
+#bbl_board_container.bbl_mockup:has(div[bbl_piece^="city_"]:hover) .bbl_city_scoring_hover {
+    opacity: 100%;
+    transition: all 100ms 500ms allow-discrete;
+}
+
+#bbl_board_container.bbl_mockup:not(:has(div[bbl_piece^="city_"]:hover)) .bbl_city_scoring_hover {
+    opacity: 0%;
+    pointer-events: none;
+    transition: all 100ms 350ms allow-discrete;
+}
+
+:root:has(#bbl_board_container.bbl_mockup):has(.bbl_pb_pool:hover) .bbl_pool_contents_hover {
+    opacity: 100%;
+    transition: all 100ms 500ms allow-discrete;
+}
+
+:root:has(#bbl_board_container.bbl_mockup):not(:has(.bbl_pb_pool:hover)) .bbl_pool_contents_hover {
+    opacity: 0%;
+    pointer-events: none;
+    transition: all 100ms 350ms allow-discrete;
+}
+
+#bbl_board_container.bbl_mockup:has( div[bbl_piece^="field_"]:hover) .bbl_field_scoring_hover {
+    opacity: 100%;
+    transition: all 100ms 500ms allow-discrete;
+}
+
+#bbl_board_container.bbl_mockup:not(:has( div[bbl_piece^="field_"]:hover)) .bbl_field_scoring_hover {
+    opacity: 0%;
+    pointer-events: none;
+    transition: all 100ms 350ms allow-discrete;
+}
