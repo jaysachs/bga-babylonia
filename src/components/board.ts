@@ -5,6 +5,7 @@ import { Html } from "../libs/html";
 import { PieceManager } from "./piece";
 import { TooltipManager } from "../libs/tooltips";
 import { TextFormatter } from "../libs/textformatter";
+import { LogManager } from "../libs/logmanager";
 
 export type HexSelectionData = { hex: number, hexDiv: HTMLElement, piece: PieceType | null, capturedPieceDiv: HTMLElement | undefined | null, terrain: string };
 
@@ -27,7 +28,11 @@ class HexFormatter {
 
 export class BoardManager extends BaseComponent<HexSelectionData> {
 
-    public constructor(private bga: Bga<BblPlayer, BGamedatas>, private readonly textFormatter: TextFormatter, private readonly tooltipManager: TooltipManager, private readonly pieceManager: PieceManager) {
+    public constructor(private bga: Bga<BblPlayer, BGamedatas>,
+        private readonly logManager: LogManager,
+        private readonly textFormatter: TextFormatter,
+        private readonly tooltipManager: TooltipManager,
+        private readonly pieceManager: PieceManager) {
         super();
     }
 
@@ -38,6 +43,7 @@ export class BoardManager extends BaseComponent<HexSelectionData> {
 
     public setup(): HTMLElement {
         this.textFormatter.registerFormatter('hex', (args) => this.renderHexArg(args.hex));
+        this.logManager.registerProcessor('[bbl_hex]', (e) => this.addHexHover(e));
 
         this.boardDiv = Html.div({id: 'bbl_board'});
         for (const hex of this.bga.gameui.gamedatas.board) {
@@ -68,18 +74,13 @@ export class BoardManager extends BaseComponent<HexSelectionData> {
         return this.boardDiv;
     }
 
-    public addHexHovers(): void {
-        // FIXME: factor out a LogComponent/Manager
-        const item_elements = document.querySelectorAll('#logs [bbl_hex]:not(.bbl_processed)');
-        Array.from(item_elements).forEach(ele => {
-            ele.classList.add('bbl_processed');  // prevents tooltips being re-added to previous log entries
-            ele.addEventListener('mouseover', (e) => {
-                this.highlightHex(Number(ele.getAttribute('bbl_hex')));
-            })
-            ele.addEventListener('mouseleave', (e) => {
-                this.unhighlightHex(Number(ele.getAttribute('bbl_hex')));
-            })
-        });
+    private addHexHover(ele: HTMLElement): void {
+        ele.addEventListener('mouseover', (e) => {
+            this.highlightHex(Number(ele.getAttribute('bbl_hex')));
+        })
+        ele.addEventListener('mouseleave', (e) => {
+            this.unhighlightHex(Number(ele.getAttribute('bbl_hex')));
+        })
     }
 
     private renderHexArg(hex: number): HTMLElement {

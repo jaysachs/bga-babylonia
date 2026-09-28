@@ -30,12 +30,13 @@ export class Game extends BaseGame<BblPlayer, BGamedatas> {
         super(bga);
         this.pieceManager = new PieceManager(bga, this.textFormatter);
         this.playerPanelManager = new PlayerPanelManager(bga, this.tooltipManager, this.pieceManager);
-        this.boardManager = new BoardManager(bga, this.textFormatter, this.tooltipManager, this.pieceManager);
+        this.boardManager = new BoardManager(bga, this.logManager, this.textFormatter, this.tooltipManager, this.pieceManager);
         this.handManager = new HandManager(bga, this.animationManager, this.playerPanelManager, this.pieceManager)
         this.zcardManager = new ZCardManager(bga, this.textFormatter, this.playerPanelManager, this.tooltipManager);
     }
 
-    async setup(gamedatas: BGamedatas) {
+    override async setup(gamedatas: BGamedatas) {
+        super.setup(gamedatas);
         this.tooltipManager.setup();
         this.playerPanelManager.setup();
         this.pieceManager.setup();
@@ -51,11 +52,11 @@ export class Game extends BaseGame<BblPlayer, BGamedatas> {
         this.bga.notifications.setupPromiseNotifications({
             // logger: console.log,
             handlers: [this, ...this.bga.states.getStateClasses()],
-            onEnd: () => this.boardManager.addHexHovers(),
+            onEnd: () => this.logManager.processLogs()
         });
         new Autosizer(this.bga).setup(mainElem)
             // FIXME: see if can make this not needed
-            .then(() => this.boardManager.addHexHovers())
+            .then(() => this.logManager.processLogs())
             .then(() => console.debug('Game setup done'));
     }
 
