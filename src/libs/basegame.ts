@@ -1,4 +1,4 @@
-import { BgaAnimations, AnimationManager } from '../libs';
+import { BgaAnimations, AnimationManager } from '../bgalibs/libs';
 import { MoreAnimations } from './more-animations';
 
 /**

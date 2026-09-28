@@ -1,4 +1,4 @@
-import { BblPlayer, BGamedatas } from "../bdata";
+import { BblPlayer, BGamedatas } from "../model/data";
 import { AnimationManager } from "../bgalibs/bga-animations";
 import { BoardManager } from "../components/board";
 import { HandManager } from "../components/hand";

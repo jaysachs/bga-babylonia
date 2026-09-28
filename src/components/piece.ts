@@ -1,4 +1,4 @@
-import { BblPlayer, PieceType } from "../bdata";
+import { BblPlayer, PieceType } from "../model/data";
 import { AttrLike, Html } from "../libs/html";
 
 export class Piece {

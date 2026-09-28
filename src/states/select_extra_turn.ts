@@ -1,4 +1,4 @@
-import { ZType } from "../bdata";
+import { ZType } from "../model/data";
 import { BabyloniaState } from "./base";
 
 export class SelectExtraTurnState extends BabyloniaState {

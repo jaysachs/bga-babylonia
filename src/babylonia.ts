@@ -1,5 +1,5 @@
 import { BaseGame } from './libs/basegame';
-import { BblPlayer, BGamedatas, PieceType } from './bdata';
+import { BblPlayer, BGamedatas, PieceType } from './model/data';
 import { SelectExtraTurnState } from './states/select_extra_turn';
 import { EndOfTurnScoringState } from './states/end_of_turn_scoring';
 import { SelectZigguratCardState } from './states/select_ziggurat_card';

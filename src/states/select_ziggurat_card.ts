@@ -1,5 +1,4 @@
-import { Css } from "../components/css";
-import { ZType } from "../bdata";
+import { ZType } from "../model/data";
 import { BabyloniaState } from "./base";
 
 type StateArgs = {
@@ -59,9 +58,9 @@ export class SelectZigguratCardState extends BabyloniaState {
         }
     ) {
         const dest = this.playerPanelManager.zcardsElement(args.player_id);
+        this.zcardManager.unselectAll();
         const zelem = this.zcardManager.getZCardElement(args.zcard);
 
-        zelem.classList.remove(Css.SELECTED);
         await this.animationManager.slideAndAttach(zelem, dest, { toPlaceholder: 'off' })
         this.bga.playerPanels.getScoreCounter(args.player_id).incValue(args.points);
         if (args.cardused) {

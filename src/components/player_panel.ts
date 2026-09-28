@@ -1,4 +1,4 @@
-import { BblPlayer, BGamedatas, PieceType } from "../bdata";
+import { BblPlayer, BGamedatas, PieceType } from "../model/data";
 import { Html } from "../libs/html";
 import { Piece } from "./piece";
 import { TooltipManager } from "../libs/tooltips";

@@ -1,5 +1,5 @@
 import { BaseComponent } from "../libs/basecomponent";
-import { BblPlayer, BGamedatas, HandPiece, PieceType } from "../bdata";
+import { BblPlayer, BGamedatas, HandPiece, PieceType } from "../model/data";
 import { AnimationManager } from "../bgalibs/bga-animations";
 import { Css } from "./css";
 import { Html } from "../libs/html";
@@ -206,6 +206,10 @@ export class HandManager extends BaseComponent<PieceInfo> {
                 cl.add(HandManager.UNPLAYABLE);
             }
         });
+    }
+
+    public setSpacePlayable(handpos: number): void {
+        this.spaceForLogicalPos(handpos).classList.add(Css.PLAYABLE);
     }
 
     private async setSpaceSelected(spaceDiv: Element, selected: boolean) {

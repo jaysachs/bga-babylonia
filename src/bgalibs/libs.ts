@@ -1,5 +1,5 @@
-import type { BgaAnimations as BgaAnimationsType, AnimationManager } from "./bgalibs/bga-animations";
-import type { BgaScoreSheet as BgaScoreSheetType, ScoreSheet } from './bgalibs/bga-score-sheet';
+import type { BgaAnimations as BgaAnimationsType, AnimationManager } from "./bga-animations";
+import type { BgaScoreSheet as BgaScoreSheetType, ScoreSheet } from './bga-score-sheet';
 
 const BgaAnimations: typeof BgaAnimationsType = await globalThis.importEsmLib('bga-animations', '1.x');
 const BgaScoreSheet: typeof BgaScoreSheetType = await globalThis.importEsmLib('bga-score-sheet', '1.x');

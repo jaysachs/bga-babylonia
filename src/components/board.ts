@@ -1,5 +1,5 @@
 import { BaseComponent } from "../libs/basecomponent";
-import { BblPlayer, BGamedatas, Hex, PieceType } from "../bdata";
+import { BblPlayer, BGamedatas, Hex, PieceType } from "../model/data";
 import { Css } from "./css";
 import { Html } from "../libs/html";
 import { Piece } from "./piece";

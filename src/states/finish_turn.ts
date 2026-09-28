@@ -1,4 +1,4 @@
-import { HandPiece, PieceCount, PieceType } from "../bdata";
+import { HandPiece, PieceCount, PieceType } from "../model/data";
 import { BabyloniaState } from "./base";
 
 export class FinishTurnState extends BabyloniaState {

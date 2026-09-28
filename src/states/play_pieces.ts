@@ -1,8 +1,7 @@
-import { PieceType } from "../bdata";
+import { PieceType } from "../model/data";
 import { AnimationList } from "../libs/more-animations";
 import { BabyloniaState } from "./base";
 import { Piece } from "../components/piece";
-import { Css } from "../components/css";
 import { PieceInfo } from "../components/hand";
 import { HexSelectionData } from "../components/board";
 
@@ -146,7 +145,7 @@ export class PlayPiecesState extends BabyloniaState {
 
         await this.animationManager.playParallel(anims);
         if (args.handpos !== undefined) {
-            destDiv.classList.add(Css.PLAYABLE);
+            this.handManager.setSpacePlayable(args.handpos);
         }
         this.playerPanelManager.updateHandCount(args);
         this.bga.playerPanels.getScoreCounter(args.player_id).incValue(-args.points);

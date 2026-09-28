@@ -1,5 +1,5 @@
 import { BaseComponent } from "../libs/basecomponent";
-import { BblPlayer, BGamedatas, Zcard, ZType } from "../bdata";
+import { BblPlayer, BGamedatas, Zcard, ZType } from "../model/data";
 import { Css } from "./css";
 import { Html } from "../libs/html";
 import { PlayerPanelManager } from "./player_panel";
