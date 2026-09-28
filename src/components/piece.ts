@@ -8,7 +8,8 @@ export class PieceManager {
     public setup(): void {
         this.textFormatter.registerFormatter('piece', (args: any) => this.renderPieceArg(args.piece, args.player_id));
         this.textFormatter.registerFormatter('original_piece', (args: any) => this.renderPieceArg(args.original_piece, args.player_id));
-        this.textFormatter.registerFormatter('captured_piece', (args: any ) => this.renderPieceArg(args.captured_piece, args.player_id));
+        this.textFormatter.registerFormatter('captured_piece', (args: any ) => this.renderPieceArg(args.captured_piece));
+        this.textFormatter.registerFormatter('city', (args) => this.renderPieceArg(args.city));
     }
 
     public isNonEmpty(p: PieceType | null): boolean { return p !== null && p !== undefined && p != 'empty' }
