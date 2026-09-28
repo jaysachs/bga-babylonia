@@ -5,6 +5,7 @@ import { Html } from "../libs/html";
 import { PlayerPanelManager } from "./player_panel";
 import { TooltipManager } from "../libs/tooltips";
 import { TextFormatter } from "../libs/textformatter";
+import { LogManager } from "../libs/logmanager";
 
 export class ZCardManager extends BaseComponent<ZType | undefined> {
 
@@ -16,12 +17,17 @@ export class ZCardManager extends BaseComponent<ZType | undefined> {
         return `bbl_${type}`;
     }
 
-    public constructor(private bga: Bga<BblPlayer, BGamedatas>,  private readonly textFormatter: TextFormatter, private playerPanelManager: PlayerPanelManager, private tooltipManager: TooltipManager) {
+    public constructor(private bga: Bga<BblPlayer, BGamedatas>,
+            private readonly logManager: LogManager,
+            private readonly textFormatter: TextFormatter,
+            private readonly playerPanelManager: PlayerPanelManager,
+            private readonly tooltipManager: TooltipManager) {
         super();
     }
 
     public setup(): HTMLElement {
         this.textFormatter.registerFormatter('zcard', (args) => this.renderZCardArg(args.zcard));
+        this.logManager.registerProcessor('[bbl_ztype]', (e) => this.addZCardHover(e));
         const zcards = this.bga.gameui.gamedatas.ziggurat_cards;
 
         this.mainDiv = Html.div({id: 'bbl_available_zcards'});
@@ -58,7 +64,7 @@ export class ZCardManager extends BaseComponent<ZType | undefined> {
         event.preventDefault();
         event.stopPropagation();
         let e = event.target as HTMLElement;
-        var z = this.get(e);
+        var z = this.getZType(e);
         if (!z) { return false; }
         if (!e.classList.contains(Css.SELECTED)) {
             this.unselectAll();
@@ -70,11 +76,42 @@ export class ZCardManager extends BaseComponent<ZType | undefined> {
         return false;
     }
 
-    private renderZCardArg(zcard: ZType): HTMLElement {
-        return Html.span({
-            title: this.zcardTooltips.get(zcard) ?? '',
-            attrs: this.attr(zcard)
+    private zcardForType(ztype: ZType): Zcard | undefined {
+        for (const zc of this.bga.gameui.gamedatas.ziggurat_cards) {
+            if (zc.type == ztype) {
+                return zc;
+            }
+        }
+        return undefined;
+    }
+
+    private renderZCardArg(zt: ZType): HTMLElement {
+        const el = Html.span({
+            id: `bbl_zc_arg_${zt}`,
+            title: this.zcardTooltips.get(zt) ?? '',
+            attrs: this.attr(zt)
         });
+        const zc = this.zcardForType(zt);
+        if (!zc) {
+            console.error("Could not find ziggurat card ", zt);
+            return el;
+        }
+        this.tooltipManager.add(el, this.zcardTooltip(zc));
+        return el;
+    }
+
+    private addZCardHover(el: HTMLElement): void {
+        const zt = this.getZType(el);
+        if (!zt) {
+            console.error("could not find ztype in ", el);
+            return;
+        }
+        const zc = this.zcardForType(zt);
+        if (!zc) {
+            console.error("Could not find ziggurat card ", zt);
+            return;
+        }
+        this.tooltipManager.add(el, this.zcardTooltip(zc));
     }
 
     private zcardTooltip(zcard: Zcard): HTMLElement {
@@ -88,7 +125,7 @@ export class ZCardManager extends BaseComponent<ZType | undefined> {
         return $(this.zcardId(ztype));
     }
 
-    private get(el: Element): ZType | undefined {
+    private getZType(el: Element): ZType | undefined {
         return el.getAttribute(ZCardManager.ATTR) as ZType;
     }
 

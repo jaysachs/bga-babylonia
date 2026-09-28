@@ -32,7 +32,7 @@ export class Game extends BaseGame<BblPlayer, BGamedatas> {
         this.playerPanelManager = new PlayerPanelManager(bga, this.tooltipManager, this.pieceManager);
         this.boardManager = new BoardManager(bga, this.logManager, this.textFormatter, this.tooltipManager, this.pieceManager);
         this.handManager = new HandManager(bga, this.animationManager, this.playerPanelManager, this.pieceManager)
-        this.zcardManager = new ZCardManager(bga, this.textFormatter, this.playerPanelManager, this.tooltipManager);
+        this.zcardManager = new ZCardManager(bga, this.logManager, this.textFormatter, this.playerPanelManager, this.tooltipManager);
     }
 
     override async setup(gamedatas: BGamedatas) {
