@@ -16,12 +16,10 @@ import { BoardManager } from './components/board';
 import { PlayerPanelManager } from './components/player_panel';
 import { range } from './libs/utils';
 import { Autosizer } from './components/autosizer';
-import { Hex } from './components/hex';
 
 /** Game class */
 export class Game extends BaseGame<BblPlayer, BGamedatas> {
 
-    private tooltipManager: TooltipManager;
     private playerPanelManager: PlayerPanelManager;
     private boardManager: BoardManager;
     private handManager: HandManager;
@@ -30,33 +28,34 @@ export class Game extends BaseGame<BblPlayer, BGamedatas> {
     constructor(bga: Bga<BblPlayer, BGamedatas>) {
         super(bga);
 
-        this.tooltipManager = new TooltipManager(bga);
         this.playerPanelManager = new PlayerPanelManager(bga, this.tooltipManager);
-        this.boardManager = new BoardManager(bga, this.tooltipManager);
+        this.boardManager = new BoardManager(bga, this.textFormatter, this.tooltipManager);
         this.handManager = new HandManager(bga, this.animationManager, this.playerPanelManager)
-        this.zcardManager = new ZCardManager(bga, this.playerPanelManager, this.tooltipManager);
+        this.zcardManager = new ZCardManager(bga, this.textFormatter, this.playerPanelManager, this.tooltipManager);
     }
 
     async setup(gamedatas: BGamedatas) {
         this.tooltipManager.setup();
         this.playerPanelManager.setup();
 
+        // FIXME: make Piece a PieceManager / PieceComponent instance
+        /* this. */ Piece.setup(this.bga, this.textFormatter);
         const mainElem = this.makeHtml(
                 this.boardManager.setup(),
                 this.handManager.setup(),
                 this.zcardManager.setup());
         this.bga.gameArea.getElement().appendChild(mainElem);
 
-        this.registerLogArgs();
         this.registerStates();
 
         this.bga.notifications.setupPromiseNotifications({
             // logger: console.log,
             handlers: [this, ...this.bga.states.getStateClasses()],
-            onEnd: this.addHexHovers.bind(this)
+            onEnd: () => this.boardManager.addHexHovers(),
         });
         new Autosizer(this.bga).setup(mainElem)
-            .then(() => this.addHexHovers())
+            // FIXME: see if can make this not needed
+            .then(() => this.boardManager.addHexHovers())
             .then(() => console.debug('Game setup done'));
     }
 
@@ -75,38 +74,6 @@ export class Game extends BaseGame<BblPlayer, BGamedatas> {
             new SelectScoringHexState(this.bga, this.animationManager, this.boardManager, this.handManager, this.zcardManager, this.playerPanelManager));
         this.bga.states.register('ScoreHex',
             new ScoreHexState(this.bga, this.animationManager, this.boardManager, this.handManager, this.zcardManager, this.playerPanelManager));
-    }
-
-    private registerLogArgs(): void {
-        this.registerLogArg('piece', (args) => this.renderPieceForLog(args.piece, args.player_id));
-        this.registerLogArg('city', (args) => this.renderPieceForLog(args.city));
-        this.registerLogArg('zcard', (args) => this.zcardManager.createSpan(args.zcard));
-        this.registerLogArg('original_piece', (args) => this.renderPieceForLog(args.original_piece, args.player_id));
-        this.registerLogArg('captured_piece', (args) => this.renderPieceForLog(args.captured_piece));
-        this.registerLogArg('hex', (args) => this.renderHexForLog(args.hex));
-    }
-
-    private addHexHovers(): void {
-        const item_elements = document.querySelectorAll('#logs [bbl_hex]:not(.bbl_processed)');
-        Array.from(item_elements).forEach(ele => {
-            ele.classList.add('bbl_processed');  // prevents tooltips being re-added to previous log entries
-            ele.addEventListener('mouseover', (e) => {
-                this.boardManager.highlightHex(Number(ele.getAttribute('bbl_hex')));
-            })
-            ele.addEventListener('mouseleave', (e) => {
-                this.boardManager.unhighlightHex(Number(ele.getAttribute('bbl_hex')));
-            })
-        });
-    }
-
-    private renderHexForLog(hex: number): HTMLElement {
-        return Html.span({ text: Hex.format(hex), attrs: { bbl_hex: String(hex) } });
-    }
-
-    private renderPieceForLog(piece: PieceType, player_id: number = 0): HTMLElement {
-        const tp = this.bga.gameui.gamedatas.translated_pieces[piece];
-        const translated = tp ? _(tp) : '';
-        return Html.span({ title: translated, attrs: Piece.attr(piece, this.bga.players.getPlayerById(player_id)) });
     }
 
     private makeHtml(boardElem: HTMLElement, handElem: HTMLElement | undefined, zcardsElem: HTMLElement): HTMLElement {

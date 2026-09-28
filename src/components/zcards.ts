@@ -4,6 +4,7 @@ import { Css } from "./css";
 import { Html } from "../libs/html";
 import { PlayerPanelManager } from "./player_panel";
 import { TooltipManager } from "../libs/tooltips";
+import { TextFormatter } from "../libs/textformatter";
 
 export class ZCardManager extends BaseComponent<ZType | undefined> {
 
@@ -15,11 +16,12 @@ export class ZCardManager extends BaseComponent<ZType | undefined> {
         return `bbl_${type}`;
     }
 
-    public constructor(private bga: Bga<BblPlayer, BGamedatas>,  private playerPanelManager: PlayerPanelManager, private tooltipManager: TooltipManager) {
+    public constructor(private bga: Bga<BblPlayer, BGamedatas>,  private readonly textFormatter: TextFormatter, private playerPanelManager: PlayerPanelManager, private tooltipManager: TooltipManager) {
         super();
     }
 
     public setup(): HTMLElement {
+        this.textFormatter.registerFormatter('zcard', (args) => this.createSpan(args.zcard));
         const zcards = this.bga.gameui.gamedatas.ziggurat_cards;
 
         this.mainDiv = Html.div({id: 'bbl_available_zcards'});
@@ -68,7 +70,7 @@ export class ZCardManager extends BaseComponent<ZType | undefined> {
         return false;
     }
 
-    public createSpan(zcard: ZType): HTMLElement {
+    private createSpan(zcard: ZType): HTMLElement {
         return Html.span({
             title: this.zcardTooltips.get(zcard) ?? '',
             attrs: this.attr(zcard)

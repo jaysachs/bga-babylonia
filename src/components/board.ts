@@ -4,12 +4,30 @@ import { Css } from "./css";
 import { Html } from "../libs/html";
 import { Piece } from "./piece";
 import { TooltipManager } from "../libs/tooltips";
+import { TextFormatter } from "../libs/textformatter";
 
 export type HexSelectionData = { hex: number, hexDiv: HTMLElement, piece: PieceType | null, capturedPieceDiv: HTMLElement | undefined | null, terrain: string };
 
+class HexFormatter {
+
+    private static col(rc: number): number {
+        return rc % 100;
+    }
+
+    private static row(rc: number): number {
+        return Math.trunc(rc / 100);
+    }
+
+    public static format(rc: number): string {
+        const col = HexFormatter.col(rc);
+        if (col < 0 || col > 50) return "??";
+        return String.fromCharCode(col + 65) + String(HexFormatter.row(rc) + 1);
+    }
+}
+
 export class BoardManager extends BaseComponent<HexSelectionData> {
 
-    public constructor(private bga: Bga<BblPlayer, BGamedatas>, private readonly tooltipManager: TooltipManager) {
+    public constructor(private bga: Bga<BblPlayer, BGamedatas>, private readonly textFormatter: TextFormatter, private readonly tooltipManager: TooltipManager) {
         super();
     }
 
@@ -19,6 +37,8 @@ export class BoardManager extends BaseComponent<HexSelectionData> {
     private static readonly HIGHLIGHTED = 'bbl_highlighted';
 
     public setup(): HTMLElement {
+        this.textFormatter.registerFormatter('hex', (args) => this.renderHexForLog(args.hex));
+
         this.boardDiv = Html.div({id: 'bbl_board'});
         for (const hex of this.bga.gameui.gamedatas.board) {
             const hexDiv = this.makeHexDiv(hex);
@@ -46,6 +66,24 @@ export class BoardManager extends BaseComponent<HexSelectionData> {
         }
         this.boardDiv.addEventListener('click', async e => this.onBoardClicked(e));
         return this.boardDiv;
+    }
+
+    public addHexHovers(): void {
+        // FIXME: factor out a LogComponent/Manager
+        const item_elements = document.querySelectorAll('#logs [bbl_hex]:not(.bbl_processed)');
+        Array.from(item_elements).forEach(ele => {
+            ele.classList.add('bbl_processed');  // prevents tooltips being re-added to previous log entries
+            ele.addEventListener('mouseover', (e) => {
+                this.highlightHex(Number(ele.getAttribute('bbl_hex')));
+            })
+            ele.addEventListener('mouseleave', (e) => {
+                this.unhighlightHex(Number(ele.getAttribute('bbl_hex')));
+            })
+        });
+    }
+
+    private renderHexForLog(hex: number): HTMLElement {
+        return Html.span({ text: HexFormatter.format(hex), attrs: { bbl_hex: String(hex) } });
     }
 
     static readonly hstart = 56.0; // this the (negative) offset on left of board
