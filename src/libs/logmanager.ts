@@ -1,21 +1,22 @@
 import { Html } from "./html";
 
 export class LogManager {
-    private processors: { fragment:string, processor: (e:HTMLElement) => void}[] = [];
+    private processors: { selector:string, processor: (e:HTMLElement) => void}[] = [];
     private logsElem: HTMLElement;
     public constructor() {
         this.logsElem = Html.div({}); // dummy
     }
 
     public registerProcessor(selectorFragment: string, processor: (e:HTMLElement) => void): void {
-        this.processors.push({fragment: selectorFragment, processor: processor });
+        this.processors.push({selector: selectorFragment, processor: processor });
     }
 
     private static readonly PROCESSED = 'bbl_processed';
 
     public processLogs(): void {
         this.processors.forEach(p => {
-            const item_elements = this.logsElem.querySelectorAll(p.fragment + `:not([${LogManager.PROCESSED}="1"])`);
+            // FIXME: this concatenation is fragile
+            const item_elements = this.logsElem.querySelectorAll(p.selector + `:not([${LogManager.PROCESSED}="1"])`);
             Array.from(item_elements).forEach(el => {
                 el.setAttribute(LogManager.PROCESSED,'0');
                 p.processor(el as HTMLElement);
