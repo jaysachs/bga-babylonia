@@ -15,7 +15,7 @@ import { Html } from './libs/html';
 import { BoardManager } from './components/board';
 import { PlayerPanelManager } from './components/player_panel';
 import { range } from './libs/utils';
-import { Autosizer } from './autosizer';
+import { Autosizer } from './components/autosizer';
 import { Hex } from './components/hex';
 
 /** Game class */
