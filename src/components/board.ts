@@ -1,5 +1,5 @@
 import { BaseComponent } from "../libs/basecomponent";
-import { BblPlayer, BGamedatas, Hex, PieceType } from "../model/data";
+import { BblPlayer, BblGamedatas, Hex, PieceType } from "../model/data";
 import { Css } from "./css";
 import { Html } from "../libs/html";
 import { PieceManager } from "./piece";
@@ -28,7 +28,7 @@ class HexFormatter {
 
 export class BoardManager extends BaseComponent<HexSelectionData> {
 
-    public constructor(private bga: Bga<BblPlayer, BGamedatas>,
+    public constructor(private bga: Bga<BblPlayer, BblGamedatas>,
         private readonly logManager: LogManager,
         private readonly textFormatter: TextFormatter,
         private readonly tooltipManager: TooltipManager,

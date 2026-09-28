@@ -1,5 +1,5 @@
 import { BaseComponent } from "../libs/basecomponent";
-import { BblPlayer, BGamedatas, Zcard, ZType } from "../model/data";
+import { BblPlayer, BblGamedatas, Zcard, ZType } from "../model/data";
 import { Css } from "./css";
 import { Html } from "../libs/html";
 import { PlayerPanelManager } from "./player_panel";
@@ -17,7 +17,7 @@ export class ZCardManager extends BaseComponent<ZType | undefined> {
         return `bbl_${type}`;
     }
 
-    public constructor(private bga: Bga<BblPlayer, BGamedatas>,
+    public constructor(private bga: Bga<BblPlayer, BblGamedatas>,
             private readonly logManager: LogManager,
             private readonly textFormatter: TextFormatter,
             private readonly playerPanelManager: PlayerPanelManager,

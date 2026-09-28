@@ -42,7 +42,7 @@ export interface PieceCount {
     count: number;
 }
 
-export interface BGamedatas extends Gamedatas<BblPlayer> {
+export interface BblGamedatas extends Gamedatas<BblPlayer> {
     board: Hex[];
     hand?: HandPiece[];
     pool?: Record<PieceType, number>;

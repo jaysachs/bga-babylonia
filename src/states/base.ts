@@ -1,4 +1,4 @@
-import { BblPlayer, BGamedatas } from "../model/data";
+import { BblPlayer, BblGamedatas } from "../model/data";
 import { AnimationManager } from "../bgalibs/bga-animations";
 import { BoardManager } from "../components/board";
 import { HandManager } from "../components/hand";
@@ -7,7 +7,7 @@ import { ZCardManager } from "../components/zcards";
 import { PieceManager } from "../components/piece";
 
 export abstract class BabyloniaState {
-    constructor(protected bga: Bga<BblPlayer, BGamedatas>,
+    constructor(protected bga: Bga<BblPlayer, BblGamedatas>,
         protected readonly animationManager: AnimationManager,
         protected readonly pieceManager: PieceManager,
         protected readonly boardManager: BoardManager,

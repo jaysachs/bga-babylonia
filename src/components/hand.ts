@@ -1,5 +1,5 @@
 import { BaseComponent } from "../libs/basecomponent";
-import { BblPlayer, BGamedatas, HandPiece, PieceType } from "../model/data";
+import { BblPlayer, BblGamedatas, HandPiece, PieceType } from "../model/data";
 import { AnimationManager } from "../bgalibs/bga-animations";
 import { Css } from "./css";
 import { Html } from "../libs/html";
@@ -19,7 +19,7 @@ export class HandManager extends BaseComponent<PieceInfo> {
     private static readonly UNPLAYABLE = 'bbl_unplayable';
     private player: BblPlayer | undefined;
     private mainDiv: HTMLElement;
-    public constructor(private bga: Bga<BblPlayer, BGamedatas>, private animationManager: AnimationManager, private playerPanelManger: PlayerPanelManager, private pieceManager: PieceManager) {
+    public constructor(private bga: Bga<BblPlayer, BblGamedatas>, private animationManager: AnimationManager, private playerPanelManger: PlayerPanelManager, private pieceManager: PieceManager) {
         super();
         this.mainDiv = Html.div({});
     }

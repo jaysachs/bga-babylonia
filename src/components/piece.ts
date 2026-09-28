@@ -1,9 +1,9 @@
-import { BblPlayer, BGamedatas, PieceType } from "../model/data";
+import { BblPlayer, BblGamedatas, PieceType } from "../model/data";
 import { AttrLike, Html } from "../libs/html";
 import { TextFormatter } from "../libs/textformatter";
 
 export class PieceManager {
-    public constructor(private bga: Bga<BblPlayer, BGamedatas>, private textFormatter: TextFormatter) { }
+    public constructor(private bga: Bga<BblPlayer, BblGamedatas>, private textFormatter: TextFormatter) { }
 
     public setup(): void {
         this.textFormatter.registerFormatter('piece', (args: any) => this.renderPieceArg(args.piece, args.player_id));

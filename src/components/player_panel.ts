@@ -1,4 +1,4 @@
-import { BblPlayer, BGamedatas, PieceType } from "../model/data";
+import { BblPlayer, BblGamedatas, PieceType } from "../model/data";
 import { Html } from "../libs/html";
 import { PieceManager } from "./piece";
 import { TooltipManager } from "../libs/tooltips";
@@ -8,7 +8,7 @@ export class PlayerPanelManager {
     private poolCounters: Counter[] = [];
     private cityCounters: Counter[] = [];
 
-    public constructor(private bga: Bga<BblPlayer, BGamedatas>, private tooltipManager: TooltipManager, private pieceManager: PieceManager) {}
+    public constructor(private bga: Bga<BblPlayer, BblGamedatas>, private tooltipManager: TooltipManager, private pieceManager: PieceManager) {}
 
     public setup(): void {
         const players = this.bga.gameui.gamedatas.players;

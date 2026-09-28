@@ -1,5 +1,5 @@
 import { BaseGame } from './libs/basegame';
-import { BblPlayer, BGamedatas, PieceType } from './model/data';
+import { BblPlayer, BblGamedatas, PieceType } from './model/data';
 import { SelectExtraTurnState } from './states/select_extra_turn';
 import { EndOfTurnScoringState } from './states/end_of_turn_scoring';
 import { SelectZigguratCardState } from './states/select_ziggurat_card';
@@ -18,7 +18,7 @@ import { range } from './libs/utils';
 import { Autosizer } from './components/autosizer';
 
 /** Game class */
-export class Game extends BaseGame<BblPlayer, BGamedatas> {
+export class Game extends BaseGame<BblPlayer, BblGamedatas> {
 
     private pieceManager: PieceManager;
     private playerPanelManager: PlayerPanelManager;
@@ -26,7 +26,7 @@ export class Game extends BaseGame<BblPlayer, BGamedatas> {
     private handManager: HandManager;
     private zcardManager: ZCardManager;
 
-    constructor(bga: Bga<BblPlayer, BGamedatas>) {
+    constructor(bga: Bga<BblPlayer, BblGamedatas>) {
         super(bga);
         this.pieceManager = new PieceManager(bga, this.textFormatter);
         this.playerPanelManager = new PlayerPanelManager(bga, this.tooltipManager, this.pieceManager);
@@ -35,7 +35,7 @@ export class Game extends BaseGame<BblPlayer, BGamedatas> {
         this.zcardManager = new ZCardManager(bga, this.logManager, this.textFormatter, this.playerPanelManager, this.tooltipManager);
     }
 
-    override async setup(gamedatas: BGamedatas) {
+    override async setup(gamedatas: BblGamedatas) {
         super.setup(gamedatas);
         this.tooltipManager.setup();
         this.playerPanelManager.setup();
