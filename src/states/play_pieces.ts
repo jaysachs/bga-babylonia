@@ -78,7 +78,7 @@ export class PlayPiecesState extends BabyloniaState {
                     this.playerPanelManager.handcountElement(args.player_id).appendChild(pieceDiv);
                 }
                 return this.animationManager.slideAndAttach(pieceDiv, hexDiv, { fromPlaceholder: 'off' })
-                    .then(() => this.pieceManager.set(pieceDiv, args.piece, this.bga.players.getPlayerById(args.player_id)));
+                    .then(() => this.pieceManager.setPieceType(pieceDiv, args.piece, this.bga.players.getPlayerById(args.player_id)));
             });
         }
 
@@ -138,7 +138,7 @@ export class PlayPiecesState extends BabyloniaState {
 
         if (args.original_piece) {
             // restore piece value, e.g. if it was originally hidden
-            this.pieceManager.set(pieceDiv, args.original_piece, this.bga.players.getPlayerById(args.player_id));
+            this.pieceManager.setPieceType(pieceDiv, args.original_piece, this.bga.players.getPlayerById(args.player_id));
         }
         // slide the played piece back to the hand
         anims.push(() => this.animationManager.slideAndAttach(pieceDiv, destDiv, { fromPlaceholder: 'off' }));
@@ -206,7 +206,7 @@ export class PlayPiecesState extends BabyloniaState {
                 // play into river, piece is hidden
                 .then(() => {
                     if (data.terrain == 'RIVER') {
-                        this.pieceManager.set(selectedPiece.pieceDiv, 'hidden', this.bga.players.getCurrentPlayer())
+                        this.pieceManager.setPieceType(selectedPiece.pieceDiv, 'hidden', this.bga.players.getCurrentPlayer())
                     }
                 })
         );

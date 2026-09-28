@@ -37,7 +37,7 @@ export class BoardManager extends BaseComponent<HexSelectionData> {
     private static readonly HIGHLIGHTED = 'bbl_highlighted';
 
     public setup(): HTMLElement {
-        this.textFormatter.registerFormatter('hex', (args) => this.renderHexForLog(args.hex));
+        this.textFormatter.registerFormatter('hex', (args) => this.renderHexArg(args.hex));
 
         this.boardDiv = Html.div({id: 'bbl_board'});
         for (const hex of this.bga.gameui.gamedatas.board) {
@@ -82,7 +82,7 @@ export class BoardManager extends BaseComponent<HexSelectionData> {
         });
     }
 
-    private renderHexForLog(hex: number): HTMLElement {
+    private renderHexArg(hex: number): HTMLElement {
         return Html.span({ text: HexFormatter.format(hex), attrs: { bbl_hex: String(hex) } });
     }
 
@@ -132,7 +132,7 @@ export class BoardManager extends BaseComponent<HexSelectionData> {
 
         const hexDiv = this.hexDiv(hex);
         const pieceDiv = hexDiv.firstElementChild as HTMLElement | null;
-        const piece = this.pieceManager.get(pieceDiv);
+        const piece = this.pieceManager.pieceTypeFrom(pieceDiv);
         await super.dispatch({ hex, hexDiv, piece, capturedPieceDiv: pieceDiv, terrain: this.hexForRc(hex)!.terrain})
         return false;
     }

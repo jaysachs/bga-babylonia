@@ -184,7 +184,7 @@ export class HandManager extends BaseComponent<PieceInfo> {
                     });
                 }
             } else {
-                let pt = this.pieceManager.get(pieceDiv);
+                let pt = this.pieceManager.pieceTypeFrom(pieceDiv);
                 if (!pt) {
                     console.error("hand had piece div but no attribute");
                 } else if (pt != this.pieceManager.pieceVal(hp.piece_type!, this.player)) {
@@ -198,7 +198,7 @@ export class HandManager extends BaseComponent<PieceInfo> {
     public setPlayablePieces(isPlayable: (h: PieceType | null) => boolean): void {
         Array.from(this.mainDiv.children).forEach((spaceDiv) => {
             const cl = spaceDiv.classList;
-            if (isPlayable(this.pieceManager.get(spaceDiv.firstElementChild))) {
+            if (isPlayable(this.pieceManager.pieceTypeFrom(spaceDiv.firstElementChild))) {
                 cl.add(Css.PLAYABLE);
                 cl.remove(HandManager.UNPLAYABLE);
             } else {
@@ -220,7 +220,7 @@ export class HandManager extends BaseComponent<PieceInfo> {
         const pieceDiv = spaceDiv.firstElementChild as HTMLElement;
         const pi: PieceInfo = {
             pieceDiv: pieceDiv,
-            pieceType: this.pieceManager.get(pieceDiv)!,
+            pieceType: this.pieceManager.pieceTypeFrom(pieceDiv)!,
             logicalPos: this.getLogicalPos(spaceDiv),
             selected: selected
         };
@@ -238,7 +238,7 @@ export class HandManager extends BaseComponent<PieceInfo> {
             console.error("no piece div in selected space", spaceDiv);
             return null;
         }
-        const pieceType = this.pieceManager.get(pieceDiv);
+        const pieceType = this.pieceManager.pieceTypeFrom(pieceDiv);
         if (!pieceType) {
             console.error("no piece in selected space", spaceDiv, pieceDiv);
             return null;
@@ -279,7 +279,7 @@ export class HandManager extends BaseComponent<PieceInfo> {
         const pieceDiv = ev.target as HTMLElement;
         const spaceDiv = pieceDiv.parentElement!;
 
-        let p = this.pieceManager.get(pieceDiv)!;
+        let p = this.pieceManager.pieceTypeFrom(pieceDiv)!;
         if (!this.pieceManager.isNonEmpty(p)) { return false; }
 
         let cl = spaceDiv.classList;

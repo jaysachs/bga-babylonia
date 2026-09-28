@@ -21,7 +21,7 @@ export class ZCardManager extends BaseComponent<ZType | undefined> {
     }
 
     public setup(): HTMLElement {
-        this.textFormatter.registerFormatter('zcard', (args) => this.createSpan(args.zcard));
+        this.textFormatter.registerFormatter('zcard', (args) => this.renderZCardArg(args.zcard));
         const zcards = this.bga.gameui.gamedatas.ziggurat_cards;
 
         this.mainDiv = Html.div({id: 'bbl_available_zcards'});
@@ -70,7 +70,7 @@ export class ZCardManager extends BaseComponent<ZType | undefined> {
         return false;
     }
 
-    private createSpan(zcard: ZType): HTMLElement {
+    private renderZCardArg(zcard: ZType): HTMLElement {
         return Html.span({
             title: this.zcardTooltips.get(zcard) ?? '',
             attrs: this.attr(zcard)
