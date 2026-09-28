@@ -1,4 +1,4 @@
-import { BgaAnimations } from './libs';
+import { BgaAnimations } from "../bgalibs/bga-animations";
 
 export type AnimationList = (() => Promise<any>)[];
 

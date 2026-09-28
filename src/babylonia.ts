@@ -1,4 +1,4 @@
-import { BaseGame } from './basegame';
+import { BaseGame } from './libs/basegame';
 import { BblPlayer, BGamedatas, PieceType } from './bdata';
 import { SelectExtraTurnState } from './states/select_extra_turn';
 import { EndOfTurnScoringState } from './states/end_of_turn_scoring';
@@ -7,16 +7,16 @@ import { PlayPiecesState } from './states/play_pieces';
 import { SelectScoringHexState } from './states/select_scoring_hex';
 import { FinishTurnState } from './states/finish_turn';
 import { ScoreHexState } from './states/score_hex';
-import { HandManager } from './hand';
-import { ZCardManager } from './zcards';
-import { TooltipManager } from './tooltips';
-import { Piece } from './piece';
-import { Html } from './html';
-import { BoardManager } from './board';
-import { PlayerPanelManager } from './player_panel';
-import { range } from './utils';
+import { HandManager } from './components/hand';
+import { ZCardManager } from './components/zcards';
+import { TooltipManager } from './libs/tooltips';
+import { Piece } from './components/piece';
+import { Html } from './libs/html';
+import { BoardManager } from './components/board';
+import { PlayerPanelManager } from './components/player_panel';
+import { range } from './libs/utils';
 import { Autosizer } from './autosizer';
-import { Hex } from './hex';
+import { Hex } from './components/hex';
 
 /** Game class */
 export class Game extends BaseGame<BblPlayer, BGamedatas> {

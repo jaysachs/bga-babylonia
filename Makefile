@@ -5,7 +5,7 @@ SFTP=sftp://vagabond:@1.studio.boardgamearena.com:2022
 STATS=modules/php/Stats.php
 GENSTATS=../bgautil/genstats/genstats.php
 WORK=work
-TS_STUBS=src/bga-framework.d.ts
+TS_STUBS=src/bgalibs/bga-framework.d.ts
 JS=modules/js/Game.js
 PHPSTAN_LEVEL=10
 

@@ -1,5 +1,5 @@
-import { BblPlayer, PieceType } from "./bdata";
-import { AttrLike, Html } from "./html";
+import { BblPlayer, PieceType } from "../bdata";
+import { AttrLike, Html } from "../libs/html";
 
 export class Piece {
     static isNonEmpty(p: PieceType | null): boolean { return p !== null && p !== undefined && p != 'empty' }

@@ -1,10 +1,10 @@
 import { PieceType } from "../bdata";
-import { AnimationList } from "../more-animations";
+import { AnimationList } from "../libs/more-animations";
 import { BabyloniaState } from "./base";
-import { Piece } from "../piece";
-import { Css } from "../css";
-import { PieceInfo } from "../hand";
-import { HexSelectionData } from "../board";
+import { Piece } from "../components/piece";
+import { Css } from "../components/css";
+import { PieceInfo } from "../components/hand";
+import { HexSelectionData } from "../components/board";
 
 interface PlayStateArgs {
     canEndTurn: boolean;
@@ -133,8 +133,8 @@ export class PlayPiecesState extends BabyloniaState {
         let pieceDiv = hexDiv.firstElementChild as HTMLElement;
         // Note that handpos is private data, only set for the active player
         //  so its existence is equivalent to "isCurrentPlayerActive()"
-        let destDiv = args.handpos !== undefined 
-            ? this.handManager.spaceForLogicalPos(args.handpos) 
+        let destDiv = args.handpos !== undefined
+            ? this.handManager.spaceForLogicalPos(args.handpos)
             : this.playerPanelManager.handcountElement(args.player_id);
 
         if (args.original_piece) {

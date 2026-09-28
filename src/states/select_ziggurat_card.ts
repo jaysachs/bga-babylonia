@@ -1,4 +1,4 @@
-import { Css } from "../css";
+import { Css } from "../components/css";
 import { ZType } from "../bdata";
 import { BabyloniaState } from "./base";
 
@@ -23,7 +23,7 @@ export class SelectZigguratCardState extends BabyloniaState {
         this.zcardManager.stopSelecting();
     }
 
-    private async handleSelection(zcardType?: string) { 
+    private async handleSelection(zcardType?: string) {
         if (!zcardType) {
             this.zcardManager.unselectAll();
             this.bga.states.restoreServerGameState();

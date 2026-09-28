@@ -1,5 +1,4 @@
-import { PieceType } from "../bdata";
-import { HexSelectionData } from "../board";
+import { HexSelectionData } from "../components/board";
 import { BabyloniaState } from "./base";
 
 export class SelectScoringHexState extends BabyloniaState {

@@ -1,9 +1,9 @@
-import { BaseComponent } from "./basecomponent";
-import { BblPlayer, BGamedatas, Zcard, ZType } from "./bdata";
+import { BaseComponent } from "../libs/basecomponent";
+import { BblPlayer, BGamedatas, Zcard, ZType } from "../bdata";
 import { Css } from "./css";
-import { Html } from "./html";
+import { Html } from "../libs/html";
 import { PlayerPanelManager } from "./player_panel";
-import { TooltipManager } from "./tooltips";
+import { TooltipManager } from "../libs/tooltips";
 
 export class ZCardManager extends BaseComponent<ZType | undefined> {
 
@@ -42,8 +42,8 @@ export class ZCardManager extends BaseComponent<ZType | undefined> {
     private controller = new AbortController();
 
     public startSelecting(): void {
-        this.mainDiv!.classList.add(ZCardManager.SELECTING); 
-        this.controller = new AbortController();       
+        this.mainDiv!.classList.add(ZCardManager.SELECTING);
+        this.controller = new AbortController();
         this.mainDiv!.addEventListener('click', this.onZCardClicked.bind(this), { signal: this.controller.signal });
     }
 

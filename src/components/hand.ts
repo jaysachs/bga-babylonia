@@ -1,9 +1,9 @@
-import { BaseComponent } from "./basecomponent";
-import { BblPlayer, BGamedatas, HandPiece, PieceType } from "./bdata";
-import { AnimationManager } from "./bga-animations";
+import { BaseComponent } from "../libs/basecomponent";
+import { BblPlayer, BGamedatas, HandPiece, PieceType } from "../bdata";
+import { AnimationManager } from "../bgalibs/bga-animations";
 import { Css } from "./css";
-import { Html } from "./html";
-import { AnimationList } from "./more-animations";
+import { Html } from "../libs/html";
+import { AnimationList } from "../libs/more-animations";
 import { Piece } from "./piece";
 import { PlayerPanelManager } from "./player_panel";
 
@@ -31,9 +31,9 @@ export class HandManager extends BaseComponent<PieceInfo> {
         this.mainDiv = Html.div({id: 'bbl_hand'});
 
         this.player = this.bga.players.getPlayerById(gameui.player_id);
-        
+
         if (true) {
-            let hand = this.sortedHandsEnabled() 
+            let hand = this.sortedHandsEnabled()
                 ? this.orderedHand(this.bga.gameui.gamedatas.hand!)
                 : this.bga.gameui.gamedatas.hand!;
             hand.forEach((hp, i) => {
@@ -60,7 +60,7 @@ export class HandManager extends BaseComponent<PieceInfo> {
         result.sort((p1, p2) => {
             if (p1.piece_type == 'empty') {
                 return p2.piece_type == 'empty' ? 0 : 1;
-            } 
+            }
             else if (p2.piece_type == 'empty') {
                 return -1;
             }
@@ -124,9 +124,9 @@ export class HandManager extends BaseComponent<PieceInfo> {
         const handSpaceDivs = hand.map((hp, i) => this.spaceForPhysicalPos(i));
 
         // hand has the desired ordering.
-        // 
+        //
         // Iterate through the hand spaces in the DOM representation.
-        // If the corresponding piece in hand doesn't belong in that space, 
+        // If the corresponding piece in hand doesn't belong in that space,
         //   move it there from the right place (other hand space or the pool).
         handSpaceDivs.forEach((hsd, i) => {
             let lp = this.getLogicalPos(hsd);
@@ -142,8 +142,8 @@ export class HandManager extends BaseComponent<PieceInfo> {
                         anims.push(() => {
                             this.setLogicalPos(hsd, newPos);
                             return this.animationManager.slideAndAttach(
-                                srcSpace.firstElementChild as HTMLElement, 
-                                hsd, 
+                                srcSpace.firstElementChild as HTMLElement,
+                                hsd,
                                 { fromPlaceholder: 'off', toPlaceholder: 'off' })
                         });
                     } else {
@@ -153,8 +153,8 @@ export class HandManager extends BaseComponent<PieceInfo> {
                             this.playerPanelManger.poolcountElement(this.bga.players.getCurrentPlayerId()).appendChild(pieceDiv);
                             this.setLogicalPos(hsd, newPos)
                             return this.animationManager.slideAndAttach(
-                                pieceDiv, 
-                                hsd, 
+                                pieceDiv,
+                                hsd,
                                 { fromPlaceholder: 'off', toPlaceholder: 'off' })
                         });
                     }
@@ -164,8 +164,8 @@ export class HandManager extends BaseComponent<PieceInfo> {
                 }
             }
         });
-        return this.animationManager.playParallel(anims).then(() => { 
-            console.debug("Final state: ", 
+        return this.animationManager.playParallel(anims).then(() => {
+            console.debug("Final state: ",
                 Array.from($('bbl_hand').children).map(d => "" + this.getLogicalPos(d) + " " + d.firstElementChild?.getAttribute('bbl_piece')));
              return Promise.resolve(); } );
     }
@@ -226,8 +226,8 @@ export class HandManager extends BaseComponent<PieceInfo> {
 
     public getSelectedPiece(deselect: boolean = false): PieceInfo | null {
         const spaceDiv = document.querySelector(`#${this.mainDiv.id} > .${Css.SELECTED}`);
-        if (!spaceDiv) { 
-            return null; 
+        if (!spaceDiv) {
+            return null;
         }
         const pieceDiv = spaceDiv.firstElementChild as HTMLElement;
         if (!pieceDiv) {

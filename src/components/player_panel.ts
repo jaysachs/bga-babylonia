@@ -1,7 +1,7 @@
-import { BblPlayer, BGamedatas, PieceType } from "./bdata";
-import { Html } from "./html";
+import { BblPlayer, BGamedatas, PieceType } from "../bdata";
+import { Html } from "../libs/html";
 import { Piece } from "./piece";
-import { TooltipManager } from "./tooltips";
+import { TooltipManager } from "../libs/tooltips";
 
 export class PlayerPanelManager {
     private handCounters: Counter[] = [];

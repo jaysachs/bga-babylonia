@@ -1,9 +1,9 @@
-import { BaseComponent } from "./basecomponent";
-import { BblPlayer, BGamedatas, Hex, PieceType } from "./bdata";
+import { BaseComponent } from "../libs/basecomponent";
+import { BblPlayer, BGamedatas, Hex, PieceType } from "../bdata";
 import { Css } from "./css";
-import { Html } from "./html";
+import { Html } from "../libs/html";
 import { Piece } from "./piece";
-import { TooltipManager } from "./tooltips";
+import { TooltipManager } from "../libs/tooltips";
 
 export type HexSelectionData = { hex: number, hexDiv: HTMLElement, piece: PieceType | null, capturedPieceDiv: HTMLElement | undefined | null, terrain: string };
 

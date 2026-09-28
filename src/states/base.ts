@@ -1,9 +1,9 @@
 import { BblPlayer, BGamedatas } from "../bdata";
-import { AnimationManager } from "../bga-animations";
-import { BoardManager } from "../board";
-import { HandManager } from "../hand";
-import { PlayerPanelManager } from "../player_panel";
-import { ZCardManager } from "../zcards";
+import { AnimationManager } from "../bgalibs/bga-animations";
+import { BoardManager } from "../components/board";
+import { HandManager } from "../components/hand";
+import { PlayerPanelManager } from "../components/player_panel";
+import { ZCardManager } from "../components/zcards";
 
 export abstract class BabyloniaState {
     constructor(protected bga: Bga<BblPlayer, BGamedatas>,
