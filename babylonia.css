@@ -810,11 +810,11 @@ div.bbl_pb_zcards>div {
     flex-direction: column;
 }
 
-.bbl_piece_hover_details > div:nth-of-type(even) {
+.bbl_pool_contents_hover .bbl_piece_hover_details > div:nth-of-type(even) {
     margin-right: 0.25em;
 }
 
-.bbl_piece_hover_details > div:nth-of-type(1) {
+.bbl_pool_contents_hover .bbl_piece_hover_details > div:nth-of-type(1) {
     margin-left: 0.25em;
 }
 
