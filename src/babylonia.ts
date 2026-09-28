@@ -48,7 +48,19 @@ export class Game extends BaseGame<BblPlayer, BGamedatas> {
         this.bga.gameArea.getElement().appendChild(mainElem);
 
         this.registerLogArgs();
+        this.registerStates();
 
+        this.bga.notifications.setupPromiseNotifications({
+            // logger: console.log,
+            handlers: [this, ...this.bga.states.getStateClasses()],
+            onEnd: this.addHexHovers.bind(this)
+        });
+        new Autosizer(this.bga).setup(mainElem)
+            .then(() => this.addHexHovers())
+            .then(() => console.debug('Game setup done'));
+    }
+
+    private registerStates(): void {
         this.bga.states.register('SelectExtraTurn',
             new SelectExtraTurnState(this.bga, this.animationManager, this.boardManager, this.handManager, this.zcardManager, this.playerPanelManager));
         this.bga.states.register('FinishTurn',
@@ -63,15 +75,6 @@ export class Game extends BaseGame<BblPlayer, BGamedatas> {
             new SelectScoringHexState(this.bga, this.animationManager, this.boardManager, this.handManager, this.zcardManager, this.playerPanelManager));
         this.bga.states.register('ScoreHex',
             new ScoreHexState(this.bga, this.animationManager, this.boardManager, this.handManager, this.zcardManager, this.playerPanelManager));
-
-        this.bga.notifications.setupPromiseNotifications({
-            // logger: console.log,
-            handlers: [this, ...this.bga.states.getStateClasses()],
-            onEnd: this.addHexHovers.bind(this)
-        });
-        new Autosizer(this.bga).setup(mainElem)
-            .then(() => this.addHexHovers())
-            .then(() => console.debug('Game setup done'));
     }
 
     private registerLogArgs(): void {
