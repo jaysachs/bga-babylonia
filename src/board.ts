@@ -124,7 +124,7 @@ export class BoardManager extends BaseComponent<HexSelectionData> {
             Html.span({ text: _("Current points") }),
             Html.div({ classes: 'bbl_piece_hover_details' },
                 ... this.playersInPlayerNoOrder().map(
-                    p => Piece.createDiv("hidden", p, undefined, String(scores[String(p.player_id)] ?? 0)))
+                    p => Piece.createDiv("hidden", p, String(scores[String(p.player_id)] ?? 0)))
             )
         )
     }

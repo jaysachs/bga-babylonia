@@ -21,8 +21,8 @@ export class Piece {
         el.setAttribute(Piece.ATTR, Piece.pieceVal(p, pl));
     }
 
-    static createDiv(piece: PieceType, player?: BblPlayer, id?: string, text?: string): HTMLElement {
-        return Html.div({ attrs: Piece.attr(piece, player), id: id, text: text });
+    static createDiv(piece: PieceType, player?: BblPlayer, text?: string): HTMLElement {
+        return Html.div({ attrs: Piece.attr(piece, player), text: text });
     }
 
     static attr(piece: PieceType, player?: BblPlayer): AttrLike {
