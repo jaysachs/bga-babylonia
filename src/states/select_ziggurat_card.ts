@@ -40,7 +40,6 @@ export class SelectZigguratCardState extends BabyloniaState {
         this.bga.statusBar.addActionButton(
             _('Cancel'),
             () => {
-                // e.classList.toggle(Css.SELECTED);
                 this.zcardManager.unselectAll();
                 this.bga.states.restoreServerGameState();
             },
