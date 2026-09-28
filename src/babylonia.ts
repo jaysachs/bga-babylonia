@@ -10,7 +10,7 @@ import { ScoreHexState } from './states/score_hex';
 import { HandManager } from './components/hand';
 import { ZCardManager } from './components/zcards';
 import { TooltipManager } from './libs/tooltips';
-import { Piece } from './components/piece';
+import { PieceManager } from './components/piece';
 import { Html } from './libs/html';
 import { BoardManager } from './components/board';
 import { PlayerPanelManager } from './components/player_panel';
@@ -20,6 +20,7 @@ import { Autosizer } from './components/autosizer';
 /** Game class */
 export class Game extends BaseGame<BblPlayer, BGamedatas> {
 
+    private pieceManager: PieceManager;
     private playerPanelManager: PlayerPanelManager;
     private boardManager: BoardManager;
     private handManager: HandManager;
@@ -27,19 +28,18 @@ export class Game extends BaseGame<BblPlayer, BGamedatas> {
 
     constructor(bga: Bga<BblPlayer, BGamedatas>) {
         super(bga);
-
-        this.playerPanelManager = new PlayerPanelManager(bga, this.tooltipManager);
-        this.boardManager = new BoardManager(bga, this.textFormatter, this.tooltipManager);
-        this.handManager = new HandManager(bga, this.animationManager, this.playerPanelManager)
+        this.pieceManager = new PieceManager(bga, this.textFormatter);
+        this.playerPanelManager = new PlayerPanelManager(bga, this.tooltipManager, this.pieceManager);
+        this.boardManager = new BoardManager(bga, this.textFormatter, this.tooltipManager, this.pieceManager);
+        this.handManager = new HandManager(bga, this.animationManager, this.playerPanelManager, this.pieceManager)
         this.zcardManager = new ZCardManager(bga, this.textFormatter, this.playerPanelManager, this.tooltipManager);
     }
 
     async setup(gamedatas: BGamedatas) {
         this.tooltipManager.setup();
         this.playerPanelManager.setup();
-
-        // FIXME: make Piece a PieceManager / PieceComponent instance
-        /* this. */ Piece.setup(this.bga, this.textFormatter);
+        this.pieceManager.setup();
+        // FIXME: consider separating setup from Html generation
         const mainElem = this.makeHtml(
                 this.boardManager.setup(),
                 this.handManager.setup(),
@@ -61,19 +61,19 @@ export class Game extends BaseGame<BblPlayer, BGamedatas> {
 
     private registerStates(): void {
         this.bga.states.register('SelectExtraTurn',
-            new SelectExtraTurnState(this.bga, this.animationManager, this.boardManager, this.handManager, this.zcardManager, this.playerPanelManager));
+            new SelectExtraTurnState(this.bga, this.animationManager, this.pieceManager, this.boardManager, this.handManager, this.zcardManager, this.playerPanelManager));
         this.bga.states.register('FinishTurn',
-            new FinishTurnState(this.bga, this.animationManager, this.boardManager, this.handManager, this.zcardManager, this.playerPanelManager));
+            new FinishTurnState(this.bga, this.animationManager, this.pieceManager, this.boardManager, this.handManager, this.zcardManager, this.playerPanelManager));
         this.bga.states.register('EndOfTurnScoring',
-            new EndOfTurnScoringState(this.bga, this.animationManager, this.boardManager, this.handManager, this.zcardManager, this.playerPanelManager));
+            new EndOfTurnScoringState(this.bga, this.animationManager, this.pieceManager, this.boardManager, this.handManager, this.zcardManager, this.playerPanelManager));
         this.bga.states.register('SelectZigguratCard',
-            new SelectZigguratCardState(this.bga, this.animationManager, this.boardManager, this.handManager, this.zcardManager, this.playerPanelManager));
+            new SelectZigguratCardState(this.bga, this.animationManager, this.pieceManager, this.boardManager, this.handManager, this.zcardManager, this.playerPanelManager));
         this.bga.states.register('PlayPieces',
-            new PlayPiecesState(this.bga, this.animationManager, this.boardManager, this.handManager, this.zcardManager, this.playerPanelManager));
+            new PlayPiecesState(this.bga, this.animationManager, this.pieceManager, this.boardManager, this.handManager, this.zcardManager, this.playerPanelManager));
         this.bga.states.register('SelectScoringHex',
-            new SelectScoringHexState(this.bga, this.animationManager, this.boardManager, this.handManager, this.zcardManager, this.playerPanelManager));
+            new SelectScoringHexState(this.bga, this.animationManager, this.pieceManager, this.boardManager, this.handManager, this.zcardManager, this.playerPanelManager));
         this.bga.states.register('ScoreHex',
-            new ScoreHexState(this.bga, this.animationManager, this.boardManager, this.handManager, this.zcardManager, this.playerPanelManager));
+            new ScoreHexState(this.bga, this.animationManager, this.pieceManager, this.boardManager, this.handManager, this.zcardManager, this.playerPanelManager));
     }
 
     private makeHtml(boardElem: HTMLElement, handElem: HTMLElement | undefined, zcardsElem: HTMLElement): HTMLElement {

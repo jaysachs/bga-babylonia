@@ -4,10 +4,12 @@ import { BoardManager } from "../components/board";
 import { HandManager } from "../components/hand";
 import { PlayerPanelManager } from "../components/player_panel";
 import { ZCardManager } from "../components/zcards";
+import { PieceManager } from "../components/piece";
 
 export abstract class BabyloniaState {
     constructor(protected bga: Bga<BblPlayer, BGamedatas>,
         protected readonly animationManager: AnimationManager,
+        protected readonly pieceManager: PieceManager,
         protected readonly boardManager: BoardManager,
         protected readonly handManager: HandManager,
         protected readonly zcardManager: ZCardManager,

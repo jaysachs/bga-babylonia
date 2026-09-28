@@ -1,7 +1,7 @@
 import { PieceType } from "../model/data";
 import { AnimationList } from "../libs/more-animations";
 import { BabyloniaState } from "./base";
-import { Piece } from "../components/piece";
+import { PieceManager } from "../components/piece";
 import { PieceInfo } from "../components/hand";
 import { HexSelectionData } from "../components/board";
 
@@ -63,7 +63,7 @@ export class PlayPiecesState extends BabyloniaState {
         // Either not active player, or another window of the active player (so piece still in hand)
         if (args.handpos === undefined || pieceDiv) {
             // Check for field capture
-            if (Piece.isNonEmpty(args.captured_piece) /* .startsWith('field') */) {
+            if (this.pieceManager.isNonEmpty(args.captured_piece) /* .startsWith('field') */) {
                 let field = hexDiv.firstElementChild as HTMLElement;
                 if (!field) { // or field is not F567X
                     console.error("attempt to capture a field that is not there");
@@ -74,11 +74,11 @@ export class PlayPiecesState extends BabyloniaState {
             anims.push(() => {
                 if (!pieceDiv) {
                     // slide piece from hand count to hex
-                    pieceDiv = Piece.createDiv(args.piece, this.bga.players.getPlayerById(args.player_id));
+                    pieceDiv = this.pieceManager.createDiv(args.piece, this.bga.players.getPlayerById(args.player_id));
                     this.playerPanelManager.handcountElement(args.player_id).appendChild(pieceDiv);
                 }
                 return this.animationManager.slideAndAttach(pieceDiv, hexDiv, { fromPlaceholder: 'off' })
-                    .then(() => Piece.set(pieceDiv, args.piece, this.bga.players.getPlayerById(args.player_id)));
+                    .then(() => this.pieceManager.set(pieceDiv, args.piece, this.bga.players.getPlayerById(args.player_id)));
             });
         }
 
@@ -120,9 +120,9 @@ export class PlayPiecesState extends BabyloniaState {
         let anims: AnimationList = [];
         let hexDiv = this.boardManager.hexDiv(args.rc);
 
-        if (Piece.isNonEmpty(args.captured_piece)) {
+        if (this.pieceManager.isNonEmpty(args.captured_piece)) {
             // slide the previously captured field back
-            let field = Piece.createDiv(args.captured_piece);
+            let field = this.pieceManager.createDiv(args.captured_piece);
             anims.push(() => {
                 this.playerPanelManager.handcountElement(args.player_id).appendChild(field);
                 return this.animationManager.slideAndAttach(field, hexDiv, { fromPlaceholder: 'off' });
@@ -138,7 +138,7 @@ export class PlayPiecesState extends BabyloniaState {
 
         if (args.original_piece) {
             // restore piece value, e.g. if it was originally hidden
-            Piece.set(pieceDiv, args.original_piece, this.bga.players.getPlayerById(args.player_id));
+            this.pieceManager.set(pieceDiv, args.original_piece, this.bga.players.getPlayerById(args.player_id));
         }
         // slide the played piece back to the hand
         anims.push(() => this.animationManager.slideAndAttach(pieceDiv, destDiv, { fromPlaceholder: 'off' }));
@@ -206,7 +206,7 @@ export class PlayPiecesState extends BabyloniaState {
                 // play into river, piece is hidden
                 .then(() => {
                     if (data.terrain == 'RIVER') {
-                        Piece.set(selectedPiece.pieceDiv, 'hidden', this.bga.players.getCurrentPlayer())
+                        this.pieceManager.set(selectedPiece.pieceDiv, 'hidden', this.bga.players.getCurrentPlayer())
                     }
                 })
         );

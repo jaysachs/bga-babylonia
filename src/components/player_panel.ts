@@ -1,6 +1,6 @@
 import { BblPlayer, BGamedatas, PieceType } from "../model/data";
 import { Html } from "../libs/html";
-import { Piece } from "./piece";
+import { PieceManager } from "./piece";
 import { TooltipManager } from "../libs/tooltips";
 
 export class PlayerPanelManager {
@@ -8,7 +8,7 @@ export class PlayerPanelManager {
     private poolCounters: Counter[] = [];
     private cityCounters: Counter[] = [];
 
-    public constructor(private bga: Bga<BblPlayer, BGamedatas>, private tooltipManager: TooltipManager) {}
+    public constructor(private bga: Bga<BblPlayer, BGamedatas>, private tooltipManager: TooltipManager, private pieceManager: PieceManager) {}
 
     public setup(): void {
         const players = this.bga.gameui.gamedatas.players;
@@ -29,7 +29,7 @@ export class PlayerPanelManager {
             Html.div({ classes: 'bbl_piece_hover_details' },
                 ... Object.entries(pool).flatMap(
                     (p) => [
-                            Piece.createDiv(
+                            this.pieceManager.createDiv(
                                 String(p[0]) as PieceType,
                                 this.bga.players.getCurrentPlayer()),
                             Html.div({ text: String(p[1]) })

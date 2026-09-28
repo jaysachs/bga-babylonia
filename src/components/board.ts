@@ -2,7 +2,7 @@ import { BaseComponent } from "../libs/basecomponent";
 import { BblPlayer, BGamedatas, Hex, PieceType } from "../model/data";
 import { Css } from "./css";
 import { Html } from "../libs/html";
-import { Piece } from "./piece";
+import { PieceManager } from "./piece";
 import { TooltipManager } from "../libs/tooltips";
 import { TextFormatter } from "../libs/textformatter";
 
@@ -27,7 +27,7 @@ class HexFormatter {
 
 export class BoardManager extends BaseComponent<HexSelectionData> {
 
-    public constructor(private bga: Bga<BblPlayer, BGamedatas>, private readonly textFormatter: TextFormatter, private readonly tooltipManager: TooltipManager) {
+    public constructor(private bga: Bga<BblPlayer, BGamedatas>, private readonly textFormatter: TextFormatter, private readonly tooltipManager: TooltipManager, private readonly pieceManager: PieceManager) {
         super();
     }
 
@@ -45,16 +45,16 @@ export class BoardManager extends BaseComponent<HexSelectionData> {
             this.boardDiv.appendChild(hexDiv);
             if (hex.piece) {
                 const piece = hex.piece;
-                if (Piece.isNonEmpty(piece)) {
-                    let pieceDiv = Piece.createDiv(piece, this.bga.players.getPlayerById(hex.board_player));
+                if (this.pieceManager.isNonEmpty(piece)) {
+                    let pieceDiv = this.pieceManager.createDiv(piece, this.bga.players.getPlayerById(hex.board_player));
                     if (hex.scored) {
                         pieceDiv.classList.add(BoardManager.SCORED);
                     }
                     hexDiv.appendChild(pieceDiv);
-                    if (Piece.isCity(piece)) {
+                    if (this.pieceManager.isCity(piece)) {
                         pieceDiv.id = `bbl_city_${hex.rc}`;
                         this.tooltipManager.add(pieceDiv, () => this.cityScoringHover(hex.rc));
-                    } else if (Piece.isField(hex.piece)) {
+                    } else if (this.pieceManager.isField(hex.piece)) {
                         pieceDiv.id = `bbl_field_${hex.rc}`;
                         this.tooltipManager.add(pieceDiv, () => this.fieldScoringHover(hex.rc, piece));
                     }
@@ -132,7 +132,7 @@ export class BoardManager extends BaseComponent<HexSelectionData> {
 
         const hexDiv = this.hexDiv(hex);
         const pieceDiv = hexDiv.firstElementChild as HTMLElement | null;
-        const piece = Piece.get(pieceDiv);
+        const piece = this.pieceManager.get(pieceDiv);
         await super.dispatch({ hex, hexDiv, piece, capturedPieceDiv: pieceDiv, terrain: this.hexForRc(hex)!.terrain})
         return false;
     }
@@ -162,7 +162,7 @@ export class BoardManager extends BaseComponent<HexSelectionData> {
             Html.span({ text: _("Current points") }),
             Html.div({ classes: 'bbl_piece_hover_details' },
                 ... this.playersInPlayerNoOrder().map(
-                    p => Piece.createDiv("hidden", p, String(scores[String(p.player_id)] ?? 0)))
+                    p => this.pieceManager.createDiv("hidden", p, String(scores[String(p.player_id)] ?? 0)))
             )
         )
     }
@@ -179,7 +179,7 @@ export class BoardManager extends BaseComponent<HexSelectionData> {
         return Html.div({ classes: ['bbl_field_scoring_hover','bbl_piece_hover'] },
             Html.span({ text: _("Field points") }),
             Html.div({ classes: 'bbl_piece_hover_details' },
-                Piece.createDiv(piece),
+                this.pieceManager.createDiv(piece),
                 Html.div({ text: `${this.fieldPoints(piece)}` })
             )
         )

@@ -4,7 +4,7 @@ import { AnimationManager } from "../bgalibs/bga-animations";
 import { Css } from "./css";
 import { Html } from "../libs/html";
 import { AnimationList } from "../libs/more-animations";
-import { Piece } from "./piece";
+import { PieceManager } from "./piece";
 import { PlayerPanelManager } from "./player_panel";
 
 export type PieceInfo = {
@@ -19,7 +19,7 @@ export class HandManager extends BaseComponent<PieceInfo> {
     private static readonly UNPLAYABLE = 'bbl_unplayable';
     private player: BblPlayer | undefined;
     private mainDiv: HTMLElement;
-    public constructor(private bga: Bga<BblPlayer, BGamedatas>, private animationManager: AnimationManager, private playerPanelManger: PlayerPanelManager) {
+    public constructor(private bga: Bga<BblPlayer, BGamedatas>, private animationManager: AnimationManager, private playerPanelManger: PlayerPanelManager, private pieceManager: PieceManager) {
         super();
         this.mainDiv = Html.div({});
     }
@@ -39,8 +39,8 @@ export class HandManager extends BaseComponent<PieceInfo> {
             hand.forEach((hp, i) => {
                 const hpd = this.spaceForPhysicalPos(i);
                 this.setLogicalPos(hpd, hp.position);
-                if (!hp.played && Piece.isNonEmpty(hp.piece_type)) {
-                    hpd.appendChild(Piece.createDiv(hp.piece_type, this.player));
+                if (!hp.played && this.pieceManager.isNonEmpty(hp.piece_type)) {
+                    hpd.appendChild(this.pieceManager.createDiv(hp.piece_type, this.player));
                 }
             });
         } else {
@@ -149,7 +149,7 @@ export class HandManager extends BaseComponent<PieceInfo> {
                     } else {
                         console.debug("will move new from pool", i, hand[i])
                         anims.push(() => {
-                            const pieceDiv = Piece.createDiv(hand[i]!.piece_type, this.player);
+                            const pieceDiv = this.pieceManager.createDiv(hand[i]!.piece_type, this.player);
                             this.playerPanelManger.poolcountElement(this.bga.players.getCurrentPlayerId()).appendChild(pieceDiv);
                             this.setLogicalPos(hsd, newPos)
                             return this.animationManager.slideAndAttach(
@@ -176,18 +176,18 @@ export class HandManager extends BaseComponent<PieceInfo> {
             const handSpaceDiv = this.spaceForPhysicalPos(i);
             let pieceDiv = handSpaceDiv.firstElementChild as HTMLElement;
             if (!pieceDiv) {
-                if (!hp.played && Piece.isNonEmpty(hp.piece_type)) {
+                if (!hp.played && this.pieceManager.isNonEmpty(hp.piece_type)) {
                     anims.push(() => {
-                        pieceDiv = Piece.createDiv(hp.piece_type, this.player);
+                        pieceDiv = this.pieceManager.createDiv(hp.piece_type, this.player);
                         this.playerPanelManger.poolcountElement(this.bga.players.getCurrentPlayerId()).appendChild(pieceDiv);
                         return this.animationManager.slideAndAttach(pieceDiv, handSpaceDiv, { fromPlaceholder: 'off', toPlaceholder: 'off' })
                     });
                 }
             } else {
-                let pt = Piece.get(pieceDiv);
+                let pt = this.pieceManager.get(pieceDiv);
                 if (!pt) {
                     console.error("hand had piece div but no attribute");
-                } else if (pt != Piece.pieceVal(hp.piece_type!, this.player)) {
+                } else if (pt != this.pieceManager.pieceVal(hp.piece_type!, this.player)) {
                     console.error("piece from args", hp.piece_type, "not matches hand", pieceDiv);
                 }
             }
@@ -198,7 +198,7 @@ export class HandManager extends BaseComponent<PieceInfo> {
     public setPlayablePieces(isPlayable: (h: PieceType | null) => boolean): void {
         Array.from(this.mainDiv.children).forEach((spaceDiv) => {
             const cl = spaceDiv.classList;
-            if (isPlayable(Piece.get(spaceDiv.firstElementChild))) {
+            if (isPlayable(this.pieceManager.get(spaceDiv.firstElementChild))) {
                 cl.add(Css.PLAYABLE);
                 cl.remove(HandManager.UNPLAYABLE);
             } else {
@@ -220,7 +220,7 @@ export class HandManager extends BaseComponent<PieceInfo> {
         const pieceDiv = spaceDiv.firstElementChild as HTMLElement;
         const pi: PieceInfo = {
             pieceDiv: pieceDiv,
-            pieceType: Piece.get(pieceDiv)!,
+            pieceType: this.pieceManager.get(pieceDiv)!,
             logicalPos: this.getLogicalPos(spaceDiv),
             selected: selected
         };
@@ -238,7 +238,7 @@ export class HandManager extends BaseComponent<PieceInfo> {
             console.error("no piece div in selected space", spaceDiv);
             return null;
         }
-        const pieceType = Piece.get(pieceDiv);
+        const pieceType = this.pieceManager.get(pieceDiv);
         if (!pieceType) {
             console.error("no piece in selected space", spaceDiv, pieceDiv);
             return null;
@@ -279,8 +279,8 @@ export class HandManager extends BaseComponent<PieceInfo> {
         const pieceDiv = ev.target as HTMLElement;
         const spaceDiv = pieceDiv.parentElement!;
 
-        let p = Piece.get(pieceDiv)!;
-        if (!Piece.isNonEmpty(p)) { return false; }
+        let p = this.pieceManager.get(pieceDiv)!;
+        if (!this.pieceManager.isNonEmpty(p)) { return false; }
 
         let cl = spaceDiv.classList;
         if (cl.contains(HandManager.UNPLAYABLE)) { return false; }
