@@ -4,7 +4,6 @@ SFTP=sftp://vagabond:@1.studio.boardgamearena.com:2022
 
 STATS=modules/php/Stats.php
 GENSTATS=../bgautil/genstats/genstats.php
-WORK=work
 TS_STUBS=src/bgalibs/bga-framework.d.ts
 JS=modules/js/Game.js
 PHPSTAN_LEVEL=10
@@ -17,15 +16,8 @@ $(JS): src/**/*.ts src/*.ts tsconfig.json $(TS_STUBS)
 $(STATS): $(GENSTATS) stats.jsonc Makefile
 	php $(GENSTATS) $(GAME)  > $(STATS)
 
-$(WORK):
-	mkdir $(WORK)
-
 $(TS_STUBS): bga-framework.d.ts
 	cp bga-framework.d.ts $(TS_STUBS)
-
-# $(STUBS): $(WORK) _ide_helper.php Makefile
-# 	mkdir -p $(WORK)/module/table
-# 	perl -p -e 's/  exit/\/\/ exit/;' _ide_helper.php > $(STUBS)
 
 build: $(JS) $(STATS) sprites
 
@@ -36,7 +28,7 @@ phpstan: build
 	phpstan --autoload-file=_ide_helper.php --level=$(PHPSTAN_LEVEL) --memory-limit=1G analyse modules/php modules/php/Utils modules/php/Model modules/php/States misc/test/php
 
 deploy: test
-	lftp -e 'cd $(GAME); mirror -e -R --exclude .vscode/ --exclude .git/ --exclude work/ --exclude local/ --exclude bga-framework.d.ts --exclude .phpunit* --exclude node_modules*/ --exclude _ide_helper.php; exit' $(SFTP)
+	lftp -e 'cd $(GAME); mirror -e -R --exclude .vscode/ --exclude .git/ --exclude local/ --exclude bga-framework.d.ts --exclude .phpunit* --exclude node_modules*/ --exclude _ide_helper.php; exit' $(SFTP)
 
 quick-deploy: test
 	lftp -e 'cd $(GAME); put -O modules/js modules/js/Game.js; put babylonia.css; exit' $(SFTP)
@@ -45,7 +37,7 @@ pull-boilerplate:
 	lftp -e 'cd $(GAME); set xfer:clobber true; get _ide_helper.php; get bga-framework.d.ts; exit' $(SFTP)
 
 clean:
-	rm -rf $(WORK) $(TS_STUBS) $(JS) $(STATS) img/pieces.png img/zcards.png
+	rm -rf $(TS_STUBS) $(JS) $(STATS) img/pieces.png img/zcards.png
 
 sprites: img/pieces.png img/zcards.png
 

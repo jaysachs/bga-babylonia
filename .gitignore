@@ -5,7 +5,6 @@
 # *.[oa]
 # *~
 modules/php/Stats.php
-work
 node_modules
 .vscode
 # Need to exclude images since they cannot be OSS-licensed.
