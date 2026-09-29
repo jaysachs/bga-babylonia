@@ -10,7 +10,7 @@ import { LogManager } from "../libs/logmanager";
 export class ZCardManager extends BaseComponent<ZType | undefined> {
 
     private zcardTooltips = new Map<string, string>();
-    private mainDiv?: HTMLElement;
+    private mainDiv: HTMLElement;
     private static readonly SELECTING = 'bbl_selecting';
 
     private zcardId(type: string): string {
@@ -23,6 +23,7 @@ export class ZCardManager extends BaseComponent<ZType | undefined> {
             private readonly playerPanelManager: PlayerPanelManager,
             private readonly tooltipManager: TooltipManager) {
         super();
+        this.mainDiv = Html.div({});
     }
 
     public setup(): HTMLElement {
@@ -44,19 +45,19 @@ export class ZCardManager extends BaseComponent<ZType | undefined> {
             this.zcardTooltips.set(zcard.type, _(zcard.tooltip));
             this.tooltipManager.add(zelem, this.zcardTooltip(zcard));
         }
-        return this.mainDiv!;
+        return this.mainDiv;
     }
 
     private controller = new AbortController();
 
     public startSelecting(): void {
-        this.mainDiv!.classList.add(ZCardManager.SELECTING);
+        this.mainDiv.classList.add(ZCardManager.SELECTING);
         this.controller = new AbortController();
-        this.mainDiv!.addEventListener('click', this.onZCardClicked.bind(this), { signal: this.controller.signal });
+        this.mainDiv.addEventListener('click', this.onZCardClicked.bind(this), { signal: this.controller.signal });
     }
 
     public stopSelecting(): void {
-        this.mainDiv!.classList.remove(ZCardManager.SELECTING);
+        this.mainDiv.classList.remove(ZCardManager.SELECTING);
         this.controller.abort();
     }
 
@@ -130,7 +131,7 @@ export class ZCardManager extends BaseComponent<ZType | undefined> {
     }
 
     public unselectAll(): void {
-        Array.from(this.mainDiv!.children).forEach(e => e.firstElementChild?.classList.remove(Css.SELECTED));
+        Array.from(this.mainDiv.children).forEach(e => e.firstElementChild?.classList.remove(Css.SELECTED));
     }
 
     public setUsed(zcard: ZType, used: boolean) {
