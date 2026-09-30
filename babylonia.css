@@ -310,14 +310,14 @@ body {
 }
 
 [bbl_piece^="city_"] {
-    filter: saturate(140%) contrast(110%);
+    filter: saturate(120%) contrast(120%);
 }
 
 #bbl_board [bbl_piece^="city_"] {
-    zoom: 84%;
+    zoom: 90%;
     position: relative;
     left: 0% !important;
-    top: 8% !important;
+    top: 5% !important;
 }
 
 /*
