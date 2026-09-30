@@ -309,6 +309,17 @@ body {
     height: var(--bbl-hex-height);
 }
 
+[bbl_piece^="city_"] {
+    filter: saturate(140%) contrast(110%);
+}
+
+#bbl_board [bbl_piece^="city_"] {
+    zoom: 84%;
+    position: relative;
+    left: 0% !important;
+    top: 8% !important;
+}
+
 /*
  * Cities and fields sprites
  */
