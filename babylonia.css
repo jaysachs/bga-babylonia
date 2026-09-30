@@ -309,7 +309,8 @@ body {
     height: var(--bbl-hex-height);
 }
 
-[bbl_piece^="city_"] {
+[bbl_piece^="city_"],
+.bbl_pb_city_label {
     filter: saturate(120%) contrast(120%);
 }
 
