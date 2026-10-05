@@ -380,7 +380,8 @@ body {
 }
 
 [bbl_piece="ziggurat"] {
-    background-position: -200% -400%;
+    background-position: -100% -400%;
+    filter: saturate(100%) sepia(80%) contrast(150%);
 }
 
 /*
