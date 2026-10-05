@@ -381,7 +381,7 @@ body {
 
 [bbl_piece="ziggurat"] {
     background-position: -100% -400%;
-    filter: saturate(100%) sepia(80%) contrast(150%);
+    filter: saturate(100%) sepia(60%) contrast(150%);
 }
 
 /*
