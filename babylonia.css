@@ -375,12 +375,11 @@ body {
     background-position: -200% -600%;
 }
 
-[bbl_piece="ziggurat"].bbl_scored {
+[bbl_piece="ziggurat"] {
     background-position: 0% -400%;
 }
 
-[bbl_piece="ziggurat"] {
-    background-position: -100% -400%;
+[bbl_piece="ziggurat"]:not(.bbl_scored) {
     filter: saturate(100%) sepia(60%) contrast(150%);
 }
 
