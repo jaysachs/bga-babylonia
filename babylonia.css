@@ -163,7 +163,7 @@ body {
 
 /* Board contents */
 
-#bbl_board>div {
+#bbl_board > div {
     height: var(--bbl-hex-height);
     aspect-ratio: var(--bbl-hex-ratio);
     margin: 0;
@@ -177,7 +177,7 @@ body {
     position: absolute;
 }
 
-#bbl_board>div.bbl_playable::after {
+#bbl_board > div.bbl_playable {
     cursor: pointer;
 }
 
@@ -199,7 +199,7 @@ body {
     }
 }
 
-#bbl_board>div.bbl_playable::after {
+#bbl_board > div.bbl_playable::before {
     position: absolute;
     right: 25%;
     bottom: 10%;
@@ -212,7 +212,12 @@ body {
     */
 }
 
-#bbl_board>div.bbl_selected::after {
+#bbl_board > div.bbl_playable:hover::after {
+    content:'';
+    filter: opacity(50%);
+}
+
+#bbl_board > div.bbl_selected::after {
     content: '';
     display: inline;
     position: absolute;
@@ -226,7 +231,7 @@ body {
 }
 
 /* does this need the same ::after treatment as bbl_selected? */
-#bbl_board>div.bbl_in_network::after,
+#bbl_board > div.bbl_in_network::after,
 #bbl_board>div.bbl_selectable::after {
     background-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='173' ><polygon points='4,86 48,4 148,4 194,86 148,168 48,168' fill='none' stroke='yellow' stroke-width='10' /></svg>");
     background-size: contain;
@@ -300,6 +305,7 @@ body {
 }
 */
 
+#bbl_board > div.bbl_playable:hover::after,
 [bbl_piece] {
     aspect-ratio: var(--bbl-hex-ratio);
     background-image: var(--bbl-pieces-sprites);
@@ -386,82 +392,102 @@ body {
 /*
  * Player piece sprites
  */
+#bbl_board[bbl_piece="hidden_1"] > div.bbl_playable:hover::after,
 [bbl_piece="hidden_1"] {
     background-position: -100% 0%;
 }
 
+#bbl_board[bbl_piece="hidden_2"] > div.bbl_playable:hover::after,
 [bbl_piece="hidden_2"] {
     background-position: -100% -100%;
 }
 
+#bbl_board[bbl_piece="hidden_3"] > div.bbl_playable:hover::after,
 [bbl_piece="hidden_3"] {
     background-position: -100% -200%;
 }
 
+#bbl_board[bbl_piece="hidden_4"] > div.bbl_playable:hover::after,
 [bbl_piece="hidden_4"] {
     background-position: -100% -300%;
 }
 
+#bbl_board[bbl_piece="farmer_1"] > div.bbl_playable:hover::after,
 [bbl_piece="farmer_1"] {
     background-position: 0% 0%;
 }
 
+#bbl_board[bbl_piece="farmer_2"] > div.bbl_playable:hover::after,
 [bbl_piece="farmer_2"] {
     background-position: 0% -100%;
 }
 
+#bbl_board[bbl_piece="farmer_3"] > div.bbl_playable:hover::after,
 [bbl_piece="farmer_3"] {
     background-position: 0% -200%;
 }
 
+#bbl_board[bbl_piece="farmer_4"] > div.bbl_playable:hover::after,
 [bbl_piece="farmer_4"] {
     background-position: 0% -300%;
 }
 
+#bbl_board[bbl_piece="merchant_1"] > div.bbl_playable:hover::after,
 [bbl_piece="merchant_1"] {
     background-position: -200% 0%;
 }
 
+#bbl_board[bbl_piece="merchant_2"] > div.bbl_playable:hover::after,
 [bbl_piece="merchant_2"] {
     background-position: -200% -100%;
 }
 
+#bbl_board[bbl_piece="merchant_3"] > div.bbl_playable:hover::after,
 [bbl_piece="merchant_3"] {
     background-position: -200% -200%;
 }
 
+#bbl_board[bbl_piece="merchant_4"] > div.bbl_playable:hover::after,
 [bbl_piece="merchant_4"] {
     background-position: -200% -300%;
 }
 
+#bbl_board[bbl_piece="servant_1"] > div.bbl_playable:hover::after,
 [bbl_piece="servant_1"] {
     background-position: -500% 0%;
 }
 
+#bbl_board[bbl_piece="servant_2"] > div.bbl_playable:hover::after,
 [bbl_piece="servant_2"] {
     background-position: -500% -100%;
 }
 
+#bbl_board[bbl_piece="servant_3"] > div.bbl_playable:hover::after,
 [bbl_piece="servant_3"] {
     background-position: -500% -200%;
 }
 
+#bbl_board[bbl_piece="servant_4"] > div.bbl_playable:hover::after,
 [bbl_piece="servant_4"] {
     background-position: -500% -300%;
 }
 
+#bbl_board[bbl_piece="priest_1"] > div.bbl_playable:hover::after,
 [bbl_piece="priest_1"] {
     background-position: -400% 0%;
 }
 
+#bbl_board[bbl_piece="priest_2"] > div.bbl_playable:hover::after,
 [bbl_piece="priest_2"] {
     background-position: -400% -100%;
 }
 
+#bbl_board[bbl_piece="priest_3"] > div.bbl_playable:hover::after,
 [bbl_piece="priest_3"] {
     background-position: -400% -200%;
 }
 
+#bbl_board[bbl_piece="priest_4"] > div.bbl_playable:hover::after,
 [bbl_piece="priest_4"] {
     background-position: -400% -300%;
 }
@@ -533,7 +559,7 @@ body {
  Styles for the hand.
 */
 
-#bbl_hand>div {
+#bbl_hand > div {
     position: relative; /* needed for highlight */
     aspect-ratio: var(--bbl-hex-ratio);
     height: calc(1.00*var(--bbl-hex-height));
@@ -555,7 +581,7 @@ body {
     background-position: center;
 }
 
-#bbl_hand>div.bbl_selected>div::before {
+#bbl_hand > div.bbl_selected > div::before {
     position: absolute;
     left: calc((var(--bbl-hex-width) - var(--bbl-hex-height)) / 2);
     top: 0;
@@ -584,12 +610,12 @@ body {
     grid-template-columns: 1fr;
 }
 
-#bbl_available_zcards.bbl_selecting>div:has(>div[bbl_ztype]) {
+#bbl_available_zcards.bbl_selecting > div:has(> div[bbl_ztype]) {
     cursor: pointer;
     border-color: #44dd4fcc;
 }
 
-#bbl_available_zcards>div {
+#bbl_available_zcards > div {
     display: inline-block;
     border: calc(var(--bbl-zcard-height)/24) solid transparent;
     width: auto;
@@ -603,7 +629,7 @@ body {
 */
 }
 
-#bbl_available_zcards.bbl_selecting>div:has(>div.bbl_selected) {
+#bbl_available_zcards.bbl_selecting > div:has(> div.bbl_selected) {
     border-color: yellow;
 }
 
@@ -619,7 +645,7 @@ body {
     grid-template-columns: repeat(3, 1.25fr) 3fr;
 }
 
-.player-board-game-specific-content>div {
+.player-board-game-specific-content > div {
     display: flex;
     flex: 1;
     align-items: center;
@@ -715,7 +741,7 @@ div.bbl_pb_zcards {
     min-height: 32px;
 }
 
-div.bbl_pb_zcards>div {
+div.bbl_pb_zcards > div {
     height: var(--bbl-label-height);
     border: 1px solid #888;
 }
@@ -872,7 +898,7 @@ div.bbl_pb_zcards>div {
     }
 }
 
-#bbl_board>div.bbl_highlighted::after {
+#bbl_board > div.bbl_highlighted::after {
     content: '';
     display: inline;
     position: absolute;

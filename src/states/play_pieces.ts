@@ -169,7 +169,7 @@ export class PlayPiecesState extends BabyloniaState {
     }
 
     private markHexesPlayableForPiece(pieceType: PieceType): void {
-        this.boardManager.markHexesPlayable(this.allowedMovesFor(pieceType));
+        this.boardManager.markHexesPlayable(pieceType, this.allowedMovesFor(pieceType));
     }
 
     private unmarkHexesPlayableForPiece(pieceType: PieceType): void {

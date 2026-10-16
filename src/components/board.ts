@@ -41,6 +41,7 @@ export class BoardManager extends BaseComponent<HexSelectionData> {
     private static readonly SCORED = 'bbl_scored';
     private static readonly SELECTABLE = 'bbl_selectable';
     private static readonly HIGHLIGHTED = 'bbl_highlighted';
+    private static readonly SELECTED_PIECE = 'bbl_piece';
 
     public setup(): HTMLElement {
         this.textFormatter.registerFormatter('hex', (args) => this.renderHexArg(args.hex));
@@ -228,11 +229,13 @@ export class BoardManager extends BaseComponent<HexSelectionData> {
         hexes.forEach((hex) => this.hexDiv(hex).classList.remove(BoardManager.SELECTABLE));
     }
 
-    public markHexesPlayable(hexes: number[]): void {
+    public markHexesPlayable(pieceType: PieceType, hexes: number[]): void {
+        this.boardDiv.setAttribute(BoardManager.SELECTED_PIECE, pieceType);
         hexes.forEach((hex) => this.markHexPlayable(hex));
     }
 
     public unmarkHexesPlayable(hexes: number[]): void {
+        this.boardDiv.removeAttribute(BoardManager.SELECTED_PIECE);
         hexes.forEach((hex) => this.unmarkHexPlayable(hex));
     }
 
