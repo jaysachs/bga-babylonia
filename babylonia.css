@@ -58,6 +58,8 @@ body {
     --bbl-zcard-height: calc(var(--bbl-board-height) / 8);
 
     --bbl-piece-shadow: calc(var(--bbl-hex-height)/35);
+
+    --bbl-playable-opacity: 0.66;
 }
 
 #bbl_main {
@@ -215,7 +217,7 @@ body {
 
 #bbl_board > div.bbl_playable:hover::after {
     content:'';
-    filter: opacity(50%);
+    filter: opacity(var(--bbl-playable-opacity));
 }
 
 #bbl_board > div.bbl_selected::after {
@@ -259,28 +261,28 @@ body {
 }
 
 #bbl_board[bbl_piece$="_1"] > div.bbl_playable:hover::after {
-    filter: drop-shadow(white 0 0 0.02em) drop-shadow(#59412b var(--bbl-piece-shadow) var(--bbl-piece-shadow)) opacity(50%);
+    filter: drop-shadow(white 0 0 0.02em) drop-shadow(#59412b var(--bbl-piece-shadow) var(--bbl-piece-shadow)) opacity(var(--bbl-playable-opacity));
 }
 [bbl_piece$="_1"] {
     filter: drop-shadow(white 0 0 0.02em) drop-shadow(#59412b var(--bbl-piece-shadow) var(--bbl-piece-shadow));
 }
 
 #bbl_board[bbl_piece$="_2"] > div.bbl_playable:hover::after {
-    filter: drop-shadow(black 0 0 0.02em) drop-shadow(#877810  var(--bbl-piece-shadow) var(--bbl-piece-shadow)) opacity(50%);
+    filter: drop-shadow(black 0 0 0.02em) drop-shadow(#877810  var(--bbl-piece-shadow) var(--bbl-piece-shadow)) opacity(var(--bbl-playable-opacity));
 }
 [bbl_piece$="_2"] {
     filter: drop-shadow(black 0 0 0.02em) drop-shadow(#877810  var(--bbl-piece-shadow) var(--bbl-piece-shadow));
 }
 
 #bbl_board[bbl_piece$="_3"] > div.bbl_playable:hover::after {
-    filter: drop-shadow(black 0 0 0.02em) drop-shadow(#772f0c var(--bbl-piece-shadow) var(--bbl-piece-shadow)) opacity(50%);
+    filter: drop-shadow(black 0 0 0.02em) drop-shadow(#772f0c var(--bbl-piece-shadow) var(--bbl-piece-shadow)) opacity(var(--bbl-playable-opacity));
 }
 [bbl_piece$="_3"] {
     filter: drop-shadow(black 0 0 0.02em) drop-shadow(#772f0c var(--bbl-piece-shadow) var(--bbl-piece-shadow));
 }
 
 #bbl_board[bbl_piece$="_4"] > div.bbl_playable:hover::after {
-    filter: drop-shadow(black 0 0 0.02em) drop-shadow(#777777 var(--bbl-piece-shadow) var(--bbl-piece-shadow)) opacity(50%);
+    filter: drop-shadow(black 0 0 0.02em) drop-shadow(#777777 var(--bbl-piece-shadow) var(--bbl-piece-shadow)) opacity(var(--bbl-playable-opacity));
 }
 [bbl_piece$="_4"] {
     filter: drop-shadow(black 0 0 0.02em) drop-shadow(#777777 var(--bbl-piece-shadow) var(--bbl-piece-shadow));
