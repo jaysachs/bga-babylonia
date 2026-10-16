@@ -184,6 +184,16 @@ body {
     cursor: pointer;
 }
 
+#bbl_board > div.bbl_playable::before {
+    position: absolute;
+    right: 25%;
+    bottom: 10%;
+    content: '\2726';
+    color: #f3f3a0c0;
+    font-size: calc(0.33 * var(--bbl-hex-height));
+    z-index: 5;
+}
+
 @keyframes playable {
     from {
         opacity: 0%;
@@ -194,30 +204,18 @@ body {
     30% {
         opacity: 100%;
     }
-    80% {
+    to {
         opacity: 100%;
     }
-    to {
-        opacity: 0%;
-    }
-}
-
-#bbl_board > div.bbl_playable::before {
-    position: absolute;
-    right: 25%;
-    bottom: 10%;
-    content: '\2726';
-    color: #f3f3a0c0;
-    font-size: calc(0.33 * var(--bbl-hex-height));
-     /*
-    animation: 3s infinite alternate playable;
-    animation-timing-function: linear;
-    */
 }
 
 #bbl_board > div.bbl_playable:hover::after {
     content:'';
+    position: absolute;
+    left: 0;
+    top: 0;
     filter: opacity(var(--bbl-playable-opacity));
+    animation: 0.5s playable;
 }
 
 #bbl_board > div.bbl_selected::after {
@@ -290,6 +288,9 @@ body {
 
 #bbl_board > div.bbl_playable:hover::after,
 [bbl_piece] {
+    position: absolute;
+    left: 0;
+    top: 0;
     aspect-ratio: var(--bbl-hex-ratio);
     background-image: var(--bbl-pieces-sprites);
     background-size: 600% 700%;
