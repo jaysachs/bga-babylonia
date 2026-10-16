@@ -150,7 +150,7 @@ export class BoardManager extends BaseComponent<HexSelectionData> {
         const col = Math.trunc(hex.rc % 100);
         const top = 100 * (BoardManager.vstart + row * BoardManager.vdelta / 2) / 2709.0;
         const left = 100 * (BoardManager.hstart + col * BoardManager.hdelta) / 3385.0;
-        return Html.div({ id: this.hexDivId(hex.rc), style: [`top:${top}%`, `left:${left}%`] });
+        return Html.div({ id: this.hexDivId(hex.rc), style: [`top:${top}%`, `left:${left}%`], attrs: { bbl_terrain: hex.terrain } });
     }
 
     private playersInPlayerNoOrder(): BblPlayer[] {
