@@ -16,7 +16,7 @@
     "default": 0
   },
   "130": {
-    "name": "Keep hand pieces sorted (may be bugs!)",
+    "name": "Automatically sort hand pieces",
     "needReload": true,
     "values": {
         "0": {
