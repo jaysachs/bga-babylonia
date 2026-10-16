@@ -164,6 +164,7 @@ body {
 /* Board contents */
 
 #bbl_board > div {
+    clip-path: polygon(0% 50%, 25% 94%, 75% 94%, 100% 50%, 75% 6%, 25% 6%);
     height: var(--bbl-hex-height);
     aspect-ratio: var(--bbl-hex-ratio);
     margin: 0;
