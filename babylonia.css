@@ -252,6 +252,7 @@ body {
     height: 32px;
 }
 
+#bbl_board > div.bbl_playable:hover::after,
 #bbl_board [bbl_piece] {
     position: absolute;
     left: 0;
@@ -288,9 +289,6 @@ body {
 
 #bbl_board > div.bbl_playable:hover::after,
 [bbl_piece] {
-    position: absolute;
-    left: 0;
-    top: 0;
     aspect-ratio: var(--bbl-hex-ratio);
     background-image: var(--bbl-pieces-sprites);
     background-size: 600% 700%;
