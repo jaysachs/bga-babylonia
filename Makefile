@@ -22,10 +22,10 @@ $(TS_STUBS): bga-framework.d.ts
 build: $(JS) $(STATS) sprites
 
 test: build
-	phpunit --bootstrap misc/autoload.php misc --testdox
+	phpunit --bootstrap tests/autoload.php tests/php --testdox
 
 phpstan: build
-	phpstan --autoload-file=_ide_helper.php --level=$(PHPSTAN_LEVEL) --memory-limit=1G analyse modules/php modules/php/Utils modules/php/Model modules/php/States misc/test/php
+	phpstan --autoload-file=_ide_helper.php --level=$(PHPSTAN_LEVEL) --memory-limit=1G analyse modules/php modules/php/Utils modules/php/Model modules/php/States tests/php
 
 deploy: test
 	lftp -e 'cd $(GAME); mirror -e -R --exclude .vscode/ --exclude .git/ --exclude local/ --exclude bga-framework.d.ts --exclude package.lock --exclude .phpunit* --exclude node_modules*/ --exclude _ide_helper.php; exit' $(SFTP)
