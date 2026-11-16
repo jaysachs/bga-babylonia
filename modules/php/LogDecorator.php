@@ -33,8 +33,8 @@ class LogDecorator {
     public function __construct(private \Closure $nameMapper) {}
 
     /**
-     * @param array<string,string|int|list<string>> $args
-     * @return array<string,string|int|list<string>>
+     * @param array<mixed> $args
+     * @return array<mixed>
      */
 	public function playerNames(string $message, array $args): array {
         foreach (["", "1", "2", "3", "4", "5"] as $suffix) {
@@ -42,7 +42,9 @@ class LogDecorator {
             $pnm = "player_name{$suffix}";
             if (isset($args[$pid])) {
                 if (!isset($args[$pnm]) && str_contains($message, "\${{$pnm}}")) {
-                    $args[$pnm] = ($this->nameMapper)(intval($args[$pid]));
+                    /** @var int|string|null */
+                    $pidval = $args[$pid];
+                    $args[$pnm] = ($this->nameMapper)(intval($pidval));
                     if (!isset($args['i18n'])) {
                         $args['i18n'] = [];
                     }
