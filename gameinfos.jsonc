@@ -13,12 +13,16 @@
 
     // Game publisher (use empty string if there is no publisher)
     "publisher": "Knizia Games",
+    // "publisher": "Ludonova",
 
     // Url of game publisher website
     "publisher_website": "http://knizia.de/",
+    // "publisher_website": "http://ludonova.com",
 
     // Board Game Geek ID of the publisher
-    "publisher_bgg_id": 0,
+    "publisher_bgg_id": 772,
+    // ludonova:
+    // "publisher_bgg_id": 16826,
 
     // Board game geek ID of the game
     "bgg_id": 266164,
