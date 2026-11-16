@@ -28,7 +28,7 @@ phpstan: build
 	phpstan --autoload-file=_ide_helper.php --level=$(PHPSTAN_LEVEL) --memory-limit=1G analyse modules/php modules/php/Utils modules/php/Model modules/php/States tests/php
 
 deploy: test
-	lftp -e 'cd $(GAME); mirror -e -R --exclude .vscode/ --exclude .git/ --exclude local/ --exclude bga-framework.d.ts --exclude package.lock --exclude .phpunit* --exclude node_modules*/ --exclude _ide_helper.php; exit' $(SFTP)
+	lftp -e 'cd $(GAME); mirror -e -R --exclude .vscode/ --exclude .git/ --exclude local/ --exclude Makefile --exclude misc/ --exclude bga-framework.d.ts --exclude package.lock --exclude .phpunit* --exclude node_modules*/ --exclude _ide_helper.php; exit' $(SFTP)
 
 quick-deploy: test
 	lftp -e 'cd $(GAME); put -O modules/js modules/js/Game.js; put babylonia.css; exit' $(SFTP)
