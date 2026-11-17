@@ -55,6 +55,7 @@ body {
     --bbl-hex-width: calc(var(--bbl-hex-ratio) * var(--bbl-hex-height));
 
     --bbl-zcard-aspect-ratio: calc(330/530);
+    --bbl-zcard-width: calc(var(--bbl-board-height) / 8 * var(--bbl-zcard-aspect-ratio));
     --bbl-zcard-height: calc(var(--bbl-board-height) / 8);
 
     --bbl-piece-shadow: calc(var(--bbl-hex-height)/35);
@@ -483,8 +484,6 @@ body {
 [bbl_ztype] {
     background-size: 900% 100%;
     background-image: var(--bbl-zcards-sprites);
-/*    background-repeat: no-repeat; */
-/*    background-size: contain; */
     height: var(--bbl-zcard-height);
     width: auto;
     aspect-ratio: var(--bbl-zcard-aspect-ratio);
@@ -591,6 +590,7 @@ body {
     display: grid;
     align-content: space-evenly;
     height: 100%;
+    width: var(--bbl-zcard-width);
     grid-template-columns: 1fr;
 }
 
@@ -601,16 +601,11 @@ body {
 
 #bbl_available_zcards > div {
     display: inline-block;
-    border: calc(var(--bbl-zcard-height)/24) solid transparent;
+    border: calc(var(--bbl-zcard-height)/48) solid transparent;
     width: auto;
     aspect-ratio: var(--bbl-zcard-aspect-ratio);
     background-clip: content-box;
     background-color: #ffffff60;
-    /*
-    border-style: dashed;
-    border-width: 1px;
-    border-color: transparent;
-*/
 }
 
 #bbl_available_zcards.bbl_selecting > div:has(> div.bbl_selected) {
