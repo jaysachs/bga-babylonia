@@ -21,9 +21,9 @@
 
     // Board Game Geek ID of the publisher
     // self-published
-    "publisher_bgg_id": 4,
+    // "publisher_bgg_id": 4,
     // looking for publisher
-    // "publisher_bgg_id": 772,
+    "publisher_bgg_id": 772,
     // ludonova
     // "publisher_bgg_id": 16826,
 
