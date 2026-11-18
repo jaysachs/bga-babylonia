@@ -140,7 +140,10 @@ body {
     border-radius: var(--bbl-hex-width);
     padding: calc(0.15 * var(--bbl-hex-width));
     width: var(--bbl-hex-width);
-    background: var(--bbl-hand-bg);
+    background:
+        linear-gradient(0deg, #6664, #6665, #6664),
+        var(--bbl-hand-bg);
+    filter: drop-shadow(black 0 0 0.02em) drop-shadow(#877810  var(--bbl-piece-shadow) var(--bbl-piece-shadow));
 }
 
 #bbl_rightpadding {
