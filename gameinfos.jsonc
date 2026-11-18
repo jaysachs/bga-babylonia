@@ -20,8 +20,11 @@
     // "publisher_website": "http://ludonova.com",
 
     // Board Game Geek ID of the publisher
-    "publisher_bgg_id": 772,
-    // ludonova:
+    // self-published
+    "publisher_bgg_id": 4,
+    // looking for publisher
+    // "publisher_bgg_id": 772,
+    // ludonova
     // "publisher_bgg_id": 16826,
 
     // Board game geek ID of the game
