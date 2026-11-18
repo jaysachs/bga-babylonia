@@ -15,11 +15,8 @@
 
 body {
     background:
-       linear-gradient(60deg, #6af3, #6af5, #6af7, #6af5, #6af3)
-        ,
-        conic-gradient(#9ac5a633,#9ac5a644,#9ac5a655,#9ac5a644,#9ac5a633)
-        ,
-        url(img/bback.jpg)
+        linear-gradient(55deg, #6669, #6665, #6667),
+        url(img/Cloud-bkgd.png)
     ;
 
     background-attachment: fixed;
@@ -44,7 +41,7 @@ body {
     --bbl-board-width: 100vw;
 
     --bbl-board-height: calc(var(--bbl-board-width) / var(--bbl-map-aspect-ratio));
-    --bbl-hand-bg: url(../../../img/layout/back-main.jpg);
+    --bbl-hand-bg: url(img/handbg.png);
 
     /*
       the denominator here works for height. but somehow width gets
